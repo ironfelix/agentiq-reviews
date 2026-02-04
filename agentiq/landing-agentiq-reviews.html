@@ -440,6 +440,85 @@
     line-height: 1.5;
   }
 
+  /* Динамика */
+  .dynamics {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #8a9bb0;
+  }
+
+  .dynamics-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .dynamics-badge.growing {
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.15);
+  }
+
+  /* Почему это важно */
+  .why-important {
+    margin: 8px 20px 0;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+  }
+
+  .why-important-label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #5c7080;
+    margin-bottom: 6px;
+  }
+
+  .why-important-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .why-important-list li {
+    font-size: 11px;
+    color: #a8bcc8;
+    padding: 1px 0;
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .why-important-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #5c7080;
+  }
+
+  /* Решение как агент */
+  .decision-reasoning {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+  }
+
+  .decision-reasoning .highlight {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* Черновик */
+  .reply-label .draft-hint {
+    font-weight: 400;
+    color: #5c7080;
+  }
+
   @media (max-width: 900px) {
     .comparison-grid {
       grid-template-columns: 1fr;
@@ -661,20 +740,30 @@
       <div class="signal">
         <span class="signal-badge warning">↑ растёт</span>
         <h5>Запах кожи — 8 упоминаний</h5>
-        <p>Появилась причина 12 дней назад. За последнюю неделю — 5 новых отзывов.</p>
+        <p>Появилась 12 дней назад. За неделю — 5 новых.</p>
+        <div class="dynamics">
+          <span class="dynamics-badge growing">↑ ускоряется</span>
+        </div>
         <div class="agent-note">↳ Это начало роста — не разовый случай.</div>
+      </div>
+      <div class="why-important">
+        <div class="why-important-label">Почему важно</div>
+        <ul class="why-important-list">
+          <li>8 упоминаний за 12 дней</li>
+          <li>5 из них — за последнюю неделю</li>
+        </ul>
       </div>
       <div class="decision">
         <div class="decision-label act">→ Решение</div>
-        <p>Проверить партию. Обновить описание товара.</p>
+        <p class="decision-reasoning">Вероятно, проблема в партии. Стоит <span class="highlight">проверить поставку</span> и добавить в описание пометку о запахе.</p>
       </div>
       <div class="reply-block">
-        <div class="reply-label">Ответ · для всех 8</div>
-        <p class="reply-text">«Запах кожи проходит за 2–3 дня носки — это нормально.»</p>
+        <div class="reply-label">Черновик <span class="draft-hint">· можно изменить</span></div>
+        <p class="reply-text">«Запах кожи проходит за 2–3 дня — это нормально для натурального материала.»</p>
       </div>
     </div>
 
-    <!-- Card 2: стабильная проблема → можно пропустить -->
+    <!-- Card 2: всё хорошо → ответы -->
     <div class="comp-card">
       <div class="comp-header">
         <h4>Детский рюкзак Динозавр</h4>
@@ -733,7 +822,7 @@
       <div class="signal">
         <span class="signal-badge info">→ не весь товар</span>
         <h5>Крышка протекает — 11 раз</h5>
-        <p>Все жалобы — про цвет Silver и Gold. Из них 7 без ответа.</p>
+        <p>Все жалобы — про Silver и Gold. 7 без ответа.</p>
         <div class="variant-summary">
           <span class="vs-item problem">Silver 4.1</span>
           <span class="vs-sep">·</span>
@@ -743,13 +832,20 @@
         </div>
         <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
       </div>
+      <div class="why-important">
+        <div class="why-important-label">Почему важно</div>
+        <ul class="why-important-list">
+          <li>64% негатива — Silver и Gold</li>
+          <li>7 отзывов без ответа</li>
+        </ul>
+      </div>
       <div class="decision reply">
         <div class="decision-label reply">→ Решение</div>
-        <p>Проверить партии Silver и Gold.</p>
+        <p class="decision-reasoning">Вероятно, проблема в партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Остальные варианты не трогать.</p>
       </div>
       <div class="reply-block">
-        <div class="reply-label">Ответ · для всех 7</div>
-        <p class="reply-text">«Благодарим за отзыв. Информируем — проверяем этот вариант.»</p>
+        <div class="reply-label">Черновик <span class="draft-hint">· можно изменить</span></div>
+        <p class="reply-text">«Благодарим за отзыв. Проверяем эту партию — свяжемся, если подтвердится.»</p>
       </div>
     </div>
 
