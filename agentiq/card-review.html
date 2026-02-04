@@ -427,12 +427,6 @@
     font-size: 13px;
     font-weight: 600;
     color: #f06543;
-    margin-bottom: 4px;
-  }
-
-  .verdict-timeframe {
-    font-size: 12px;
-    color: #8a9bb0;
   }
 
   /* Опорные ожидания — что покупатели ценят */
@@ -507,38 +501,6 @@
     position: absolute;
     left: 0;
     color: #5c7080;
-  }
-
-  /* Динамика */
-  .dynamics {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    font-size: 11px;
-    color: #8a9bb0;
-  }
-
-  .dynamics-badge {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 3px;
-  }
-
-  .dynamics-badge.growing {
-    color: #f06543;
-    background: rgba(240, 101, 67, 0.15);
-  }
-
-  .dynamics-badge.stable {
-    color: #7db8e8;
-    background: rgba(125, 184, 232, 0.15);
-  }
-
-  .dynamics-badge.fading {
-    color: #4caf7a;
-    background: rgba(76, 175, 122, 0.15);
   }
 
   /* Решение как агент — рассуждение */
@@ -684,13 +646,9 @@
     </div>
 
     <div class="signal">
-      <span class="signal-badge">→ не весь товар</span>
+      <span class="signal-badge">⚠ не весь товар</span>
       <h5>Крышка протекает — 11 раз</h5>
-      <p>Появилась 8 дней назад. Все жалобы — про цвет Silver и Gold.</p>
-      <div class="dynamics">
-        <span class="dynamics-badge growing">↑ растёт</span>
-        <span>появилось 8 дней назад · динамика растущая</span>
-      </div>
+      <p>Только Silver и Gold. Появилось 8 дней назад, растёт.</p>
 
       <!-- Сравнение вариантов -->
       <div class="variant-compare">
@@ -769,33 +727,29 @@
         </div>
       </div>
 
-      <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
     </div>
 
-    <!-- Почему это важно — рассуждение агента -->
+    <!-- Почему это важно — только логика, не цифры -->
     <div class="why-important">
-      <div class="why-important-label">Почему это важно</div>
+      <div class="why-important-label">Почему важно</div>
       <ul class="why-important-list">
-        <li>11 упоминаний за 8 дней</li>
-        <li>64% отзывов по Silver / Gold</li>
-        <li>7 отзывов без ответа</li>
-        <li>«не протекает» — ключевое ожидание покупателей</li>
+        <li>Проблема локализована — остальные варианты чисты</li>
+        <li>«Не протекает» — ключевое ожидание покупателей</li>
       </ul>
     </div>
 
-    <!-- Вердикт агента — статус и таймфрейм -->
+    <!-- Вердикт агента — один статус -->
     <div class="agent-verdict">
-      <div class="verdict-status">Статус: начало проблемы</div>
-      <div class="verdict-timeframe">Требует действий в ближайшие 5–7 дней</div>
+      <div class="verdict-status">⚠ Начало проблемы · действовать в 5–7 дней</div>
     </div>
 
     <div class="decision">
       <div class="decision-label">→ Решение</div>
-      <p class="decision-reasoning">Вероятнее всего проблема в партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Логично проверить их отдельно, не трогая остальные варианты.</p>
+      <p class="decision-reasoning">Проверить партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Остальные не трогать.</p>
     </div>
     <div class="reply-block">
-      <div class="reply-label">Черновик ответа <span class="draft-hint">· можно отредактировать</span></div>
-      <p class="reply-text">«Благодарим за отзыв. Мы проверяем эту партию — если подтвердится проблема, свяжемся с вами.»</p>
+      <div class="reply-label">Черновик ответа <span class="draft-hint">· можно изменить</span></div>
+      <p class="reply-text">«Благодарим за отзыв. Проверяем эту партию — свяжемся, если подтвердится.»</p>
     </div>
   </div>
 
