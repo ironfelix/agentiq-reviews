@@ -440,28 +440,6 @@
     line-height: 1.5;
   }
 
-  /* Динамика */
-  .dynamics {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    font-size: 11px;
-    color: #8a9bb0;
-  }
-
-  .dynamics-badge {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 3px;
-  }
-
-  .dynamics-badge.growing {
-    color: #f06543;
-    background: rgba(240, 101, 67, 0.15);
-  }
-
   /* Почему это важно */
   .why-important {
     margin: 8px 20px 0;
@@ -738,27 +716,22 @@
         </div>
       </div>
       <div class="signal">
-        <span class="signal-badge warning">↑ растёт</span>
+        <span class="signal-badge warning">⚠ растущий паттерн</span>
         <h5>Запах кожи — 8 упоминаний</h5>
-        <p>Появилась 12 дней назад. За неделю — 5 новых.</p>
-        <div class="dynamics">
-          <span class="dynamics-badge growing">↑ ускоряется</span>
-        </div>
-        <div class="agent-note">↳ Это начало роста — не разовый случай.</div>
+        <p>Появился 12 дней назад, ускоряется. 5 новых за неделю.</p>
       </div>
       <div class="why-important">
         <div class="why-important-label">Почему важно</div>
         <ul class="why-important-list">
-          <li>8 упоминаний за 12 дней</li>
-          <li>5 из них — за последнюю неделю</li>
+          <li>Большинство жалоб — после последней поставки</li>
         </ul>
       </div>
       <div class="decision">
         <div class="decision-label act">→ Решение</div>
-        <p class="decision-reasoning">Вероятно, проблема в партии. Стоит <span class="highlight">проверить поставку</span> и добавить в описание пометку о запахе.</p>
+        <p class="decision-reasoning">Стоит <span class="highlight">проверить поставку</span> и добавить в описание пометку о запахе.</p>
       </div>
       <div class="reply-block">
-        <div class="reply-label">Черновик <span class="draft-hint">· можно изменить</span></div>
+        <div class="reply-label">Черновик ответа <span class="draft-hint">· можно изменить</span></div>
         <p class="reply-text">«Запах кожи проходит за 2–3 дня — это нормально для натурального материала.»</p>
       </div>
     </div>
@@ -786,16 +759,15 @@
       <div class="signal">
         <span class="signal-badge stable">✓ всё хорошо</span>
         <h5>12 новых отзывов за неделю</h5>
-        <p>Средняя оценка 4.8. Проблемных паттернов нет.</p>
-        <div class="agent-note">↳ Действие не требуется — товар в норме.</div>
+        <p>Средняя оценка 4.8. Жалоб нет.</p>
       </div>
       <div class="decision safe">
         <div class="decision-label skip">→ Ответы</div>
-        <p>Сгенерированы для 12 отзывов. Каждый — персональный.</p>
+        <p>Готовы 12 персональных ответов.</p>
       </div>
       <div class="reply-block">
-        <div class="reply-label">Пример · 1 из 12</div>
-        <p class="reply-text">«Спасибо, что выбрали рюкзак для вашего Миши! Рады, что динозавр пришёлся по душе 🦕»</p>
+        <div class="reply-label">Пример <span class="draft-hint">· 1 из 12</span></div>
+        <p class="reply-text">«Спасибо, что выбрали рюкзак для Миши! Рады, что динозавр понравился 🦕»</p>
       </div>
     </div>
 
@@ -820,9 +792,9 @@
         </div>
       </div>
       <div class="signal">
-        <span class="signal-badge info">→ не весь товар</span>
+        <span class="signal-badge info">⚠ не весь товар</span>
         <h5>Крышка протекает — 11 раз</h5>
-        <p>Все жалобы — про Silver и Gold. 7 без ответа.</p>
+        <p>Только Silver и Gold. Остальные варианты чисты.</p>
         <div class="variant-summary">
           <span class="vs-item problem">Silver 4.1</span>
           <span class="vs-sep">·</span>
@@ -830,21 +802,19 @@
           <span class="vs-sep">·</span>
           <span class="vs-item ok">остальные 4.7</span>
         </div>
-        <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
       </div>
       <div class="why-important">
         <div class="why-important-label">Почему важно</div>
         <ul class="why-important-list">
-          <li>64% негатива — Silver и Gold</li>
-          <li>7 отзывов без ответа</li>
+          <li>Проблема локализована — можно не трогать остальные</li>
         </ul>
       </div>
       <div class="decision reply">
         <div class="decision-label reply">→ Решение</div>
-        <p class="decision-reasoning">Вероятно, проблема в партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Остальные варианты не трогать.</p>
+        <p class="decision-reasoning">Проверить партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>.</p>
       </div>
       <div class="reply-block">
-        <div class="reply-label">Черновик <span class="draft-hint">· можно изменить</span></div>
+        <div class="reply-label">Черновик ответа <span class="draft-hint">· можно изменить</span></div>
         <p class="reply-text">«Благодарим за отзыв. Проверяем эту партию — свяжемся, если подтвердится.»</p>
       </div>
     </div>
