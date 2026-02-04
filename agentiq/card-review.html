@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Preview — Было / Стало</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  /* Лейаут: две карточки + стрелка */
+  .cards-container {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .arrow-col {
+    align-self: center;
+    font-size: 30px;
+    color: #4caf7a;
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Stato badge: Было / Стало */
+  .state-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .state-badge.before {
+    color: #5c7080;
+    background: rgba(92, 112, 128, 0.2);
+  }
+
+  .state-badge.after {
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  /* Header */
+  .comp-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .comp-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .comp-header .comp-meta {
+    font-size: 12px;
+    color: #8a9bb0;
+  }
+
+  /* Stats */
+  .comp-stats {
+    display: flex;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .comp-stat { flex: 1; text-align: center; }
+
+  .comp-stat .stat-val {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .comp-stat .stat-val.pending { color: #f06543; }
+
+  .comp-stat .stat-label {
+    font-size: 11px;
+    color: #8a9bb0;
+    margin-top: 3px;
+  }
+
+  /* ============================================
+     БЫЛО: просто список отзывов, без анализа
+     ============================================ */
+  .reviews-plain {
+    padding: 16px 20px 18px;
+  }
+
+  .reviews-plain-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #5c7080;
+    margin-bottom: 10px;
+  }
+
+  .review-plain {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .review-plain:last-child { border-bottom: none; }
+
+  .review-plain-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .review-plain-stars {
+    font-size: 11px;
+    color: #5c7080; /* серые звёзды — цветового анализа нет */
+    letter-spacing: 1px;
+  }
+
+  .review-plain-time {
+    font-size: 11px;
+    color: #5c7080;
+    margin-left: auto;
+  }
+
+  .review-plain-text {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.45;
+  }
+
+  .reviews-plain-more {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #4a5a68;
+    font-style: italic;
+  }
+
+  /* ============================================
+     СТАЛО: сигнал + анализ + решение
+     ============================================ */
+  .signal {
+    padding: 16px 20px 14px;
+  }
+
+  .signal-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    color: #7db8e8;
+    background: rgba(125, 184, 232, 0.12);
+  }
+
+  .signal h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .signal > p {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Сравнение вариантов */
+  .variant-compare { margin: 14px 0 0; }
+
+  .variant-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+
+  .variant-row:last-child { margin-bottom: 0; }
+
+  .variant-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #c8d6e0;
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  .variant-name.problem { color: #f06543; font-weight: 600; }
+
+  .variant-row.others .variant-name { color: #5c7080; font-size: 12px; }
+  .variant-row.others .variant-bar  { background: rgba(255,255,255,0.18); }
+
+  .variant-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .variant-bar { height: 100%; border-radius: 3px; }
+  .variant-bar.problem { background: #f06543; }
+
+  .variant-rating {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .variant-rating.rating-high { color: #4caf7a; } /* ≥ 4.5 */
+  .variant-rating.rating-low  { color: #f06543; } /* < 4.2 */
+
+  /* Без ответа по причине */
+  .issue-pending {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 12px;
+    color: #8a9bb0;
+  }
+
+  .issue-pending .pending-num {
+    color: #f06543;
+    font-weight: 600;
+  }
+
+  /* Цитаты (сгруппированные по причине) */
+  .reviews {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .reviews-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #5c7080;
+    margin-bottom: 8px;
+  }
+
+  .review-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .review-item:last-child { margin-bottom: 0; }
+
+  .review-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #5c7080;
+  }
+
+  .review-body { flex: 1; min-width: 0; }
+
+  .review-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .review-stars {
+    color: #f06543;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .review-variant-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.12);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .review-time {
+    font-size: 11px;
+    color: #5c7080;
+  }
+
+  .review-text {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.45;
+  }
+
+  .variant-count {
+    font-size: 11px;
+    color: #5c7080;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .review-unanswered {
+    font-size: 10px;
+    font-weight: 600;
+    color: #f06543;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* Decision */
+  .decision {
+    margin: 8px 20px 8px;
+    background: rgba(125, 184, 232, 0.08);
+    border: 1px solid rgba(125, 184, 232, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .decision-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #7db8e8;
+    margin-bottom: 6px;
+  }
+
+  .decision p {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .decision:last-child { margin-bottom: 20px; }
+
+  /* Ответ покупателю */
+  .reply-block {
+    margin: 4px 20px 20px 32px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(255,255,255,0.12);
+    border-radius: 0;
+    padding: 6px 12px 8px;
+  }
+
+  .reply-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #5c7080;
+    margin-bottom: 4px;
+  }
+
+  .reply-text {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Позиция агента — суждение, не данные */
+  .agent-note {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #a8bcc8;
+    line-height: 1.5;
+  }
+
+  /* Responsive: стек на узких экранах */
+  @media (max-width: 1020px) {
+    .cards-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    .arrow-col {
+      align-self: auto;
+      transform: rotate(90deg);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="cards-container">
+
+  <!-- ======== БЫЛО: товар без анализа ======== -->
+  <div class="card">
+    <div class="comp-header">
+      <span class="state-badge before">Было</span>
+      <h4>Термос 1L нерж. сталь</h4>
+      <span class="comp-meta">Wildberries · артикул 519340</span>
+    </div>
+
+    <div class="comp-stats">
+      <div class="comp-stat">
+        <div class="stat-val">203</div>
+        <div class="stat-label">отзыва</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val">4.3</div>
+        <div class="stat-label">рейтинг</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val">120</div><!-- белый — проблему ещё не видно -->
+        <div class="stat-label">без ответа</div>
+      </div>
+    </div>
+
+    <!-- Просто хронологический список, без группировки -->
+    <div class="reviews-plain">
+      <div class="reviews-plain-label">Последние отзывы</div>
+
+      <div class="review-plain">
+        <div class="review-plain-meta">
+          <span class="review-plain-stars">★★★★★</span>
+          <span class="review-plain-time">4 дня назад</span>
+        </div>
+        <div class="review-plain-text">Отличный термос! Держит тепло как надо. Синий цвет красивый.</div>
+      </div>
+
+      <div class="review-plain">
+        <div class="review-plain-meta">
+          <span class="review-plain-stars">★★★★☆</span>
+          <span class="review-plain-time">3 дня назад</span>
+        </div>
+        <div class="review-plain-text">Термос хороший, но крышка через неделю начала подтекать. Попытался затянуть — не помогло.</div>
+      </div>
+
+      <div class="review-plain">
+        <div class="review-plain-meta">
+          <span class="review-plain-stars">★★★★★</span>
+          <span class="review-plain-time">5 дней назад</span>
+        </div>
+        <div class="review-plain-text">Понравилось, буду рекомендовать другим покупателям.</div>
+      </div>
+
+      <div class="review-plain">
+        <div class="review-plain-meta">
+          <span class="review-plain-stars">★★★☆☆</span>
+          <span class="review-plain-time">5 дней назад</span>
+        </div>
+        <div class="review-plain-text">Купил серебряный. Уже на второй день из крышки капает. Вернуть хочу но не знаю как.</div>
+      </div>
+
+      <div class="review-plain">
+        <div class="review-plain-meta">
+          <span class="review-plain-stars">★★☆☆☆</span>
+          <span class="review-plain-time">6 дней назад</span>
+        </div>
+        <div class="review-plain-text">Золотистый термос — крышка протекает с первого дня. Разочарован.</div>
+      </div>
+
+      <div class="reviews-plain-more">... и ещё 117 отзывов</div>
+    </div>
+  </div>
+
+  <!-- Стрелка -->
+  <div class="arrow-col">→</div>
+
+  <!-- ======== СТАЛО: товар с анализом AgentIQ ======== -->
+  <div class="card">
+    <div class="comp-header">
+      <span class="state-badge after">Стало</span>
+      <h4>Термос 1L нерж. сталь</h4>
+      <span class="comp-meta">Wildberries · артикул 519340</span>
+    </div>
+
+    <div class="comp-stats">
+      <div class="comp-stat">
+        <div class="stat-val">203</div>
+        <div class="stat-label">отзыва</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val">4.3</div>
+        <div class="stat-label">рейтинг</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val">120</div>
+        <div class="stat-label">без ответа</div>
+      </div>
+    </div>
+
+    <div class="signal">
+      <span class="signal-badge">→ не весь товар</span>
+      <h5>Крышка протекает — 11 раз</h5>
+      <p>Появилась 8 дней назад. Все жалобы — про цвет Silver и Gold.</p>
+
+      <!-- Сравнение вариантов -->
+      <div class="variant-compare">
+        <div class="variant-row">
+          <span class="variant-name problem">Silver</span>
+          <div class="variant-bar-wrap">
+            <div class="variant-bar problem" style="width: 82%"></div>
+          </div>
+          <span class="variant-rating rating-low">4.1</span>
+          <span class="variant-count">28</span>
+        </div>
+        <div class="variant-row">
+          <span class="variant-name problem">Gold</span>
+          <div class="variant-bar-wrap">
+            <div class="variant-bar problem" style="width: 78%"></div>
+          </div>
+          <span class="variant-rating rating-low">3.9</span>
+          <span class="variant-count">19</span>
+        </div>
+        <div class="variant-row others">
+          <span class="variant-name">Остальные · 16</span>
+          <div class="variant-bar-wrap">
+            <div class="variant-bar" style="width: 91%"></div>
+          </div>
+          <span class="variant-rating rating-high">4.7</span>
+          <span class="variant-count">156</span>
+        </div>
+      </div>
+
+      <!-- Без ответа: из 11 упоминаний -->
+      <div class="issue-pending">
+        из них <span class="pending-num">7</span> без ответа
+      </div>
+
+      <!-- Только те отзывы, что попали в сигнал -->
+      <div class="reviews">
+        <div class="reviews-label">Из отзывов</div>
+
+        <div class="review-item">
+          <div class="review-avatar">А</div>
+          <div class="review-body">
+            <div class="review-meta">
+              <span class="review-stars">★★★★☆</span>
+              <span class="review-variant-tag">Silver</span>
+              <span class="review-time">3 дня назад</span>
+              <span class="review-unanswered">без ответа</span>
+            </div>
+            <div class="review-text">Термос хороший, но крышка через неделю начала подтекать. Попытался затянуть — не помогло.</div>
+          </div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-avatar">М</div>
+          <div class="review-body">
+            <div class="review-meta">
+              <span class="review-stars">★★★☆☆</span>
+              <span class="review-variant-tag">Silver</span>
+              <span class="review-time">5 дней назад</span>
+              <span class="review-unanswered">без ответа</span>
+            </div>
+            <div class="review-text">Купил серебряный. Уже на второй день из крышки капает. Вернуть хочу но не знаю как.</div>
+          </div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-avatar">К</div>
+          <div class="review-body">
+            <div class="review-meta">
+              <span class="review-stars">★★☆☆☆</span>
+              <span class="review-variant-tag">Gold</span>
+              <span class="review-time">6 дней назад</span>
+              <span class="review-unanswered">без ответа</span>
+            </div>
+            <div class="review-text">Золотистый термос — крышка протекает с первого дня. Разочарован.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
+    </div>
+
+    <div class="decision">
+      <div class="decision-label">→ Решение</div>
+      <p>Проверить партию Silver и Gold.</p>
+    </div>
+    <div class="reply-block">
+      <div class="reply-label">Ответ · для всех 7</div>
+      <p class="reply-text">«Благодарим за отзыв. Информируем — проверяем этот вариант.»</p>
+    </div>
+  </div>
+
+</div><!-- /cards-container -->
+
+</body>
+</html>

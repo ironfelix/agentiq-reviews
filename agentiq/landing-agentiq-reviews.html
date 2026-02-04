@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentIQ Reviews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: #f06543;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .nav-link {
+    color: #8a9bb0;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover {
+    color: #fff;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    display: inline-block;
+    background: #f06543;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover {
+    background: #d9533f;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: transparent;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 120px 24px 100px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    color: #fff;
+    margin-bottom: 24px;
+  }
+
+  .hero p {
+    font-size: 19px;
+    color: #8a9bb0;
+    line-height: 1.55;
+    max-width: 520px;
+    margin: 0 auto 44px;
+  }
+
+  .hero-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* Section label */
+  .section-label {
+    text-align: center;
+    padding: 0 24px 48px;
+  }
+
+  .section-label h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #f06543;
+    margin-bottom: 12px;
+  }
+
+  .section-label p {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  /* Features grid */
+  .features {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 48px 100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .feature-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 36px 32px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .feature-card.coming-soon {
+    opacity: 0.6;
+  }
+
+  .feature-num {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f06543;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+
+  .feature-card h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -0.2px;
+  }
+
+  .feature-card p {
+    font-size: 15px;
+    color: #8a9bb0;
+    line-height: 1.6;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a9bb0;
+    background: rgba(255,255,255,0.07);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  /* Comparison */
+  .comparison {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 48px 100px;
+  }
+
+  .comparison-label {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .comparison-label h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #f06543;
+    margin-bottom: 12px;
+  }
+
+  .comparison-label p {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .comp-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comp-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .comp-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .comp-header .comp-meta {
+    font-size: 12px;
+    color: #8a9bb0;
+  }
+
+  /* Stats row */
+  .comp-stats {
+    display: flex;
+    padding: 14px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .comp-stat {
+    flex: 1;
+    text-align: center;
+  }
+
+  .comp-stat .stat-val {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .comp-stat .stat-val.pending { color: #f06543; }
+  .comp-stat .stat-val.ok { color: #4caf7a; }
+
+  .comp-stat .stat-label {
+    font-size: 11px;
+    color: #8a9bb0;
+    margin-top: 3px;
+  }
+
+  /* Signal — что обнаружил AgentIQ */
+  .signal {
+    padding: 16px 20px 10px;
+    flex: 1;
+  }
+
+  .signal-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .signal-badge.warning {
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.15);
+  }
+
+  .signal-badge.stable {
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  .signal-badge.info {
+    color: #7db8e8;
+    background: rgba(125, 184, 232, 0.12);
+  }
+
+  .signal h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .signal p {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .variant-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .vs-item { font-size: 12px; font-weight: 600; color: #8a9bb0; }
+  .vs-item.problem { color: #f06543; }
+  .vs-item.ok { color: #4caf7a; }
+  .vs-sep { font-size: 12px; color: #3a4a5a; }
+
+  /* Decision — решение (main value prop) */
+  .decision {
+    margin: 8px 20px 8px;
+    background: rgba(240, 101, 67, 0.08);
+    border: 1px solid rgba(240, 101, 67, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .decision.safe {
+    background: rgba(76, 175, 122, 0.08);
+    border-color: rgba(76, 175, 122, 0.2);
+  }
+
+  .decision.reply {
+    background: rgba(125, 184, 232, 0.08);
+    border-color: rgba(125, 184, 232, 0.2);
+  }
+
+  .decision-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .decision-label.act { color: #f06543; }
+  .decision-label.skip { color: #4caf7a; }
+  .decision-label.reply { color: #7db8e8; }
+
+  .decision p {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .decision:last-child { margin-bottom: 20px; }
+
+  /* Ответ покупателю */
+  .reply-block {
+    margin: 4px 20px 20px 32px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(255,255,255,0.12);
+    border-radius: 0;
+    padding: 6px 12px 8px;
+  }
+
+  .reply-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #5c7080;
+    margin-bottom: 4px;
+  }
+
+  .reply-text {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .agent-note {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #a8bcc8;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 900px) {
+    .comparison-grid {
+      grid-template-columns: 1fr;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .comparison {
+      padding: 0 24px 60px;
+    }
+  }
+
+  /* Final CTA */
+  .cta-final {
+    text-align: center;
+    padding: 120px 24px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .cta-final h2 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .cta-final p {
+    font-size: 17px;
+    color: #8a9bb0;
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+
+  .cta-final-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .footer-brand .logo {
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .footer-brand p {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.6;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 48px;
+  }
+
+  .footer-links a {
+    color: #8a9bb0;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover {
+    color: #fff;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav {
+      padding: 20px 24px;
+    }
+
+    .hero {
+      padding: 80px 24px 60px;
+    }
+
+    .hero h1 {
+      font-size: 28px;
+    }
+
+    .features {
+      grid-template-columns: 1fr;
+      padding: 0 24px 60px;
+    }
+
+    .cta-final {
+      padding: 80px 24px;
+    }
+
+    .cta-final h2 {
+      font-size: 26px;
+    }
+
+    footer {
+      flex-direction: column;
+      gap: 32px;
+      padding: 48px 24px;
+    }
+
+    .footer-links {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="logo">AGENT<span>IQ</span></a>
+  <div class="nav-actions">
+    <a href="#" class="nav-link">Войти</a>
+    <a href="#" class="btn-primary" style="padding: 10px 22px; font-size: 14px;">Посмотреть пример</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>AgentIQ Reviews</h1>
+  <p>Разбор отзывов на товары для селлеров маркетплейсов.</p>
+  <div class="hero-cta">
+    <a href="#" class="btn-primary">Посмотреть пример</a>
+    <a href="#" class="btn-secondary">Попросить доступ</a>
+  </div>
+</section>
+
+<!-- Features -->
+<div class="section-label">
+  <h2>Как работает</h2>
+  <p>Что делает AGENTIQ</p>
+</div>
+
+<section class="features">
+  <div class="feature-card">
+    <div class="feature-num">01</div>
+    <h3>Отзывы по каждому товару — в одном месте</h3>
+    <p>AGENTIQ собирает отзывы покупателей по всем товарам и показывает их в удобном виде, без ручной выгрузки и постоянных проверок кабинета.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">02</div>
+    <h3>Понятно, за что товар хвалят и за что ругают</h3>
+    <p>Покупатели часто пишут об одном и том же: что им нравится в товаре и что вызывает вопросы. AGENTIQ группирует такие отзывы и показывает основные причины откликов — как положительных, так и негативных.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">03</div>
+    <h3>Понимание, по каким товарам что-то меняется</h3>
+    <p>Не по всем товарам нужно что-то делать. AGENTIQ помогает увидеть товары, по которым ситуация действительно меняется и требует внимания.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">04</div>
+    <h3>Подсказки по следующим шагам</h3>
+    <p>Когда ситуация понятна, важно решить, что делать дальше. AGENTIQ подсказывает возможные варианты действий: проверить товар, обновить описание, уточнить ожидания или оставить как есть.</p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-num">05</div>
+    <h3>Ответы на отзывы — по ситуации</h3>
+    <p>Если на отзыв действительно стоит ответить, AGENTIQ подсказывает аккуратный вариант ответа с учётом товара и контекста.</p>
+  </div>
+
+  <div class="feature-card coming-soon">
+    <div class="badge">Скоро</div>
+    <div class="feature-num">06</div>
+    <h3>Вопросы покупателей</h3>
+    <p>Покупатели часто задают одни и те же вопросы ещё до покупки: о размере, комплектации, доставке. AGENTIQ будет собирать такие вопросы по товарам, помогать видеть, что вызывает сомнения, и подсказывать ответы.</p>
+  </div>
+</section>
+
+<!-- Примеры -->
+<section class="comparison">
+  <div class="comparison-label">
+    <h2>Примеры</h2>
+    <p>От отзывов — к решениям</p>
+  </div>
+
+  <div class="comparison-grid">
+
+    <!-- Card 1: растущая проблема → действовать -->
+    <div class="comp-card">
+      <div class="comp-header">
+        <h4>Кожаная сумка через плечо</h4>
+        <span class="comp-meta">Wildberries · артикул 612084</span>
+      </div>
+      <div class="comp-stats">
+        <div class="comp-stat">
+          <div class="stat-val">142</div>
+          <div class="stat-label">отзыва</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val">4.6</div>
+          <div class="stat-label">рейтинг</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val">31</div>
+          <div class="stat-label">без ответа</div>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="signal-badge warning">↑ растёт</span>
+        <h5>Запах кожи — 8 упоминаний</h5>
+        <p>Появилась причина 12 дней назад. За последнюю неделю — 5 новых отзывов.</p>
+        <div class="agent-note">↳ Это начало роста — не разовый случай.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-label act">→ Решение</div>
+        <p>Проверить партию. Обновить описание товара.</p>
+      </div>
+      <div class="reply-block">
+        <div class="reply-label">Ответ · для всех 8</div>
+        <p class="reply-text">«Запах кожи проходит за 2–3 дня носки — это нормально.»</p>
+      </div>
+    </div>
+
+    <!-- Card 2: стабильная проблема → можно пропустить -->
+    <div class="comp-card">
+      <div class="comp-header">
+        <h4>Детский рюкзак Динозавр</h4>
+        <span class="comp-meta">Wildberries · артикул 448271</span>
+      </div>
+      <div class="comp-stats">
+        <div class="comp-stat">
+          <div class="stat-val">89</div>
+          <div class="stat-label">отзывов</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val">4.7</div>
+          <div class="stat-label">рейтинг</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val ok">0</div>
+          <div class="stat-label">без ответа</div>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="signal-badge stable">✓ всё хорошо</span>
+        <h5>12 новых отзывов за неделю</h5>
+        <p>Средняя оценка 4.8. Проблемных паттернов нет.</p>
+        <div class="agent-note">↳ Действие не требуется — товар в норме.</div>
+      </div>
+      <div class="decision safe">
+        <div class="decision-label skip">→ Ответы</div>
+        <p>Сгенерированы для 12 отзывов. Каждый — персональный.</p>
+      </div>
+      <div class="reply-block">
+        <div class="reply-label">Пример · 1 из 12</div>
+        <p class="reply-text">«Спасибо, что выбрали рюкзак для вашего Миши! Рады, что динозавр пришёлся по душе 🦕»</p>
+      </div>
+    </div>
+
+    <!-- Card 3: атрибуция к варианту + готов ответ -->
+    <div class="comp-card">
+      <div class="comp-header">
+        <h4>Термос 1L нерж. сталь</h4>
+        <span class="comp-meta">Wildberries · артикул 519340</span>
+      </div>
+      <div class="comp-stats">
+        <div class="comp-stat">
+          <div class="stat-val">203</div>
+          <div class="stat-label">отзыва</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val">4.3</div>
+          <div class="stat-label">рейтинг</div>
+        </div>
+        <div class="comp-stat">
+          <div class="stat-val">120</div>
+          <div class="stat-label">без ответа</div>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="signal-badge info">→ не весь товар</span>
+        <h5>Крышка протекает — 11 раз</h5>
+        <p>Все жалобы — про цвет Silver и Gold. Из них 7 без ответа.</p>
+        <div class="variant-summary">
+          <span class="vs-item problem">Silver 4.1</span>
+          <span class="vs-sep">·</span>
+          <span class="vs-item problem">Gold 3.9</span>
+          <span class="vs-sep">·</span>
+          <span class="vs-item ok">остальные 4.7</span>
+        </div>
+        <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
+      </div>
+      <div class="decision reply">
+        <div class="decision-label reply">→ Решение</div>
+        <p>Проверить партии Silver и Gold.</p>
+      </div>
+      <div class="reply-block">
+        <div class="reply-label">Ответ · для всех 7</div>
+        <p class="reply-text">«Благодарим за отзыв. Информируем — проверяем этот вариант.»</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="cta-final">
+  <h2>Попробуйте на одном товаре</h2>
+  <p>Без настройки руками.<br>Без обязательств.</p>
+  <div class="cta-final-buttons">
+    <a href="#" class="btn-primary">Посмотреть пример</a>
+    <a href="#" class="btn-secondary">Попросить доступ</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-brand">
+    <a href="#" class="logo">AGENT<span>IQ</span></a>
+    <p>Email: hello@agentiq.ru<br>Telegram: @agentiq_support</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">Политика конфиденциальности</a>
+    <a href="#">Пользовательское соглашение</a>
+  </div>
+</footer>
+
+</body>
+</html>
