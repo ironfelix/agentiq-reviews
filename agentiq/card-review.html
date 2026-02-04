@@ -472,6 +472,93 @@
     background: rgba(240, 101, 67, 0.1);
   }
 
+  /* Почему это важно — рассуждение агента */
+  .why-important {
+    margin: 12px 20px 0;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+  }
+
+  .why-important-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #5c7080;
+    margin-bottom: 8px;
+  }
+
+  .why-important-list {
+    list-style: none;
+  }
+
+  .why-important-list li {
+    font-size: 12px;
+    color: #a8bcc8;
+    padding: 2px 0;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .why-important-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #5c7080;
+  }
+
+  /* Динамика */
+  .dynamics {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #8a9bb0;
+  }
+
+  .dynamics-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .dynamics-badge.growing {
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.15);
+  }
+
+  .dynamics-badge.stable {
+    color: #7db8e8;
+    background: rgba(125, 184, 232, 0.15);
+  }
+
+  .dynamics-badge.fading {
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  /* Решение как агент — рассуждение */
+  .decision-reasoning {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+  }
+
+  .decision-reasoning .highlight {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* Черновик ответа */
+  .reply-label .draft-hint {
+    font-weight: 400;
+    color: #5c7080;
+  }
+
   /* Responsive: стек на узких экранах */
   @media (max-width: 1020px) {
     .cards-container {
@@ -600,6 +687,10 @@
       <span class="signal-badge">→ не весь товар</span>
       <h5>Крышка протекает — 11 раз</h5>
       <p>Появилась 8 дней назад. Все жалобы — про цвет Silver и Gold.</p>
+      <div class="dynamics">
+        <span class="dynamics-badge growing">↑ растёт</span>
+        <span>появилось 8 дней назад · динамика растущая</span>
+      </div>
 
       <!-- Сравнение вариантов -->
       <div class="variant-compare">
@@ -681,6 +772,17 @@
       <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
     </div>
 
+    <!-- Почему это важно — рассуждение агента -->
+    <div class="why-important">
+      <div class="why-important-label">Почему это важно</div>
+      <ul class="why-important-list">
+        <li>11 упоминаний за 8 дней</li>
+        <li>64% отзывов по Silver / Gold</li>
+        <li>7 отзывов без ответа</li>
+        <li>«не протекает» — ключевое ожидание покупателей</li>
+      </ul>
+    </div>
+
     <!-- Вердикт агента — статус и таймфрейм -->
     <div class="agent-verdict">
       <div class="verdict-status">Статус: начало проблемы</div>
@@ -689,11 +791,11 @@
 
     <div class="decision">
       <div class="decision-label">→ Решение</div>
-      <p>Проверить партию Silver и Gold.</p>
+      <p class="decision-reasoning">Вероятнее всего проблема в партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Логично проверить их отдельно, не трогая остальные варианты.</p>
     </div>
     <div class="reply-block">
-      <div class="reply-label">Ответ · для всех 7</div>
-      <p class="reply-text">«Благодарим за отзыв. Информируем — проверяем этот вариант.»</p>
+      <div class="reply-label">Черновик ответа <span class="draft-hint">· можно отредактировать</span></div>
+      <p class="reply-text">«Благодарим за отзыв. Мы проверяем эту партию — если подтвердится проблема, свяжемся с вами.»</p>
     </div>
   </div>
 
