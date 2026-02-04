@@ -414,6 +414,64 @@
     line-height: 1.5;
   }
 
+  /* Вердикт агента — статус/риск */
+  .agent-verdict {
+    margin: 16px 20px 8px;
+    padding: 12px 14px;
+    background: rgba(240, 101, 67, 0.06);
+    border-left: 3px solid #f06543;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .verdict-status {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f06543;
+    margin-bottom: 4px;
+  }
+
+  .verdict-timeframe {
+    font-size: 12px;
+    color: #8a9bb0;
+  }
+
+  /* Опорные ожидания — что покупатели ценят */
+  .expectations {
+    margin: 12px 20px 0;
+    padding: 10px 12px;
+    background: rgba(76, 175, 122, 0.06);
+    border: 1px solid rgba(76, 175, 122, 0.15);
+    border-radius: 8px;
+  }
+
+  .expectations-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4caf7a;
+    margin-bottom: 6px;
+  }
+
+  .expectations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .expectation-tag {
+    font-size: 11px;
+    color: #a8bcc8;
+    background: rgba(255,255,255,0.05);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .expectation-tag.violated {
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.1);
+  }
+
   /* Responsive: стек на узких экранах */
   @media (max-width: 1020px) {
     .cards-container {
@@ -528,6 +586,16 @@
       </div>
     </div>
 
+    <!-- Опорные ожидания — что покупатели ценят -->
+    <div class="expectations">
+      <div class="expectations-label">Покупатели ценят</div>
+      <div class="expectations-list">
+        <span class="expectation-tag">держит тепло 8+ часов</span>
+        <span class="expectation-tag violated">не протекает</span>
+        <span class="expectation-tag">качество стали</span>
+      </div>
+    </div>
+
     <div class="signal">
       <span class="signal-badge">→ не весь товар</span>
       <h5>Крышка протекает — 11 раз</h5>
@@ -611,6 +679,12 @@
       </div>
 
       <div class="agent-note">↳ Проблема в партии — остальные варианты чисты.</div>
+    </div>
+
+    <!-- Вердикт агента — статус и таймфрейм -->
+    <div class="agent-verdict">
+      <div class="verdict-status">Статус: начало проблемы</div>
+      <div class="verdict-timeframe">Требует действий в ближайшие 5–7 дней</div>
     </div>
 
     <div class="decision">
