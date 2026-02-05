@@ -162,6 +162,77 @@
   .reply-label { font-size: 11px; color: #5c7080; margin-bottom: 4px; }
   .reply-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; }
 
+  /* Verdict — главный вывод вверху */
+  .verdict {
+    margin: 0;
+    padding: 12px 20px;
+    background: rgba(240, 101, 67, 0.08);
+    border-bottom: 1px solid rgba(240, 101, 67, 0.2);
+  }
+  .verdict-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f06543;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .verdict-sub {
+    font-size: 11px;
+    color: #8a9bb0;
+    margin-top: 3px;
+  }
+  .verdict.ok {
+    background: rgba(76, 175, 122, 0.08);
+    border-bottom-color: rgba(76, 175, 122, 0.2);
+  }
+  .verdict.ok .verdict-title { color: #4caf7a; }
+
+  /* Таблица причин по вариантам */
+  .reasons-table { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .reasons-table-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #5c7080; margin-bottom: 8px; }
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: 1fr 50px 50px 50px;
+    gap: 4px 8px;
+    font-size: 11px;
+  }
+  .reasons-grid-header { color: #5c7080; font-weight: 600; text-align: center; padding-bottom: 4px; }
+  .reasons-grid-header:first-child { text-align: left; }
+  .reasons-grid-row { display: contents; }
+  .reasons-grid-row > span { padding: 3px 0; }
+  .reasons-grid-row > span:first-child { color: #a8bcc8; }
+  .reasons-grid-row > span:not(:first-child) { text-align: center; color: #5c7080; }
+  .reasons-grid-row > span.high { color: #f06543; font-weight: 600; }
+
+  /* Тултипы */
+  .with-tooltip {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dotted rgba(255,255,255,0.3);
+  }
+  .with-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a2530;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #c8d6e0;
+    font-size: 10px;
+    font-weight: 400;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .with-tooltip:hover::after { opacity: 1; }
+
   @media (max-width: 920px) {
     .cards-container { flex-direction: column; align-items: center; }
     .arrow-col { transform: rotate(90deg); }
@@ -268,11 +339,16 @@
       </div>
     </div>
 
+    <!-- Verdict — явный вывод вверху -->
+    <div class="verdict">
+      <div class="verdict-title">⚠ Риск по режиму «красный»</div>
+      <div class="verdict-sub">Рейтинг 4.08 — ниже остальных на 0.6 пункта, тренд ↓</div>
+    </div>
+
     <div class="signal">
-      <span class="signal-badge">⚠ режим проседает</span>
       <h5>Красный спектр: 4.08 ↓</h5>
       <p>Один фонарик, разные режимы свечения. Красный режим получает худшие оценки.</p>
-      <div class="signal-source">12 отзывов · доверие: среднее</div>
+      <div class="signal-source">12 отзывов · <span class="with-tooltip" data-tooltip="5-20 отзывов = среднее доверие. Сигнал достаточный для проверки">доверие: среднее</span></div>
 
       <div class="variant-compare" style="margin-top: 10px;">
         <div style="font-size: 10px; color: #5c7080; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Один товар → разбивка по режимам свечения</div>
@@ -283,7 +359,7 @@
           </div>
           <span class="variant-rating rating-low">4.08</span>
           <span class="variant-count">12</span>
-          <span class="variant-trend down">↓ –0.15</span>
+          <span class="variant-trend down with-tooltip" data-tooltip="Изменение за 30 дней: было 4.23">↓ –0.15</span>
         </div>
         <div class="variant-row">
           <span class="variant-name">⚪ белый</span>
@@ -305,17 +381,33 @@
         </div>
       </div>
 
-      <div class="reasons">
-        <div class="reasons-label">Причины жалоб на красный режим</div>
-        <div class="reason-row">
-          <span>💡 "Тусклый" / слабый свет</span>
-          <div class="reason-bar"><div class="reason-bar-fill" style="width: 50%"></div></div>
-          <span class="reason-pct">50%</span>
-        </div>
-        <div class="reason-row">
-          <span>🔋 Батарея садится быстро</span>
-          <div class="reason-bar"><div class="reason-bar-fill" style="width: 30%"></div></div>
-          <span class="reason-pct">30%</span>
+      <!-- Таблица причин по вариантам -->
+      <div class="reasons-table">
+        <div class="reasons-table-label">Причины жалоб по режимам</div>
+        <div class="reasons-grid">
+          <span class="reasons-grid-header"></span>
+          <span class="reasons-grid-header">🔴</span>
+          <span class="reasons-grid-header">⚪</span>
+          <span class="reasons-grid-header">🔵</span>
+
+          <div class="reasons-grid-row">
+            <span>💡 Тусклый свет</span>
+            <span class="high">50%</span>
+            <span>5%</span>
+            <span>8%</span>
+          </div>
+          <div class="reasons-grid-row">
+            <span>🔋 Батарея быстро</span>
+            <span class="high">30%</span>
+            <span>10%</span>
+            <span>12%</span>
+          </div>
+          <div class="reasons-grid-row">
+            <span>🔧 Брак / дефект</span>
+            <span>8%</span>
+            <span>5%</span>
+            <span>5%</span>
+          </div>
         </div>
       </div>
 
