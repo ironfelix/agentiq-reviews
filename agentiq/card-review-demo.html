@@ -43,7 +43,7 @@
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    overflow: hidden;
+    /* overflow: hidden убран чтобы тултипы не обрезались */
   }
 
   .card.before {
@@ -162,7 +162,7 @@
   .reply-label { font-size: 11px; color: #5c7080; margin-bottom: 4px; }
   .reply-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; }
 
-  /* Тултипы для пояснений */
+  /* Тултипы для пояснений — показываем снизу чтобы не резался бордером */
   .hint {
     position: relative;
     border-bottom: 1px dotted rgba(255,255,255,0.3);
@@ -171,7 +171,7 @@
   .hint::after {
     content: attr(data-hint);
     position: absolute;
-    bottom: calc(100% + 4px);
+    top: calc(100% + 4px);
     left: 50%;
     transform: translateX(-50%);
     background: #1a2a38;
@@ -184,7 +184,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s;
-    z-index: 10;
+    z-index: 100;
   }
   .hint:hover::after { opacity: 1; }
 
