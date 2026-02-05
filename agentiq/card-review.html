@@ -50,6 +50,17 @@
     flex-direction: column;
   }
 
+  .card.before {
+    border-color: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    opacity: 0.92;
+  }
+
+  .card.after {
+    border-color: rgba(125, 184, 232, 0.28);
+    background: rgba(125, 184, 232, 0.05);
+  }
+
   /* Stato badge: Было / Стало */
   .state-badge {
     display: inline-block;
@@ -201,6 +212,12 @@
     color: #8a9bb0;
     line-height: 1.5;
     margin: 0;
+  }
+
+  .signal-source {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #5c7080;
   }
 
   /* Сравнение вариантов */
@@ -380,6 +397,16 @@
 
   .decision:last-child { margin-bottom: 20px; }
 
+  .action-list {
+    margin-top: 10px;
+    padding-left: 16px;
+    color: #a8bcc8;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .action-list li { margin: 4px 0; }
+
   /* Ответ покупателю */
   .reply-block {
     margin: 4px 20px 20px 32px;
@@ -540,7 +567,7 @@
 <div class="cards-container">
 
   <!-- ======== БЫЛО: товар без анализа ======== -->
-  <div class="card">
+  <div class="card before">
     <div class="comp-header">
       <span class="state-badge before">Было</span>
       <h4>Термос 1L нерж. сталь</h4>
@@ -614,7 +641,7 @@
   <div class="arrow-col">→</div>
 
   <!-- ======== СТАЛО: товар с анализом AgentIQ ======== -->
-  <div class="card">
+  <div class="card after">
     <div class="comp-header">
       <span class="state-badge after">Стало</span>
       <h4>Термос 1L нерж. сталь</h4>
@@ -650,6 +677,7 @@
       <span class="signal-badge">⚠ не весь товар</span>
       <h5>Крышка протекает — 11 раз</h5>
       <p>Только Silver и Gold. Появилось 8 дней назад, растёт.</p>
+      <div class="signal-source">Источник: 11 отзывов, последние 8 дней</div>
 
       <!-- Сравнение вариантов -->
       <div class="variant-compare">
@@ -736,6 +764,7 @@
       <ul class="why-important-list">
         <li>Проблема локализована — остальные варианты чисты</li>
         <li>«Не протекает» — ключевое ожидание покупателей</li>
+        <li>Если тренд сохранится — рейтинг по Silver/Gold упадёт до 4.0</li>
       </ul>
     </div>
 
@@ -747,6 +776,11 @@
     <div class="decision">
       <div class="decision-label">→ Решение</div>
       <p class="decision-reasoning">Проверить партии <span class="highlight">Silver</span> и <span class="highlight">Gold</span>. Остальные не трогать.</p>
+      <ul class="action-list">
+        <li>Запросить партию у поставщика и проверить крышку</li>
+        <li>Добавить уточнение в описание для Silver/Gold</li>
+        <li>Ответить на 7 отзывов из сигнала</li>
+      </ul>
     </div>
     <div class="reply-block">
       <div class="reply-label">Черновик ответа <span class="draft-hint">· можно изменить</span></div>
