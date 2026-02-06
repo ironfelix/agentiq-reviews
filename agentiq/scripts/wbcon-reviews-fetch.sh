@@ -1,39 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# WBCON API v2 (2026) — token-based auth
+# Docs: https://19-fb.wbcon.su/docs
+
 if [[ $# -lt 1 ]]; then
   echo "Usage: $(basename "$0") <article>"
-  echo "Requires env vars: WBCON_EMAIL, WBCON_PASS"
+  echo "Requires env var: WBCON_TOKEN"
+  echo ""
+  echo "Example:"
+  echo "  export WBCON_TOKEN='eyJhbGciOi...'"
+  echo "  $(basename "$0") 282955222"
   exit 1
 fi
 
-: "${WBCON_EMAIL:?WBCON_EMAIL is required}"
-: "${WBCON_PASS:?WBCON_PASS is required}"
-: "${WBCON_FB_BASE:?WBCON_FB_BASE is required (API host)}"
+: "${WBCON_TOKEN:?WBCON_TOKEN is required (see https://19-fb.wbcon.su/docs)}"
 
 ARTICLE="$1"
+WBCON_FB_BASE="https://19-fb.wbcon.su"
 
 create_task() {
-  curl -s -X POST "${WBCON_FB_BASE}/create_task_fb?email=${WBCON_EMAIL}&password=${WBCON_PASS}" \
+  curl -s -X POST "${WBCON_FB_BASE}/create_task_fb" \
     -H "Content-Type: application/json" \
+    -H "token: ${WBCON_TOKEN}" \
     -d "{\"article\":${ARTICLE}}"
 }
 
 check_status() {
   local task_id="$1"
-  curl -s "${WBCON_FB_BASE}/task_status?task_id=${task_id}&email=${WBCON_EMAIL}&password=${WBCON_PASS}"
+  curl -s "${WBCON_FB_BASE}/task_status?task_id=${task_id}" \
+    -H "token: ${WBCON_TOKEN}"
 }
 
 get_results() {
   local task_id="$1"
   local offset="${2:-0}"
-  curl -s "${WBCON_FB_BASE}/get_results_fb?task_id=${task_id}&offset=${offset}&email=${WBCON_EMAIL}&password=${WBCON_PASS}"
+  curl -s "${WBCON_FB_BASE}/get_results_fb?task_id=${task_id}&offset=${offset}" \
+    -H "token: ${WBCON_TOKEN}"
 }
 
 TASK_JSON=$(create_task)
-TASK_ID=$(printf '%s' "$TASK_JSON" | python3 -c 'import json,sys; 
+TASK_ID=$(printf '%s' "$TASK_JSON" | python3 -c 'import json,sys;
 try:
-  data=json.load(sys.stdin); 
+  data=json.load(sys.stdin);
   print(data.get("task_id","") or "")
 except Exception:
   print("")')
@@ -44,7 +53,7 @@ if [[ -z "$TASK_ID" ]]; then
   exit 1
 fi
 
-echo "task_id=$TASK_ID"
+echo "task_id=$TASK_ID" >&2
 
 # Wait for ready
 for i in {1..24}; do
@@ -59,7 +68,8 @@ except Exception:
 PY
 <<< "$STATUS_JSON")
 
-  if [[ "$READY" == "true" ]] || echo "$STATUS_JSON" | grep -q '\"is_ready\":true'; then
+  if [[ "$READY" == "true" ]] || echo "$STATUS_JSON" | grep -q '"is_ready":true'; then
+    echo "Task ready" >&2
     break
   fi
 
@@ -72,19 +82,22 @@ PY
 done
 
 # Paginated fetch — collect all feedbacks
-python3 - "$TASK_ID" "$WBCON_FB_BASE" "$WBCON_EMAIL" "$WBCON_PASS" <<'PYEOF'
+python3 - "$TASK_ID" "$WBCON_FB_BASE" "$WBCON_TOKEN" <<'PYEOF'
 import json, sys, time, urllib.request, urllib.error
 
-task_id, base, email, pwd = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+task_id, base, token = sys.argv[1], sys.argv[2], sys.argv[3]
 all_fbs = []
 seen_ids = set()
 offset = 0
 total = None
 
 while True:
-    url = f"{base}/get_results_fb?task_id={task_id}&offset={offset}&email={email}&password={pwd}"
+    url = f"{base}/get_results_fb?task_id={task_id}&offset={offset}"
+    req = urllib.request.Request(url)
+    req.add_header("token", token)
+
     try:
-        with urllib.request.urlopen(url, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.load(resp)
     except Exception as e:
         print(f"Error at offset {offset}: {e}", file=sys.stderr)
