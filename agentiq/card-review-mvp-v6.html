@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сравнение: Демо vs MVP v7 · Артикул 282955222</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0a1018;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    padding: 32px 24px;
+  }
+  .page-header {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .page-header .sub { font-size: 13px; color: #8a9bb0; }
+  .page-header .version-badge {
+    display: inline-block;
+    background: rgba(76,175,122,0.15);
+    color: #4caf7a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+  }
+  .col-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5c7080;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .card {
+    background: rgba(125, 184, 232, 0.04);
+    border: 1px solid rgba(125, 184, 232, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .card-header .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .badge-green { color: #4caf7a; background: rgba(76,175,122,0.15); }
+  .badge-blue { color: #7db8e8; background: rgba(125,184,232,0.15); }
+  .card-header h4 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .card-header .meta { font-size: 12px; color: #8a9bb0; }
+
+  .stats-row {
+    display: flex;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat { flex: 1; text-align: center; }
+  .stat-val { font-size: 18px; font-weight: 700; }
+  .stat-val.good { color: #4caf7a; }
+  .stat-label { font-size: 11px; color: #8a9bb0; margin-top: 2px; }
+
+  .section { padding: 14px 20px; }
+  .section + .section { border-top: 1px solid rgba(255,255,255,0.06); }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #5c7080;
+    margin-bottom: 8px;
+  }
+  .signal-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.12);
+  }
+  .signal-meta { font-size: 11px; color: #5c7080; margin-top: 6px; }
+
+  .variant-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .v-name { font-size: 13px; font-weight: 500; color: #c8d6e0; width: 80px; flex-shrink: 0; }
+  .v-name.problem { color: #f06543; font-weight: 600; }
+  .v-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .v-bar { height: 100%; border-radius: 3px; }
+  .v-bar.ok { background: #4caf7a; }
+  .v-bar.problem { background: #f06543; }
+  .v-rating { font-size: 13px; font-weight: 700; width: 32px; text-align: right; }
+  .v-rating.high { color: #4caf7a; }
+  .v-rating.low { color: #f06543; }
+  .v-count { font-size: 11px; color: #5c7080; width: 20px; text-align: right; }
+  .v-trend { font-size: 10px; width: 40px; text-align: right; }
+  .v-trend.down { color: #f06543; }
+  .v-trend.stable { color: #5c7080; }
+
+  .reason-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; color: #a8bcc8; }
+  .reason-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .reason-bar-fill { height: 100%; background: #f06543; border-radius: 2px; }
+  .reason-pct { font-size: 11px; color: #5c7080; width: 32px; }
+
+  .review-item {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid #f06543;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    border-radius: 0 6px 6px 0;
+  }
+  .review-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; font-style: italic; }
+  .review-meta { font-size: 10px; color: #5c7080; margin-top: 3px; }
+  .review-toggle { font-size: 11px; color: #7db8e8; cursor: pointer; margin-top: 6px; }
+
+  .explanation-list { list-style: none; }
+  .explanation-list li {
+    font-size: 12px;
+    color: #a8bcc8;
+    padding: 3px 0 3px 14px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .explanation-list li::before { content: "\2192"; position: absolute; left: 0; color: #5c7080; }
+  .conclusion { font-size: 12px; color: #c8d6e0; font-style: italic; margin-top: 8px; }
+
+  .strategy-box {
+    background: rgba(125, 184, 232, 0.08);
+    border: 1px solid rgba(125, 184, 232, 0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 12px 0 0;
+  }
+  .strategy-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: #5c7080; margin-bottom: 6px; }
+  .strategy-title { font-size: 13px; font-weight: 600; color: #7db8e8; margin-bottom: 4px; }
+  .strategy-desc { font-size: 12px; color: #c8d6e0; line-height: 1.4; margin-bottom: 6px; }
+  .action-list { padding-left: 16px; color: #a8bcc8; font-size: 12px; line-height: 1.4; }
+  .action-list li { margin: 3px 0; }
+
+  .reply-box {
+    border-left: 2px solid rgba(255,255,255,0.12);
+    padding: 6px 12px;
+    margin-top: 10px;
+  }
+  .reply-label { font-size: 11px; color: #5c7080; margin-bottom: 3px; }
+  .reply-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; }
+  .reply-note { font-size: 10px; color: #5c7080; margin-top: 4px; }
+
+  .debug {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+  }
+  .debug h3 { font-size: 16px; margin-bottom: 16px; }
+  .debug h4 { font-size: 13px; color: #7db8e8; margin: 16px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 6px 8px; color: #5c7080; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  td { padding: 6px 8px; color: #c8d6e0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .match { color: #4caf7a; }
+  .diff { color: #f06543; }
+  .improved { color: #4caf7a; font-weight: 600; }
+  .fixed { color: #7db8e8; }
+
+  @media (max-width: 900px) {
+    .columns { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Артикул 282955222 · Сравнение карточек</h1>
+  <div class="sub">Фонарь · Демо-хардкод vs MVP v7 (+ описание карточки WB)</div>
+  <div class="version-badge">V7 — LLM видит описание товара</div>
+</div>
+
+<div class="columns">
+  <!-- LEFT: Static Demo Card -->
+  <div>
+    <div class="col-label">Хардкод (демо)</div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge badge-green">Анализ</span>
+        <h4>LED фонарик</h4>
+        <div class="meta">Wildberries · артикул 282955222</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val">407</div><div class="stat-label">отзывов</div></div>
+        <div class="stat"><div class="stat-val good">4.79</div><div class="stat-label">рейтинг</div></div>
+        <div class="stat"><div class="stat-val">1</div><div class="stat-label">без ответа</div></div>
+      </div>
+
+      <div class="section">
+        <span class="signal-badge">⚠ Проблема в варианте: красный</span>
+        <p style="font-size:13px; color:#8a9bb0">Рейтинг 4.08 — ниже остальных<br>Причина: тусклый свет</p>
+        <div class="signal-meta">12 отзывов, тренд ↓ –0.15</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Рейтинг по артикулам</div>
+        <div class="variant-row">
+          <span class="v-name problem">красный</span>
+          <div class="v-bar-wrap"><div class="v-bar problem" style="width:81.6%"></div></div>
+          <span class="v-rating low">4.08</span><span class="v-count">12</span><span class="v-trend down">↓ –0.15</span>
+        </div>
+        <div class="variant-row">
+          <span class="v-name">белый</span>
+          <div class="v-bar-wrap"><div class="v-bar ok" style="width:94.2%"></div></div>
+          <span class="v-rating high">4.71</span><span class="v-count">21</span><span class="v-trend stable">→</span>
+        </div>
+        <div class="variant-row">
+          <span class="v-name">синий</span>
+          <div class="v-bar-wrap"><div class="v-bar ok" style="width:90%"></div></div>
+          <span class="v-rating high">4.50</span><span class="v-count">8</span><span class="v-trend stable">→</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Причины негатива</div>
+        <div class="reason-row"><span>💡 Тусклый свет</span><div class="reason-bar"><div class="reason-bar-fill" style="width:50%"></div></div><span class="reason-pct">50%</span></div>
+        <div class="reason-row"><span>🔋 Батарея садится</span><div class="reason-bar"><div class="reason-bar-fill" style="width:30%"></div></div><span class="reason-pct">30%</span></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Отзывы</div>
+        <div class="review-item"><div class="review-text">«Светит хорошо, батарейки хватает на 10 минут максимум»</div><div class="review-meta">★3 · 22.09</div></div>
+        <div class="review-item"><div class="review-text">«Батарею нехрена не держит»</div><div class="review-meta">★1 · 16.05</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Выводы</div>
+        <ul class="explanation-list">
+          <li>Физика: красный спектр воспринимается глазом тусклее белого</li>
+          <li>Ожидания: люди ждут яркость как у белого</li>
+          <li>Назначение: красный для ночного зрения — специально тусклый</li>
+        </ul>
+        <div class="conclusion">Это не брак — несовпадение ожиданий</div>
+      </div>
+
+      <div class="section">
+        <div class="strategy-box">
+          <div class="strategy-label">Что делать</div>
+          <div class="strategy-title">→ Объяснить назначение</div>
+          <ol class="action-list">
+            <li>Добавить в описание: «Красный режим для сохранения ночного зрения»</li>
+            <li>Указать назначение: охота, астрономия</li>
+            <li>Ответить на отзывы с объяснением</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="reply-box">
+          <div class="reply-label">Черновик ответа</div>
+          <div class="reply-text">«Красный режим специально сделан тусклым — он для сохранения ночного зрения (охота, астрономия). Для яркого света используйте белый режим.»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: MVP v6 Card -->
+  <div>
+    <div class="col-label">MVP v7 (+ описание карточки WB)</div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge badge-blue">Автоанализ</span>
+        <h4>LED фонарик</h4>
+        <div class="meta">Wildberries · артикул 282955222</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val">100</div><div class="stat-label">из 407 отзывов</div></div>
+        <div class="stat"><div class="stat-val good">4.79</div><div class="stat-label">рейтинг</div></div>
+        <div class="stat"><div class="stat-val">1</div><div class="stat-label">без ответа</div></div>
+      </div>
+
+      <div class="section">
+        <span class="signal-badge">⚠ Проблема в варианте: красный</span>
+        <p style="font-size:13px; color:#8a9bb0">Рейтинг 3.89 — на 0.7 ниже остальных<br>Причина: Быстро садится аккумулятор</p>
+        <div class="signal-meta">19 отзывов, доверие: среднее · тренд ↓ –0.2</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Рейтинг по артикулам</div>
+        <div class="variant-row">
+          <span class="v-name problem">красный</span>
+          <div class="v-bar-wrap"><div class="v-bar problem" style="width:77.8%"></div></div>
+          <span class="v-rating low">3.89</span><span class="v-count">19</span><span class="v-trend down">↓ –0.2</span>
+        </div>
+        <div class="variant-row">
+          <span class="v-name">белый</span>
+          <div class="v-bar-wrap"><div class="v-bar ok" style="width:83.2%"></div></div>
+          <span class="v-rating">4.16</span><span class="v-count">19</span><span class="v-trend stable">→</span>
+        </div>
+        <div class="variant-row">
+          <span class="v-name">синий</span>
+          <div class="v-bar-wrap"><div class="v-bar ok" style="width:91%"></div></div>
+          <span class="v-rating high">4.55</span><span class="v-count">11</span><span class="v-trend stable">→</span>
+        </div>
+        <div class="variant-row">
+          <span class="v-name">серый</span>
+          <div class="v-bar-wrap"><div class="v-bar ok" style="width:94.6%"></div></div>
+          <span class="v-rating high">4.73</span><span class="v-count">49</span><span class="v-trend stable">→</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Причины негатива (LLM)</div>
+        <div class="reason-row"><span>🔋 Быстро садится аккумулятор</span><div class="reason-bar"><div class="reason-bar-fill" style="width:60%"></div></div><span class="reason-pct">60%</span></div>
+        <div class="reason-row"><span>🔧 Брак / дефект</span><div class="reason-bar"><div class="reason-bar-fill" style="width:20%"></div></div><span class="reason-pct">20%</span></div>
+        <div class="reason-row"><span>💡 Светит слабее</span><div class="reason-bar"><div class="reason-bar-fill" style="width:20%"></div></div><span class="reason-pct">20%</span></div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Отзывы</div>
+        <div class="review-item"><div class="review-text">«Фонарь пришёл не рабочий, пришлось паять провода»</div><div class="review-meta">★3 · 2025-10-09</div></div>
+        <div class="review-item"><div class="review-text">«Не проработал и дня»</div><div class="review-meta">★1 · 2025-11-20</div></div>
+        <div class="review-item"><div class="review-text">«Светит хорошо, батарейки хватает на 10 минут»</div><div class="review-meta">★3 · 2025-09-22</div></div>
+        <div id="extra-reviews" style="display:none;">
+          <div class="review-item"><div class="review-text">«Батарею нехрена не держит»</div><div class="review-meta">★1 · 2025-05-16</div></div>
+          <div class="review-item"><div class="review-text">«Зелёный-синий-красный едва светят»</div><div class="review-meta">★3 · 2025-05-01</div></div>
+        </div>
+        <div class="review-toggle" onclick="var el=document.getElementById('extra-reviews');if(el.style.display==='none'){el.style.display='block';this.textContent='Свернуть ↑';}else{el.style.display='none';this.textContent='Ещё 2 →';}">Ещё 2 →</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Выводы</div>
+        <ul class="explanation-list">
+          <li>Качество: жалобы на полную неработоспособность и быстрый разряд указывают на брак аккумулятора или сборки.</li>
+          <li>Ожидания: описание карточки обещает 2.5 часа работы, а реальность — 10 минут, что является критическим несоответствием.</li>
+          <li>Физика: красный светодиод потребляет примерно столько же энергии, что и другие цвета, поэтому разряд за 10 минут — это не особенность цвета, а дефект.</li>
+        </ul>
+        <div class="conclusion">Проблема в дефектной партии или конструкции, приводящей к быстрому разряду и поломкам, а не в особенностях красного.</div>
+      </div>
+
+      <div class="section">
+        <div class="strategy-box">
+          <div class="strategy-label">Что делать</div>
+          <div class="strategy-title">→ Проверить и заменить партию</div>
+          <div class="strategy-desc">Необходимо проверить качество компонентов и сборки, так как жалобы указывают на производственный брак.</div>
+          <ol class="action-list">
+            <li>Провести выборочный тест аккумуляторов и пайки в партии красного варианта.</li>
+            <li>Обновить описание, чётко указав время работы для КРАСНОГО режима (если отличается).</li>
+            <li>Рассмотреть возможность отзыва или замены дефектных единиц из текущей партии.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="reply-box">
+          <div class="reply-label">Черновик ответа (LLM)</div>
+          <div class="reply-text">«Красный свет в этом фонаре предназначен для сохранения ночного зрения и меньшего беспокойства животных. Мы проверяем партию на предмет возможных дефектов аккумулятора, так как заявленное время работы не должно быть столь коротким.»</div>
+          <div class="reply-note">Объясняет назначение красного + конкретно указывает на несоответствие заявленного времени работы</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEBUG -->
+<div class="debug">
+  <h3>Что изменилось в v7</h3>
+
+  <h4>Главное: LLM теперь видит описание карточки WB</h4>
+  <table>
+    <tr><th>Параметр</th><th>v6 (без описания)</th><th>v7 (+ описание)</th><th>Статус</th></tr>
+    <tr>
+      <td>Описание товара</td>
+      <td>LLM не знает что за товар</td>
+      <td>Полное описание + характеристики из card.json</td>
+      <td class="improved">NEW — fetch_wb_card_info()</td>
+    </tr>
+    <tr>
+      <td>Понимание назначения</td>
+      <td>Не знает что красный = ночное зрение</td>
+      <td>Видит: «Красный свет улучшает ночное видение»</td>
+      <td class="improved">LLM теперь знает назначение</td>
+    </tr>
+    <tr>
+      <td>Конкретика в выводах</td>
+      <td>«Брак в партии» (шаблонно)</td>
+      <td>«Описание обещает 2.5ч, реальность — 10 мин»</td>
+      <td class="improved">Ссылка на конкретные данные</td>
+    </tr>
+    <tr>
+      <td>Физическое рассуждение</td>
+      <td>Нет</td>
+      <td>«Красный LED потребляет столько же энергии → разряд за 10 мин = дефект»</td>
+      <td class="improved">NEW — LLM рассуждает о физике</td>
+    </tr>
+  </table>
+
+  <h4>Демо vs v7: ключевые отличия</h4>
+  <table>
+    <tr><th>Параметр</th><th>Демо</th><th>MVP v7</th><th>Комментарий</th></tr>
+    <tr>
+      <td>Диагноз</td>
+      <td>Несовпадение ожиданий</td>
+      <td>Дефект (обоснованно)</td>
+      <td class="improved">v7 объясняет ПОЧЕМУ: «2.5ч заявлено vs 10 мин реально»</td>
+    </tr>
+    <tr>
+      <td>Знание товара</td>
+      <td>Хардкод</td>
+      <td>Из WB API (imt_name, description, options)</td>
+      <td class="improved">Автоматически, не зависит от хардкода</td>
+    </tr>
+    <tr>
+      <td>Ответ покупателю</td>
+      <td>«Красный для ночного зрения»</td>
+      <td>«Красный для ночного зрения + проверяем дефект аккумулятора»</td>
+      <td class="improved">v7 = назначение + конкретная проблема</td>
+    </tr>
+    <tr>
+      <td>Действия</td>
+      <td>Добавить в описание</td>
+      <td>Тест аккумуляторов + обновить описание + отзыв партии</td>
+      <td class="improved">v7 конкретнее: «тест пайки», «время для КРАСНОГО режима»</td>
+    </tr>
+    <tr>
+      <td>Структура</td>
+      <td>3 пункта + 3 действия</td>
+      <td>3 пункта + 3 действия</td>
+      <td class="match">СОВПАДАЕТ</td>
+    </tr>
+  </table>
+
+  <h4>Источник данных</h4>
+  <table>
+    <tr><th>Данные</th><th>Источник</th><th>Что LLM видит</th></tr>
+    <tr>
+      <td>Описание</td>
+      <td>basket-17.wbbasket.ru/...card.json</td>
+      <td>«Красный свет фонаря улучшает ночное видение человеческого глаза...»</td>
+    </tr>
+    <tr>
+      <td>Характеристики</td>
+      <td>card.json → options[]</td>
+      <td>Ёмкость 1500мАч, световой поток 500лм, время работы 6ч</td>
+    </tr>
+    <tr>
+      <td>Название</td>
+      <td>card.json → imt_name</td>
+      <td>«Фонарик налобный аккумуляторный 3 спектра свечения»</td>
+    </tr>
+  </table>
+
+  <h4>Открытые вопросы</h4>
+  <table>
+    <tr><th>#</th><th>Вопрос</th><th>Описание</th></tr>
+    <tr>
+      <td>1</td>
+      <td>Пагинация WBCON</td>
+      <td>Только 100 из 407. С полными данными LLM может увидеть больше контекста.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Вопросы покупателей</td>
+      <td>WBCON QS API — в разработке. Добавят ещё один срез данных для LLM.</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>
