@@ -18,7 +18,7 @@
   }
   .page { max-width: 560px; width: 100%; }
 
-  .page-header { text-align: center; margin-bottom: 20px; }
+  .page-header { text-align: center; margin-bottom: 28px; }
   .page-header h1 { font-size: 18px; font-weight: 700; }
   .page-header .sub { font-size: 12px; color: #7a9bb5; margin-top: 4px; }
 
@@ -27,15 +27,15 @@
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 16px;
     padding: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
-  .card-header { margin-bottom: 16px; }
+  .card-header { margin-bottom: 18px; }
   .card-header h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .card-header .meta { font-size: 11px; color: #7a9bb5; }
 
   /* Stats grid */
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
   .stat-box {
     background: rgba(255,255,255,0.04);
     border-radius: 10px;
@@ -50,10 +50,15 @@
   .stat-val.blue { color: #7db8e8; }
 
   /* Risk breakdown bars */
-  .risk-bar-section { margin-bottom: 18px; }
-  .risk-bar-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .risk-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .risk-bar-name { font-size: 11px; color: #c8d6e0; width: 130px; flex-shrink: 0; }
+  .risk-bar-section { margin-bottom: 10px; }
+  .risk-bar-label { font-size: 11px; color: #a8bcc8; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .risk-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; position: relative; }
+  .risk-bar-name {
+    font-size: 11px; color: #c8d6e0; width: 160px; flex-shrink: 0;
+    cursor: help;
+    border-bottom: 1px dotted rgba(255,255,255,0.2);
+    padding-bottom: 1px;
+  }
   .risk-bar-wrap { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
   .risk-bar { height: 100%; border-radius: 5px; transition: width 0.3s; }
   .risk-bar.critical { background: #e85454; }
@@ -62,17 +67,37 @@
   .risk-bar.neutral { background: #7db8e8; }
   .risk-bar-count { font-size: 11px; color: #a8bcc8; width: 30px; text-align: right; flex-shrink: 0; font-weight: 600; }
 
+  /* Tooltip */
+  .tooltip-wrap { position: relative; }
+  .tooltip-wrap .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: #1e2d3d;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    width: 260px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tooltip-wrap:hover .tooltip { display: block; }
+
   /* Response time bar */
   .rt-section { margin-bottom: 18px; }
-  .rt-label { font-size: 11px; color: #a8bcc8; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .rt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .rt-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .rt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .rt-name { font-size: 12px; color: #c8d6e0; width: 90px; flex-shrink: 0; }
   .rt-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
   .rt-bar { height: 100%; border-radius: 4px; }
   .rt-bar.fast { background: #4ecb71; }
   .rt-bar.medium { background: #e8a838; }
   .rt-bar.slow { background: #e85454; }
-  .rt-value { font-size: 11px; color: #a8bcc8; width: 50px; text-align: right; flex-shrink: 0; }
+  .rt-value { font-size: 11px; color: #a8bcc8; width: 70px; text-align: right; flex-shrink: 0; }
 
   /* Risks */
   .risk-section { margin-bottom: 18px; }
@@ -82,7 +107,7 @@
     border-left: 3px solid #e85454;
     border-radius: 0 8px 8px 0;
     padding: 10px 12px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
   .risk-item.warning {
     background: rgba(232, 168, 56, 0.08);
@@ -102,32 +127,28 @@
     border-radius: 12px;
     padding: 16px;
     text-align: center;
-    margin-bottom: 18px;
-  }
-  .loss-box.low-risk {
-    background: linear-gradient(135deg, rgba(78, 203, 113, 0.08) 0%, rgba(125, 184, 232, 0.06) 100%);
-    border-color: rgba(78, 203, 113, 0.2);
+    margin-bottom: 20px;
   }
   .loss-pct { font-size: 24px; font-weight: 700; }
   .loss-label { font-size: 11px; color: #a8bcc8; margin-top: 2px; }
   .loss-confidence { font-size: 10px; color: #7a9bb5; margin-top: 6px; }
 
   /* Review sample */
-  .sample { margin-bottom: 18px; }
-  .sample-label { font-size: 11px; color: #a8bcc8; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sample { margin-bottom: 22px; }
+  .sample-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
   .sample-item {
     background: rgba(255,255,255,0.03);
     border-left: 3px solid #e85454;
     border-radius: 0 8px 8px 0;
-    padding: 10px 12px;
-    margin-bottom: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
   }
   .sample-item.warn-border {
     border-left-color: #e8a838;
   }
   .sample-text { font-size: 12px; color: #c8d6e0; font-style: italic; line-height: 1.5; }
-  .sample-reply { font-size: 11px; color: #e8a838; margin-top: 6px; line-height: 1.4; }
-  .sample-meta { font-size: 10px; color: #7a9bb5; margin-top: 4px; }
+  .sample-reply { font-size: 11px; color: #e8a838; margin-top: 8px; line-height: 1.4; }
+  .sample-meta { font-size: 10px; color: #7a9bb5; margin-top: 6px; }
   .sample-tag {
     display: inline-block;
     font-size: 9px;
@@ -136,7 +157,7 @@
     letter-spacing: 0.5px;
     padding: 2px 6px;
     border-radius: 4px;
-    margin-top: 4px;
+    margin-top: 6px;
   }
   .tag-blame { background: rgba(232, 84, 84, 0.2); color: #e85454; }
   .tag-ignore { background: rgba(232, 168, 56, 0.2); color: #e8a838; }
@@ -150,17 +171,17 @@
     background: rgba(232, 84, 84, 0.06);
     border: 1px solid rgba(232, 84, 84, 0.15);
     border-radius: 12px;
-    padding: 14px;
+    padding: 16px;
   }
-  .verdict-title { font-size: 12px; font-weight: 600; color: #e85454; margin-bottom: 6px; }
-  .verdict-text { font-size: 12px; color: #c8d6e0; line-height: 1.5; }
-  .verdict-note { font-size: 10px; color: #7a9bb5; margin-top: 8px; font-style: italic; }
+  .verdict-title { font-size: 12px; font-weight: 600; color: #e85454; margin-bottom: 8px; }
+  .verdict-text { font-size: 12px; color: #c8d6e0; line-height: 1.6; }
+  .verdict-note { font-size: 10px; color: #7a9bb5; margin-top: 10px; font-style: italic; }
 
   /* Breakdown table */
   .breakdown { margin-bottom: 18px; }
   .breakdown table { width: 100%; border-collapse: collapse; }
-  .breakdown th { font-size: 10px; color: #7a9bb5; text-align: left; padding: 4px 8px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .breakdown td { font-size: 12px; color: #c8d6e0; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .breakdown th { font-size: 10px; color: #7a9bb5; text-align: left; padding: 6px 8px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .breakdown td { font-size: 12px; color: #c8d6e0; padding: 8px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .breakdown td.num { text-align: right; font-weight: 600; }
   .breakdown td.red-text { color: #e85454; }
   .breakdown td.yellow-text { color: #e8a838; }
@@ -171,7 +192,7 @@
   .perception-list li {
     font-size: 11px;
     color: #c8d6e0;
-    padding: 6px 0;
+    padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.03);
     line-height: 1.5;
   }
@@ -187,117 +208,245 @@
   }
 
   /* Gauge */
-  .gauge-wrap { text-align: center; margin-bottom: 18px; }
+  .gauge-wrap { text-align: center; margin-bottom: 20px; }
   .gauge-score { font-size: 48px; font-weight: 700; color: #e85454; }
   .gauge-max { font-size: 16px; color: #7a9bb5; font-weight: 400; }
-  .gauge-label { font-size: 11px; color: #a8bcc8; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .gauge-label { font-size: 11px; color: #a8bcc8; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* Section divider */
-  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 16px 0; }
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 18px 0; }
+
+  /* Expandable AI recommendation */
+  details { margin-top: 12px; }
+  summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: #4ecb71;
+    padding: 8px 12px;
+    background: rgba(78, 203, 113, 0.06);
+    border: 1px solid rgba(78, 203, 113, 0.12);
+    border-radius: 6px;
+    list-style: none;
+    font-weight: 600;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { background: rgba(78, 203, 113, 0.1); }
+
+  .ai-rewrite {
+    margin-top: 10px;
+    padding: 14px;
+    background: rgba(78, 203, 113, 0.05);
+    border-left: 3px solid #4ecb71;
+    border-radius: 0 8px 8px 0;
+  }
+  .ai-rewrite-label { font-size: 9px; color: #4ecb71; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+  .ai-rewrite-text { font-size: 12px; color: #c8d6e0; line-height: 1.6; margin-bottom: 10px; }
+  .ai-rewrite-why { font-size: 10px; color: #7a9bb5; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 8px; }
+
+  /* Action items */
+  .action-list { list-style: none; padding: 0; counter-reset: action; }
+  .action-list li {
+    font-size: 12px;
+    color: #c8d6e0;
+    padding: 10px 0 10px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    line-height: 1.5;
+    position: relative;
+  }
+  .action-list li::before {
+    counter-increment: action;
+    content: counter(action);
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(78, 203, 113, 0.12);
+    color: #4ecb71;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .action-priority { font-size: 9px; color: #e85454; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .action-priority.medium { color: #e8a838; }
 </style>
 </head>
 <body>
 
 <div class="page">
   <div class="page-header">
-    <h1>Артикул 282955222 · Коммуникация</h1>
-    <div class="sub">LED фонарик · глубокий анализ качества ответов · 100 из 407 отзывов</div>
+    <h1>Артикул 282955222 &middot; Коммуникация</h1>
+    <div class="sub">LED фонарик &middot; анализ качества ответов продавца &middot; 100 из 407 отзывов</div>
   </div>
 
   <!-- Quality Score -->
   <div class="card">
     <div class="card-header">
-      <h3>Качество коммуникации с покупателями</h3>
-      <div class="meta">Анализ содержания ответов на 17 негативных отзывов (1-3 звезды)</div>
+      <h3>Качество ответов продавца</h3>
+      <div class="meta">17 негативных + 83 позитивных отзыва &middot; 99 с ответом, 1 без ответа</div>
+    </div>
+
+    <!-- Verdict first -->
+    <div style="margin-bottom: 18px; padding: 14px; background: rgba(232, 84, 84, 0.06); border: 1px solid rgba(232, 84, 84, 0.12); border-radius: 10px;">
+      <div style="font-size: 13px; color: #c8d6e0; line-height: 1.6;">Продавец отвечает быстро (медиана 9 часов) и покрывает 94% негатива. Но 7 из 17 ответов на негатив активно вредят: обвиняют покупателя, не замечают жалобу или подтверждают проблему публично. Быстрый плохой ответ хуже, чем медленный хороший.</div>
     </div>
 
     <div class="gauge-wrap">
       <div class="gauge-score">4<span class="gauge-max">/10</span></div>
-      <div class="gauge-label">Реальная оценка качества ответов</div>
+      <div class="gauge-label">Оценка качества ответов</div>
     </div>
 
     <div class="stats">
       <div class="stat-box">
-        <div class="stat-val red">41%</div>
-        <div class="stat-label">Вредят конверсии</div>
+        <div class="stat-val red">7</div>
+        <div class="stat-label">Вредят продажам</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val yellow">18%</div>
-        <div class="stat-label">Средний риск</div>
+        <div class="stat-val yellow">3</div>
+        <div class="stat-label">Есть проблемы</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val green">18%</div>
-        <div class="stat-label">Хорошие ответы</div>
+        <div class="stat-val green">3</div>
+        <div class="stat-label">Хорошие</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val blue">23%</div>
-        <div class="stat-label">Приемлемые</div>
+        <div class="stat-val blue">4</div>
+        <div class="stat-label">Нормальные</div>
       </div>
-    </div>
-
-    <div class="breakdown">
-      <table>
-        <tr><th>Метрика</th><th style="text-align:right">Значение</th></tr>
-        <tr><td>Негативных отзывов</td><td class="num">17</td></tr>
-        <tr><td>Высокий риск (вредят конверсии)</td><td class="num red-text">7</td></tr>
-        <tr><td>Средний риск</td><td class="num yellow-text">3</td></tr>
-        <tr><td>Хорошие / приемлемые ответы</td><td class="num green-text">7</td></tr>
-        <tr><td>Без ответа</td><td class="num red-text">1</td></tr>
-        <tr><td>Позитивные отзывы с проигнорированными жалобами</td><td class="num yellow-text">3</td></tr>
-      </table>
     </div>
   </div>
 
-  <!-- Risk Breakdown -->
+  <!-- Response Speed -->
   <div class="card">
     <div class="card-header">
-      <h3>Типы коммуникационных рисков</h3>
-      <div class="meta">Классификация ответов на негативные отзывы по типу проблемы</div>
+      <h3>Скорость ответа</h3>
+      <div class="meta">Время от публикации отзыва до ответа продавца</div>
+    </div>
+
+    <div class="rt-section">
+      <div class="rt-label">Негативные отзывы (1-3 звезды)</div>
+      <div class="rt-row">
+        <span class="rt-name">Медиана</span>
+        <div class="rt-bar-wrap"><div class="rt-bar fast" style="width: 19%"></div></div>
+        <span class="rt-value">9 часов</span>
+      </div>
+      <div class="rt-row">
+        <span class="rt-name">Среднее</span>
+        <div class="rt-bar-wrap"><div class="rt-bar fast" style="width: 21%"></div></div>
+        <span class="rt-value">10 часов</span>
+      </div>
+    </div>
+
+    <div class="rt-section">
+      <div class="rt-label">Все отзывы (100 шт.)</div>
+      <div class="rt-row">
+        <span class="rt-name">Медиана</span>
+        <div class="rt-bar-wrap"><div class="rt-bar fast" style="width: 14%"></div></div>
+        <span class="rt-value">6.5 часов</span>
+      </div>
+      <div class="rt-row">
+        <span class="rt-name">Среднее</span>
+        <div class="rt-bar-wrap"><div class="rt-bar medium" style="width: 65%"></div></div>
+        <span class="rt-value">2.6 дня</span>
+      </div>
+    </div>
+
+    <div class="risk-item warning">
+      <div class="risk-desc">Медиана быстрая (6-9 ч.), но среднее завышено из-за 4 отзывов с ответом через 7+ дней (макс. 163 дня). 80 из 99 отвечены в тот же день.</div>
+    </div>
+  </div>
+
+  <!-- Response quality -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Качество ответов</h3>
+      <div class="meta">Классификация 17 ответов на негативные отзывы</div>
     </div>
 
     <div class="risk-bar-section">
-      <div class="risk-bar-label">Распределение рисков (17 отзывов)</div>
+      <div class="risk-bar-label">Хорошие ответы</div>
 
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Хорошие</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Хорошие ответы <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Эмпатия + конкретное решение или объяснение ситуации</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar ok" style="width: 43%"></div></div>
         <span class="risk-bar-count">3</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Приемлемые</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Нормальные ответы <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Вежливый, но неконкретный. Не вредит, но покупатель не получает решения</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar neutral" style="width: 57%"></div></div>
         <span class="risk-bar-count">4</span>
       </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="risk-bar-section">
+      <div class="risk-bar-label">Ошибки в ответах</div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Вина покупателя</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Перекладывает вину <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">&laquo;Читайте описание&raquo;, &laquo;вы неправильно используете&raquo; &mdash; винит клиента в проблеме</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar critical" style="width: 29%"></div></div>
         <span class="risk-bar-count">2</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Игнорирование</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Игнорирует жалобу <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Покупатель жалуется, а продавец благодарит за &laquo;позитивный отзыв&raquo; или отвечает про другое</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar warning" style="width: 29%"></div></div>
         <span class="risk-bar-count">2</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Усиление негатива</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Подтверждает проблему <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Продавец сам признаёт несоответствие описанию &mdash; это видят все потенциальные покупатели</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar critical" style="width: 29%"></div></div>
         <span class="risk-bar-count">2</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Отрицание проблемы</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Отрицает проблему <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">&laquo;У нас всё хорошо&raquo; &mdash; проблема есть, но продавец говорит что нет</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar critical" style="width: 29%"></div></div>
         <span class="risk-bar-count">2</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Пустой шаблон</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Копипаст-шаблон <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Одинаковый текст на все отзывы &mdash; покупатель видит: никто не читает</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar warning" style="width: 14%"></div></div>
         <span class="risk-bar-count">1</span>
       </div>
+
       <div class="risk-bar-row">
-        <span class="risk-bar-name">Без ответа</span>
+        <span class="risk-bar-name tooltip-wrap">
+          Без ответа <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Продавец не ответил на негативный отзыв вообще</span>
+        </span>
         <div class="risk-bar-wrap"><div class="risk-bar critical" style="width: 14%"></div></div>
         <span class="risk-bar-count">1</span>
       </div>
+
     </div>
   </div>
 
@@ -309,42 +458,69 @@
     </div>
 
     <div class="sample">
-      <div class="sample-label">#1 · Игнорирование жалобы на негативный отзыв</div>
+      <div class="sample-label">#1 &middot; Благодарит за &laquo;позитив&raquo; на жалобу</div>
       <div class="sample-item">
         <div class="sample-text">Покупатель (3 звезды): &laquo;Быстро садиться. За такие деньги не ожидал.&raquo;</div>
         <div class="sample-reply">Продавец: &laquo;Спасибо Вам за положительную обратную связь! Будем рады видеть вас снова!&raquo;</div>
-        <div class="sample-meta">&#9733;3 · серый · 2025-03-25</div>
-        <span class="sample-tag tag-ignore">ИГНОРИРОВАНИЕ</span>
+        <div class="sample-meta">&#9733;3 &middot; серый &middot; 2025-03-25</div>
+        <span class="sample-tag tag-ignore">НЕ ЗАМЕЧАЕТ ЖАЛОБУ</span>
       </div>
       <div class="risk-item">
-        <div class="risk-desc">Покупатель жалуется на быстрый разряд батареи, а продавец благодарит за &laquo;позитивный отзыв&raquo;. Любой потенциальный покупатель видит: продавец не читает отзывы или ему все равно. Это может быть бот-ошибка, но покупатель этого не знает.</div>
+        <div class="risk-desc">Покупатель жалуется на быстрый разряд батареи, а продавец благодарит за &laquo;позитивный отзыв&raquo;. Любой читающий видит: продавец не читает отзывы или ему всё равно.</div>
       </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Благодарим за отзыв! Нам жаль, что время работы не оправдало ожиданий. На автономность влияет режим яркости и температура &mdash; на минимальном режиме фонарик работает значительно дольше. Если нужна помощь с настройкой &mdash; пишите нам!&raquo;</div>
+          <div class="ai-rewrite-why">Признаёт проблему клиента, объясняет возможные причины без обвинений, предлагает помощь</div>
+        </div>
+      </details>
     </div>
 
     <div class="sample">
-      <div class="sample-label">#2 · Обвинение покупателя</div>
+      <div class="sample-label">#2 &middot; Обвиняет покупателя</div>
       <div class="sample-item">
         <div class="sample-text">Покупатель (2 звезды): &laquo;Светит не ярко&raquo;</div>
         <div class="sample-reply">Продавец: &laquo;Световой поток 500лм указан в характеристиках. Пожалуйста изучайте характеристики товара перед заказом.&raquo;</div>
-        <div class="sample-meta">&#9733;2 · серый/зеленый/хаки/черный · 2025-12-24</div>
-        <span class="sample-tag tag-blame">ВИНА ПОКУПАТЕЛЯ</span>
+        <div class="sample-meta">&#9733;2 &middot; серый/зеленый/хаки/черный &middot; 2025-12-24</div>
+        <span class="sample-tag tag-blame">ПЕРЕКЛАДЫВАЕТ ВИНУ</span>
       </div>
       <div class="risk-item">
-        <div class="risk-desc">&laquo;Изучайте характеристики перед заказом&raquo; &mdash; самый токсичный тип ответа. Каждый потенциальный покупатель думает: &laquo;Если у меня будет проблема, продавец обвинит меня.&raquo; Один такой ответ может отпугнуть 5-10 колеблющихся покупателей.</div>
+        <div class="risk-desc">&laquo;Изучайте характеристики перед заказом&raquo; &mdash; самый токсичный тип ответа. Каждый потенциальный покупатель думает: &laquo;Если у меня будет проблема, продавец обвинит меня.&raquo;</div>
       </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Понимаем ваше разочарование! Этот фонарик рассчитан на ближнее освещение (кемпинг, дом). Для мощного уличного света рекомендуем модели с 800+ лм. Если есть вопросы по подбору &mdash; напишите нам.&raquo;</div>
+          <div class="ai-rewrite-why">Эмпатия вместо обвинений, объясняет назначение товара, предлагает альтернативу, открывает диалог</div>
+        </div>
+      </details>
     </div>
 
     <div class="sample">
-      <div class="sample-label">#3 · Признание проблемы без решения</div>
+      <div class="sample-label">#3 &middot; Публично подтверждает обман</div>
       <div class="sample-item">
         <div class="sample-text">Покупатель (2 звезды): &laquo;24 минуты вместо заявленных 6 часов. Механизм наклона как на китайской игрушке.&raquo;</div>
         <div class="sample-reply">Продавец: &laquo;Сожалеем, что реальные характеристики не соответствуют заявленным показателям... Спасибо за подробный разбор.&raquo;</div>
-        <div class="sample-meta">&#9733;2 · серый · 2026-01-08</div>
-        <span class="sample-tag tag-amplify">УСИЛЕНИЕ НЕГАТИВА</span>
+        <div class="sample-meta">&#9733;2 &middot; серый &middot; 2026-01-08</div>
+        <span class="sample-tag tag-amplify">ПОДТВЕРЖДАЕТ ПРОБЛЕМУ ПУБЛИЧНО</span>
       </div>
       <div class="risk-item">
-        <div class="risk-desc">Продавец публично признает, что реальные характеристики не совпадают с заявленными (24 мин. вместо 6 ч.), но не предлагает НИЧЕГО: ни возврат, ни замену, ни ремонт. Для покупателя это публичное признание обмана без компенсации.</div>
+        <div class="risk-desc">Продавец сам пишет &laquo;характеристики не соответствуют заявленным&raquo;. Это видят ВСЕ потенциальные покупатели. По сути &mdash; публичное признание, что описание товара неправдиво.</div>
       </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Спасибо за подробный разбор, нам очень жаль. Такое отклонение &mdash; нештатная ситуация, возможен дефект конкретного экземпляра. Мы уже передали информацию в отдел качества для проверки этой партии. Напишите нам, поможем разобраться!&raquo;</div>
+          <div class="ai-rewrite-why">Не признаёт обман публично (&laquo;нештатная ситуация&raquo;, а не &laquo;характеристики не соответствуют&raquo;), показывает конкретное действие (проверка партии)</div>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -356,9 +532,8 @@
     </div>
 
     <ul class="perception-list">
-      <li>Продавец использует шаблоны и ИИ-ответы, которые не всегда соответствуют содержанию отзыва</li>
+      <li>Продавец использует шаблонные ответы, которые не соответствуют содержанию отзыва</li>
       <li>При реальных проблемах (яркость, батарея, дефекты) продавец обвиняет покупателя, игнорирует жалобу или признает проблему без решения</li>
-      <li>Скорость ответа высокая, но бессмысленна, если содержание ответа неадекватно</li>
       <li>Только 40% ответов на негатив реально помогают покупателю</li>
       <li>Повторяющаяся проблема с батареей, которую продавец не может или не хочет решить</li>
       <li>Паттерн поведения: &laquo;покупайте на свой страх и риск&raquo;</li>
@@ -368,54 +543,175 @@
   <!-- Additional risks in positive reviews -->
   <div class="card">
     <div class="card-header">
-      <h3>Скрытые риски в позитивных отзывах</h3>
-      <div class="meta">3 позитивных отзыва (4-5 звезд) с проигнорированными жалобами</div>
+      <h3>Упущенные возможности в позитивных отзывах</h3>
+      <div class="meta">Позитивные отзывы (4-5 звезд), где покупатель указал проблему &mdash; продавец проигнорировал</div>
     </div>
 
     <div class="sample">
       <div class="sample-item warn-border">
-        <div class="sample-text">&#9733;5: &laquo;На морозе хватает на 40 минут. Может аккумулятор еще не разработался...&raquo;</div>
-        <div class="sample-reply">Продавец: &laquo;Спасибо за положительную обратную связь! Будем рады видеть вас снова!&raquo;</div>
+        <div class="sample-text">&#9733;5 &middot; Игорь: &laquo;На морозе хватает на 40 минут. Может аккумулятор еще не разработался...&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Спасибо Вам за положительную обратную связь! Будем рады видеть вас снова!&raquo;</div>
         <div class="sample-meta">Жалоба на время работы в холоде полностью проигнорирована</div>
       </div>
       <div class="sample-item warn-border">
-        <div class="sample-text">&#9733;5: &laquo;А на зарядке нет обещанного индикатора.&raquo;</div>
-        <div class="sample-reply">Продавец хвалит яркость, обещанный индикатор не упоминает</div>
-        <div class="sample-meta">Несоответствие карточке товара не адресовано</div>
+        <div class="sample-text">&#9733;5 &middot; Сергей: &laquo;А на зарядке нет обещанного индикатора.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Мы рады, что фонарь впечатлил вас своей мощностью и стабильной работой...&raquo;</div>
+        <div class="sample-meta">Покупатель указал на расхождение с описанием &mdash; продавец не заметил</div>
       </div>
       <div class="sample-item warn-border">
         <div class="sample-text">&#9733;4: &laquo;Корпус липнет к рукам&raquo;</div>
-        <div class="sample-reply">Продавец: общая похвала характеристик, проблема не упомянута</div>
-        <div class="sample-meta">Тактильная проблема качества проигнорирована</div>
+        <div class="sample-reply">Продавец: &laquo;Яркость в 500 люмен и дальность свечения до 120 метров обеспечивают комфорт...&raquo;</div>
+        <div class="sample-meta">Тактильная проблема качества проигнорирована, в ответ &mdash; характеристики из карточки</div>
       </div>
     </div>
 
-    <div class="risk-item warning">
-      <div class="risk-desc">Даже в позитивных отзывах покупатели поднимают реальные проблемы. Игнорируя их, продавец теряет шанс укрепить доверие и подтверждает паттерн: жалобы не читаются.</div>
+    <div id="positive-more" style="display: none;">
+
+      <div class="divider"></div>
+      <div class="sample-label">Подробный разбор позитивных отзывов с проблемами</div>
+
+      <div class="sample">
+        <div class="sample-label">#1 &middot; Нет обещанного индикатора зарядки</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Сергей: &laquo;Фонарь ставил на прогон. 5 часов, светит как будто бы только включил. А на зарядке нет обещанного индикатора.&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Большое спасибо за подробный отзыв и высшую оценку! Мы рады, что фонарь впечатлил вас своей мощностью...&raquo;</div>
+          <div class="sample-meta">Покупатель явно пишет &laquo;нет обещанного индикатора&raquo; &mdash; продавец игнорирует</div>
+          <span class="sample-tag tag-ignore">НЕ ЗАМЕЧАЕТ ЖАЛОБУ</span>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Несоответствие описанию товара &mdash; индикатор зарядки отсутствует. Продавец мог объяснить, как работает индикация, или признать расхождение с описанием. Вместо этого &mdash; шаблонная благодарность.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Сергей, спасибо за подробный тест! 5 часов без потери яркости &mdash; отличный результат. По индикатору зарядки &mdash; он расположен на кнопке и светится красным/зеленым при подключении кабеля. Если индикатор не загорается &mdash; напишите нам, поможем разобраться!&raquo;</div>
+            <div class="ai-rewrite-why">Отвечает на конкретную жалобу, объясняет как должно работать, предлагает помощь</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#2 &middot; Датчик движения только 2 режима</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Ирина: Недостатки: &laquo;По датчику движения только два режима &mdash; полная яркость и УФ&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Спасибо Вам за положительную обратную связь! Будем рады видеть вас снова!&raquo;</div>
+          <div class="sample-meta">Конкретная жалоба на функционал датчика &mdash; самый шаблонный ответ</div>
+          <span class="sample-tag tag-template">КОПИПАСТ-ШАБЛОН</span>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Покупатель точно описывает ограничение функционала &mdash; датчик движения работает только в 2 из 5 режимов. Ответ &laquo;спасибо за позитивный отзыв&raquo; подтверждает: жалобы не читают.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Ирина, спасибо за важное наблюдение! Датчик движения работает с полной яркостью и УФ &mdash; это сделано для удобства при работе в темноте. Для других режимов используйте кнопку. Передадим ваше пожелание в отдел разработки!&raquo;</div>
+            <div class="ai-rewrite-why">Объясняет логику ограничения, показывает что feedback дошёл до команды</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#3 &middot; Датчик реагирует на всё подряд + нет зажима</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;4 &middot; Сергей: &laquo;Не удобная функция датчика движения, реагирует на всё подряд. Нет зажима на одежду.&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;...в этом фонаре таких характиристик нет, при этом есть другие преимущества... Присмотритесь к нашему повербанку Warrior Pro...&raquo;</div>
+          <div class="sample-meta">Две конкретные проблемы &mdash; в ответ невнятное отрицание и кросс-продажа</div>
+          <span class="sample-tag tag-deny">ОТРИЦАНИЕ + КРОСС-ПРОДАЖА</span>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Покупатель описывает 2 проблемы: (1) чрезмерная чувствительность датчика, (2) нет клипсы. Продавец невнятно отрицает и тут же продвигает повербанк. Для потенциального покупателя это выглядит как &laquo;нам не интересны ваши проблемы, купите ещё что-нибудь&raquo;.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Сергей, спасибо за обратную связь! Датчик можно отключить длительным нажатием кнопки &mdash; попробуйте в режиме без датчика. По клипсе &mdash; в этой модели крепление на голову, но мы фиксируем запрос (уже не первый). Если нужна помощь с настройкой &mdash; пишите!&raquo;</div>
+            <div class="ai-rewrite-why">Конкретное решение для датчика, честный ответ по клипсе, открытый диалог</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#4 &middot; Сенсор переключает режимы вместо вкл/выкл</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Заур (3-й фонарик!): &laquo;Если захотеть включить и выключить фонарь по датчику &mdash; он переключает цвета подряд&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Спасибо за подробный отзыв... Присмотритесь к нашему повербанку Warrior Pro...&raquo;</div>
+          <div class="sample-meta">Лояльный повторный покупатель описывает UX-баг &mdash; в ответ кросс-продажа</div>
+          <span class="sample-tag tag-ignore">НЕ ЗАМЕЧАЕТ + КРОСС-ПРОДАЖА</span>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Это третий фонарик покупателя &mdash; он максимально лоялен. Описывает конкретный баг: жест датчика переключает режимы вместо вкл/выкл. Продавец игнорирует и продвигает повербанк. Самый лояльный клиент получает самый безразличный ответ.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Заур, спасибо что снова выбрали нас &mdash; третий фонарик, это дорогого стоит! По датчику: быстрый взмах &mdash; вкл/выкл, медленное движение &mdash; переключение режимов. Попробуйте резкий жест. Если поведение не меняется &mdash; напишите нам, разберёмся!&raquo;</div>
+            <div class="ai-rewrite-why">Признание лояльности, конкретная помощь с жестом, открытый диалог вместо кросс-продажи</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#5 &middot; Просьба о клипсе на пояс</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Алексей: &laquo;Хороший фонарь, не ноунейм.&raquo; Недостатки: &laquo;Клипсу бы... Для крепления на пояс и тд&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;...Особенно благодарим за ценное замечание относительно клипсы &mdash; обязательно передадим в отдел разработки...&raquo;</div>
+          <div class="sample-meta">Лучший ответ из пяти &mdash; но &laquo;передадим в разработку&raquo; без конкретики</div>
+          <span class="sample-tag tag-template">ФОРМАЛЬНОЕ ОБЕЩАНИЕ</span>
+        </div>
+        <div class="risk-item ok">
+          <div class="risk-desc">Единственный ответ, где продавец хотя бы упоминает жалобу. Но &laquo;передадим в разработку&raquo; &mdash; это формальная отписка. Запрос на клипсу повторяется у нескольких покупателей &mdash; можно было ответить конкретнее.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Алексей, спасибо за отзыв! Клипса &mdash; частый запрос, мы это слышим. В текущей модели крепление на голову, но для пояса подойдёт универсальный чехол. Учтём для следующей версии!&raquo;</div>
+            <div class="ai-rewrite-why">Конкретный ответ вместо &laquo;передадим&raquo;, предлагает существующее решение, подтверждает что запрос не первый</div>
+          </div>
+        </details>
+      </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 14px;">
+      <a href="#" id="toggle-positive" onclick="var el=document.getElementById('positive-more'); var link=this; if(el.style.display==='none'){el.style.display='block';link.textContent='Скрыть подробный разбор';}else{el.style.display='none';link.textContent='Посмотреть ещё 5 \u2192';} return false;" style="font-size: 12px; color: #e8a838; text-decoration: none; font-weight: 600;">Посмотреть ещё 5 &rarr;</a>
+    </div>
+
+    <div class="risk-item warning" style="margin-top: 16px;">
+      <div class="risk-title">Системная проблема</div>
+      <div class="risk-desc">Даже в позитивных отзывах покупатели поднимают реальные проблемы. Игнорируя их, продавец теряет шанс укрепить доверие. Повторяющиеся запросы: датчик движения &mdash; 3 отзыва, клипса &mdash; 2 отзыва.</div>
     </div>
   </div>
 
   <!-- Loss estimate -->
   <div class="card">
     <div class="card-header">
-      <h3>Реальная оценка потерь конверсии</h3>
+      <h3>Оценка влияния на конверсию</h3>
     </div>
 
     <div class="loss-box">
-      <div class="loss-pct" style="color: #e85454;">-3 ... 8%</div>
-      <div class="loss-label">потенциальные потери конверсии из-за качества ответов</div>
-      <div class="loss-confidence">Уверенность: средняя (17 негативных отзывов, 7 высокорисковых ответов)</div>
+      <div class="loss-pct" style="color: #e8a838;">~2-5%</div>
+      <div class="loss-label">приблизительные потери конверсии из-за качества ответов</div>
+      <div class="loss-confidence">Приблизительная оценка на основе 17 негативных отзывов и 7 вредящих ответов. Точность зависит от категории товара и трафика.</div>
     </div>
 
     <div class="risk-section">
-      <div class="risk-label">Расчет</div>
+      <div class="risk-label">Логика расчёта</div>
       <div class="risk-item">
         <div class="risk-title">7 из 17 ответов активно вредят</div>
         <div class="risk-desc">
           Каждый негативный отзыв читают 10-50x больше людей, чем оставляют отзывы.
           Ответ &laquo;изучайте характеристики&raquo; и &laquo;спасибо за позитивный отзыв&raquo; на жалобу видны ВСЕМ.
-          Консервативная оценка: 3-5% потенциальных покупателей уходят.
-          Верхняя граница: 8% с учетом косвенных эффектов (эрозия доверия).
+          Приблизительная оценка: 2-5% потенциальных покупателей могут уйти.
         </div>
       </div>
       <div class="risk-item warning">
@@ -426,52 +722,42 @@
         </div>
       </div>
     </div>
-
-    <div class="verdict">
-      <div class="verdict-title">Вывод</div>
-      <div class="verdict-text">
-        Продавец отвечает быстро (медиана 0.3 дня) и покрывает 94% негатива. Но качество ответов &mdash;
-        главная проблема. 41% ответов на негатив активно вредят конверсии: обвиняют покупателя,
-        игнорируют жалобу, признают проблему без решения, или отрицают её.
-        Быстрый плохой ответ хуже, чем медленный хороший.
-        Основные точки роста: (1) убрать шаблонные ответы с бота на негатив,
-        (2) никогда не обвинять покупателя, (3) всегда предлагать конкретное решение.
-      </div>
-      <div class="verdict-note">
-        Оценка качества: 4/10. Расчет на 100 из 407 отзывов. Методология: ручная классификация каждого ответа по 9 категориям риска.
-      </div>
-    </div>
   </div>
 
-  <!-- Full Classification Table -->
+  <!-- Action Plan -->
   <div class="card">
     <div class="card-header">
-      <h3>Все 17 негативных отзывов</h3>
-      <div class="meta">Полная классификация с указанием типа риска и серьезности</div>
+      <h3>Что делать продавцу</h3>
+      <div class="meta">Конкретные шаги для улучшения качества ответов</div>
     </div>
 
-    <div class="breakdown">
-      <table>
-        <tr><th>#</th><th>Звезды</th><th>Тип риска</th><th style="text-align:right">Серьезн.</th></tr>
-        <tr><td>1</td><td>&#9733;2</td><td class="red-text">Вина покупателя</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>2</td><td>&#9733;1</td><td class="green-text">Приемлемый</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>3</td><td>&#9733;3</td><td class="green-text">Хороший</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>4</td><td>&#9733;1</td><td class="red-text">Без ответа</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>5</td><td>&#9733;3</td><td class="yellow-text">Усиление негатива</td><td class="num yellow-text">Средн.</td></tr>
-        <tr><td>6</td><td>&#9733;2</td><td class="green-text">Приемлемый</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>7</td><td>&#9733;1</td><td class="red-text">Вина покупателя</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>8</td><td>&#9733;1</td><td class="green-text">Хороший</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>9</td><td>&#9733;3</td><td class="red-text">Отрицание проблемы</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>10</td><td>&#9733;3</td><td class="red-text">Игнорирование</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>11</td><td>&#9733;1</td><td class="green-text">Приемлемый</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>12</td><td>&#9733;1</td><td class="green-text">Хороший</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>13</td><td>&#9733;3</td><td class="red-text">Пустой шаблон</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>14</td><td>&#9733;1</td><td class="green-text">Приемлемый</td><td class="num green-text">Низк.</td></tr>
-        <tr><td>15</td><td>&#9733;2</td><td class="red-text">Усиление негатива</td><td class="num red-text">Выс.</td></tr>
-        <tr><td>16</td><td>&#9733;3</td><td class="yellow-text">Игнорирование</td><td class="num yellow-text">Средн.</td></tr>
-        <tr><td>17</td><td>&#9733;1</td><td class="yellow-text">Отрицание проблемы</td><td class="num yellow-text">Средн.</td></tr>
-      </table>
-    </div>
+    <ol class="action-list">
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Отключить автоматические шаблоны на негативные отзывы (1-3 звезды). Каждый негатив &mdash; ручной ответ, который отвечает на конкретную жалобу покупателя.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Никогда не обвинять покупателя (&laquo;читайте описание&raquo;, &laquo;вы неправильно используете&raquo;). Вместо этого &mdash; эмпатия и объяснение.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Не признавать публично, что характеристики не соответствуют описанию. Использовать формулировки &laquo;нештатная ситуация&raquo;, &laquo;возможен дефект экземпляра&raquo;.
+      </li>
+      <li>
+        <span class="action-priority medium">Важно</span><br>
+        В позитивных отзывах с жалобами &mdash; отвечать на конкретный недостаток, а не только благодарить. Это укрепляет доверие и показывает внимательность.
+      </li>
+      <li>
+        <span class="action-priority medium">Важно</span><br>
+        Проблема датчика движения упоминается в 3+ отзывах. Добавить инструкцию по настройке датчика в описание товара или FAQ.
+      </li>
+    </ol>
+  </div>
+
+  <!-- Note -->
+  <div style="text-align: center; padding: 8px; font-size: 10px; color: #5c6878;">
+    Оценка: 4/10 &middot; Анализ 100 из 407 отзывов &middot; Классификация по 8 категориям
   </div>
 
 </div>
