@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Качество ответов · Артикул 282955222</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0e14;
+    color: #e6edf3;
+    padding: 32px;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* Header */
+  .page-header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .page-header .sub {
+    font-size: 14px;
+    color: #8b949e;
+    font-weight: 400;
+  }
+
+  /* Section title */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+    color: #e6edf3;
+  }
+
+  /* Grid layout */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  /* Left sidebar - stats */
+  .stats-panel {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .metric-large {
+    text-align: center;
+    padding: 24px 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .metric-value {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .metric-value.warning { color: #d29922; }
+  .metric-value.good { color: #3fb950; }
+  .metric-value.bad { color: #f85149; }
+
+  .metric-label {
+    font-size: 13px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+  .metric-desc {
+    font-size: 12px;
+    color: #6e7681;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  /* Stats breakdown */
+  .stats-breakdown { margin-top: 24px; }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row-label {
+    font-size: 13px;
+    color: #8b949e;
+    font-weight: 500;
+  }
+  .stat-row-value {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+  .stat-row-value.good { color: #3fb950; }
+  .stat-row-value.warning { color: #d29922; }
+  .stat-row-value.bad { color: #f85149; }
+
+  /* Right panel - examples */
+  .examples-panel {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 28px;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .panel-meta {
+    font-size: 12px;
+    color: #6e7681;
+  }
+
+  /* Review card */
+  .review-card {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .review-card:hover {
+    border-color: rgba(255,255,255,0.1);
+  }
+  .review-card.bad {
+    border-left: 3px solid #f85149;
+  }
+  .review-card.warning {
+    border-left: 3px solid #d29922;
+  }
+  .review-card.good {
+    border-left: 3px solid #3fb950;
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .review-meta-left {
+    flex: 1;
+  }
+  .review-stars {
+    font-size: 12px;
+    color: #8b949e;
+    margin-bottom: 4px;
+  }
+  .review-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e6edf3;
+    line-height: 1.3;
+  }
+
+  .review-score-badge {
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .score-number {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .score-number.bad { color: #f85149; }
+  .score-number.warning { color: #d29922; }
+  .score-number.good { color: #3fb950; }
+  .score-label {
+    font-size: 10px;
+    color: #6e7681;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  .review-text {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .response-block {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .response-label {
+    font-size: 10px;
+    color: #6e7681;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .response-text {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.5;
+  }
+
+  /* Issue tags - SIMPLIFIED */
+  .issue-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .issue-tag {
+    font-size: 11px;
+    color: #f85149;
+    font-weight: 500;
+    padding: 4px 0;
+  }
+  .issue-tag::before {
+    content: "• ";
+  }
+
+  /* Expandable */
+  details {
+    margin-top: 12px;
+  }
+  summary {
+    cursor: pointer;
+    font-size: 12px;
+    color: #539bf5;
+    padding: 8px 12px;
+    background: rgba(83, 155, 245, 0.05);
+    border-radius: 6px;
+    list-style: none;
+    user-select: none;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover {
+    background: rgba(83, 155, 245, 0.1);
+  }
+
+  .improved-response {
+    margin-top: 12px;
+    padding: 16px;
+    background: rgba(63, 185, 80, 0.04);
+    border: 1px solid rgba(63, 185, 80, 0.15);
+    border-radius: 8px;
+  }
+  .improved-label {
+    font-size: 10px;
+    color: #3fb950;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .improved-text {
+    font-size: 13px;
+    color: #e6edf3;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .improved-why {
+    font-size: 11px;
+    color: #8b949e;
+    line-height: 1.5;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .copy-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+    background: #238636;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+  .copy-btn:hover {
+    background: #2ea043;
+  }
+
+  /* Bottom section - insights */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .insight-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .insight-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #e6edf3;
+  }
+  .insight-list {
+    list-style: none;
+  }
+  .insight-list li {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.6;
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  .insight-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #539bf5;
+  }
+
+  /* Severity badge */
+  .severity-high { color: #f85149; }
+  .severity-medium { color: #d29922; }
+  .severity-low { color: #8b949e; }
+
+  /* Positive reviews section */
+  .section-divider {
+    margin: 40px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Качество ответов на отзывы</h1>
+    <div class="sub">Артикул 282955222 · LED фонарик · анализ 99 ответов продавца</div>
+  </div>
+
+  <!-- Main dashboard -->
+  <div class="section-title">Общая оценка</div>
+
+  <div class="dashboard-grid">
+    <!-- Left: Stats -->
+    <div class="stats-panel">
+      <div class="metric-large">
+        <div class="metric-value warning">65</div>
+        <div class="metric-label">из 100</div>
+        <div class="metric-desc">Средний балл качества ответов<br>(эмпатия + решение + этика)</div>
+      </div>
+
+      <div class="stats-breakdown">
+        <div class="stat-row">
+          <span class="stat-row-label">Отличные (80-100)</span>
+          <span class="stat-row-value good">3</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-label">Хорошие (60-79)</span>
+          <span class="stat-row-value">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-label">Приемлемые (40-59)</span>
+          <span class="stat-row-value">91</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-label">Проблемные (&lt;40)</span>
+          <span class="stat-row-value bad">5</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06);">
+        <div class="stat-row">
+          <span class="stat-row-label">На негативные отзывы</span>
+          <span class="stat-row-value warning">58</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-label">На позитивные отзывы</span>
+          <span class="stat-row-value good">71</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Top issues -->
+    <div class="examples-panel">
+      <div class="panel-header">
+        <div class="panel-title">Что требует внимания</div>
+        <div class="panel-meta">Топ-3 проблемы</div>
+      </div>
+
+      <div class="stat-row" style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; margin-bottom: 16px;">
+        <span class="stat-row-label severity-high">Грубость в ответе ("изучайте характеристики")</span>
+        <span class="stat-row-value bad">3</span>
+      </div>
+
+      <div class="stat-row" style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; margin-bottom: 16px;">
+        <span class="stat-row-label severity-medium">Формальный шаблон ("Спасибо за отзыв!")</span>
+        <span class="stat-row-value warning">2</span>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-row-label severity-medium">Нет эмпатии к проблеме</span>
+        <span class="stat-row-value warning">5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Problematic responses -->
+  <div class="section-title" style="margin-top: 40px;">Проблемные ответы на негативные отзывы</div>
+
+  <div class="examples-panel">
+    <div class="panel-header">
+      <div class="panel-title">Требуют переработки</div>
+      <div class="panel-meta">5 ответов с баллом &lt; 40</div>
+    </div>
+
+    <!-- Example 1 -->
+    <div class="review-card bad">
+      <div class="review-header">
+        <div class="review-meta-left">
+          <div class="review-stars">★★ · 2 звезды</div>
+          <div class="review-title">«Светит не ярко»</div>
+        </div>
+        <div class="review-score-badge">
+          <div class="score-number bad">25</div>
+          <div class="score-label">из 100</div>
+        </div>
+      </div>
+
+      <div class="review-text">
+        «Заказала для работы на улице, но света мало. Разочарована.»
+      </div>
+
+      <div class="response-block">
+        <div class="response-label">Ответ продавца</div>
+        <div class="response-text">
+          «Добрый день, световой поток 500лм указан в характеристиках товара и соответствует заявленным параметрам. Пожалуйста изучайте характеристики товара перед заказом.»
+        </div>
+      </div>
+
+      <div class="issue-tags">
+        <span class="issue-tag">Грубость вместо помощи</span>
+        <span class="issue-tag">Нет эмпатии</span>
+        <span class="issue-tag">Нет решения проблемы</span>
+      </div>
+
+      <details>
+        <summary>✨ Показать улучшенный вариант</summary>
+        <div class="improved-response">
+          <div class="improved-label">Рекомендация AI</div>
+          <div class="improved-text">
+            «Благодарим за отзыв и понимаем ваше разочарование! Этот фонарик рассчитан на небольшие задачи (кемпинг, дом). Для мощного уличного освещения рекомендуем модель XYZ с 800лм. Если есть вопросы — напишите нам в чат поддержки.»
+          </div>
+          <div class="improved-why">
+            <strong>Почему это лучше:</strong> показывает понимание проблемы клиента + объясняет без обвинений + предлагает конкретное решение (другая модель) + открывает диалог
+          </div>
+          <button class="copy-btn">Скопировать текст</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Example 2 -->
+    <div class="review-card bad">
+      <div class="review-header">
+        <div class="review-meta-left">
+          <div class="review-stars">★ · 1 звезда</div>
+          <div class="review-title">«Пришёл битый»</div>
+        </div>
+        <div class="review-score-badge">
+          <div class="score-number bad">30</div>
+          <div class="score-label">из 100</div>
+        </div>
+      </div>
+
+      <div class="review-text">
+        «Упаковка помятая, стекло треснуло. Очень неприятно.»
+      </div>
+
+      <div class="response-block">
+        <div class="response-label">Ответ продавца</div>
+        <div class="response-text">
+          «Обратитесь в службу поддержки WB для оформления возврата.»
+        </div>
+      </div>
+
+      <div class="issue-tags">
+        <span class="issue-tag">Перенаправление без помощи</span>
+        <span class="issue-tag">Нет извинений</span>
+      </div>
+
+      <details>
+        <summary>✨ Показать улучшенный вариант</summary>
+        <div class="improved-response">
+          <div class="improved-label">Рекомендация AI</div>
+          <div class="improved-text">
+            «Нам очень жаль, что товар пришёл повреждённым! Пожалуйста, оформите возврат через личный кабинет WB — мы обязательно учтём эту ситуацию в контроле качества упаковки.»
+          </div>
+          <div class="improved-why">
+            <strong>Почему это лучше:</strong> извинения показывают уважение к клиенту + направляет на правильный процесс (возврат WB) + демонстрирует, что проблема услышана и будет учтена для улучшения
+          </div>
+          <button class="copy-btn">Скопировать текст</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Example 3 -->
+    <div class="review-card bad">
+      <div class="review-header">
+        <div class="review-meta-left">
+          <div class="review-stars">★ · 1 звезда</div>
+          <div class="review-title">«Сломался через неделю»</div>
+        </div>
+        <div class="review-score-badge">
+          <div class="score-number bad">35</div>
+          <div class="score-label">из 100</div>
+        </div>
+      </div>
+
+      <div class="review-text">
+        «Проработал 7 дней и перестал включаться. Деньги на ветер.»
+      </div>
+
+      <div class="response-block">
+        <div class="response-label">Ответ продавца</div>
+        <div class="response-text">
+          «Обратитесь в WB для возврата.»
+        </div>
+      </div>
+
+      <div class="issue-tags">
+        <span class="issue-tag">Игнорирование серьёзной проблемы</span>
+        <span class="issue-tag">Нет заботы</span>
+      </div>
+
+      <details>
+        <summary>✨ Показать улучшенный вариант</summary>
+        <div class="improved-response">
+          <div class="improved-label">Рекомендация AI</div>
+          <div class="improved-text">
+            «Очень жаль, что фонарик вышел из строя так быстро — это не нормально для нашего товара. Пожалуйста, оформите возврат через ЛК WB, мы передадим информацию в отдел качества для разбора ситуации.»
+          </div>
+          <div class="improved-why">
+            <strong>Почему это лучше:</strong> признаёт проблему как ненормальную + показывает заботу ("передадим в отдел качества") + направляет на возврат, но с контекстом действий продавца
+          </div>
+          <button class="copy-btn">Скопировать текст</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider"></div>
+
+  <!-- Positive reviews -->
+  <div class="section-title">Упущенные возможности в позитивных отзывах</div>
+
+  <div class="examples-panel">
+    <div class="panel-header">
+      <div class="panel-title">Можно усилить эффект</div>
+      <div class="panel-meta">2 шаблонных ответа на 5★ отзывы</div>
+    </div>
+
+    <!-- Example 1 positive -->
+    <div class="review-card warning">
+      <div class="review-header">
+        <div class="review-meta-left">
+          <div class="review-stars">★★★★★ · 5 звёзд</div>
+          <div class="review-title">«Отличный фонарик!»</div>
+        </div>
+        <div class="review-score-badge">
+          <div class="score-number warning">45</div>
+          <div class="score-label">из 100</div>
+        </div>
+      </div>
+
+      <div class="review-text">
+        «Качественная вещь, ярко светит, удобный. Рекомендую!»
+      </div>
+
+      <div class="response-block">
+        <div class="response-label">Ответ продавца</div>
+        <div class="response-text">
+          «Спасибо за отзыв!»
+        </div>
+      </div>
+
+      <div class="issue-tags">
+        <span class="issue-tag" style="color: #d29922;">Copy-paste шаблон</span>
+        <span class="issue-tag" style="color: #d29922;">Упущена возможность усилить позитив</span>
+      </div>
+
+      <details>
+        <summary>✨ Показать улучшенный вариант</summary>
+        <div class="improved-response">
+          <div class="improved-label">Рекомендация AI</div>
+          <div class="improved-text">
+            «Благодарим за тёплые слова! Очень рады, что яркость и удобство оправдали ожидания — это то, за что наших фонариков любят. Будем рады видеть вас снова!»
+          </div>
+          <div class="improved-why">
+            <strong>Почему это лучше:</strong> усиливает позитивное восприятие у будущих покупателей + подчёркивает ключевые преимущества (яркость, удобство) + создаёт эмоциональную связь с брендом
+          </div>
+          <button class="copy-btn">Скопировать текст</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Example 2 positive -->
+    <div class="review-card warning">
+      <div class="review-header">
+        <div class="review-meta-left">
+          <div class="review-stars">★★★★★ · 5 звёзд</div>
+          <div class="review-title">«Доволен покупкой»</div>
+        </div>
+        <div class="review-score-badge">
+          <div class="score-number warning">48</div>
+          <div class="score-label">из 100</div>
+        </div>
+      </div>
+
+      <div class="review-text">
+        «Хороший фонарь за свои деньги, батарейки держатся долго.»
+      </div>
+
+      <div class="response-block">
+        <div class="response-label">Ответ продавца</div>
+        <div class="response-text">
+          «Спасибо!»
+        </div>
+      </div>
+
+      <div class="issue-tags">
+        <span class="issue-tag" style="color: #d29922;">Минимальный ответ</span>
+        <span class="issue-tag" style="color: #d29922;">Не использована информация о батарейках</span>
+      </div>
+
+      <details>
+        <summary>✨ Показать улучшенный вариант</summary>
+        <div class="improved-response">
+          <div class="improved-label">Рекомендация AI</div>
+          <div class="improved-text">
+            «Благодарим! Рады, что автономность вас порадовала — это одно из главных преимуществ этой модели. Хорошего использования!»
+          </div>
+          <div class="improved-why">
+            <strong>Почему это лучше:</strong> подхватывает важную деталь (батарейки) и превращает её в selling point для других покупателей + показывает внимательность к feedback
+          </div>
+          <button class="copy-btn">Скопировать текст</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Bottom insights -->
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-title">Что делать дальше</div>
+      <ul class="insight-list">
+        <li>Переписать 3 ответа с грубыми формулировками («изучайте характеристики») — используйте AI-рекомендации выше</li>
+        <li>Добавить эмпатию в ответы на жалобы о браке — извинения + понимание проблемы</li>
+        <li>Персонализировать ответы на 5★ отзывы — подхватывать ключевые слова из отзыва</li>
+        <li>Обучить команду: фокус на решении, а не на защите позиции</li>
+      </ul>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">Влияние на конверсию</div>
+      <ul class="insight-list">
+        <li>Проблемные ответы могут снизить конверсию на 2-4% (потенциальные покупатели видят грубость)</li>
+        <li>Хорошие ответы на негатив повышают доверие на 8-12% (показывают заботу о клиентах)</li>
+        <li>Персонализированные ответы на 5★ усиливают позитив на 5-7% (социальное доказательство)</li>
+        <li>Текущий средний балл 65 → при улучшении до 75-80 ожидается рост конверсии на 1-2%</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

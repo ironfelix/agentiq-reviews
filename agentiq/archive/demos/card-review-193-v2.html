@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Review — Variant Risk (193)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Montserrat', sans-serif; background: #0f1923; color: #fff; -webkit-font-smoothing: antialiased; padding: 40px 20px; }
+  .wrap { max-width: 820px; margin: 0 auto; }
+
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 22px 22px 10px; }
+  .title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #8a9bb0; margin-bottom: 16px; }
+
+  .block { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .block h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #f06543; margin-bottom: 10px; }
+
+  .signal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .signal-text { color: #a8bcc8; font-size: 13px; line-height: 1.45; margin-bottom: 12px; white-space: pre-line; }
+
+  .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .score-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; }
+  .score-card .label { font-size: 11px; color: #8a9bb0; }
+  .score-card .val { font-size: 20px; font-weight: 700; margin-top: 4px; }
+
+  .meta { font-size: 11px; color: #6f8596; margin-top: 8px; }
+
+  .reason-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .reason-item:last-child { border-bottom: none; }
+  .reason-left { font-size: 13px; color: #d5e1ea; }
+  .reason-right { font-size: 12px; color: #8a9bb0; }
+
+  .compare-row { font-size: 13px; color: #c8d6e0; margin: 6px 0; }
+  .conclusion { margin-top: 8px; font-weight: 600; color: #fff; }
+
+  .risk-item, .action-item { font-size: 13px; color: #c8d6e0; margin: 6px 0; }
+  .status { margin-top: 8px; font-size: 12px; color: #f5c26b; }
+
+  .reply { font-size: 13px; color: #c8d6e0; line-height: 1.5; }
+  .note { font-size: 11px; color: #7a8f9e; margin-top: 6px; }
+
+  .btn { display: inline-block; margin-top: 10px; background: #f06543; color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 12px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="title" id="headerTitle">—</div>
+    <div class="subtitle" id="headerSubtitle">—</div>
+    <div class="meta" id="headerRating">—</div>
+
+    <div class="block">
+      <h3>Главный сигнал</h3>
+      <div class="signal-title" id="signalTitle">—</div>
+      <div class="signal-text" id="signalText">—</div>
+      <div class="score-grid" id="scoreGrid"></div>
+      <div class="meta" id="signalMeta">—</div>
+    </div>
+
+    <div class="block">
+      <h3>Почему именно этот вариант проседает</h3>
+      <div id="reasonList"></div>
+      <a class="btn" href="#" id="reasonCta">Показать отзывы</a>
+    </div>
+
+    <div class="block">
+      <h3>Это аномалия или норма</h3>
+      <div id="compareList"></div>
+      <div class="conclusion" id="compareConclusion">—</div>
+    </div>
+
+    <div class="block">
+      <h3>Потенциальный риск</h3>
+      <div id="riskList"></div>
+      <div class="note" id="riskNote">—</div>
+    </div>
+
+    <div class="block">
+      <h3>Что делать сейчас</h3>
+      <div id="actionList"></div>
+      <div class="status" id="actionStatus">—</div>
+    </div>
+
+    <div class="block">
+      <h3>Ответы на отзывы</h3>
+      <div class="reply" id="replyText">—</div>
+      <div class="note" id="replyNote">—</div>
+    </div>
+  </div>
+</div>
+
+<script id="cardData" type="application/json">
+{
+  "header": {
+    "title": "Артикул 282955222 · Риск по режиму",
+    "subtitle": "WB · 407 отзывов · рейтинг 4.79 · данные за весь период",
+    "rating": 4.79
+  },
+  "signal": {
+    "title": "⚠ Проблема в режиме: красный спектр",
+    "summary": "Рейтинг ниже остальных режимов\nПричина: Прочее\nРиск падения рейтинга карточки",
+    "scores": [
+      {
+        "label": "красный",
+        "value": 4.08
+      },
+      {
+        "label": "серый",
+        "value": 4.71
+      },
+      {
+        "label": "синий",
+        "value": 4.5
+      }
+    ],
+    "meta": "12 отзывов, доверие: среднее"
+  },
+  "reasons": {
+    "title": "Почему именно этот режим проседает",
+    "items": [
+      {
+        "label": "Прочее",
+        "emoji": "📦",
+        "count": 1,
+        "share": 50
+      },
+      {
+        "label": "Светит слабее, чем ожидали",
+        "emoji": "🔴",
+        "count": 1,
+        "share": 50
+      }
+    ],
+    "cta": "Показать отзывы (12)"
+  },
+  "compare": {
+    "title": "Это аномалия или норма",
+    "rows": [
+      {
+        "name": "серый",
+        "share": 38
+      },
+      {
+        "name": "синий",
+        "share": 12
+      }
+    ],
+    "conclusion": "Проблема специфична для режима «красный»"
+  },
+  "risk": {
+    "title": "Потенциальный риск",
+    "items": [
+      "Вероятное падение конверсии: –3–6%",
+      "Рост негатива в рекламе",
+      "Риск падения рейтинга карточки"
+    ],
+    "note": "Оценка на основе исторических данных по WB"
+  },
+  "actions": {
+    "title": "Что делать сейчас",
+    "items": [
+      "Проверить партии режима «красный» за последние 30 дней",
+      "Сверить заявленную яркость с фактической",
+      "Обновить описание: ожидания по яркости и автономности",
+      "Ответить на негативные отзывы по шаблону (ниже)"
+    ],
+    "status": "⏳ Под наблюдением, пересчет сигнала через 7 дней"
+  },
+  "reply": {
+    "title": "Черновик ответа (авто)",
+    "text": "Спасибо за отзыв. Нам важно ваше замечание по яркости и времени работы. Мы уже проверяем информацию и уточним характеристики товара.",
+    "note": "Ответ не снижает проблему, но снижает повторный негатив."
+  }
+}
+</script>
+
+<script>
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '—';
+  }
+
+  function render(data) {
+    setText('headerTitle', data.header?.title);
+    setText('headerSubtitle', data.header?.subtitle);
+    setText('headerRating', data.header?.rating != null ? `Общий рейтинг: ${data.header.rating}` : '');
+
+    setText('signalTitle', data.signal?.title);
+    setText('signalText', data.signal?.summary);
+    setText('signalMeta', data.signal?.meta);
+
+    const scoreGrid = document.getElementById('scoreGrid');
+    scoreGrid.innerHTML = '';
+    (data.signal?.scores || []).forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'score-card';
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = s.label;
+      const val = document.createElement('div');
+      val.className = 'val';
+      val.textContent = s.value;
+      card.appendChild(label);
+      card.appendChild(val);
+      scoreGrid.appendChild(card);
+    });
+
+    const reasonList = document.getElementById('reasonList');
+    reasonList.innerHTML = '';
+    if (data.reasons?.items?.length) {
+      data.reasons.items.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'reason-item';
+        const left = document.createElement('div');
+        left.className = 'reason-left';
+        left.textContent = `${r.emoji} ${r.label}`;
+        const right = document.createElement('div');
+        right.className = 'reason-right';
+        right.textContent = `${r.count} отзывов · ${r.share}%`;
+        row.appendChild(left);
+        row.appendChild(right);
+        reasonList.appendChild(row);
+      });
+    } else {
+      reasonList.textContent = 'Недостаточно причин для вывода';
+    }
+    setText('reasonCta', data.reasons?.cta);
+
+    const compareList = document.getElementById('compareList');
+    compareList.innerHTML = '';
+    (data.compare?.rows || []).forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'compare-row';
+      const value = r.share == null ? 'н/д' : `${r.share}%`;
+      div.textContent = `В варианте «${r.name}» причины встречаются в ${value} отзывов`;
+      compareList.appendChild(div);
+    });
+    setText('compareConclusion', data.compare?.conclusion);
+
+    const riskList = document.getElementById('riskList');
+    riskList.innerHTML = '';
+    (data.risk?.items || []).forEach(i => {
+      const div = document.createElement('div');
+      div.className = 'risk-item';
+      div.textContent = `• ${i}`;
+      riskList.appendChild(div);
+    });
+    setText('riskNote', data.risk?.note);
+
+    const actionList = document.getElementById('actionList');
+    actionList.innerHTML = '';
+    (data.actions?.items || []).forEach(i => {
+      const div = document.createElement('div');
+      div.className = 'action-item';
+      div.textContent = `• ${i}`;
+      actionList.appendChild(div);
+    });
+    setText('actionStatus', data.actions?.status);
+
+    setText('replyText', data.reply?.text);
+    setText('replyNote', data.reply?.note);
+  }
+
+  const embedded = document.getElementById('cardData');
+  const data = JSON.parse(embedded.textContent);
+  render(data);
+
+</script>
+</body>
+</html>

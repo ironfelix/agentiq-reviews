@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отчёт по артикулу {{ report.article_id }} - AgentIQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  .nav {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .back-link {
+    color: #7db8e8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .back-link:hover { opacity: 0.7; }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    margin-left: auto;
+  }
+
+  .logo span { color: #7db8e8; }
+
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(125, 184, 232, 0.05);
+    border: 1px solid rgba(125, 184, 232, 0.28);
+    border-radius: 16px;
+  }
+
+  .state-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  .comp-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .comp-header h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .comp-header .comp-meta { font-size: 12px; color: #8a9bb0; }
+
+  .comp-stats {
+    display: flex;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .comp-stat { flex: 1; text-align: center; }
+  .comp-stat .stat-val { font-size: 19px; font-weight: 700; }
+  .comp-stat .stat-val.good { color: #4caf7a; }
+  .comp-stat .stat-label { font-size: 11px; color: #8a9bb0; margin-top: 3px; }
+
+  .signal { padding: 16px 20px 14px; }
+  .signal-badge {
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.12);
+  }
+  .signal h5 { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+  .signal > p { font-size: 13px; color: #8a9bb0; line-height: 1.5; margin: 0; }
+  .signal-source { margin-top: 8px; font-size: 11px; color: #5c7080; }
+
+  .variant-compare { margin: 14px 0 0; }
+  .variant-compare-label {
+    font-size: 10px;
+    color: #5c7080;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .variant-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+  .variant-row:last-child { margin-bottom: 0; }
+  .variant-name { font-size: 13px; font-weight: 500; color: #c8d6e0; width: 72px; flex-shrink: 0; }
+  .variant-name.problem { color: #f06543; font-weight: 600; }
+  .variant-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .variant-bar { height: 100%; border-radius: 3px; }
+  .variant-bar.problem { background: #f06543; }
+  .variant-bar.ok { background: #4caf7a; }
+  .variant-rating { font-size: 13px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+  .variant-rating.rating-high { color: #4caf7a; }
+  .variant-rating.rating-low { color: #f06543; }
+  .variant-count { font-size: 11px; color: #5c7080; width: 28px; text-align: right; flex-shrink: 0; }
+  .variant-trend { font-size: 10px; width: 50px; text-align: right; flex-shrink: 0; }
+  .variant-trend.down { color: #f06543; }
+  .variant-trend.up { color: #4caf7a; }
+  .variant-trend.stable { color: #5c7080; }
+
+  .reasons { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .reasons-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: #5c7080; margin-bottom: 8px; }
+  .reason-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; color: #a8bcc8; }
+  .reason-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .reason-bar-fill { height: 100%; background: #f06543; border-radius: 2px; }
+  .reason-pct { font-size: 11px; color: #5c7080; width: 32px; }
+
+  .reviews { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .reviews-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: #5c7080; margin-bottom: 8px; }
+  .review-item { background: rgba(255,255,255,0.03); border-left: 3px solid #f06543; padding: 8px 10px; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+  .review-item:last-child { margin-bottom: 0; }
+  .review-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; font-style: italic; }
+  .review-meta { font-size: 10px; color: #5c7080; margin-top: 4px; }
+
+  .why-important { margin: 12px 20px 0; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; }
+  .why-important-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #5c7080; margin-bottom: 6px; }
+  .why-important-list { list-style: none; }
+  .why-important-list li { font-size: 12px; color: #a8bcc8; padding: 2px 0 2px 14px; position: relative; }
+  .why-important-list li::before { content: "→"; position: absolute; left: 0; color: #5c7080; }
+
+  .decision { margin: 12px 20px; background: rgba(125, 184, 232, 0.08); border: 1px solid rgba(125, 184, 232, 0.2); border-radius: 10px; padding: 12px 14px; }
+  .decision-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #7db8e8; margin-bottom: 6px; }
+  .decision p { font-size: 13px; color: #c8d6e0; line-height: 1.5; margin: 0; }
+  .decision .highlight { color: #fff; font-weight: 500; }
+  .action-list { margin-top: 8px; padding-left: 16px; color: #a8bcc8; font-size: 12px; line-height: 1.4; }
+  .action-list li { margin: 3px 0; }
+
+  .reply-block { margin: 4px 20px 16px 32px; border-left: 2px solid rgba(255,255,255,0.12); padding: 6px 12px; }
+  .reply-label { font-size: 11px; color: #5c7080; margin-bottom: 4px; }
+  .reply-text { font-size: 12px; color: #c8d6e0; line-height: 1.4; }
+
+  .hint {
+    position: relative;
+    border-bottom: 1px dotted rgba(255,255,255,0.3);
+    cursor: help;
+  }
+  .hint::after {
+    content: attr(data-hint);
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a2a38;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #c8d6e0;
+    font-size: 10px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 100;
+  }
+  .hint:hover::after { opacity: 1; }
+
+  /* Communication quality section */
+  .comm-gauge { text-align: center; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .comm-gauge-score { font-size: 48px; font-weight: 700; }
+  .comm-gauge-max { font-size: 16px; color: #5c7080; font-weight: 400; }
+  .comm-gauge-label { font-size: 11px; color: #8a9bb0; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .comm-risk-bar-section { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .comm-risk-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .comm-risk-bar-name { font-size: 11px; color: #c8d6e0; width: 110px; flex-shrink: 0; }
+  .comm-risk-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .comm-risk-bar { height: 100%; border-radius: 4px; }
+  .comm-risk-bar.harmful { background: #f06543; }
+  .comm-risk-bar.risky { background: #e8a838; }
+  .comm-risk-bar.acceptable { background: #7db8e8; }
+  .comm-risk-bar.good { background: #4caf7a; }
+  .comm-risk-bar-count { font-size: 11px; color: #8a9bb0; width: 24px; text-align: right; flex-shrink: 0; font-weight: 600; }
+
+  .comm-sample { padding: 0 20px; margin-bottom: 12px; }
+  .comm-sample-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: #5c7080; margin-bottom: 8px; }
+  .comm-sample-item { background: rgba(255,255,255,0.03); border-left: 3px solid #f06543; border-radius: 0 6px 6px 0; padding: 10px 12px; margin-bottom: 8px; }
+  .comm-sample-item.warn { border-left-color: #e8a838; }
+  .comm-review-text { font-size: 12px; color: #c8d6e0; font-style: italic; line-height: 1.5; }
+  .comm-reply-text { font-size: 11px; color: #e8a838; margin-top: 6px; line-height: 1.4; }
+  .comm-meta { font-size: 10px; color: #5c7080; margin-top: 4px; }
+  .comm-risk-tag { display: inline-block; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+  .comm-risk-tag.blame { background: rgba(240, 101, 67, 0.2); color: #f06543; }
+  .comm-risk-tag.ignore { background: rgba(232, 168, 56, 0.2); color: #e8a838; }
+  .comm-risk-tag.amplify { background: rgba(200, 100, 200, 0.2); color: #d080d0; }
+  .comm-risk-tag.deny { background: rgba(240, 101, 67, 0.15); color: #e88484; }
+  .comm-risk-tag.template { background: rgba(125, 184, 232, 0.2); color: #7db8e8; }
+  .comm-risk-tag.no_answer { background: rgba(255,255,255,0.1); color: #999; }
+
+  .comm-explanation { font-size: 11px; color: #8a9bb0; line-height: 1.5; margin-top: 6px; padding: 8px; background: rgba(240, 101, 67, 0.06); border-radius: 6px; }
+
+  .comm-rewrite { margin-top: 8px; }
+  .comm-rewrite summary { cursor: pointer; font-size: 11px; color: #4caf7a; padding: 5px 8px; background: rgba(76, 175, 122, 0.06); border: 1px solid rgba(76, 175, 122, 0.12); border-radius: 5px; list-style: none; font-weight: 600; }
+  .comm-rewrite summary::-webkit-details-marker { display: none; }
+  .comm-rewrite summary:hover { background: rgba(76, 175, 122, 0.1); }
+  .comm-rewrite-body { margin-top: 6px; padding: 10px; background: rgba(76, 175, 122, 0.05); border-left: 3px solid #4caf7a; border-radius: 0 6px 6px 0; }
+  .comm-rewrite-text { font-size: 12px; color: #c8d6e0; line-height: 1.5; }
+
+  .comm-perception { list-style: none; padding: 0 20px 12px; }
+  .comm-perception li { font-size: 11px; color: #c8d6e0; padding: 5px 0 5px 14px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.03); line-height: 1.5; }
+  .comm-perception li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #f06543; position: absolute; left: 0; top: 10px; }
+
+  .no-signal { margin: 16px 20px; padding: 12px; background: rgba(92, 112, 128, 0.1); border-radius: 8px; text-align: center; }
+  .no-signal-icon { font-size: 24px; margin-bottom: 6px; }
+  .no-signal-text { font-size: 12px; color: #8a9bb0; }
+
+  @media (max-width: 920px) {
+    .container { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="/dashboard" class="back-link">← Назад к дашборду</a>
+  <a href="/" class="logo">AGENT<span>IQ</span></a>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="comp-header">
+      <span class="state-badge">Анализ</span>
+      <h4>{{ data.header.product_name or 'Товар' }}</h4>
+      <span class="comp-meta">Wildberries · артикул {{ report.article_id }}</span>
+    </div>
+
+    <div class="comp-stats">
+      <div class="comp-stat">
+        <div class="stat-val">{{ data.header.analyzed_count or data.header.feedback_count }}</div>
+        <div class="stat-label">{% if data.header.analyzed_count and data.header.analyzed_count != data.header.feedback_count %}из {{ data.header.feedback_count }} отзывов{% else %}отзывов{% endif %}</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val {% if data.header.rating >= 4.5 %}good{% endif %}">{{ "%.2f"|format(data.header.rating) }}</div>
+        <div class="stat-label">рейтинг</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val">{{ data.header.unanswered_count or 0 }}</div>
+        <div class="stat-label">без ответа</div>
+      </div>
+    </div>
+
+    {% if data.signal %}
+    <div class="signal">
+      <span class="signal-badge">{{ data.signal.title }}</span>
+      <p>{{ data.signal.summary }}</p>
+      <div class="signal-source">{{ data.signal.meta }}</div>
+
+      {% if data.signal.scores and data.signal.scores|length > 0 %}
+      <div class="variant-compare">
+        <div class="variant-compare-label">Рейтинг по артикулам</div>
+        {% for score in data.signal.scores %}
+        {% if score.value > 0 %}
+        <div class="variant-row">
+          <span class="variant-name {% if score.get('is_target') and '⚠' in data.signal.title %}problem{% endif %}">{{ score.label }}</span>
+          <div class="variant-bar-wrap">
+            <div class="variant-bar {% if score.get('is_target') and '⚠' in data.signal.title %}problem{% else %}ok{% endif %}"
+                 style="width: {{ (score.value / 5 * 100)|int }}%"></div>
+          </div>
+          <span class="variant-rating {% if score.value >= 4.5 %}rating-high{% elif score.value < 4.0 %}rating-low{% endif %}">
+            {{ "%.2f"|format(score.value) }}
+          </span>
+          <span class="variant-count">{{ score.get('count', '') }}</span>
+          <span class="variant-trend {% if score.trend == 'down' %}down{% elif score.trend == 'up' %}up{% else %}stable{% endif %}">
+            {% if score.trend %}{{ score.trend }}{% else %}→{% endif %}
+          </span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if data.reasons and data.reasons.get('items') %}
+      <div class="reasons">
+        <div class="reasons-label">{{ data.reasons.title }}</div>
+        {% for reason in data.reasons.get('items', []) %}
+        <div class="reason-row">
+          <span>{{ reason.emoji }} {{ reason.label }}</span>
+          <div class="reason-bar">
+            <div class="reason-bar-fill" style="width: {{ reason.share }}%"></div>
+          </div>
+          <span class="reason-pct">{{ reason.share }}%</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if data.reasons and data.reasons.get('reviews') %}
+      {% set all_reviews = data.reasons.get('reviews', []) %}
+      <div class="reviews">
+        <div class="reviews-label">Отзывы покупателей</div>
+        {% for rev in all_reviews[:3] %}
+        <div class="review-item">
+          <div class="review-text">«{{ rev.text }}»</div>
+          <div class="review-meta">★{{ rev.rating }}{% if rev.date %} · {{ rev.date }}{% endif %}</div>
+        </div>
+        {% endfor %}
+        {% if all_reviews|length > 3 %}
+        <div class="reviews-extra" style="display:none;">
+          {% for rev in all_reviews[3:] %}
+          <div class="review-item">
+            <div class="review-text">«{{ rev.text }}»</div>
+            <div class="review-meta">★{{ rev.rating }}{% if rev.date %} · {{ rev.date }}{% endif %}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <div style="margin-top: 6px; font-size: 11px;">
+          <a href="#" class="reviews-toggle" style="color: #7db8e8; text-decoration: none;"
+             onclick="var el=this.parentNode.previousElementSibling;if(el.style.display==='none'){el.style.display='block';this.textContent='Свернуть ↑';}else{el.style.display='none';this.textContent='Ещё {{ all_reviews|length - 3 }} →';}return false;">Ещё {{ all_reviews|length - 3 }} →</a>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if data.questions and data.questions.get('count', 0) > 0 %}
+      <div class="reviews" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06);">
+        <div class="reviews-label">Вопросы покупателей</div>
+        <div style="font-size: 12px; color: #a8bcc8; margin-bottom: 8px;">
+          Всего: {{ data.questions.count }} · Без ответа: {{ data.questions.unanswered_count }}
+        </div>
+        {% set unanswered_samples = [] %}
+        {% for s in data.questions.get('samples', []) %}
+          {% if not s.answered %}
+            {% if unanswered_samples.append(s) %}{% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if unanswered_samples %}
+        {% for s in unanswered_samples[:3] %}
+        <div class="review-item" style="border-left-color: #e8a838;">
+          <div class="review-text">{{ s.text }}</div>
+          <div class="review-meta" style="color: #e8a838;">без ответа</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    {% if data.risk %}
+    <div class="why-important">
+      <div class="why-important-label">{{ data.risk.title }}</div>
+      <ul class="why-important-list">
+        {% for item in data.risk.get('items', []) %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% if data.risk.get('conclusion') %}
+      <p style="margin-top: 8px; font-size: 12px; color: #c8d6e0; font-style: italic;">{{ data.risk.conclusion }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if data.actions %}
+    <div class="decision">
+      <div class="decision-label">{{ data.actions.title }}</div>
+      {% if data.actions.get('strategy') %}
+      <p style="font-size: 13px; font-weight: 600; color: #7db8e8; margin-bottom: 6px;">→ {{ data.actions.strategy }}</p>
+      {% endif %}
+      {% if data.actions.get('description') %}
+      <p>{{ data.actions.description }}</p>
+      {% endif %}
+      <ul class="action-list">
+        {% for action in data.actions.get('items', []) %}
+        <li>{{ action }}</li>
+        {% endfor %}
+      </ul>
+      {% if data.actions.get('status') %}
+      <p style="margin-top: 8px; font-size: 12px; color: #8a9bb0;">{{ data.actions.status }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if data.reply and data.reply.text %}
+    <div class="reply-block">
+      <div class="reply-label">{{ data.reply.title }}</div>
+      <div class="reply-text">«{{ data.reply.text }}»</div>
+      {% if data.reply.note %}
+      <p style="margin-top: 6px; font-size: 11px; color: #5c7080;">{{ data.reply.note }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="no-signal">
+      <div class="no-signal-icon">✅</div>
+      <div class="no-signal-text">
+        Проблем не обнаружено.<br>
+        Все варианты товара получают хорошие оценки.
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if data.communication %}
+  <div class="card" style="margin-top: 16px;">
+    <div class="comp-header">
+      <span class="state-badge" style="{% if data.communication.quality_score <= 4 %}color: #f06543; background: rgba(240, 101, 67, 0.15);{% elif data.communication.quality_score <= 6 %}color: #e8a838; background: rgba(232, 168, 56, 0.15);{% endif %}">Коммуникация</span>
+      <h4>Качество ответов продавца</h4>
+      <span class="comp-meta">Анализ содержания ответов на все отзывы</span>
+    </div>
+
+    {# --- Verdict first --- #}
+    {% if data.communication.verdict %}
+    <div style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <p style="font-size: 13px; color: #c8d6e0; line-height: 1.6;">{{ data.communication.verdict }}</p>
+    </div>
+    {% endif %}
+
+    {# --- Gauge score --- #}
+    <div class="comm-gauge">
+      <div class="comm-gauge-score" style="{% if data.communication.quality_score <= 4 %}color: #f06543;{% elif data.communication.quality_score <= 6 %}color: #e8a838;{% else %}color: #4caf7a;{% endif %}">{{ data.communication.quality_score }}<span class="comm-gauge-max">/10</span></div>
+      <div class="comm-gauge-label">Оценка качества ответов</div>
+    </div>
+
+    {# --- Distribution stats --- #}
+    {% if data.communication.distribution %}
+    {% set dist = data.communication.distribution %}
+    <div class="comp-stats" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div class="comp-stat">
+        <div class="stat-val" style="color: #f06543;">{{ dist.harmful or 0 }}</div>
+        <div class="stat-label">Вредят</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val" style="color: #e8a838;">{{ dist.risky or 0 }}</div>
+        <div class="stat-label">Есть проблемы</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val" style="color: #7db8e8;">{{ dist.acceptable or 0 }}</div>
+        <div class="stat-label">Нормальные</div>
+      </div>
+      <div class="comp-stat">
+        <div class="stat-val good">{{ dist.good or 0 }}</div>
+        <div class="stat-label">Хорошие</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# --- Response speed (computed from data, not LLM) --- #}
+    {% if data.response_speed %}
+    <div style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div class="reasons-label" style="margin-bottom: 10px;">Скорость ответа</div>
+      {% if data.response_speed.neg_median_hours is not none %}
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="font-size: 11px; color: #c8d6e0; width: 90px;">Негатив</span>
+        <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+          <div style="height: 100%; border-radius: 4px; background: {% if data.response_speed.neg_median_hours < 24 %}#4caf7a{% elif data.response_speed.neg_median_hours < 72 %}#e8a838{% else %}#f06543{% endif %}; width: {{ [data.response_speed.neg_median_hours / 48 * 100, 100]|min|int }}%"></div>
+        </div>
+        <span style="font-size: 11px; color: #8a9bb0; width: 70px; text-align: right;">{% if data.response_speed.neg_median_hours < 24 %}{{ data.response_speed.neg_median_hours|round(0)|int }} ч.{% else %}{{ (data.response_speed.neg_median_hours / 24)|round(1) }} дн.{% endif %}</span>
+      </div>
+      {% endif %}
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="font-size: 11px; color: #c8d6e0; width: 90px;">Все отзывы</span>
+        <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+          <div style="height: 100%; border-radius: 4px; background: {% if data.response_speed.all_median_hours < 24 %}#4caf7a{% elif data.response_speed.all_median_hours < 72 %}#e8a838{% else %}#f06543{% endif %}; width: {{ [data.response_speed.all_median_hours / 48 * 100, 100]|min|int }}%"></div>
+        </div>
+        <span style="font-size: 11px; color: #8a9bb0; width: 70px; text-align: right;">{% if data.response_speed.all_median_hours < 24 %}{{ data.response_speed.all_median_hours|round(0)|int }} ч.{% else %}{{ (data.response_speed.all_median_hours / 24)|round(1) }} дн.{% endif %}</span>
+      </div>
+      <div style="font-size: 10px; color: #5c7080; margin-top: 4px;">
+        Медиана. {{ data.response_speed.same_day_count }} из {{ data.response_speed.all_count }} отвечены в тот же день{% if data.response_speed.slow_count %}, {{ data.response_speed.slow_count }} позже 7 дней{% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# --- Error types with tooltips — split into good + errors --- #}
+    {% if data.communication.error_types %}
+    {% set max_et = data.communication.error_types|map(attribute='count')|max %}
+    {% set good_types = [] %}
+    {% set error_types_list = [] %}
+    {% for et in data.communication.error_types %}
+      {% if et.severity == 'ok' or et.risk_type in ['ok', 'good'] %}
+        {% if good_types.append(et) %}{% endif %}
+      {% else %}
+        {% if error_types_list.append(et) %}{% endif %}
+      {% endif %}
+    {% endfor %}
+
+    <div style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      {% if good_types %}
+      <div class="reasons-label" style="margin-bottom: 10px;">Хорошие ответы</div>
+      {% for et in good_types %}
+      <div class="comm-risk-bar-row" style="margin-bottom: 8px;">
+        <span class="hint comm-risk-bar-name" data-hint="{{ et.tooltip }}" style="width: 160px; font-size: 11px; cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.2);">{{ et.label }} <span style="font-size: 9px; color: #5c7080;">&#8635;</span></span>
+        <div class="comm-risk-bar-wrap"><div class="comm-risk-bar good" style="width: {{ (et.count / max_et * 100)|int }}%"></div></div>
+        <span class="comm-risk-bar-count">{{ et.count }}</span>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      {% if error_types_list %}
+      {% if good_types %}<div style="height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0;"></div>{% endif %}
+      <div class="reasons-label" style="margin-bottom: 10px;">Ошибки в ответах</div>
+      {% for et in error_types_list %}
+      <div class="comm-risk-bar-row" style="margin-bottom: 8px;">
+        <span class="hint comm-risk-bar-name" data-hint="{{ et.tooltip }}" style="width: 160px; font-size: 11px; cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.2);">{{ et.label }} <span style="font-size: 9px; color: #5c7080;">&#8635;</span></span>
+        <div class="comm-risk-bar-wrap"><div class="comm-risk-bar {% if et.severity == 'critical' %}harmful{% else %}risky{% endif %}" style="width: {{ (et.count / max_et * 100)|int }}%"></div></div>
+        <span class="comm-risk-bar-count">{{ et.count }}</span>
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# --- Worst responses --- #}
+    {% if data.communication.worst_responses %}
+    <div class="comm-sample" style="padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+      <div class="comm-sample-label">Худшие ответы</div>
+      {% for resp in data.communication.worst_responses %}
+      <div class="comm-sample-item" style="margin-bottom: 14px;">
+        <div class="comm-review-text">Покупатель ({{ resp.review_rating }}&#9733;): &laquo;{{ resp.review_text }}&raquo;</div>
+        <div class="comm-reply-text" style="margin-top: 8px;">Продавец: &laquo;{{ resp.response_text }}&raquo;</div>
+        <span class="comm-risk-tag {{ resp.risk_type }}" style="margin-top: 6px;">{{ resp.risk_label }}</span>
+        <div class="comm-explanation" style="margin-top: 8px;">{{ resp.explanation }}</div>
+
+        {% if resp.recommendation %}
+        <details class="comm-rewrite" style="margin-top: 12px;">
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="comm-rewrite-body" style="margin-top: 8px;">
+            <div class="comm-rewrite-text">{{ resp.recommendation }}</div>
+          </div>
+        </details>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# --- Buyer perception --- #}
+    {% if data.communication.buyer_perception %}
+    <div style="padding: 14px 0 0; margin: 0 20px; border-top: 1px solid rgba(255,255,255,0.06);">
+      <div class="reasons-label" style="padding: 0 0 8px;">Что видит потенциальный покупатель</div>
+    </div>
+    <ul class="comm-perception">
+      {% for item in data.communication.buyer_perception %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {# --- Hidden risks in positive reviews --- #}
+    {% if data.communication.hidden_risks %}
+    <div class="comm-sample" style="padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+      <div class="comm-sample-label">Упущенные возможности в позитивных отзывах</div>
+      {% set visible_risks = data.communication.hidden_risks[:3] %}
+      {% set extra_risks = data.communication.hidden_risks[3:] %}
+      {% for risk in visible_risks %}
+      <div class="comm-sample-item warn" style="margin-bottom: 10px;">
+        <div class="comm-review-text">&#9733;{{ risk.review_rating }}{% if risk.reviewer_name %} &middot; {{ risk.reviewer_name }}{% endif %}: &laquo;{{ risk.review_text }}&raquo;</div>
+        <div class="comm-reply-text" style="margin-top: 6px;">Продавец: &laquo;{{ risk.response_text }}&raquo;</div>
+        <div class="comm-meta" style="margin-top: 6px;">{{ risk.issue }}</div>
+      </div>
+      {% endfor %}
+      {% if extra_risks %}
+      <div class="comm-hidden-extra" style="display: none;">
+        {% for risk in extra_risks %}
+        <div class="comm-sample-item warn" style="margin-bottom: 10px;">
+          <div class="comm-review-text">&#9733;{{ risk.review_rating }}{% if risk.reviewer_name %} &middot; {{ risk.reviewer_name }}{% endif %}: &laquo;{{ risk.review_text }}&raquo;</div>
+          <div class="comm-reply-text" style="margin-top: 6px;">Продавец: &laquo;{{ risk.response_text }}&raquo;</div>
+          <div class="comm-meta" style="margin-top: 6px;">{{ risk.issue }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="margin-top: 8px; font-size: 11px; text-align: center;">
+        <a href="#" class="comm-toggle-risks" style="color: #e8a838; text-decoration: none; font-weight: 600;"
+           onclick="var el=this.parentNode.previousElementSibling;if(el.style.display==='none'){el.style.display='block';this.textContent='Скрыть';}else{el.style.display='none';this.textContent='Ещё {{ extra_risks|length }} →';}return false;">Ещё {{ extra_risks|length }} →</a>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {# --- Action plan --- #}
+    {% if data.communication.action_plan %}
+    <div class="decision" style="margin-top: 14px;">
+      <div class="decision-label">Что делать продавцу</div>
+      <ol class="action-list" style="counter-reset: action;">
+        {% for ap in data.communication.action_plan %}
+        <li>
+          {% if ap.priority == 'critical' %}<span style="font-size: 9px; color: #f06543; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Критично</span> {% else %}<span style="font-size: 9px; color: #e8a838; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Важно</span> {% endif %}{{ ap.action }}
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+</body>
+</html>

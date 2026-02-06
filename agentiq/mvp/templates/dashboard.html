@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - AgentIQ Reviews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: #f06543;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .user-name {
+    font-size: 14px;
+    color: #8a9bb0;
+  }
+
+  .btn-logout {
+    font-size: 13px;
+    color: #8a9bb0;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+  }
+
+  /* Main */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 32px;
+  }
+
+  /* New Task Form */
+  .new-task-section {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+
+  .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+    color: #fff;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .input-article {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .input-article:focus {
+    outline: none;
+    border-color: #f06543;
+  }
+
+  .btn-primary {
+    background: #f06543;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .btn-primary:hover {
+    background: #d9533f;
+  }
+
+  .btn-primary:disabled {
+    background: rgba(240, 101, 67, 0.4);
+    cursor: not-allowed;
+  }
+
+  .form-note {
+    font-size: 12px;
+    color: #5c7080;
+    margin-top: 8px;
+  }
+
+  /* Tasks List */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .task-count {
+    font-size: 14px;
+    color: #8a9bb0;
+  }
+
+  .tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .task-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .task-card:hover {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .task-info {
+    flex: 1;
+  }
+
+  .task-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  .task-status-badge.warning {
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.15);
+  }
+
+  .task-status-badge.success {
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  .task-status-badge.processing {
+    color: #7db8e8;
+    background: rgba(125, 184, 232, 0.15);
+  }
+
+  .task-status-badge.failed {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.15);
+  }
+
+  .task-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .task-meta {
+    font-size: 13px;
+    color: #8a9bb0;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #7db8e8;
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: #5c7080;
+  }
+
+  .empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .empty-state-text {
+    font-size: 15px;
+  }
+
+  @media (max-width: 768px) {
+    nav, main {
+      padding: 20px 24px;
+    }
+
+    .task-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .task-actions {
+      width: 100%;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">AGENT<span>IQ</span></a>
+  <div class="user-info">
+    <span class="user-name">{{ user.first_name or user.username or 'User' }}</span>
+    <button class="btn-logout" onclick="logout()">Выйти</button>
+  </div>
+</nav>
+
+<main>
+  <h1>Анализ отзывов WB</h1>
+
+  <!-- New Task Form -->
+  <section class="new-task-section">
+    <label class="form-label" for="article-input">Новый анализ</label>
+    <div class="form-row">
+      <input
+        type="number"
+        id="article-input"
+        class="input-article"
+        placeholder="Введите артикул WB"
+        min="1"
+      >
+      <button class="btn-primary" onclick="createTask()">Анализировать</button>
+    </div>
+    <div class="form-note" id="form-note">
+      Введите артикул товара с Wildberries (например: 117220345)
+    </div>
+  </section>
+
+  <!-- Tasks List -->
+  <section class="section-header">
+    <h2 class="section-title">Ваши отчёты</h2>
+    <span class="task-count" id="task-count">Загрузка...</span>
+  </section>
+
+  <div class="tasks-list" id="tasks-list">
+    <div class="empty-state">
+      <div class="empty-state-icon">📊</div>
+      <div class="empty-state-text">Загрузка отчётов...</div>
+    </div>
+  </div>
+</main>
+
+<script>
+let tasksData = [];
+let pollingInterval = null;
+
+async function createTask() {
+  const input = document.getElementById('article-input');
+  const articleId = parseInt(input.value);
+
+  if (!articleId || articleId < 1) {
+    showNote('Введите корректный артикул', 'error');
+    return;
+  }
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Создаём...';
+
+  try {
+    const response = await fetch('/api/tasks/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ article_id: articleId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка создания задачи');
+    }
+
+    const task = await response.json();
+    showNote('Задача создана! Получите уведомление в Telegram, когда анализ будет готов.', 'success');
+    input.value = '';
+
+    // Refresh task list
+    await loadTasks();
+
+    // Start polling if not already running
+    if (!pollingInterval) {
+      startPolling();
+    }
+
+  } catch (error) {
+    showNote('Ошибка: ' + error.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Анализировать';
+  }
+}
+
+async function loadTasks() {
+  try {
+    const response = await fetch('/api/tasks/list');
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = '/';
+        return;
+      }
+      throw new Error('Ошибка загрузки задач');
+    }
+
+    tasksData = await response.json();
+    renderTasks();
+  } catch (error) {
+    console.error('Failed to load tasks:', error);
+  }
+}
+
+function renderTasks() {
+  const listElement = document.getElementById('tasks-list');
+  const countElement = document.getElementById('task-count');
+
+  countElement.textContent = `${tasksData.length} ${pluralize(tasksData.length, 'отчёт', 'отчёта', 'отчётов')}`;
+
+  if (tasksData.length === 0) {
+    listElement.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📊</div>
+        <div class="empty-state-text">Пока нет отчётов. Создайте первый анализ выше.</div>
+      </div>
+    `;
+    return;
+  }
+
+  listElement.innerHTML = tasksData.map(task => {
+    const statusConfig = getStatusConfig(task.status);
+    const timeAgo = formatTimeAgo(task.created_at);
+
+    return `
+      <div class="task-card">
+        <div class="task-info">
+          <span class="task-status-badge ${statusConfig.class}">${statusConfig.icon} ${statusConfig.label}</span>
+          <div class="task-title">Артикул ${task.article_id}</div>
+          <div class="task-meta">${timeAgo}</div>
+          ${task.status === 'processing' ? `
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: ${task.progress}%"></div>
+            </div>
+          ` : ''}
+          ${task.status === 'failed' ? `
+            <div class="task-meta" style="color: #e74c3c; margin-top: 8px;">Ошибка: ${task.error_message || 'Неизвестная ошибка'}</div>
+          ` : ''}
+        </div>
+        <div class="task-actions">
+          ${task.status === 'completed' ? `
+            <a href="/dashboard/report/${task.id}" class="btn-secondary">Открыть отчёт</a>
+          ` : task.status === 'processing' ? `
+            <button class="btn-secondary" disabled>Обрабатывается... ${task.progress}%</button>
+          ` : task.status === 'failed' ? `
+            <button class="btn-secondary" onclick="retryTask(${task.id})">Повторить</button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getStatusConfig(status) {
+  const configs = {
+    'pending': { icon: '⏳', label: 'В очереди', class: 'processing' },
+    'processing': { icon: '🔄', label: 'Обрабатывается', class: 'processing' },
+    'completed': { icon: '✓', label: 'Готов', class: 'success' },
+    'failed': { icon: '✗', label: 'Ошибка', class: 'failed' },
+  };
+  return configs[status] || configs['pending'];
+}
+
+function formatTimeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000); // seconds
+
+  if (diff < 60) return 'Только что';
+  if (diff < 3600) return `${Math.floor(diff / 60)} мин назад`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} ч назад`;
+  return `${Math.floor(diff / 86400)} дн назад`;
+}
+
+function pluralize(num, one, two, five) {
+  if (num % 10 === 1 && num % 100 !== 11) return one;
+  if (num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)) return two;
+  return five;
+}
+
+function showNote(message, type = 'info') {
+  const noteElement = document.getElementById('form-note');
+  noteElement.textContent = message;
+  noteElement.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#4caf7a' : '#5c7080';
+
+  if (type !== 'info') {
+    setTimeout(() => {
+      noteElement.textContent = 'Введите артикул товара с Wildberries (например: 117220345)';
+      noteElement.style.color = '#5c7080';
+    }, 5000);
+  }
+}
+
+async function logout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/';
+  } catch (error) {
+    console.error('Logout failed:', error);
+    window.location.href = '/';
+  }
+}
+
+function startPolling() {
+  pollingInterval = setInterval(async () => {
+    // Check if any task is processing
+    const hasProcessing = tasksData.some(t => t.status === 'processing' || t.status === 'pending');
+
+    if (hasProcessing) {
+      await loadTasks();
+    } else {
+      // Stop polling if no active tasks
+      stopPolling();
+    }
+  }, 5000); // Poll every 5 seconds
+}
+
+function stopPolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+}
+
+// Initial load
+loadTasks();
+
+// Start polling if there are active tasks
+setTimeout(() => {
+  const hasProcessing = tasksData.some(t => t.status === 'processing' || t.status === 'pending');
+  if (hasProcessing) {
+    startPolling();
+  }
+}, 1000);
+
+// Stop polling when user leaves page
+window.addEventListener('beforeunload', stopPolling);
+</script>
+
+</body>
+</html>

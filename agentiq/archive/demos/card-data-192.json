@@ -1,0 +1,52 @@
+{
+  "product": {
+    "title": "Артикул 117220345",
+    "article": "117220345",
+    "platform": "Wildberries"
+  },
+  "stats": {
+    "feedback_count": 147,
+    "rating": 4.71,
+    "unanswered_count": 0,
+    "unanswered_in_signal": null,
+    "recent_count": 6,
+    "recent_low": 1
+  },
+  "signal": {
+    "title": "Хорошо сидит — 2 раз за 30 дней",
+    "text": "Локальный паттерн в свежих отзывах — стоит проверить.",
+    "source": "6 отзывов за 30 дней"
+  },
+  "variants": [
+    {
+      "name": "синий",
+      "rating": 4.37,
+      "count": 46,
+      "status": "ok",
+      "bar": 100
+    },
+    {
+      "name": "Темно-синий",
+      "rating": 4.71,
+      "count": 7,
+      "status": "ok",
+      "bar": 15
+    },
+    {
+      "name": "50",
+      "rating": 4.75,
+      "count": 4,
+      "status": "ok",
+      "bar": 9
+    }
+  ],
+  "decision": {
+    "text": "Проверить проблемные варианты и обновить описание.",
+    "actions": [
+      "Проверить проблемные партии",
+      "Обновить описание/ожидания",
+      "Ответить на новые отзывы"
+    ]
+  },
+  "reply_draft": "Спасибо за отзыв. Мы проверяем информацию и уточним детали."
+}

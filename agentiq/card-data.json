@@ -1,0 +1,32 @@
+{
+  "product": {
+    "title": "Термос 1L нерж. сталь",
+    "article": "519340",
+    "platform": "Wildberries"
+  },
+  "stats": {
+    "feedback_count": 203,
+    "rating": 4.3,
+    "unanswered_count": 120,
+    "unanswered_in_signal": 7
+  },
+  "signal": {
+    "title": "Крышка протекает — 11 раз",
+    "text": "Только Silver и Gold. Появилось 8 дней назад, растёт.",
+    "source": "11 отзывов, последние 8 дней"
+  },
+  "variants": [
+    {"name": "Silver", "rating": 4.1, "count": 28, "status": "problem", "bar": 82},
+    {"name": "Gold", "rating": 3.9, "count": 19, "status": "problem", "bar": 78},
+    {"name": "Остальные", "rating": 4.7, "count": 156, "status": "ok", "bar": 91}
+  ],
+  "decision": {
+    "text": "Проверить партии Silver и Gold. Остальные не трогать.",
+    "actions": [
+      "Запросить партию у поставщика и проверить крышку",
+      "Добавить уточнение в описание для Silver/Gold",
+      "Ответить на 7 отзывов из сигнала"
+    ]
+  },
+  "reply_draft": "Благодарим за отзыв. Проверяем эту партию — свяжемся, если подтвердится."
+}

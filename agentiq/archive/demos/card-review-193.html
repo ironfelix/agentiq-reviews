@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Preview — Task 193</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(125, 184, 232, 0.05);
+    border: 1px solid rgba(125, 184, 232, 0.28);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .state-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: #4caf7a;
+    background: rgba(76, 175, 122, 0.15);
+  }
+
+  .comp-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .comp-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .comp-header .comp-meta {
+    font-size: 12px;
+    color: #8a9bb0;
+  }
+
+  .comp-stats {
+    display: flex;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .comp-stat { flex: 1; text-align: center; }
+
+  .comp-stat .stat-val {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .comp-stat .stat-label {
+    font-size: 11px;
+    color: #8a9bb0;
+    margin-top: 3px;
+  }
+
+  .signal {
+    padding: 16px 20px 14px;
+  }
+
+  .signal-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    color: #f06543;
+    background: rgba(240, 101, 67, 0.15);
+  }
+
+  .signal h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .signal > p {
+    font-size: 13px;
+    color: #8a9bb0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .signal-source {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #5c7080;
+  }
+
+  .variant-compare { margin: 14px 0 0; }
+
+  .variant-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+
+  .variant-row:last-child { margin-bottom: 0; }
+
+  .variant-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #c8d6e0;
+    width: 92px;
+    flex-shrink: 0;
+  }
+
+  .variant-name.problem { color: #f06543; font-weight: 600; }
+  .variant-row.others .variant-name { color: #5c7080; font-size: 12px; }
+  .variant-row.others .variant-bar  { background: rgba(255,255,255,0.18); }
+
+  .variant-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .variant-bar { height: 100%; border-radius: 3px; }
+  .variant-bar.problem { background: #f06543; }
+  .variant-bar.ok { background: #4caf7a; }
+
+  .variant-rating {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .variant-rating.rating-high { color: #4caf7a; }
+  .variant-rating.rating-low  { color: #f06543; }
+
+  .variant-count {
+    font-size: 11px;
+    color: #5c7080;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .decision {
+    margin: 8px 20px 8px;
+    background: rgba(125, 184, 232, 0.08);
+    border: 1px solid rgba(125, 184, 232, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .decision-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #7db8e8;
+    margin-bottom: 6px;
+  }
+
+  .decision p {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .action-list {
+    margin-top: 10px;
+    padding-left: 16px;
+    color: #a8bcc8;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .action-list li { margin: 4px 0; }
+
+  .reply-block {
+    margin: 4px 20px 20px 32px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid rgba(255,255,255,0.12);
+    border-radius: 0;
+    padding: 6px 12px 8px;
+  }
+
+  .reply-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #5c7080;
+    margin-bottom: 4px;
+  }
+
+  .reply-text {
+    font-size: 13px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div class="comp-header">
+    <span class="state-badge">Стало</span>
+    <h4 id="title">—</h4>
+    <span class="comp-meta" id="meta">—</span>
+  </div>
+
+  <div class="comp-stats">
+    <div class="comp-stat">
+      <div class="stat-val" id="feedbackCount">—</div>
+      <div class="stat-label">отзывов</div>
+    </div>
+    <div class="comp-stat">
+      <div class="stat-val" id="rating">—</div>
+      <div class="stat-label">рейтинг</div>
+    </div>
+    <div class="comp-stat">
+      <div class="stat-val" id="unanswered">—</div>
+      <div class="stat-label">без ответа</div>
+    </div>
+  </div>
+
+  <div class="signal">
+    <span class="signal-badge" id="signalBadge">⚠ сигнал</span>
+    <h5 id="signalTitle">—</h5>
+    <p id="signalText">—</p>
+    <div class="signal-source" id="signalSource">—</div>
+
+    <div class="variant-compare" id="variantList"></div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-label">→ Решение</div>
+    <p id="decisionText">—</p>
+    <ul class="action-list" id="actionList"></ul>
+  </div>
+
+  <div class="reply-block">
+    <div class="reply-label">Черновик ответа</div>
+    <p class="reply-text" id="replyText">—</p>
+  </div>
+</div>
+
+<script id="cardData" type="application/json">
+{
+  "product": {
+    "title": "Артикул 282955222",
+    "article": "282955222",
+    "platform": "Wildberries"
+  },
+  "stats": {
+    "feedback_count": 100,
+    "feedback_total": 407,
+    "rating": 4.79,
+    "unanswered_count": 1,
+    "unanswered_in_signal": null,
+    "recent_count": 11,
+    "recent_low": 0
+  },
+  "signal": {
+    "title": "Вариант «красный» хуже среднего",
+    "text": "Средняя оценка 4.08 против 4.79 по товару.",
+    "source": "12 отзывов по варианту"
+  },
+  "variants": [
+    {
+      "name": "4 шт. · 120 м",
+      "rating": 4.55,
+      "count": 22,
+      "status": "ok",
+      "bar": 100
+    },
+    {
+      "name": "серый",
+      "rating": 4.71,
+      "count": 21,
+      "status": "ok",
+      "bar": 95
+    },
+    {
+      "name": "красный",
+      "rating": 4.08,
+      "count": 12,
+      "status": "problem",
+      "bar": 55
+    }
+  ],
+  "decision": {
+    "text": "Проверить вариант «красный» — он заметно хуже среднего.",
+    "actions": [
+      "Проверить проблемные партии",
+      "Обновить описание/ожидания",
+      "Ответить на новые отзывы"
+    ]
+  },
+  "reply_draft": "Спасибо за отзыв. Мы проверяем информацию и уточним детали."
+}
+</script>
+
+<script>
+  async function loadData() {
+    const embedded = document.getElementById('cardData');
+    let embeddedData = null;
+    if (embedded && embedded.textContent) {
+      try { embeddedData = JSON.parse(embedded.textContent); } catch (e) {}
+    }
+
+    try {
+      const res = await fetch('card-data-193.json', { cache: 'no-store' });
+      if (res.ok) return res.json();
+    } catch (e) {}
+
+    if (embeddedData) return embeddedData;
+    throw new Error('Failed to load card data');
+  }
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '—';
+  }
+
+  function buildVariantRow(v) {
+    const row = document.createElement('div');
+    row.className = 'variant-row' + (v.status === 'ok' ? ' others' : '');
+
+    const name = document.createElement('span');
+    name.className = 'variant-name' + (v.status === 'problem' ? ' problem' : '');
+    name.textContent = v.name;
+
+    const barWrap = document.createElement('div');
+    barWrap.className = 'variant-bar-wrap';
+
+    const bar = document.createElement('div');
+    bar.className = 'variant-bar ' + (v.status === 'problem' ? 'problem' : 'ok');
+    bar.style.width = `${v.bar || 60}%`;
+
+    const rating = document.createElement('span');
+    rating.className = 'variant-rating ' + (v.rating >= 4.5 ? 'rating-high' : (v.rating <= 4.2 ? 'rating-low' : ''));
+    rating.textContent = (v.rating ?? '-').toString();
+
+    const count = document.createElement('span');
+    count.className = 'variant-count';
+    count.textContent = v.count ?? '';
+
+    barWrap.appendChild(bar);
+    row.appendChild(name);
+    row.appendChild(barWrap);
+    row.appendChild(rating);
+    row.appendChild(count);
+    return row;
+  }
+
+  function render(data) {
+    setText('title', data.product?.title);
+    setText('meta', `${data.product?.platform || ''} · артикул ${data.product?.article || ''}`.trim());
+    setText('feedbackCount', data.stats?.feedback_count ?? '—');
+    setText('rating', data.stats?.rating ?? '—');
+    setText('unanswered', data.stats?.unanswered_count ?? '—');
+
+    setText('signalTitle', data.signal?.title);
+    setText('signalText', data.signal?.text);
+    setText('signalSource', data.signal?.source ? `Источник: ${data.signal.source}` : '');
+
+    const list = document.getElementById('variantList');
+    list.innerHTML = '';
+    (data.variants || []).forEach(v => list.appendChild(buildVariantRow(v)));
+
+    setText('decisionText', data.decision?.text);
+
+    const actions = document.getElementById('actionList');
+    actions.innerHTML = '';
+    (data.decision?.actions || []).forEach(a => {
+      const li = document.createElement('li');
+      li.textContent = a;
+      actions.appendChild(li);
+    });
+
+    setText('replyText', data.reply_draft);
+  }
+
+  loadData().then(render).catch(err => {
+    console.error(err);
+    setText('title', 'Не удалось загрузить данные');
+  });
+</script>
+</body>
+</html>
