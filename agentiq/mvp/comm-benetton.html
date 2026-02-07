@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Коммуникация · Артикул 110737323</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0a1018;
+    color: #fff;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .page { max-width: 560px; width: 100%; }
+
+  .page-header { text-align: center; margin-bottom: 28px; }
+  .page-header h1 { font-size: 18px; font-weight: 700; }
+  .page-header .sub { font-size: 12px; color: #7a9bb5; margin-top: 4px; }
+
+  .card {
+    background: linear-gradient(135deg, #141e2b 0%, #0f1720 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card-header { margin-bottom: 18px; }
+  .card-header h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .card-header .meta { font-size: 11px; color: #7a9bb5; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-box {
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-val { font-size: 22px; font-weight: 700; }
+  .stat-label { font-size: 10px; color: #7a9bb5; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val.green { color: #4ecb71; }
+  .stat-val.yellow { color: #e8a838; }
+  .stat-val.red { color: #e85454; }
+  .stat-val.blue { color: #7db8e8; }
+
+  .risk-bar-section { margin-bottom: 10px; }
+  .risk-bar-label { font-size: 11px; color: #a8bcc8; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .risk-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; position: relative; }
+  .risk-bar-name {
+    font-size: 11px; color: #c8d6e0; width: 160px; flex-shrink: 0;
+    cursor: help;
+    border-bottom: 1px dotted rgba(255,255,255,0.2);
+    padding-bottom: 1px;
+  }
+  .risk-bar-wrap { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+  .risk-bar { height: 100%; border-radius: 5px; transition: width 0.3s; }
+  .risk-bar.critical { background: #e85454; }
+  .risk-bar.warning { background: #e8a838; }
+  .risk-bar.ok { background: #4ecb71; }
+  .risk-bar.neutral { background: #7db8e8; }
+  .risk-bar-count { font-size: 11px; color: #a8bcc8; width: 30px; text-align: right; flex-shrink: 0; font-weight: 600; }
+
+  .tooltip-wrap { position: relative; }
+  .tooltip-wrap .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: #1e2d3d;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: #c8d6e0;
+    line-height: 1.5;
+    width: 260px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tooltip-wrap:hover .tooltip { display: block; }
+
+  .rt-section { margin-bottom: 18px; }
+  .rt-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .rt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .rt-name { font-size: 12px; color: #c8d6e0; width: 90px; flex-shrink: 0; }
+  .rt-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .rt-bar { height: 100%; border-radius: 4px; }
+  .rt-bar.fast { background: #4ecb71; }
+  .rt-bar.medium { background: #e8a838; }
+  .rt-bar.slow { background: #e85454; }
+  .rt-value { font-size: 11px; color: #a8bcc8; width: 70px; text-align: right; flex-shrink: 0; }
+
+  .risk-section { margin-bottom: 18px; }
+  .risk-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .risk-item {
+    background: rgba(232, 84, 84, 0.08);
+    border-left: 3px solid #e85454;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .risk-item.warning {
+    background: rgba(232, 168, 56, 0.08);
+    border-left-color: #e8a838;
+  }
+  .risk-item.ok {
+    background: rgba(78, 203, 113, 0.08);
+    border-left-color: #4ecb71;
+  }
+  .risk-title { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .risk-desc { font-size: 11px; color: #a8bcc8; line-height: 1.5; }
+
+  .loss-box {
+    background: linear-gradient(135deg, rgba(232, 84, 84, 0.12) 0%, rgba(232, 168, 56, 0.08) 100%);
+    border: 1px solid rgba(232, 84, 84, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .loss-pct { font-size: 24px; font-weight: 700; }
+  .loss-label { font-size: 11px; color: #a8bcc8; margin-top: 2px; }
+  .loss-confidence { font-size: 10px; color: #7a9bb5; margin-top: 6px; }
+
+  .sample { margin-bottom: 22px; }
+  .sample-label { font-size: 11px; color: #a8bcc8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sample-item {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid #e85454;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .sample-item.warn-border { border-left-color: #e8a838; }
+  .sample-text { font-size: 12px; color: #c8d6e0; font-style: italic; line-height: 1.5; }
+  .sample-reply { font-size: 11px; color: #e8a838; margin-top: 8px; line-height: 1.4; }
+  .sample-meta { font-size: 10px; color: #7a9bb5; margin-top: 6px; }
+  .sample-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 6px;
+  }
+  .tag-blame { background: rgba(232, 84, 84, 0.2); color: #e85454; }
+  .tag-ignore { background: rgba(232, 168, 56, 0.2); color: #e8a838; }
+  .tag-template { background: rgba(125, 184, 232, 0.2); color: #7db8e8; }
+  .tag-amplify { background: rgba(200, 100, 200, 0.2); color: #d080d0; }
+  .tag-deny { background: rgba(232, 84, 84, 0.15); color: #e88484; }
+  .tag-no-reply { background: rgba(255, 255, 255, 0.1); color: #999; }
+  .tag-size { background: rgba(160, 120, 232, 0.2); color: #a078e8; }
+  .tag-color { background: rgba(232, 160, 120, 0.2); color: #e8a078; }
+  .tag-fabric { background: rgba(120, 200, 160, 0.2); color: #78c8a0; }
+
+  .verdict {
+    background: rgba(232, 84, 84, 0.06);
+    border: 1px solid rgba(232, 84, 84, 0.15);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .verdict-title { font-size: 12px; font-weight: 600; color: #e85454; margin-bottom: 8px; }
+  .verdict-text { font-size: 12px; color: #c8d6e0; line-height: 1.6; }
+
+  .breakdown { margin-bottom: 18px; }
+  .breakdown table { width: 100%; border-collapse: collapse; }
+  .breakdown th { font-size: 10px; color: #7a9bb5; text-align: left; padding: 6px 8px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .breakdown td { font-size: 12px; color: #c8d6e0; padding: 8px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .breakdown td.num { text-align: right; font-weight: 600; }
+  .breakdown td.red-text { color: #e85454; }
+  .breakdown td.yellow-text { color: #e8a838; }
+  .breakdown td.green-text { color: #4ecb71; }
+
+  .perception-list { list-style: none; padding: 0; }
+  .perception-list li {
+    font-size: 11px;
+    color: #c8d6e0;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    line-height: 1.5;
+  }
+  .perception-list li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e85454;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .gauge-wrap { text-align: center; margin-bottom: 20px; }
+  .gauge-score { font-size: 48px; font-weight: 700; }
+  .gauge-max { font-size: 16px; color: #7a9bb5; font-weight: 400; }
+  .gauge-label { font-size: 11px; color: #a8bcc8; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 18px 0; }
+
+  details { margin-top: 12px; }
+  summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: #4ecb71;
+    padding: 8px 12px;
+    background: rgba(78, 203, 113, 0.06);
+    border: 1px solid rgba(78, 203, 113, 0.12);
+    border-radius: 6px;
+    list-style: none;
+    font-weight: 600;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { background: rgba(78, 203, 113, 0.1); }
+
+  .ai-rewrite {
+    margin-top: 10px;
+    padding: 14px;
+    background: rgba(78, 203, 113, 0.05);
+    border-left: 3px solid #4ecb71;
+    border-radius: 0 8px 8px 0;
+  }
+  .ai-rewrite-label { font-size: 9px; color: #4ecb71; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+  .ai-rewrite-text { font-size: 12px; color: #c8d6e0; line-height: 1.6; margin-bottom: 10px; }
+  .ai-rewrite-why { font-size: 10px; color: #7a9bb5; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 8px; }
+
+  .action-list { list-style: none; padding: 0; counter-reset: action; }
+  .action-list li {
+    font-size: 12px;
+    color: #c8d6e0;
+    padding: 10px 0 10px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    line-height: 1.5;
+    position: relative;
+  }
+  .action-list li::before {
+    counter-increment: action;
+    content: counter(action);
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(78, 203, 113, 0.12);
+    color: #4ecb71;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .action-priority { font-size: 9px; color: #e85454; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .action-priority.medium { color: #e8a838; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Артикул 110737323 &middot; Коммуникация</h1>
+    <div class="sub">United Colors of Benetton &middot; водолазка &middot; анализ качества ответов &middot; 215 отзывов за 12 мес.</div>
+  </div>
+
+  <!-- Quality Score -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Качество ответов продавца</h3>
+      <div class="meta">25 негативных + 190 позитивных отзывов &middot; 215 из 215 с ответом &middot; фев 2024 &mdash; фев 2026</div>
+    </div>
+
+    <!-- Verdict first -->
+    <div style="margin-bottom: 18px; padding: 14px; background: rgba(232, 84, 84, 0.06); border: 1px solid rgba(232, 84, 84, 0.12); border-radius: 10px;">
+      <div style="font-size: 13px; color: #c8d6e0; line-height: 1.6;">Продавец отвечает молниеносно (медиана 1.1 часа) и покрывает 100% отзывов. Но используется один шаблон на все ситуации: от &laquo;спасибо, отличная вещь&raquo; до &laquo;прислали подделку&raquo;. Ни одного ответа с конкретным решением за 12 месяцев. Для fashion-бренда, где доверие к подлинности = конверсия, это критическая ошибка.</div>
+    </div>
+
+    <div class="gauge-wrap">
+      <div class="gauge-score" style="color: #e85454;">2<span class="gauge-max">/10</span></div>
+      <div class="gauge-label">Оценка качества ответов</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-val red">21</div>
+        <div class="stat-label">Вредят продажам</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val yellow">31</div>
+        <div class="stat-label">Есть проблемы</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val green">0</div>
+        <div class="stat-label">Хорошие</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val blue">163</div>
+        <div class="stat-label">Нормальные</div>
+      </div>
+    </div>
+
+    <!-- Loss estimate (moved into first card) -->
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06);">
+      <div class="loss-box">
+        <div class="loss-pct" style="color: #e85454;">
+          ~4-7% <span class="tooltip-wrap" style="font-size: 14px; color: #7a9bb5; cursor: help; vertical-align: super;">*<span class="tooltip" style="width: 320px; left: 50%; transform: translateX(-50%); font-size: 10px; line-height: 1.5; white-space: normal;"><strong>Логика расчёта:</strong><br>&bull; Индекс вреда: (критичные&times;10 + рискованные&times;1) / макс = harm%<br>&bull; Влияние на CR: 45% читают &times; harm% &times; 0.9 fashion<br>&bull; Диапазон 4-7% учитывает неопределённость (40-55% читателей в fashion)</span></span>
+        </div>
+        <div class="loss-label">приблизительные потери конверсии из-за качества ответов</div>
+        <div style="font-size: 11px; color: #a8bcc8; margin-top: 8px; text-align: center;">что может означать</div>
+        <div style="font-size: 22px; font-weight: 700; color: #e85454; margin-top: 6px; text-align: center;">50,000 - 120,000&#8381;/месяц</div>
+        <div class="loss-confidence">Текущая цена 1,921&#8381;, средняя за 3 мес. ~2,100&#8381; (данные WB). Оценка при 500-800 заказов/мес.</div>
+      </div>
+    </div>
+
+    <div class="risk-item">
+      <div class="risk-title">0 из 215 ответов содержат конкретное решение проблемы</div>
+      <div class="risk-desc">Ни одного хорошего ответа за 12 месяцев. Максимум &mdash; &laquo;приносим извинения за неудобства&raquo;. На жалобы о подделке, браке, несоответствии цвета &mdash; один и тот же шаблон.</div>
+    </div>
+  </div>
+
+  <!-- Response Speed -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Скорость ответа</h3>
+      <div class="meta">Время от публикации отзыва до ответа продавца</div>
+    </div>
+
+    <div class="rt-section">
+      <div class="rt-label">Негативные отзывы (1-3 звезды)</div>
+      <div class="rt-row">
+        <span class="rt-name">Медиана</span>
+        <div class="rt-bar-wrap"><div class="rt-bar fast" style="width: 5%"></div></div>
+        <span class="rt-value">1.2 часа</span>
+      </div>
+      <div class="rt-row">
+        <span class="rt-name">Среднее</span>
+        <div class="rt-bar-wrap"><div class="rt-bar medium" style="width: 29%"></div></div>
+        <span class="rt-value">1.4 дня</span>
+      </div>
+    </div>
+
+    <div class="rt-section">
+      <div class="rt-label">Все отзывы (215 шт.)</div>
+      <div class="rt-row">
+        <span class="rt-name">Медиана</span>
+        <div class="rt-bar-wrap"><div class="rt-bar fast" style="width: 5%"></div></div>
+        <span class="rt-value">1.1 часа</span>
+      </div>
+      <div class="rt-row">
+        <span class="rt-name">Среднее</span>
+        <div class="rt-bar-wrap"><div class="rt-bar slow" style="width: 68%"></div></div>
+        <span class="rt-value">3.3 дня</span>
+      </div>
+    </div>
+
+    <div class="risk-item ok">
+      <div class="risk-desc">Медиана 1.1 часа &mdash; отлично. 169 из 215 отвечены в первые сутки, 45 &mdash; менее чем за 30 минут (вероятно, автоматизация). Но быстрый шаблонный ответ хуже медленного вдумчивого.</div>
+    </div>
+  </div>
+
+  <!-- Response quality breakdown -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Качество ответов</h3>
+      <div class="meta">Классификация 215 ответов (все отзывы 1-5&#9733;)</div>
+    </div>
+
+    <div class="risk-bar-section">
+      <div class="risk-bar-label">Хорошие ответы</div>
+
+      <div class="risk-bar-row">
+        <span class="risk-bar-name tooltip-wrap">
+          Хороший ответ <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Эмпатия + конкретное решение или объяснение</span>
+        </span>
+        <div class="risk-bar-wrap"><div class="risk-bar ok" style="width: 0%"></div></div>
+        <span class="risk-bar-count">0</span>
+      </div>
+
+      <div class="risk-bar-row">
+        <span class="risk-bar-name tooltip-wrap">
+          Нормальный ответ <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Вежливый шаблон на позитивный отзыв &mdash; не вредит, но и не помогает</span>
+        </span>
+        <div class="risk-bar-wrap"><div class="risk-bar neutral" style="width: 100%"></div></div>
+        <span class="risk-bar-count">163</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="risk-bar-section">
+      <div class="risk-bar-label">Ошибки в ответах</div>
+
+      <div class="risk-bar-row">
+        <span class="risk-bar-name tooltip-wrap">
+          Копипаст-шаблон <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">Один и тот же текст на жалобы и похвалы &mdash; покупатель видит, что никто не читает отзывы</span>
+        </span>
+        <div class="risk-bar-wrap"><div class="risk-bar warning" style="width: 76%"></div></div>
+        <span class="risk-bar-count">51</span>
+      </div>
+
+      <div class="risk-bar-row">
+        <span class="risk-bar-name tooltip-wrap">
+          Перекладывает вину <span style="font-size: 9px; color: #7a9bb5; margin-left: 2px;">&olarr;</span>
+          <span class="tooltip">&laquo;Производитель не контролирует доставку&raquo; &mdash; обвиняет WB вместо решения</span>
+        </span>
+        <div class="risk-bar-wrap"><div class="risk-bar critical" style="width: 1.5%"></div></div>
+        <span class="risk-bar-count">1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fashion: Size, Fabric, Color -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Размер, ткань и цвет</h3>
+      <div class="meta">Fashion-анализ на основе 215 отзывов за 12 месяцев</div>
+    </div>
+
+    <div class="breakdown">
+      <table>
+        <thead>
+          <tr><th>Проблема</th><th>Упоминания</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sample-tag tag-fabric">ткань</span> Тонкая / просвечивает / мнётся</td>
+            <td class="num red-text">33</td>
+          </tr>
+          <tr>
+            <td><span class="sample-tag tag-size">размер</span> Маломерит / обтягивает</td>
+            <td class="num yellow-text">7</td>
+          </tr>
+          <tr>
+            <td><span class="sample-tag tag-size">размер</span> Великоват / длинноват</td>
+            <td class="num">4</td>
+          </tr>
+          <tr>
+            <td><span class="sample-tag tag-color">цвет</span> Не соответствует фото</td>
+            <td class="num yellow-text">4</td>
+          </tr>
+          <tr>
+            <td><span class="sample-tag tag-fabric">подмена</span> Не Benetton / другая фирма / без бирок</td>
+            <td class="num red-text">3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="risk-item warning">
+      <div class="risk-title">Главная боль &mdash; тонкая ткань (33 упоминания)</div>
+      <div class="risk-desc">Каждый 6-й покупатель упоминает тонкость или просвечивание. Это свойство 100% хлопка, но покупатели ожидают плотную водолазку. Продавец ни разу за 12 месяцев не объяснил это в ответе.</div>
+    </div>
+
+    <div class="risk-item ok">
+      <div class="risk-title">Размерная сетка в порядке</div>
+      <div class="risk-desc">18 покупателей подтверждают соответствие размера. Жалобы на маломерку (7) и великоватость (4) в пределах нормы для трикотажа.</div>
+    </div>
+  </div>
+
+  <!-- TOP-3 Worst Responses -->
+  <div class="card">
+    <div class="card-header">
+      <h3>ТОП-3 худших ответа</h3>
+      <div class="meta">Ответы, которые активно отпугивают покупателей</div>
+    </div>
+
+    <div class="sample">
+      <div class="sample-label">#1 &middot; Вместо Benetton пришла FinFlare &mdash; шаблон</div>
+      <div class="sample-item">
+        <div class="sample-text">Покупатель (1 звезда): Недостатки: &laquo;Вместо водолазки Benetton пришла водолазка FinFlare.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы по товару, доставке или возврату, пожалуйста, обратитесь в службу поддержки интернет магазина.&raquo;</div>
+        <div class="sample-meta">&#9733;1 &middot; черный M &middot; 2025-09-03</div>
+        <span class="sample-tag tag-template">КОПИПАСТ-ШАБЛОН</span>
+      </div>
+      <div class="risk-item">
+        <div class="risk-desc">Покупатель получил товар ДРУГОГО бренда. Это подмена. Продавец &mdash; стандартный шаблон &laquo;обратитесь в поддержку&raquo;. Для потенциального покупателя это сигнал: продавец знает о подменах, но не реагирует.</div>
+      </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Нам очень жаль за эту ситуацию. Это недопустимо &mdash; вы заказывали Benetton и должны были получить именно его. Оформите, пожалуйста, возврат через ЛК WB с пометкой &laquo;не соответствует описанию&raquo; &mdash; возврат бесплатный. Мы уже передали информацию для проверки комплектации на складе.&raquo;</div>
+          <div class="ai-rewrite-why">Признание проблемы. Конкретная инструкция по бесплатному возврату. Действие (проверка склада). Не обещает компенсацию.</div>
+        </div>
+      </details>
+    </div>
+
+    <div class="sample">
+      <div class="sample-label">#2 &middot; Подделка с разными бирками &mdash; шаблон</div>
+      <div class="sample-item">
+        <div class="sample-text">Покупатель (1 звезда): &laquo;На вороте бирка Benetton и страна Тунис, а на вшитой бирке &mdash; другая фирма и страна Россия.&raquo; Недостатки: &laquo;Подделка.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы... обратитесь в службу поддержки интернет магазина.&raquo;</div>
+        <div class="sample-meta">&#9733;1 &middot; черный XS &middot; 2025-09-18</div>
+        <span class="sample-tag tag-template">КОПИПАСТ-ШАБЛОН</span>
+      </div>
+      <div class="risk-item">
+        <div class="risk-desc">Покупатель детально описывает признаки подделки (две разные бирки, разные страны). Ответ &mdash; шаблон. Три покупателя за год заявляют о подмене &mdash; ни одного расследования.</div>
+      </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Спасибо, что сообщили &mdash; мы относимся к этому крайне серьёзно. Все наши изделия проходят контроль подлинности. Описанная ситуация нетипична &mdash; возможно, произошла ошибка при комплектации. Оформите возврат через ЛК WB как &laquo;не соответствует описанию&raquo;. Мы запустили проверку этой партии.&raquo;</div>
+          <div class="ai-rewrite-why">Серьёзное отношение к заявлению. Не отрицает в лоб. Конкретная инструкция. Действие (проверка партии).</div>
+        </div>
+      </details>
+    </div>
+
+    <div class="sample">
+      <div class="sample-label">#3 &middot; Тонкая ткань просвечивает &mdash; шаблон</div>
+      <div class="sample-item">
+        <div class="sample-text">Покупатель (2 звезды): &laquo;Полупрозрачная, на фото недостоверное изображение плотной ткани. Очень мнущаяся. Не стоит таких денег за такой вид.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы... обратитесь в службу поддержки интернет магазина.&raquo;</div>
+        <div class="sample-meta">&#9733;2 &middot; белый 42-44 &middot; 2025-02-21</div>
+        <span class="sample-tag tag-template">КОПИПАСТ-ШАБЛОН</span>
+      </div>
+      <div class="risk-item">
+        <div class="risk-desc">Самая частая жалоба (33 упоминания за год): ткань тонкая, просвечивает, мнётся. Покупатель указывает на несоответствие фото. Ответ &mdash; тот же шаблон. 33 раза одна и та же проблема, 0 конкретных ответов.</div>
+      </div>
+
+      <details>
+        <summary>&#8617; Как стоило ответить</summary>
+        <div class="ai-rewrite">
+          <div class="ai-rewrite-label">Рекомендация</div>
+          <div class="ai-rewrite-text">&laquo;Благодарим за обратную связь. Эта модель из 100% хлопка &mdash; лёгкая и дышащая, поэтому светлые оттенки могут просвечивать. Для белого/кремового рекомендуем нижнее бельё в тон. Мы обновим фотографии, чтобы точнее передать плотность ткани.&raquo;</div>
+          <div class="ai-rewrite-why">Объясняет свойство ткани как преимущество. Практический совет. Конкретное действие (обновление фото).</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- What buyer sees -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Что видит потенциальный покупатель</h3>
+      <div class="meta">Восприятие ответов при чтении негативных отзывов</div>
+    </div>
+
+    <ul class="perception-list">
+      <li>80% ответов на негатив &mdash; один и тот же шаблон: &laquo;Благодарим за оценку. Обратитесь в поддержку&raquo;. Покупатель видит: жалобы никто не читает</li>
+      <li>3 покупателя за год сообщают о подмене/подделке &mdash; продавец ни разу не расследовал, только шаблон</li>
+      <li>33 упоминания тонкой ткани &mdash; продавец ни разу не объяснил, что это 100% хлопок. Покупатель делает вывод: ткань действительно плохая</li>
+      <li>4 жалобы на цвет (коричневый = болотный, розовый = зелёный) &mdash; фото так и не обновлены</li>
+      <li>Паттерн: быстрый ответ-робот, который не различает &laquo;спасибо, всё отлично&raquo; и &laquo;прислали подделку&raquo;</li>
+    </ul>
+  </div>
+
+  <!-- Hidden complaints in positive reviews -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Скрытые проблемы в позитивных отзывах</h3>
+      <div class="meta">4-5 звёзд, но покупатель указал конкретный недостаток &mdash; продавец проигнорировал</div>
+    </div>
+
+    <div class="sample">
+      <div class="sample-item warn-border">
+        <div class="sample-text">&#9733;5 &middot; Недостатки: &laquo;Водолазка тонкая и просвечивает, телесный бесшовный лиф виден, поэтому планирую носить исключительно под пиджак.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Спасибо за высокую оценку и обратную связь. С уважением, United Colors of Benetton & Sisley.&raquo;</div>
+        <div class="sample-meta">Белый, S &middot; 2024-10-13 &middot; Конкретная проблема с просвечиванием &mdash; шаблон</div>
+        <span class="sample-tag tag-fabric">ТКАНЬ</span>
+      </div>
+      <div class="sample-item warn-border">
+        <div class="sample-text">&#9733;4 &middot; Недостатки: &laquo;Не взяла, потому что цвет не соответствует. Он более холодный.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Благодарим за вашу оценку и обратную связь. Обратитесь в службу поддержки.&raquo;</div>
+        <div class="sample-meta">Красный, XL &middot; 2024-11-04 &middot; Несоответствие цвета &mdash; шаблон</div>
+        <span class="sample-tag tag-color">ЦВЕТ</span>
+      </div>
+      <div class="sample-item warn-border">
+        <div class="sample-text">&#9733;4 &middot; &laquo;Это уже вторая водолазка, с первой всё прекрасно...&raquo; Недостатки: &laquo;Привезли брак.&raquo;</div>
+        <div class="sample-reply">Продавец: &laquo;Благодарим за вашу оценку и обратную связь. Обратитесь в службу поддержки.&raquo;</div>
+        <div class="sample-meta">Чёрный, S &middot; 2025-03-28 &middot; Лояльная повторная покупательница получила брак &mdash; шаблон</div>
+        <span class="sample-tag tag-fabric">БРАК</span>
+      </div>
+    </div>
+
+    <div id="positive-more" style="display: none;">
+
+      <div class="divider"></div>
+      <div class="sample-label">Подробный разбор</div>
+
+      <div class="sample">
+        <div class="sample-label">#1 &middot; Цвет не соответствует карточке</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;4 &middot; Недостатки: &laquo;Сильно мнётся, цвет необычный, серо-зелёный, не под все и не всем подходит.&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Благодарим за вашу оценку. Обратитесь в службу поддержки.&raquo;</div>
+          <div class="sample-meta">Бежевый, L &middot; 2025-04-03</div>
+          <span class="sample-tag tag-color">ЦВЕТ</span> <span class="sample-tag tag-fabric">ТКАНЬ</span>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Хлопок мнётся &mdash; это свойство натуральной ткани. Продавец мог превратить недостаток в преимущество, объяснив, что 100% хлопок мнётся больше синтетики.</div>
+        </div>
+
+        <details>
+          <summary>&#8617; Как стоило ответить</summary>
+          <div class="ai-rewrite">
+            <div class="ai-rewrite-label">Рекомендация</div>
+            <div class="ai-rewrite-text">&laquo;Спасибо за отзыв! Наш трикотаж &mdash; 100% хлопок, поэтому он чуть более склонен к заминам, чем смесовые ткани. Это обратная сторона натуральности. По цвету &laquo;бежевый&raquo; &mdash; оттенок действительно имеет сероватый подтон. Учтём для описания!&raquo;</div>
+            <div class="ai-rewrite-why">Превращает недостаток в преимущество (натуральность). Честно про цвет. Конкретное действие.</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#2 &middot; Упаковка</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Недостатки: &laquo;Упаковка так себе, мятый рваный пакет.&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Спасибо за высокую оценку и обратную связь.&raquo;</div>
+          <div class="sample-meta">Зеленый, S &middot; 2024-10-31</div>
+        </div>
+        <div class="risk-item warning">
+          <div class="risk-desc">Жалобы на упаковку повторяются. Для fashion-бренда упаковка &mdash; часть впечатления. Мятый пакет ставит под сомнение оригинальность товара.</div>
+        </div>
+      </div>
+
+      <div class="sample">
+        <div class="sample-label">#3 &middot; Липнет ворс</div>
+        <div class="sample-item warn-border">
+          <div class="sample-text">&#9733;5 &middot; Недостатки: &laquo;Липнет ворс/шерсть.&raquo;</div>
+          <div class="sample-reply">Продавец: &laquo;Спасибо за высокую оценку и обратную связь.&raquo;</div>
+          <div class="sample-meta">Чёрный, M &middot; 2024-11-07</div>
+          <span class="sample-tag tag-fabric">ТКАНЬ</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 14px;">
+      <a href="#" id="toggle-positive" onclick="var el=document.getElementById('positive-more'); var link=this; if(el.style.display==='none'){el.style.display='block';link.textContent='Скрыть подробный разбор';}else{el.style.display='none';link.textContent='Посмотреть ещё 3 \u2192';} return false;" style="font-size: 12px; color: #e8a838; text-decoration: none; font-weight: 600;">Посмотреть ещё 3 &rarr;</a>
+    </div>
+
+    <div class="risk-item warning" style="margin-top: 16px;">
+      <div class="risk-title">Системная проблема</div>
+      <div class="risk-desc">31 позитивный отзыв содержит конкретную жалобу (ткань, цвет, размер, упаковка). Ни на одну продавец не ответил по существу. Повторяющиеся сигналы: тонкая ткань &mdash; 33 упоминания, цвет &ne; фото &mdash; 4, подмена &mdash; 3.</div>
+    </div>
+  </div>
+
+
+  <!-- Action Plan -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Что делать продавцу</h3>
+      <div class="meta">Конкретные шаги для улучшения качества ответов</div>
+    </div>
+
+    <!-- Why it matters -->
+    <div class="risk-section" style="margin-bottom: 20px;">
+      <div class="risk-label">Почему это важно</div>
+      <div class="risk-item warning">
+        <div class="risk-title">21 вредящий ответ &times; fashion-множитель = максимальный урон</div>
+        <div class="risk-desc">
+          В fashion-категории 45-55% покупателей читают отзывы перед покупкой (vs 30-40% в электронике). Каждый шаблонный ответ на жалобу о подделке или браке видят десятки потенциальных клиентов.
+        </div>
+      </div>
+      <div class="risk-item warning">
+        <div class="risk-title">Быстрая скорость ответа не компенсирует шаблон</div>
+        <div class="risk-desc">
+          Медиана 1.1 часа &mdash; одна из лучших на WB. Но когда за 1 час приходит роботизированный шаблон, это хуже, чем вдумчивый ответ через сутки. Покупатель видит: бот, а не человек.
+        </div>
+      </div>
+    </div>
+
+    <ol class="action-list">
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Заменить шаблон на негативные отзывы ручными ответами. Каждый негатив (1-3 звезды) &mdash; ответ, адресующий конкретную жалобу. &laquo;Обратитесь в поддержку&raquo; &mdash; не ответ.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Расследовать подмену товара. 3 покупателя за год получили не-Benetton (FinFlare, другие бирки). Нужен аудит складских процессов. В ответах &mdash; признавать проблему и давать инструкцию по бесплатному возврату через ЛК WB.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Добавить в описание карточки честную информацию о плотности ткани: &laquo;лёгкий 100% хлопок, светлые цвета могут просвечивать&raquo;. 33 жалобы за год &mdash; это системное ожидание, которое нужно корректировать на входе.
+      </li>
+      <li>
+        <span class="action-priority medium">Важно</span><br>
+        Обновить фото для коричневого/бежевого/красного цветов. Минимум 4 покупателя жалуются на расхождение реального цвета с карточкой.
+      </li>
+      <li>
+        <span class="action-priority medium">Важно</span><br>
+        На жалобы о тонкости ткани отвечать: &laquo;100% хлопок &mdash; лёгкий и дышащий, для светлых цветов рекомендуем нижнее бельё в тон&raquo;. Превращать свойство в преимущество вместо молчания.
+      </li>
+      <li>
+        <span class="action-priority medium">Важно</span><br>
+        В позитивных отзывах с недостатками &mdash; отвечать на конкретный минус. Особенно для повторных покупателей: их конкретные замечания помогают улучшить карточку и укрепляют лояльность.
+      </li>
+    </ol>
+  </div>
+
+  <!-- Note -->
+  <div style="text-align: center; padding: 8px; font-size: 10px; color: #5c6878;">
+    Оценка: 2/10 &middot; 215 отзывов за 12 мес. (фев 2024 &mdash; фев 2026) &middot; WBCON API &middot; Fashion-контекст
+  </div>
+
+</div>
+
+</body>
+</html>
