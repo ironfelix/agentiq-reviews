@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ Chat Center v3.0 — Monochrome Minimal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafbfc;
+            color: #1a1a1a;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-center {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== ЛЕВАЯ ПАНЕЛЬ: Chat List ===== */
+        .chat-list {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e8eaed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .chat-list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        /* Queue sections with drag & drop */
+        .queue-section {
+            margin-bottom: 16px;
+        }
+
+        .queue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .queue-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .queue-count {
+            font-size: 11px;
+            color: #9aa0a6;
+        }
+
+        .queue-cards {
+            min-height: 60px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .queue-cards.drag-over {
+            background: #f5f6f7;
+        }
+
+        .queue-divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 16px 0;
+        }
+
+        .search-box {
+            width: 100%;
+            background: #f5f6f7;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a1a;
+            transition: all 0.2s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            background: white;
+            border-color: #1a1a1a;
+        }
+
+        .search-box::placeholder {
+            color: #9aa0a6;
+        }
+
+        .chat-list-items {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f6f7;
+            cursor: grab;
+            transition: all 0.15s;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+
+        .chat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .chat-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .chat-item:hover {
+            background: #f5f6f7;
+        }
+
+        .chat-item.active {
+            background: #f5f6f7;
+        }
+
+        /* Marketplace icon - единственный цветной элемент */
+        .marketplace-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .marketplace-icon.wb {
+            background: #8b33ff;
+        }
+
+        .marketplace-icon.ozon {
+            background: #005bff;
+        }
+
+        .marketplace-icon.yandex {
+            background: #fc0;
+            color: #000;
+        }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-item-header {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .chat-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .chat-item-time {
+            font-size: 12px;
+            color: #9aa0a6;
+            margin-left: auto;
+        }
+
+        .chat-item-meta {
+            font-size: 12px;
+            color: #9aa0a6;
+            margin-bottom: 6px;
+        }
+
+        .chat-item-preview {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Urgent indicator - минимальный */
+        .chat-item.urgent .chat-item-name::before {
+            content: '●';
+            color: #ea4335;
+            margin-right: 6px;
+            font-size: 8px;
+        }
+
+        /* ===== ЦЕНТР: Dialog ===== */
+        .chat-window {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .chat-header-meta {
+            font-size: 13px;
+            color: #5f6368;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #e8eaed;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.15s;
+            color: #5f6368;
+        }
+
+        .header-action-btn:hover {
+            background: #f5f6f7;
+            border-color: #1a1a1a;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .message {
+            max-width: 560px;
+        }
+
+        .message.customer {
+            align-self: flex-start;
+        }
+
+        .message.seller {
+            align-self: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message-author {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .message-content {
+            background: #f5f6f7;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1a1a1a;
+        }
+
+        .message.seller .message-content {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        /* AI Suggestion - минимальная */
+        .ai-suggestion {
+            background: #f5f6f7;
+            border-left: 3px solid #1a1a1a;
+            padding: 12px 16px;
+            margin: 0 24px 16px 24px;
+            border-radius: 4px;
+        }
+
+        .ai-suggestion-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .ai-suggestion-text {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.6;
+        }
+
+        /* Input */
+        .chat-input-container {
+            border-top: 1px solid #e8eaed;
+            padding: 20px 24px;
+            background: white;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #f5f6f7;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a1a;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            background: white;
+            border-color: #1a1a1a;
+        }
+
+        .chat-input::placeholder {
+            color: #9aa0a6;
+        }
+
+        .btn-send {
+            background: #1a1a1a;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== ПРАВАЯ ПАНЕЛЬ: Product Context ===== */
+        .product-context {
+            width: 300px;
+            background: white;
+            border-left: 1px solid #e8eaed;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .context-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .context-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            font-size: 13px;
+            color: #5f6368;
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .info-section {
+            padding: 20px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .info-section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            margin-bottom: 16px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #9aa0a6;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .info-link {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .info-link:hover {
+            text-decoration: underline;
+        }
+
+        /* AI Insights styling */
+        .insight-badge {
+            display: inline-block;
+            background: #f5f6f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #5f6368;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+
+        .insight-badge.negative {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .insight-badge.urgent {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #c5221f;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        /* Quick actions - minimal */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 1px solid #e8eaed;
+            color: #5f6368;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .quick-action-btn:hover {
+            background: #f5f6f7;
+            border-color: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-center">
+        <!-- ЛЕВАЯ ПАНЕЛЬ: Chat List -->
+        <section class="chat-list">
+            <div class="chat-list-header">
+                <h1 class="chat-list-title">Сообщения</h1>
+
+                <input type="text" class="search-box" placeholder="Поиск..." id="searchBox">
+
+                <div class="queue-divider"></div>
+
+                <!-- В работе -->
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">В работе</div>
+                        <div class="queue-count">1 Live</div>
+                    </div>
+                    <div class="queue-cards" id="nowServing" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                </div>
+
+                <!-- Ожидают ответа -->
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">Ожидают ответа</div>
+                        <div class="queue-count">4 Conversations</div>
+                    </div>
+                    <div class="queue-cards" id="upNext" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                </div>
+
+                <div class="queue-divider"></div>
+
+                <!-- Все сообщения -->
+                <div class="queue-section">
+                    <div class="queue-label">Все сообщения</div>
+                    <div id="allChats"></div>
+                </div>
+            </div>
+
+            <div class="chat-list-items" style="display: none;">
+                <!-- Чат 1: WB, срочный -->
+                <div class="chat-item urgent active" data-chat="1">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Иван Петров</span>
+                            <span class="chat-item-time">2 мин</span>
+                        </div>
+                        <div class="chat-item-meta">1★ Отзыв · Осталось 22 мин</div>
+                        <div class="chat-item-preview">
+                            Пришел порванный пакет, корм рассыпался по всей коробке. Ужасная упаковка!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Чат 2: Ozon -->
+                <div class="chat-item" data-chat="2">
+                    <div class="marketplace-icon ozon">O</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Мария Соколова</span>
+                            <span class="chat-item-time">15 мин</span>
+                        </div>
+                        <div class="chat-item-meta">Вопрос на карточке</div>
+                        <div class="chat-item-preview">
+                            Подскажите, какой размер гранул? Моя кошка привередливая, ест только мелкие...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Чат 3: WB -->
+                <div class="chat-item" data-chat="3">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Елена Смирнова</span>
+                            <span class="chat-item-time">1 ч</span>
+                        </div>
+                        <div class="chat-item-meta">5★ Отзыв</div>
+                        <div class="chat-item-preview">
+                            Отличный корм! Кот ест с удовольствием, шерсть блестит. Заказываем уже третий раз.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Чат 4: WB -->
+                <div class="chat-item" data-chat="4">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Александр Ковалев</span>
+                            <span class="chat-item-time">2 ч</span>
+                        </div>
+                        <div class="chat-item-meta">Чат покупателя</div>
+                        <div class="chat-item-preview">
+                            Вы: Заказ будет доставлен завтра до 18:00. Спасибо за ожидание!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Чат 5: Яндекс -->
+                <div class="chat-item urgent" data-chat="5">
+                    <div class="marketplace-icon yandex">Я</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Ольга Николаева</span>
+                            <span class="chat-item-time">3 ч</span>
+                        </div>
+                        <div class="chat-item-meta">2★ Отзыв · Осталось 38 мин</div>
+                        <div class="chat-item-preview">
+                            Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ЦЕНТР: Dialog -->
+        <main class="chat-window">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <h2>Иван Петров · Royal Canin Urinary S/O LP34</h2>
+                    <div class="chat-header-meta">Wildberries · Отзыв 1★ · Сегодня, 12:34</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="header-action-btn" title="Информация">ℹ</button>
+                    <button class="header-action-btn" title="Еще">⋮</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:34</span>
+                    </div>
+                    <div class="message-content">
+                        Пришел порванный пакет, корм рассыпался по всей коробке. Ужасная упаковка! Требую возврат денег. Это уже второй раз такое происходит!
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Suggestion - minimal -->
+            <div class="ai-suggestion">
+                <div class="ai-suggestion-label">AI Рекомендация</div>
+                <div class="ai-suggestion-text">
+                    Иван, добрый день! Приносим извинения за проблему с упаковкой. Нам жаль, что это произошло повторно.
+                    <br><br>
+                    Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы". Средства вернутся на вашу карту в течение 3-5 рабочих дней.
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-container">
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="useTemplate('apology')">Извиниться</button>
+                    <button class="quick-action-btn" onclick="useTemplate('refund')">Возврат</button>
+                    <button class="quick-action-btn" onclick="useTemplate('thanks')">Благодарность</button>
+                </div>
+
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="chatInput" placeholder="Напишите ответ..." rows="1"></textarea>
+                    <button class="btn-send" onclick="sendMessage()">→</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ: Product Context -->
+        <aside class="product-context">
+            <div class="context-header">
+                <div class="context-title">Товар</div>
+                <div class="product-name">Royal Canin Urinary S/O LP34 Feline 1.5 кг</div>
+                <div class="product-rating">★ 4.8 · 1,234 отзыва · Артикул 123456</div>
+                <div class="product-price">₽2,340</div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Review Details</div>
+                <div class="info-item">
+                    <div class="info-label">Оценка</div>
+                    <div class="info-value">1★ · Негативный</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Дата</div>
+                    <div class="info-value">08.02.2026, 12:34</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Вариант</div>
+                    <div class="info-value">1.5 кг</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Автор</div>
+                    <div class="info-value">Иван Петров</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">AI Insights</div>
+                <div class="info-item">
+                    <div class="info-label">Тональность</div>
+                    <div class="info-value">
+                        <span class="insight-badge negative">Негативная (-0.8)</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Категории проблем</div>
+                    <div class="info-value">
+                        <span class="insight-badge">Брак упаковки</span>
+                        <span class="insight-badge">Повторная проблема</span>
+                        <span class="insight-badge">Требует возврата</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Срочность</div>
+                    <div class="info-value">
+                        <span class="insight-badge urgent">Высокая · Осталось 22 мин</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Рекомендация</div>
+                    <div class="info-value">Извиниться + инструкция по возврату</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Similar Issues</div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "упаковка"</div>
+                    <div class="info-value">
+                        12 отзывов за 30 дней
+                        <div class="trend-indicator">↑ Тренд растёт</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "рассыпался"</div>
+                    <div class="info-value">5 отзывов за 30 дней</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Повторные жалобы</div>
+                    <div class="info-value">
+                        3 клиента (упаковка)
+                        <div class="trend-indicator">⚠️ Требует внимания</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Действия</div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Посмотреть все отзывы о товаре</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Похожие проблемы с упаковкой</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Открыть карточку товара на WB</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const chatInput = document.getElementById('chatInput');
+
+        // Chat data
+        const chats = [
+            {
+                id: '1',
+                marketplace: 'wb',
+                name: 'Иван Петров',
+                time: '2 мин',
+                type: '1★ Отзыв',
+                preview: 'Пришел порванный пакет, корм рассыпался по всей коробке. Ужасная упаковка!',
+                urgent: true,
+                queue: 'now'
+            },
+            {
+                id: '2',
+                marketplace: 'ozon',
+                name: 'Мария Соколова',
+                time: '15 мин',
+                type: 'Вопрос на карточке',
+                preview: 'Подскажите, какой размер гранул? Моя кошка привередливая, ест только мелкие...',
+                urgent: false,
+                queue: 'next'
+            },
+            {
+                id: '3',
+                marketplace: 'wb',
+                name: 'Елена Смирнова',
+                time: '1 ч',
+                type: '5★ Отзыв',
+                preview: 'Отличный корм! Кот ест с удовольствием, шерсть блестит. Заказываем уже третий раз.',
+                urgent: false,
+                queue: 'next'
+            },
+            {
+                id: '4',
+                marketplace: 'wb',
+                name: 'Александр Ковалев',
+                time: '2 ч',
+                type: 'Чат покупателя',
+                preview: 'Вы: Заказ будет доставлен завтра до 18:00. Спасибо за ожидание!',
+                urgent: false,
+                queue: 'next'
+            },
+            {
+                id: '5',
+                marketplace: 'yandex',
+                name: 'Ольга Николаева',
+                time: '3 ч',
+                type: '2★ Отзыв',
+                preview: 'Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления...',
+                urgent: true,
+                queue: 'next'
+            }
+        ];
+
+        // Render chat card
+        function renderChatCard(chat) {
+            const urgentClass = chat.urgent ? 'urgent' : '';
+            return `
+                <div class="chat-item ${urgentClass}" draggable="true" data-chat-id="${chat.id}" ondragstart="drag(event)">
+                    <div class="marketplace-icon ${chat.marketplace}">${chat.marketplace === 'wb' ? 'W' : chat.marketplace === 'ozon' ? 'O' : 'Я'}</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">${chat.name}</span>
+                            <span class="chat-item-time">${chat.time}</span>
+                        </div>
+                        <div class="chat-item-meta">${chat.type}${chat.urgent ? ' · Осталось 22 мин' : ''}</div>
+                        <div class="chat-item-preview">${chat.preview}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize queues
+        function initQueues() {
+            const nowServing = document.getElementById('nowServing');
+            const upNext = document.getElementById('upNext');
+            const allChats = document.getElementById('allChats');
+
+            chats.forEach(chat => {
+                const card = renderChatCard(chat);
+                if (chat.queue === 'now') {
+                    nowServing.innerHTML += card;
+                } else if (chat.queue === 'next') {
+                    upNext.innerHTML += card;
+                }
+            });
+
+            updateCounts();
+        }
+
+        // Update counts
+        function updateCounts() {
+            const nowCount = document.querySelectorAll('#nowServing .chat-item').length;
+            const nextCount = document.querySelectorAll('#upNext .chat-item').length;
+
+            document.querySelector('#nowServing').closest('.queue-section').querySelector('.queue-count').textContent =
+                nowCount > 0 ? `${nowCount} Live` : '0';
+            document.querySelector('#upNext').closest('.queue-section').querySelector('.queue-count').textContent =
+                nextCount > 0 ? `${nextCount} Conversations` : '0';
+        }
+
+        // Drag & Drop
+        let draggedElement = null;
+
+        function drag(e) {
+            draggedElement = e.target.closest('.chat-item');
+            draggedElement.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+            const dropzone = e.currentTarget;
+            dropzone.classList.add('drag-over');
+        }
+
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            if (draggedElement) {
+                const dropzone = e.currentTarget;
+                dropzone.appendChild(draggedElement);
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+                updateCounts();
+            }
+        }
+
+        // Initialize
+        initQueues();
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Templates
+        const templates = {
+            'apology': 'Приносим извинения за доставленные неудобства. ',
+            'refund': 'Оформите, пожалуйста, возврат через личный кабинет маркетплейса в разделе "Мои заказы". ',
+            'thanks': 'Спасибо за отзыв! Очень рады, что вам понравилось. '
+        };
+
+        function useTemplate(type) {
+            chatInput.value += templates[type];
+            chatInput.focus();
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        }
+
+        // Send message
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message seller';
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">Вы</span>
+                    <span class="message-time">Только что</span>
+                </div>
+                <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+        }
+
+        // Enter to send
+        chatInput.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Chat selection (delegated)
+        document.addEventListener('click', function(e) {
+            const chatItem = e.target.closest('.chat-item');
+            if (chatItem) {
+                document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+                chatItem.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
