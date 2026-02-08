@@ -401,6 +401,10 @@
             border-radius: var(--radius-lg);
             margin-bottom: var(--space-1);
             border: 1px solid transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .chat-item:hover {
@@ -498,9 +502,14 @@
             margin-right: 5px;
         }
 
+        .chat-item[draggable="true"] {
+            cursor: move;
+        }
+
         .chat-item.dragging {
             opacity: 0.5;
             transform: rotate(2deg);
+            cursor: grabbing;
         }
 
         .queue-section.drag-over {
