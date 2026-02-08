@@ -1034,3 +1034,108 @@
     </script>
 </body>
 </html>
+<style>
+/* ===== MOBILE RESPONSIVE ===== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .product-context {
+        display: none; /* Hide right panel on tablet */
+    }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+    .chat-center {
+        flex-direction: column;
+    }
+    
+    .chat-list {
+        width: 100%;
+        height: 100vh;
+        border-right: none;
+    }
+    
+    .chat-window {
+        display: none; /* Hide dialog by default on mobile */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 100;
+    }
+    
+    .chat-window.mobile-active {
+        display: flex;
+    }
+    
+    .product-context {
+        display: none;
+    }
+    
+    /* Back button for mobile */
+    .mobile-back {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 20px;
+        background: white;
+        border-bottom: 1px solid #e8eaed;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .mobile-back::before {
+        content: '←';
+        font-size: 20px;
+    }
+}
+
+/* Touch-friendly tap targets (44px minimum) */
+@media (max-width: 767px) {
+    .chat-item {
+        min-height: 44px;
+        padding: 16px 20px;
+    }
+    
+    .btn-send,
+    .quick-action-btn,
+    .header-action-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .search-box {
+        min-height: 44px;
+    }
+}
+</style>
+
+<script>
+// Mobile navigation
+if (window.innerWidth < 768) {
+    document.addEventListener('click', function(e) {
+        const chatItem = e.target.closest('.chat-item');
+        if (chatItem) {
+            // Show dialog on mobile
+            document.querySelector('.chat-list').style.display = 'none';
+            document.querySelector('.chat-window').classList.add('mobile-active');
+            
+            // Add back button
+            const chatWindow = document.querySelector('.chat-window');
+            if (!chatWindow.querySelector('.mobile-back')) {
+                const backBtn = document.createElement('div');
+                backBtn.className = 'mobile-back';
+                backBtn.textContent = 'Назад';
+                backBtn.onclick = function() {
+                    document.querySelector('.chat-list').style.display = 'flex';
+                    chatWindow.classList.remove('mobile-active');
+                };
+                chatWindow.insertBefore(backBtn, chatWindow.firstChild);
+            }
+        }
+    });
+}
+</script>
