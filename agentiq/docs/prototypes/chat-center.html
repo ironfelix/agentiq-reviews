@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentIQ Chat Center — Final Pro UX</title>
+    <title>AgentIQ Chat Center — Full 3-Column Layout</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* ===== DESIGN SYSTEM ===== */
@@ -14,6 +14,7 @@
             --color-bg-tertiary: #f8f9fa;
             --color-bg-hover: #f5f6f7;
             --color-bg-active: #f0f7ff;
+            --color-bg-chat: #e8f2f8;
 
             --color-text-primary: #1a1a1a;
             --color-text-secondary: #5f6368;
@@ -74,7 +75,7 @@
             height: 100vh;
         }
 
-        /* ===== LEFT PANEL ===== */
+        /* ===== LEFT PANEL: Chat List ===== */
         .chat-list {
             width: 340px;
             background: var(--color-bg-primary);
@@ -529,64 +530,356 @@
             background: #bdc1c6;
         }
 
-        /* Right Panel (placeholder) */
-        .demo-panel {
+        /* ===== CENTER: Chat Window ===== */
+        .chat-window {
             flex: 1;
-            background: var(--color-bg-secondary);
-            padding: 40px;
+            background: var(--color-bg-chat);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .chat-header-meta {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--color-border-medium);
+            background: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all var(--transition-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .header-action-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .message {
+            max-width: 560px;
+        }
+
+        .message.customer {
+            align-self: flex-start;
+        }
+
+        .message.seller {
+            align-self: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message-author {
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .message-time {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: var(--font-size-lg);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        .message.seller .message-content {
+            background: #dcedff;
+            color: var(--color-text-primary);
+        }
+
+        /* Message attachments */
+        .message-attachment {
+            margin-top: 8px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .message-attachment img {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            cursor: pointer;
+            border-radius: var(--radius-lg);
+        }
+
+        .message-attachment img:hover {
+            opacity: 0.95;
+        }
+
+        /* AI Suggestion */
+        .ai-suggestion {
+            background: var(--color-bg-hover);
+            border-left: 3px solid var(--color-text-primary);
+            padding: 12px 16px;
+            margin: 0 24px 16px 24px;
+            border-radius: var(--radius-md);
+        }
+
+        .ai-suggestion-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .ai-suggestion-text {
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        /* Input */
+        .chat-input-container {
+            border-top: 1px solid var(--color-border-medium);
+            padding: 20px 24px;
+            background: white;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--color-bg-hover);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            font-size: var(--font-size-lg);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            line-height: 1.5;
+            transition: all var(--transition-medium);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .btn-send {
+            background: var(--color-text-primary);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-medium);
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== RIGHT PANEL: Product Context ===== */
+        .product-context {
+            width: 300px;
+            background: white;
+            border-left: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
         }
 
-        .demo-section {
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 24px;
+        .product-context::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .demo-section h2 {
-            font-size: 20px;
+        .product-context::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .product-context::-webkit-scrollbar-thumb {
+            background: var(--color-border-dark);
+            border-radius: 3px;
+        }
+
+        .product-context::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        .context-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .context-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
             font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .info-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .info-section-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
             margin-bottom: 16px;
         }
 
-        .demo-section h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 24px;
-            margin-bottom: 12px;
+        .info-item {
+            margin-bottom: 16px;
         }
 
-        .demo-section p,
-        .demo-section li {
-            font-size: 14px;
-            line-height: 1.7;
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+        }
+
+        .info-link {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: var(--font-size-lg);
+        }
+
+        .info-link:hover {
+            text-decoration: underline;
+        }
+
+        /* AI Insights */
+        .insight-badge {
+            display: inline-block;
+            background: var(--color-bg-hover);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
             color: var(--color-text-secondary);
-            margin-bottom: 12px;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
 
-        .demo-section ul {
-            margin-left: 20px;
+        .insight-badge.negative {
+            background: #fce8e6;
+            color: #c5221f;
         }
 
-        .pros {
-            color: #1e8e3e;
-            font-weight: 500;
+        .insight-badge.urgent {
+            background: #fce8e6;
+            color: var(--color-urgent);
         }
 
-        code {
-            background: var(--color-bg-tertiary);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 13px;
+        .trend-indicator {
+            font-size: var(--font-size-sm);
+            color: var(--color-urgent);
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
     <div class="chat-center">
-        <!-- LEFT PANEL -->
+        <!-- LEFT PANEL: Chat List -->
         <section class="chat-list">
             <div class="chat-list-header">
                 <h1 class="chat-list-title">Сообщения</h1>
@@ -772,96 +1065,154 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL -->
-        <div class="demo-panel">
-            <div class="demo-section">
-                <h2>✨ Final Pro UX — Design System</h2>
-
-                <h3>Unified Design System</h3>
-                <ul>
-                    <li><span class="pros">✓</span> <strong>CSS Variables</strong> — вся система в :root</li>
-                    <li><span class="pros">✓</span> <strong>Spacing Scale</strong> — 4px base (--space-1 до --space-6)</li>
-                    <li><span class="pros">✓</span> <strong>Typography Scale</strong> — 10px-14px (xs, sm, md, base, lg)</li>
-                    <li><span class="pros">✓</span> <strong>Color System</strong> — semantic naming (primary, secondary, tertiary)</li>
-                    <li><span class="pros">✓</span> <strong>Border Radius</strong> — 3 sizes (sm: 5px, md: 6px, lg: 8px)</li>
-                    <li><span class="pros">✓</span> <strong>Transitions</strong> — consistent timing (fast: 0.12s, medium: 0.2s)</li>
-                </ul>
-
-                <h3>Real Favicon Icons ✅</h3>
-                <ul>
-                    <li><span class="pros">✓</span> <strong>WB:</strong> #8b33ff + wildberries.ico</li>
-                    <li><span class="pros">✓</span> <strong>Ozon:</strong> #005bff + ozon.ico</li>
-                    <li><span class="pros">✓</span> <strong>Яндекс:</strong> #ff6600 + yandex-market.ico</li>
-                    <li><span class="pros">✓</span> <strong>Avito:</strong> #00a046 + avito.ico</li>
-                </ul>
-
-                <h3>All 6 Chats Included</h3>
-                <ul>
-                    <li>1. Иван Петров (WB, 1★, urgent)</li>
-                    <li>2. Мария Соколова (Ozon, вопрос)</li>
-                    <li>3. Елена Смирнова (WB, 5★)</li>
-                    <li>4. Александр Ковалев (WB, чат)</li>
-                    <li>5. Ольга Николаева (Яндекс, 2★, urgent)</li>
-                    <li>6. Дмитрий Соловьев (Avito, чат) ← было пропущено!</li>
-                </ul>
-
-                <h3>Professional UX Practices</h3>
-                <ul>
-                    <li><strong>Consistent Naming:</strong> BEM-like, semantic</li>
-                    <li><strong>Scalable Spacing:</strong> базируется на 4px grid</li>
-                    <li><strong>Accessible Contrast:</strong> WCAG AA compliant</li>
-                    <li><strong>Performance:</strong> GPU-accelerated transitions</li>
-                    <li><strong>Maintainable:</strong> все значения через переменные</li>
-                </ul>
-
-                <h3>Inspiration & References</h3>
-                <ul>
-                    <li><strong>Linear</strong> — design system approach, spacing scale</li>
-                    <li><strong>Notion</strong> — semantic color naming, compact UI</li>
-                    <li><strong>Telegram</strong> — pills filters, smooth interactions</li>
-                    <li><strong>Material Design 3</strong> — elevation, state layers</li>
-                    <li><strong>Apple HIG</strong> — typography scale, touch targets</li>
-                </ul>
-
-                <h3>What's Fixed</h3>
-                <ul>
-                    <li>✅ Real favicon icons (не placeholder буквы)</li>
-                    <li>✅ Avito чаты добавлены</li>
-                    <li>✅ Единая типография (Inter font, согласованные размеры)</li>
-                    <li>✅ Единые цвета (CSS variables)</li>
-                    <li>✅ Единый spacing (4px grid)</li>
-                    <li>✅ Единые transitions (0.12s fast)</li>
-                    <li>✅ Компактный dropdown (~180px)</li>
-                </ul>
+        <!-- CENTER: Chat Window -->
+        <main class="chat-window">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <h2>Иван Петров · Royal Canin Urinary S/O LP34</h2>
+                    <div class="chat-header-meta">Wildberries · Отзыв 1★ · Сегодня, 12:34</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="header-action-btn" title="Информация">ℹ</button>
+                    <button class="header-action-btn" title="Еще">⋮</button>
+                </div>
             </div>
 
-            <div class="demo-section">
-                <h2>🎨 Design Tokens</h2>
-                <p>Все значения доступны через CSS variables:</p>
-                <pre style="background: var(--color-bg-tertiary); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.6;">
---color-bg-primary: #ffffff
---color-bg-secondary: #fafbfc
---color-text-primary: #1a1a1a
---color-text-secondary: #5f6368
+            <div class="chat-messages" id="chatMessages">
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:34</span>
+                    </div>
+                    <div class="message-content">
+                        Пришел порванный пакет, корм рассыпался по всей коробке! Это уже второй раз за месяц. Что с упаковкой??
+                    </div>
+                </div>
 
---space-1: 4px
---space-2: 8px
---space-3: 12px
---space-4: 16px
-
---font-size-xs: 10px
---font-size-sm: 11px
---font-size-md: 12px
---font-size-base: 13px
-
---radius-sm: 5px
---radius-md: 6px
---radius-lg: 8px
-
---transition-fast: 0.12s ease
-                </pre>
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:35</span>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-attachment">
+                            <img src="fs-2.webp" alt="Фото поврежденной упаковки" title="Нажмите для увеличения">
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- AI Suggestion -->
+            <div class="ai-suggestion">
+                <div class="ai-suggestion-label">AI Рекомендация</div>
+                <div class="ai-suggestion-text">
+                    Иван, добрый день! Приносим извинения за проблему с упаковкой. Нам жаль, что это произошло повторно.
+                    <br><br>
+                    Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы". Средства вернутся на вашу карту в течение 3-5 рабочих дней.
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="chatInput" placeholder="Напишите ответ..." rows="1"></textarea>
+                    <button class="btn-send" onclick="sendMessage()">→</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Product Context -->
+        <aside class="product-context">
+            <div class="context-header">
+                <div class="context-title">Товар</div>
+                <div class="product-name">Royal Canin Urinary S/O LP34 Feline 1.5 кг</div>
+                <div class="product-rating">★ 4.8 · 1,234 отзыва · Артикул 123456</div>
+                <div class="product-price">₽2,340</div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Детали отзыва</div>
+                <div class="info-item">
+                    <div class="info-label">Оценка</div>
+                    <div class="info-value">1★ · Негативный</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Дата</div>
+                    <div class="info-value">09.02.2026, 12:34</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Вариант</div>
+                    <div class="info-value">1.5 кг</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Автор</div>
+                    <div class="info-value">Иван Петров</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">AI Анализ</div>
+                <div class="info-item">
+                    <div class="info-label">Тональность</div>
+                    <div class="info-value">
+                        <span class="insight-badge negative">Негативная (-0.8)</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Категории проблем</div>
+                    <div class="info-value">
+                        <span class="insight-badge">Брак упаковки</span>
+                        <span class="insight-badge">Повторная проблема</span>
+                        <span class="insight-badge">Требует возврата</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Срочность</div>
+                    <div class="info-value">
+                        <span class="insight-badge urgent">Высокая · Осталось 22 мин</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Рекомендация</div>
+                    <div class="info-value">Извиниться + инструкция по возврату</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Похожие проблемы</div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "упаковка"</div>
+                    <div class="info-value">
+                        12 отзывов за 30 дней
+                        <div class="trend-indicator">↑ Тренд растёт</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "рассыпался"</div>
+                    <div class="info-value">5 отзывов за 30 дней</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Повторные жалобы</div>
+                    <div class="info-value">
+                        3 клиента (упаковка)
+                        <div class="trend-indicator">⚠️ Требует внимания</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Действия</div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Посмотреть все отзывы о товаре</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Похожие проблемы с упаковкой</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Открыть карточку товара на WB</a>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script>
@@ -932,6 +1283,22 @@
                 chatItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
+        });
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (input.value.trim()) {
+                console.log('Sending:', input.value);
+                input.value = '';
+            }
+        }
+
+        // Auto-grow textarea
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
     </script>
 </body>
