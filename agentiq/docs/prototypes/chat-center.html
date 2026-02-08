@@ -1235,6 +1235,73 @@
     </div>
 
     <script>
+        // Current chat ID
+        let currentChatId = '1';
+
+        // Context data for all 6 chats
+        const contextData = {
+            '1': {
+                header: { title: 'Иван Петров · Royal Canin Urinary S/O LP34', meta: 'Wildberries · Отзыв 1★ · Сегодня, 12:34' },
+                message: { author: 'Иван Петров', time: '12:34', text: 'Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных, а нам был нужен для обычных! Проверяйте что вы отправляете!!', attachments: [{ type: 'image', url: 'fs-2.webp', alt: 'Фото неправильного товара' }] },
+                messages: [],
+                aiSuggestion: 'Иван, добрый день! Приносим извинения за ошибку при комплектации заказа.<br><br>Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы" и закажите правильный вариант. Средства вернутся на вашу карту в течение 3-5 рабочих дней.',
+                product: { name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг', rating: '★ 4.8 · 1,234 отзыва · Артикул 123456', price: '₽2,340' },
+                review: { rating: '1★ · Негативный', date: '08.02.2026, 12:34', variant: '1.5 кг', author: 'Иван Петров' },
+                ai: { sentiment: { label: 'Негативная (-0.7)', negative: true }, categories: ['Ошибка комплектации', 'Неправильный товар', 'Требует возврата'], urgency: { label: 'Высокая · Осталось 22 мин', urgent: true }, recommendation: 'Извиниться + инструкция по возврату' },
+                similar: [{ label: 'Ошибки комплектации', value: '8 отзывов за 30 дней', trend: '↑ Тренд растёт' }, { label: 'Упоминание "не тот товар"', value: '5 отзывов за 30 дней' }, { label: 'Проблемы на складе', value: '3 случая', trend: '⚠️ Требует внимания' }]
+            },
+            '2': {
+                header: { title: 'Мария Соколова · Royal Canin British Shorthair', meta: 'Ozon · Вопрос на карточке · Сегодня, 11:19' },
+                message: { author: 'Мария Соколова', time: '11:19', text: 'Подскажите, пожалуйста, какой размер гранул в этом корме? Моя кошка привередливая, ест только мелкие гранулы. Не хочется заказывать и потом возвращать, если не подойдет.' },
+                messages: [],
+                aiSuggestion: 'Мария, добрый день! Размер гранул в Royal Canin British Shorthair составляет примерно 8-10 мм. Это средний размер, разработанный специально для британских короткошерстных кошек.<br><br>Если ваша кошка предпочитает более мелкие гранулы, рекомендуем обратить внимание на линейку Instinctive — там гранулы меньше (5-7 мм).',
+                product: { name: 'Royal Canin British Shorthair Adult 2 кг', rating: '★ 4.9 · 2,567 отзывов · Артикул 234567', price: '₽1,890' },
+                review: { rating: 'Вопрос на карточке', date: '08.02.2026, 11:19', variant: '2 кг', author: 'Мария Соколова' },
+                ai: { sentiment: { label: 'Нейтральная (0.0)', negative: false }, categories: ['Технические характеристики', 'Размер гранул'], urgency: { label: 'Низкая · Осталось 3 ч 45 мин', urgent: false }, recommendation: 'Предоставить информацию о размере гранул' },
+                similar: [{ label: 'Упоминание "гранулы"', value: '8 вопросов за 30 дней' }, { label: 'Упоминание "размер"', value: '15 вопросов за 30 дней' }]
+            },
+            '3': {
+                header: { title: 'Елена Смирнова · Royal Canin Urinary S/O LP34', meta: 'Wildberries · Отзыв 5★ · Сегодня, 10:34' },
+                message: { author: 'Елена Смирнова', time: '10:34', text: 'Отличный корм! Кот ест с удовольствием, шерсть стала блестеть, стал более активным. Заказываем уже третий раз, результатом очень довольны. Рекомендую!' },
+                messages: [],
+                aiSuggestion: 'Елена, спасибо большое за такой подробный и позитивный отзыв! Очень приятно знать, что корм подошел вашему питомцу и вы видите положительные результаты.<br><br>Рады, что вы с нами! 🐱',
+                product: { name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг', rating: '★ 4.8 · 1,234 отзыва · Артикул 123456', price: '₽2,340' },
+                review: { rating: '5★ · Позитивный', date: '08.02.2026, 10:34', variant: '1.5 кг', author: 'Елена Смирнова' },
+                ai: { sentiment: { label: 'Позитивная (+0.9)', negative: false }, categories: ['Качество товара', 'Повторная покупка', 'Эффективность'], urgency: { label: 'Низкая · Можно ответить позже', urgent: false }, recommendation: 'Поблагодарить за отзыв' },
+                similar: [{ label: 'Упоминание "отличный"', value: '45 отзывов за 30 дней', trend: '↑ Тренд растёт' }, { label: 'Повторные покупки', value: '89 клиентов', trend: '✓ Высокая лояльность' }]
+            },
+            '4': {
+                header: { title: 'Александр Ковалев · Royal Canin Gastrointestinal', meta: 'Wildberries · Чат покупателя · Сегодня, 09:15' },
+                message: { author: 'Александр Ковалев', time: '09:15', text: 'Здравствуйте! Подскажите, когда ожидать доставку? Заказ оформил 3 дня назад, а статус до сих пор "в обработке". Нужен корм срочно для кота после операции.' },
+                messages: [],
+                aiSuggestion: 'Александр, добрый день! Проверили ваш заказ — он уже передан в доставку. Заказ будет доставлен завтра до 18:00 на пункт выдачи.<br><br>Приносим извинения за задержку обновления статуса. Спасибо за ожидание!',
+                product: { name: 'Royal Canin Gastrointestinal Moderate Calorie 400г', rating: '★ 4.7 · 892 отзыва · Артикул 345678', price: '₽580' },
+                review: { rating: 'Чат покупателя', date: '08.02.2026, 09:15', variant: '400г', author: 'Александр Ковалев' },
+                ai: { sentiment: { label: 'Нейтральная (0.0)', negative: false }, categories: ['Вопрос о доставке', 'Решен'], urgency: { label: 'Низкая · Вопрос решен', urgent: false }, recommendation: 'Подтвердить информацию о доставке' },
+                similar: [{ label: 'Вопросы о доставке', value: '23 обращения за 30 дней' }]
+            },
+            '5': {
+                header: { title: 'Ольга Николаева · Royal Canin Sterilised 37', meta: 'Яндекс.Маркет · Отзыв 2★ · Сегодня, 08:34' },
+                message: { author: 'Ольга Николаева', time: '08:34', text: 'Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления. Сильный зуд, выпадение шерсти. Пришлось срочно обращаться к ветеринару. Очень разочарована, хотя отзывы были хорошие.' },
+                messages: [],
+                aiSuggestion: 'Ольга, приносим искренние извинения за ситуацию с вашей кошкой. Действительно, в редких случаях может возникнуть индивидуальная непереносимость компонентов корма.<br><br>Рекомендуем оформить возврат через личный кабинет в разделе "Мои заказы". Также советуем проконсультироваться с ветеринаром для подбора гипоаллергенного корма.<br><br>Желаем скорейшего выздоровления вашему питомцу! 🐱',
+                product: { name: 'Royal Canin Sterilised 37 Feline 4 кг', rating: '★ 4.6 · 3,421 отзыв · Артикул 456789', price: '₽3,150' },
+                review: { rating: '2★ · Негативный', date: '08.02.2026, 08:34', variant: '4 кг', author: 'Ольга Николаева' },
+                ai: { sentiment: { label: 'Негативная (-0.6)', negative: true }, categories: ['Аллергическая реакция', 'Здоровье животного', 'Требует возврата'], urgency: { label: 'Высокая · Осталось 38 мин', urgent: true }, recommendation: 'Извиниться + инструкция по возврату + рекомендация ветеринара' },
+                similar: [{ label: 'Упоминание "аллергия"', value: '7 отзывов за 30 дней', trend: '⚠️ Требует внимания' }, { label: 'Проблемы со здоровьем', value: '4 отзыва за 30 дней' }]
+            },
+            '6': {
+                header: { title: 'Дмитрий Соловьев · Royal Canin Persian Adult', meta: 'Avito · Чат покупателя · Сегодня, 07:15' },
+                message: { author: 'Дмитрий Соловьев', time: '07:15', text: 'Здравствуйте! Можете сегодня привезти? Готов встретить в любое время. Нужен срочно корм для кошки, заканчивается. Район метро Площадь Революции подойдет?' },
+                messages: [],
+                aiSuggestion: 'Дмитрий, добрый день! Да, могу привезти сегодня. Удобно будет в 18:00 у метро Площадь Революции?<br><br>Корм Royal Canin Persian 2 кг в наличии, упакован, срок годности до июня 2027. Оплата наличными или переводом на карту.',
+                product: { name: 'Royal Canin Persian Adult 2 кг', rating: '★ 4.9 · 156 отзывов · Avito', price: '₽1,650' },
+                review: { rating: 'Чат покупателя', date: '08.02.2026, 07:15', variant: '2 кг', author: 'Дмитрий Соловьев' },
+                ai: { sentiment: { label: 'Позитивная (+0.5)', negative: false }, categories: ['Срочная доставка', 'Готов встретить'], urgency: { label: 'Средняя · Нужна договоренность', urgent: false }, recommendation: 'Предложить время и подтвердить наличие' },
+                similar: [{ label: 'Запросы доставки', value: '23 обращения за 30 дней' }, { label: 'Срочные заказы', value: '12 обращений за 30 дней', trend: '↑ Тренд растёт' }]
+            }
+        };
+
         // Pills filters
         const pills = document.querySelectorAll('.filter-pill');
         pills.forEach(pill => {
@@ -1295,6 +1362,118 @@
             ratingChips.forEach(c => c.classList.remove('active'));
         });
 
+        // Update product context panel
+        function updateProductContext(chatId) {
+            const context = contextData[chatId];
+            if (!context) return;
+            currentChatId = chatId;
+
+            // Update chat window header
+            document.querySelector('.chat-header-info h2').textContent = context.header.title;
+            document.querySelector('.chat-header-meta').textContent = context.header.meta;
+
+            // Update customer messages
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+
+            // Add first message (text)
+            const textMessage = document.createElement('div');
+            textMessage.className = 'message customer';
+            textMessage.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">${context.message.author}</span>
+                    <span class="message-time">${context.message.time}</span>
+                </div>
+                <div class="message-content">${context.message.text}</div>
+            `;
+            messagesContainer.appendChild(textMessage);
+
+            // Add attachments if any
+            if (context.message.attachments) {
+                context.message.attachments.forEach(attachment => {
+                    const attachmentMessage = document.createElement('div');
+                    attachmentMessage.className = 'message customer';
+                    attachmentMessage.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-author">${context.message.author}</span>
+                            <span class="message-time">${context.message.time}</span>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-attachment">
+                                <img src="${attachment.url}" alt="${attachment.alt}" title="Нажмите для увеличения">
+                            </div>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(attachmentMessage);
+                });
+            }
+
+            // Add seller messages for this chat
+            context.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message seller';
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            ${msg.time}
+                            <span class="message-status ${msg.status}" title="${msg.statusTitle}">${msg.statusIcon}</span>
+                        </span>
+                    </div>
+                    <div class="message-content">${msg.text.replace(/\n/g, '<br>')}</div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Update AI suggestion
+            document.querySelector('.ai-suggestion-text').innerHTML = context.aiSuggestion;
+
+            // Update product info
+            document.querySelector('.product-name').textContent = context.product.name;
+            document.querySelector('.product-rating').textContent = context.product.rating;
+            document.querySelector('.product-price').textContent = context.product.price;
+
+            // Update review details
+            const reviewSection = document.querySelectorAll('.info-section')[0];
+            reviewSection.querySelectorAll('.info-value')[0].textContent = context.review.rating;
+            reviewSection.querySelectorAll('.info-value')[1].textContent = context.review.date;
+            reviewSection.querySelectorAll('.info-value')[2].textContent = context.review.variant;
+            reviewSection.querySelectorAll('.info-value')[3].textContent = context.review.author;
+
+            // Update AI insights
+            const aiSection = document.querySelectorAll('.info-section')[1];
+            const sentimentBadge = aiSection.querySelector('.insight-badge');
+            sentimentBadge.textContent = context.ai.sentiment.label;
+            sentimentBadge.className = context.ai.sentiment.negative ? 'insight-badge negative' : 'insight-badge';
+
+            const categoriesContainer = aiSection.querySelectorAll('.info-value')[1];
+            categoriesContainer.innerHTML = context.ai.categories.map(cat => `<span class="insight-badge">${cat}</span>`).join('');
+
+            const urgencyValue = aiSection.querySelectorAll('.info-value')[2];
+            urgencyValue.innerHTML = `<span class="insight-badge ${context.ai.urgency.urgent ? 'urgent' : ''}">${context.ai.urgency.label}</span>`;
+
+            aiSection.querySelectorAll('.info-value')[3].textContent = context.ai.recommendation;
+
+            // Update similar issues
+            const similarSection = document.querySelectorAll('.info-section')[2];
+            const similarItems = similarSection.querySelectorAll('.info-item');
+            context.similar.forEach((issue, index) => {
+                if (similarItems[index]) {
+                    similarItems[index].querySelector('.info-label').textContent = issue.label;
+                    const valueDiv = similarItems[index].querySelector('.info-value');
+                    valueDiv.innerHTML = issue.value;
+                    if (issue.trend) {
+                        valueDiv.innerHTML += `<div class="trend-indicator">${issue.trend}</div>`;
+                    }
+                    similarItems[index].style.display = 'block';
+                }
+            });
+            for (let i = context.similar.length; i < similarItems.length; i++) {
+                if (similarItems[i]) similarItems[i].style.display = 'none';
+            }
+        }
+
         // Chat items - с переключением контента
         document.addEventListener('click', function(e) {
             const chatItem = e.target.closest('.chat-item');
@@ -1303,33 +1482,10 @@
                 document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
                 chatItem.classList.add('active');
 
-                // Get chat data
+                // Get chat ID and update context
                 const chatId = chatItem.getAttribute('data-chat-id');
-                const name = chatItem.querySelector('.chat-item-name').textContent;
-                const preview = chatItem.querySelector('.chat-item-preview').textContent;
-
-                // Update header
-                const headerTitle = document.querySelector('.chat-header-info h2');
-                if (headerTitle) {
-                    headerTitle.textContent = `${name} · Royal Canin Urinary S/O LP34`;
-                }
-
-                // Update message
-                const messageContent = document.querySelector('.message.customer .message-content');
-                if (messageContent) {
-                    messageContent.textContent = preview;
-                }
-
-                // Update author
-                const messageAuthor = document.querySelector('.message.customer .message-author');
-                if (messageAuthor) {
-                    messageAuthor.textContent = name;
-                }
-
-                // Update right panel author
-                const contextAuthor = document.querySelector('.info-section .info-value');
-                if (contextAuthor && contextAuthor.closest('.info-item').querySelector('.info-label').textContent === 'Автор') {
-                    contextAuthor.textContent = name;
+                if (chatId) {
+                    updateProductContext(chatId);
                 }
             }
         });
