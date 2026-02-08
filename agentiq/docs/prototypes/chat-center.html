@@ -498,6 +498,16 @@
             margin-right: 5px;
         }
 
+        .chat-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .queue-section.drag-over {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+        }
+
         .unread-badge {
             display: inline-flex;
             align-items: center;
@@ -962,7 +972,7 @@
                     </div>
 
                     <!-- Chat 1: WB Urgent -->
-                    <div class="chat-item urgent active">
+                    <div class="chat-item urgent active" draggable="true" data-chat-id="1">
                         <div class="marketplace-icon wb">W</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -978,7 +988,7 @@
                     </div>
 
                     <!-- Chat 5: Yandex Urgent -->
-                    <div class="chat-item urgent">
+                    <div class="chat-item urgent" draggable="true" data-chat-id="5">
                         <div class="marketplace-icon yandex">Я</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -1001,7 +1011,7 @@
                     </div>
 
                     <!-- Chat 2: Ozon -->
-                    <div class="chat-item">
+                    <div class="chat-item" draggable="true" data-chat-id="2">
                         <div class="marketplace-icon ozon">O</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -1017,7 +1027,7 @@
                     </div>
 
                     <!-- Chat 3: WB -->
-                    <div class="chat-item">
+                    <div class="chat-item" draggable="true" data-chat-id="3">
                         <div class="marketplace-icon wb">W</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -1032,7 +1042,7 @@
                     </div>
 
                     <!-- Chat 4: WB -->
-                    <div class="chat-item">
+                    <div class="chat-item" draggable="true" data-chat-id="4">
                         <div class="marketplace-icon wb">W</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -1047,7 +1057,7 @@
                     </div>
 
                     <!-- Chat 6: Avito -->
-                    <div class="chat-item">
+                    <div class="chat-item" draggable="true" data-chat-id="6">
                         <div class="marketplace-icon avito">A</div>
                         <div class="chat-item-content">
                             <div class="chat-item-header">
@@ -1276,12 +1286,91 @@
             ratingChips.forEach(c => c.classList.remove('active'));
         });
 
-        // Chat items
-        const chatItems = document.querySelectorAll('.chat-item');
-        chatItems.forEach(item => {
-            item.addEventListener('click', function() {
-                chatItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
+        // Chat items - с переключением контента
+        document.addEventListener('click', function(e) {
+            const chatItem = e.target.closest('.chat-item');
+            if (chatItem) {
+                // Remove active from all
+                document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+                chatItem.classList.add('active');
+
+                // Get chat data
+                const chatId = chatItem.getAttribute('data-chat-id');
+                const name = chatItem.querySelector('.chat-item-name').textContent;
+                const preview = chatItem.querySelector('.chat-item-preview').textContent;
+
+                // Update header
+                const headerTitle = document.querySelector('.chat-header-info h2');
+                if (headerTitle) {
+                    headerTitle.textContent = `${name} · Royal Canin Urinary S/O LP34`;
+                }
+
+                // Update message
+                const messageContent = document.querySelector('.message.customer .message-content');
+                if (messageContent) {
+                    messageContent.textContent = preview;
+                }
+
+                // Update author
+                const messageAuthor = document.querySelector('.message.customer .message-author');
+                if (messageAuthor) {
+                    messageAuthor.textContent = name;
+                }
+
+                // Update right panel author
+                const contextAuthor = document.querySelector('.info-section .info-value');
+                if (contextAuthor && contextAuthor.closest('.info-item').querySelector('.info-label').textContent === 'Автор') {
+                    contextAuthor.textContent = name;
+                }
+            }
+        });
+
+        // Drag & Drop
+        let draggedElement = null;
+
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedElement = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+
+        // Queue sections as drop targets
+        document.querySelectorAll('.queue-section').forEach(section => {
+            section.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            section.addEventListener('dragleave', function(e) {
+                if (!this.contains(e.relatedTarget)) {
+                    this.classList.remove('drag-over');
+                }
+            });
+
+            section.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                if (draggedElement) {
+                    // Append to the content area of this queue
+                    const contentArea = this;
+                    contentArea.appendChild(draggedElement);
+
+                    // Update counts (simplified)
+                    document.querySelectorAll('.queue-section').forEach(q => {
+                        const count = q.querySelectorAll('.chat-item').length;
+                        const countEl = q.querySelector('.queue-count');
+                        if (countEl) {
+                            countEl.textContent = count;
+                        }
+                    });
+                }
             });
         });
 
