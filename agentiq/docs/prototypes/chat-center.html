@@ -37,6 +37,28 @@
         .chat-list-header {
             padding: 20px;
             border-bottom: 1px solid #e8eaed;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Telegram-style scrollbar */
+        .chat-list-header::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-list-header::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-list-header::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 3px;
+        }
+
+        .chat-list-header::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
         }
 
         .chat-list-title {
@@ -141,7 +163,25 @@
         }
 
         .chat-item.active {
-            background: #f5f6f7;
+            background: #e8f4fd;
+            border-left: 3px solid #1a73e8;
+            padding-left: 13px; /* compensate for border */
+        }
+
+        /* Unread badge */
+        .unread-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: #1a73e8;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 10px;
+            margin-left: auto;
         }
 
         /* Marketplace icon - единственный цветной элемент */
@@ -168,8 +208,13 @@
         }
 
         .marketplace-icon.yandex {
-            background: #fc0;
-            color: #000;
+            background: #ff6600;
+            color: #fff;
+        }
+
+        .marketplace-icon.avito {
+            background: #00a046 url('https://www.avito.ru/favicon.ico') center/contain no-repeat;
+            text-indent: -9999px; /* Hide text */
         }
 
         .chat-item-content {
@@ -223,7 +268,7 @@
         /* ===== ЦЕНТР: Dialog ===== */
         .chat-window {
             flex: 1;
-            background: white;
+            background: #e8f2f8;
             display: flex;
             flex-direction: column;
         }
@@ -313,7 +358,7 @@
         }
 
         .message-content {
-            background: #f5f6f7;
+            background: white;
             padding: 12px 16px;
             border-radius: 12px;
             font-size: 14px;
@@ -322,8 +367,28 @@
         }
 
         .message.seller .message-content {
-            background: #1a1a1a;
-            color: white;
+            background: #dcedff;
+            color: #1a1a1a;
+        }
+
+        /* Message attachments */
+        .message-attachment {
+            margin-top: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .message-attachment img {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .message-attachment img:hover {
+            opacity: 0.95;
         }
 
         /* AI Suggestion - минимальная */
@@ -348,6 +413,27 @@
             font-size: 13px;
             color: #5f6368;
             line-height: 1.6;
+        }
+
+        /* Message Status */
+        .message-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 4px;
+            font-size: 12px;
+        }
+
+        .message-status.sent {
+            color: #9aa0a6;
+        }
+
+        .message-status.read {
+            color: #1a73e8;
+        }
+
+        .message-status.error {
+            color: #c5221f;
         }
 
         /* Input */
@@ -421,6 +507,24 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+        }
+
+        /* Telegram-style scrollbar for right panel */
+        .product-context::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .product-context::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .product-context::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 3px;
+        }
+
+        .product-context::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
         }
 
         .context-header {
@@ -548,30 +652,6 @@
             background: #bdc1c6;
         }
 
-        /* Quick actions - minimal */
-        .quick-actions {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .quick-action-btn {
-            background: white;
-            border: 1px solid #e8eaed;
-            color: #5f6368;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.15s;
-        }
-
-        .quick-action-btn:hover {
-            background: #f5f6f7;
-            border-color: #1a1a1a;
-        }
     </style>
 </head>
 <body>
@@ -589,7 +669,7 @@
                 <div class="queue-section">
                     <div class="queue-header">
                         <div class="queue-label">В работе</div>
-                        <div class="queue-count">1 Live</div>
+                        <div class="queue-count">1 Активно</div>
                     </div>
                     <div class="queue-cards" id="nowServing" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
                 </div>
@@ -598,7 +678,7 @@
                 <div class="queue-section">
                     <div class="queue-header">
                         <div class="queue-label">Ожидают ответа</div>
-                        <div class="queue-count">4 Conversations</div>
+                        <div class="queue-count">4 Диалогов</div>
                     </div>
                     <div class="queue-cards" id="upNext" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
                 </div>
@@ -710,7 +790,59 @@
                         <span class="message-time">12:34</span>
                     </div>
                     <div class="message-content">
-                        Пришел порванный пакет, корм рассыпался по всей коробке. Ужасная упаковка! Требую возврат денег. Это уже второй раз такое происходит!
+                        Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных, а нам был нужен для обычных! Проверяйте что вы отправляете!!
+                    </div>
+                </div>
+
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:35</span>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-attachment">
+                            <img src="fs-2.webp" alt="Фото неправильного товара" title="Нажмите для увеличения">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Пример ответа продавца с разными статусами (hidden by default) -->
+                <div class="message seller" style="display: none;" data-example="sent">
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            12:36
+                            <span class="message-status sent" title="Отправлено на Wildberries">✓</span>
+                        </span>
+                    </div>
+                    <div class="message-content">
+                        Иван, добрый день! Приносим извинения за проблему с упаковкой...
+                    </div>
+                </div>
+
+                <div class="message seller" style="display: none;" data-example="read">
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            12:36
+                            <span class="message-status read" title="Прочитано">✓✓</span>
+                        </span>
+                    </div>
+                    <div class="message-content">
+                        Иван, добрый день! Приносим извинения за проблему с упаковкой...
+                    </div>
+                </div>
+
+                <div class="message seller" style="display: none;" data-example="error">
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            12:36
+                            <span class="message-status error" title="Ошибка отправки. Нажмите для повтора">⚠️</span>
+                        </span>
+                    </div>
+                    <div class="message-content">
+                        Иван, добрый день! Приносим извинения за проблему с упаковкой...
                     </div>
                 </div>
             </div>
@@ -727,12 +859,6 @@
 
             <!-- Input -->
             <div class="chat-input-container">
-                <div class="quick-actions">
-                    <button class="quick-action-btn" onclick="useTemplate('apology')">Извиниться</button>
-                    <button class="quick-action-btn" onclick="useTemplate('refund')">Возврат</button>
-                    <button class="quick-action-btn" onclick="useTemplate('thanks')">Благодарность</button>
-                </div>
-
                 <div class="chat-input-wrapper">
                     <textarea class="chat-input" id="chatInput" placeholder="Напишите ответ..." rows="1"></textarea>
                     <button class="btn-send" onclick="sendMessage()">→</button>
@@ -750,7 +876,7 @@
             </div>
 
             <div class="info-section">
-                <div class="info-section-title">Review Details</div>
+                <div class="info-section-title">Детали отзыва</div>
                 <div class="info-item">
                     <div class="info-label">Оценка</div>
                     <div class="info-value">1★ · Негативный</div>
@@ -770,7 +896,7 @@
             </div>
 
             <div class="info-section">
-                <div class="info-section-title">AI Insights</div>
+                <div class="info-section-title">AI Анализ</div>
                 <div class="info-item">
                     <div class="info-label">Тональность</div>
                     <div class="info-value">
@@ -798,7 +924,7 @@
             </div>
 
             <div class="info-section">
-                <div class="info-section-title">Similar Issues</div>
+                <div class="info-section-title">Похожие проблемы</div>
                 <div class="info-item">
                     <div class="info-label">Упоминание "упаковка"</div>
                     <div class="info-value">
@@ -837,6 +963,9 @@
     <script>
         const chatInput = document.getElementById('chatInput');
 
+        // Track current active chat
+        let currentChatId = '1';
+
         // Chat data
         const chats = [
             {
@@ -845,8 +974,9 @@
                 name: 'Иван Петров',
                 time: '2 мин',
                 type: '1★ Отзыв',
-                preview: 'Пришел порванный пакет, корм рассыпался по всей коробке. Ужасная упаковка!',
+                preview: 'Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных...',
                 urgent: true,
+                unread: 1,
                 queue: 'now'
             },
             {
@@ -857,6 +987,7 @@
                 type: 'Вопрос на карточке',
                 preview: 'Подскажите, какой размер гранул? Моя кошка привередливая, ест только мелкие...',
                 urgent: false,
+                unread: 2,
                 queue: 'next'
             },
             {
@@ -867,6 +998,7 @@
                 type: '5★ Отзыв',
                 preview: 'Отличный корм! Кот ест с удовольствием, шерсть блестит. Заказываем уже третий раз.',
                 urgent: false,
+                unread: 0,
                 queue: 'next'
             },
             {
@@ -877,6 +1009,7 @@
                 type: 'Чат покупателя',
                 preview: 'Вы: Заказ будет доставлен завтра до 18:00. Спасибо за ожидание!',
                 urgent: false,
+                unread: 0,
                 queue: 'next'
             },
             {
@@ -887,19 +1020,251 @@
                 type: '2★ Отзыв',
                 preview: 'Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления...',
                 urgent: true,
+                unread: 3,
+                queue: 'now'
+            },
+            {
+                id: '6',
+                marketplace: 'avito',
+                name: 'Дмитрий Соловьев',
+                time: '4 ч',
+                type: 'Чат покупателя',
+                preview: 'Здравствуйте! Можете сегодня привезти? Готов встретить в любое время...',
+                urgent: false,
+                unread: 1,
                 queue: 'next'
             }
         ];
 
+        // Context data for each chat
+        const contextData = {
+            '1': {
+                header: {
+                    title: 'Иван Петров · Royal Canin Urinary S/O LP34',
+                    meta: 'Wildberries · Отзыв 1★ · Сегодня, 12:34'
+                },
+                message: {
+                    author: 'Иван Петров',
+                    time: '12:34',
+                    text: 'Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных, а нам был нужен для обычных! Проверяйте что вы отправляете!!',
+                    attachments: [
+                        {
+                            type: 'image',
+                            url: 'fs-2.webp',
+                            alt: 'Фото неправильного товара'
+                        }
+                    ]
+                },
+                messages: [], // Seller's sent messages for this chat
+                aiSuggestion: 'Иван, добрый день! Приносим извинения за ошибку при комплектации заказа.<br><br>Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы" и закажите правильный вариант. Средства вернутся на вашу карту в течение 3-5 рабочих дней.',
+                product: {
+                    name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг',
+                    rating: '★ 4.8 · 1,234 отзыва · Артикул 123456',
+                    price: '₽2,340'
+                },
+                review: {
+                    rating: '1★ · Негативный',
+                    date: '08.02.2026, 12:34',
+                    variant: '1.5 кг',
+                    author: 'Иван Петров'
+                },
+                ai: {
+                    sentiment: { label: 'Негативная (-0.7)', negative: true },
+                    categories: ['Ошибка комплектации', 'Неправильный товар', 'Требует возврата'],
+                    urgency: { label: 'Высокая · Осталось 22 мин', urgent: true },
+                    recommendation: 'Извиниться + инструкция по возврату'
+                },
+                similar: [
+                    { label: 'Ошибки комплектации', value: '8 отзывов за 30 дней', trend: '↑ Тренд растёт' },
+                    { label: 'Упоминание "не тот товар"', value: '5 отзывов за 30 дней' },
+                    { label: 'Проблемы на складе', value: '3 случая', trend: '⚠️ Требует внимания' }
+                ]
+            },
+            '2': {
+                header: {
+                    title: 'Мария Соколова · Royal Canin British Shorthair',
+                    meta: 'Ozon · Вопрос на карточке · Сегодня, 11:19'
+                },
+                message: {
+                    author: 'Мария Соколова',
+                    time: '11:19',
+                    text: 'Подскажите, пожалуйста, какой размер гранул в этом корме? Моя кошка привередливая, ест только мелкие гранулы. Не хочется заказывать и потом возвращать, если не подойдет.'
+                },
+                messages: [],
+                aiSuggestion: 'Мария, добрый день! Размер гранул в Royal Canin British Shorthair составляет примерно 8-10 мм. Это средний размер, разработанный специально для британских короткошерстных кошек.<br><br>Если ваша кошка предпочитает более мелкие гранулы, рекомендуем обратить внимание на линейку Instinctive — там гранулы меньше (5-7 мм).',
+                product: {
+                    name: 'Royal Canin British Shorthair Adult 2 кг',
+                    rating: '★ 4.9 · 2,567 отзывов · Артикул 234567',
+                    price: '₽1,890'
+                },
+                review: {
+                    rating: 'Вопрос на карточке',
+                    date: '08.02.2026, 11:19',
+                    variant: '2 кг',
+                    author: 'Мария Соколова'
+                },
+                ai: {
+                    sentiment: { label: 'Нейтральная (0.0)', negative: false },
+                    categories: ['Технические характеристики', 'Размер гранул'],
+                    urgency: { label: 'Низкая · Осталось 3 ч 45 мин', urgent: false },
+                    recommendation: 'Предоставить информацию о размере гранул'
+                },
+                similar: [
+                    { label: 'Упоминание "гранулы"', value: '8 вопросов за 30 дней' },
+                    { label: 'Упоминание "размер"', value: '15 вопросов за 30 дней' }
+                ]
+            },
+            '3': {
+                header: {
+                    title: 'Елена Смирнова · Royal Canin Urinary S/O LP34',
+                    meta: 'Wildberries · Отзыв 5★ · Сегодня, 10:34'
+                },
+                message: {
+                    author: 'Елена Смирнова',
+                    time: '10:34',
+                    text: 'Отличный корм! Кот ест с удовольствием, шерсть стала блестеть, стал более активным. Заказываем уже третий раз, результатом очень довольны. Рекомендую!'
+                },
+                messages: [],
+                aiSuggestion: 'Елена, спасибо большое за такой подробный и позитивный отзыв! Очень приятно знать, что корм подошел вашему питомцу и вы видите положительные результаты.<br><br>Рады, что вы с нами! 🐱',
+                product: {
+                    name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг',
+                    rating: '★ 4.8 · 1,234 отзыва · Артикул 123456',
+                    price: '₽2,340'
+                },
+                review: {
+                    rating: '5★ · Позитивный',
+                    date: '08.02.2026, 10:34',
+                    variant: '1.5 кг',
+                    author: 'Елена Смирнова'
+                },
+                ai: {
+                    sentiment: { label: 'Позитивная (+0.9)', negative: false },
+                    categories: ['Качество товара', 'Повторная покупка', 'Эффективность'],
+                    urgency: { label: 'Низкая · Можно ответить позже', urgent: false },
+                    recommendation: 'Поблагодарить за отзыв'
+                },
+                similar: [
+                    { label: 'Упоминание "отличный"', value: '45 отзывов за 30 дней', trend: '↑ Тренд растёт' },
+                    { label: 'Повторные покупки', value: '89 клиентов', trend: '✓ Высокая лояльность' }
+                ]
+            },
+            '4': {
+                header: {
+                    title: 'Александр Ковалев · Royal Canin Gastrointestinal',
+                    meta: 'Wildberries · Чат покупателя · Сегодня, 09:15'
+                },
+                message: {
+                    author: 'Александр Ковалев',
+                    time: '09:15',
+                    text: 'Здравствуйте! Подскажите, когда ожидать доставку? Заказ оформил 3 дня назад, а статус до сих пор "в обработке". Нужен корм срочно для кота после операции.'
+                },
+                messages: [],
+                aiSuggestion: 'Александр, добрый день! Проверили ваш заказ — он уже передан в доставку. Заказ будет доставлен завтра до 18:00 на пункт выдачи.<br><br>Приносим извинения за задержку обновления статуса. Спасибо за ожидание!',
+                product: {
+                    name: 'Royal Canin Gastrointestinal Moderate Calorie 400г',
+                    rating: '★ 4.7 · 892 отзыва · Артикул 345678',
+                    price: '₽580'
+                },
+                review: {
+                    rating: 'Чат покупателя',
+                    date: '08.02.2026, 09:15',
+                    variant: '400г',
+                    author: 'Александр Ковалев'
+                },
+                ai: {
+                    sentiment: { label: 'Нейтральная (0.0)', negative: false },
+                    categories: ['Вопрос о доставке', 'Решен'],
+                    urgency: { label: 'Низкая · Вопрос решен', urgent: false },
+                    recommendation: 'Подтвердить информацию о доставке'
+                },
+                similar: [
+                    { label: 'Вопросы о доставке', value: '23 обращения за 30 дней' }
+                ]
+            },
+            '5': {
+                header: {
+                    title: 'Ольга Николаева · Royal Canin Sterilised 37',
+                    meta: 'Яндекс.Маркет · Отзыв 2★ · Сегодня, 08:34'
+                },
+                message: {
+                    author: 'Ольга Николаева',
+                    time: '08:34',
+                    text: 'Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления. Сильный зуд, выпадение шерсти. Пришлось срочно обращаться к ветеринару. Очень разочарована, хотя отзывы были хорошие.'
+                },
+                messages: [],
+                aiSuggestion: 'Ольга, приносим искренние извинения за ситуацию с вашей кошкой. Действительно, в редких случаях может возникнуть индивидуальная непереносимость компонентов корма.<br><br>Рекомендуем оформить возврат через личный кабинет в разделе "Мои заказы". Также советуем проконсультироваться с ветеринаром для подбора гипоаллергенного корма.<br><br>Желаем скорейшего выздоровления вашему питомцу! 🐱',
+                product: {
+                    name: 'Royal Canin Sterilised 37 Feline 4 кг',
+                    rating: '★ 4.6 · 3,421 отзыв · Артикул 456789',
+                    price: '₽3,150'
+                },
+                review: {
+                    rating: '2★ · Негативный',
+                    date: '08.02.2026, 08:34',
+                    variant: '4 кг',
+                    author: 'Ольга Николаева'
+                },
+                ai: {
+                    sentiment: { label: 'Негативная (-0.6)', negative: true },
+                    categories: ['Аллергическая реакция', 'Здоровье животного', 'Требует возврата'],
+                    urgency: { label: 'Высокая · Осталось 38 мин', urgent: true },
+                    recommendation: 'Извиниться + инструкция по возврату + рекомендация ветеринара'
+                },
+                similar: [
+                    { label: 'Упоминание "аллергия"', value: '7 отзывов за 30 дней', trend: '⚠️ Требует внимания' },
+                    { label: 'Проблемы со здоровьем', value: '4 отзыва за 30 дней' }
+                ]
+            },
+            '6': {
+                header: {
+                    title: 'Дмитрий Соловьев · Royal Canin Persian Adult',
+                    meta: 'Avito · Чат покупателя · Сегодня, 07:15'
+                },
+                message: {
+                    author: 'Дмитрий Соловьев',
+                    time: '07:15',
+                    text: 'Здравствуйте! Можете сегодня привезти? Готов встретить в любое время. Нужен срочно корм для кошки, заканчивается. Район метро Площадь Революции подойдет?'
+                },
+                messages: [],
+                aiSuggestion: 'Дмитрий, добрый день! Да, могу привезти сегодня. Удобно будет в 18:00 у метро Площадь Революции?<br><br>Корм Royal Canin Persian 2 кг в наличии, упакован, срок годности до июня 2027. Оплата наличными или переводом на карту.',
+                product: {
+                    name: 'Royal Canin Persian Adult 2 кг',
+                    rating: '★ 4.9 · 156 отзывов · Avito',
+                    price: '₽1,650'
+                },
+                review: {
+                    rating: 'Чат покупателя',
+                    date: '08.02.2026, 07:15',
+                    variant: '2 кг',
+                    author: 'Дмитрий Соловьев'
+                },
+                ai: {
+                    sentiment: { label: 'Позитивная (+0.5)', negative: false },
+                    categories: ['Срочная доставка', 'Готов встретить'],
+                    urgency: { label: 'Средняя · Нужна договоренность', urgent: false },
+                    recommendation: 'Предложить время и подтвердить наличие'
+                },
+                similar: [
+                    { label: 'Запросы доставки', value: '23 обращения за 30 дней' },
+                    { label: 'Срочные заказы', value: '12 обращений за 30 дней', trend: '↑ Тренд растёт' }
+                ]
+            }
+        };
+
         // Render chat card
         function renderChatCard(chat) {
             const urgentClass = chat.urgent ? 'urgent' : '';
+            const unreadBadge = chat.unread > 0 ? `<span class="unread-badge">${chat.unread}</span>` : '';
+            const marketplaceIcon = chat.marketplace === 'wb' ? 'W' :
+                                   chat.marketplace === 'ozon' ? 'O' :
+                                   chat.marketplace === 'avito' ? 'A' : 'Я';
             return `
                 <div class="chat-item ${urgentClass}" draggable="true" data-chat-id="${chat.id}" ondragstart="drag(event)">
-                    <div class="marketplace-icon ${chat.marketplace}">${chat.marketplace === 'wb' ? 'W' : chat.marketplace === 'ozon' ? 'O' : 'Я'}</div>
+                    <div class="marketplace-icon ${chat.marketplace}">${marketplaceIcon}</div>
                     <div class="chat-item-content">
                         <div class="chat-item-header">
                             <span class="chat-item-name">${chat.name}</span>
+                            ${unreadBadge}
                             <span class="chat-item-time">${chat.time}</span>
                         </div>
                         <div class="chat-item-meta">${chat.type}${chat.urgent ? ' · Осталось 22 мин' : ''}</div>
@@ -907,6 +1272,82 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Update product context panel
+        function updateProductContext(chatId) {
+            const context = contextData[chatId];
+            if (!context) return;
+
+            // Update current chat ID
+            currentChatId = chatId;
+
+            // Update chat window header
+            document.querySelector('.chat-header-info h2').textContent = context.header.title;
+            document.querySelector('.chat-header-meta').textContent = context.header.meta;
+
+            // Update customer message (only text, no attachments - they are in HTML)
+            const firstMessage = document.querySelector('.message.customer');
+            firstMessage.querySelector('.message-author').textContent = context.message.author;
+            firstMessage.querySelector('.message-time').textContent = context.message.time;
+            firstMessage.querySelector('.message-content').textContent = context.message.text;
+
+            // Render seller messages for this chat
+            renderMessages(chatId);
+
+            // Update AI suggestion
+            document.querySelector('.ai-suggestion-text').innerHTML = context.aiSuggestion;
+
+            // Update product info
+            document.querySelector('.product-name').textContent = context.product.name;
+            document.querySelector('.product-rating').textContent = context.product.rating;
+            document.querySelector('.product-price').textContent = context.product.price;
+
+            // Update review details
+            const reviewSection = document.querySelectorAll('.info-section')[0];
+            reviewSection.querySelectorAll('.info-value')[0].textContent = context.review.rating;
+            reviewSection.querySelectorAll('.info-value')[1].textContent = context.review.date;
+            reviewSection.querySelectorAll('.info-value')[2].textContent = context.review.variant;
+            reviewSection.querySelectorAll('.info-value')[3].textContent = context.review.author;
+
+            // Update AI insights
+            const aiSection = document.querySelectorAll('.info-section')[1];
+            const sentimentBadge = aiSection.querySelector('.insight-badge');
+            sentimentBadge.textContent = context.ai.sentiment.label;
+            sentimentBadge.className = context.ai.sentiment.negative ? 'insight-badge negative' : 'insight-badge';
+
+            const categoriesContainer = aiSection.querySelectorAll('.info-value')[1];
+            categoriesContainer.innerHTML = context.ai.categories.map(cat =>
+                `<span class="insight-badge">${cat}</span>`
+            ).join('');
+
+            const urgencyBadge = aiSection.querySelectorAll('.insight-badge')[aiSection.querySelectorAll('.insight-badge').length - 1];
+            urgencyBadge.textContent = context.ai.urgency.label;
+            urgencyBadge.className = context.ai.urgency.urgent ? 'insight-badge urgent' : 'insight-badge';
+
+            aiSection.querySelectorAll('.info-value')[3].textContent = context.ai.recommendation;
+
+            // Update similar issues
+            const similarSection = document.querySelectorAll('.info-section')[2];
+            const similarItems = similarSection.querySelectorAll('.info-item');
+            context.similar.forEach((issue, index) => {
+                if (similarItems[index]) {
+                    similarItems[index].querySelector('.info-label').textContent = issue.label;
+                    const valueDiv = similarItems[index].querySelector('.info-value');
+                    valueDiv.innerHTML = issue.value;
+                    if (issue.trend) {
+                        valueDiv.innerHTML += `<div class="trend-indicator">${issue.trend}</div>`;
+                    }
+                }
+            });
+
+            // Hide extra similar items if there are fewer than 3
+            for (let i = context.similar.length; i < similarItems.length; i++) {
+                similarItems[i].style.display = 'none';
+            }
+            for (let i = 0; i < context.similar.length; i++) {
+                similarItems[i].style.display = 'block';
+            }
         }
 
         // Initialize queues
@@ -933,9 +1374,9 @@
             const nextCount = document.querySelectorAll('#upNext .chat-item').length;
 
             document.querySelector('#nowServing').closest('.queue-section').querySelector('.queue-count').textContent =
-                nowCount > 0 ? `${nowCount} Live` : '0';
+                nowCount > 0 ? `${nowCount} Активно` : '0';
             document.querySelector('#upNext').closest('.queue-section').querySelector('.queue-count').textContent =
-                nextCount > 0 ? `${nextCount} Conversations` : '0';
+                nextCount > 0 ? `${nextCount} Диалогов` : '0';
         }
 
         // Drag & Drop
@@ -972,6 +1413,7 @@
 
         // Initialize
         initQueues();
+        updateProductContext('1'); // Show context for first chat
 
         // Auto-resize textarea
         chatInput.addEventListener('input', function() {
@@ -979,18 +1421,35 @@
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
-        // Templates
-        const templates = {
-            'apology': 'Приносим извинения за доставленные неудобства. ',
-            'refund': 'Оформите, пожалуйста, возврат через личный кабинет маркетплейса в разделе "Мои заказы". ',
-            'thanks': 'Спасибо за отзыв! Очень рады, что вам понравилось. '
-        };
+        // Render messages for a chat
+        function renderMessages(chatId) {
+            const context = contextData[chatId];
+            if (!context) return;
 
-        function useTemplate(type) {
-            chatInput.value += templates[type];
-            chatInput.focus();
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+            const messagesContainer = document.getElementById('chatMessages');
+
+            // Clear existing seller messages (keep the customer message)
+            const sellerMessages = messagesContainer.querySelectorAll('.message.seller');
+            sellerMessages.forEach(msg => msg.remove());
+
+            // Render all seller messages from this chat's history
+            context.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message seller';
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            ${msg.time}
+                            <span class="message-status ${msg.status}" title="${msg.statusTitle}">${msg.statusIcon}</span>
+                        </span>
+                    </div>
+                    <div class="message-content">${msg.text.replace(/\n/g, '<br>')}</div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+            });
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
         // Send message
@@ -998,18 +1457,41 @@
             const text = chatInput.value.trim();
             if (!text) return;
 
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message seller';
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span class="message-author">Вы</span>
-                    <span class="message-time">Только что</span>
-                </div>
-                <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
-            `;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            // Create message object
+            const messageObj = {
+                text: text,
+                time: time,
+                status: 'sent',
+                statusIcon: '⏳',
+                statusTitle: 'Отправляется...'
+            };
+
+            // Add to current chat's messages array
+            const context = contextData[currentChatId];
+            if (context) {
+                context.messages.push(messageObj);
+
+                // Re-render messages for this chat
+                renderMessages(currentChatId);
+
+                // Simulate status changes: sending → sent → read
+                setTimeout(() => {
+                    messageObj.status = 'sent';
+                    messageObj.statusIcon = '✓';
+                    messageObj.statusTitle = 'Отправлено на Wildberries';
+                    renderMessages(currentChatId);
+                }, 1000);
+
+                setTimeout(() => {
+                    messageObj.status = 'read';
+                    messageObj.statusIcon = '✓✓';
+                    messageObj.statusTitle = 'Прочитано клиентом';
+                    renderMessages(currentChatId);
+                }, 3000);
+            }
 
             chatInput.value = '';
             chatInput.style.height = 'auto';
@@ -1029,113 +1511,12 @@
             if (chatItem) {
                 document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
                 chatItem.classList.add('active');
+
+                // Update context panel
+                const chatId = chatItem.getAttribute('data-chat-id');
+                updateProductContext(chatId);
             }
         });
     </script>
 </body>
 </html>
-<style>
-/* ===== MOBILE RESPONSIVE ===== */
-
-/* Tablet (768px - 1024px) */
-@media (max-width: 1024px) {
-    .product-context {
-        display: none; /* Hide right panel on tablet */
-    }
-}
-
-/* Mobile (< 768px) */
-@media (max-width: 767px) {
-    .chat-center {
-        flex-direction: column;
-    }
-    
-    .chat-list {
-        width: 100%;
-        height: 100vh;
-        border-right: none;
-    }
-    
-    .chat-window {
-        display: none; /* Hide dialog by default on mobile */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        z-index: 100;
-    }
-    
-    .chat-window.mobile-active {
-        display: flex;
-    }
-    
-    .product-context {
-        display: none;
-    }
-    
-    /* Back button for mobile */
-    .mobile-back {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 16px 20px;
-        background: white;
-        border-bottom: 1px solid #e8eaed;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-    }
-    
-    .mobile-back::before {
-        content: '←';
-        font-size: 20px;
-    }
-}
-
-/* Touch-friendly tap targets (44px minimum) */
-@media (max-width: 767px) {
-    .chat-item {
-        min-height: 44px;
-        padding: 16px 20px;
-    }
-    
-    .btn-send,
-    .quick-action-btn,
-    .header-action-btn {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    .search-box {
-        min-height: 44px;
-    }
-}
-</style>
-
-<script>
-// Mobile navigation
-if (window.innerWidth < 768) {
-    document.addEventListener('click', function(e) {
-        const chatItem = e.target.closest('.chat-item');
-        if (chatItem) {
-            // Show dialog on mobile
-            document.querySelector('.chat-list').style.display = 'none';
-            document.querySelector('.chat-window').classList.add('mobile-active');
-            
-            // Add back button
-            const chatWindow = document.querySelector('.chat-window');
-            if (!chatWindow.querySelector('.mobile-back')) {
-                const backBtn = document.createElement('div');
-                backBtn.className = 'mobile-back';
-                backBtn.textContent = 'Назад';
-                backBtn.onclick = function() {
-                    document.querySelector('.chat-list').style.display = 'flex';
-                    chatWindow.classList.remove('mobile-active');
-                };
-                chatWindow.insertBefore(backBtn, chatWindow.firstChild);
-            }
-        }
-    });
-}
-</script>
