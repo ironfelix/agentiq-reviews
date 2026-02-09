@@ -358,7 +358,7 @@ def generate_chat_item_html(chat, is_active=False):
     if chat.get("article"):
         meta_parts.append(f"Арт. {chat['article']}")
     elif chat.get("product_name"):
-        meta_parts.append(f"{chat['product_name']} (точный артикул не определён)")
+        meta_parts.append(chat["product_name"])
     meta_parts.append(chat["status_label"])
     meta_text = " · ".join(meta_parts)
 
