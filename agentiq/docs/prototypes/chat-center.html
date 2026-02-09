@@ -895,9 +895,158 @@
             margin-top: 4px;
         }
     </style>
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .chat-center {
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* Hide all panels by default */
+    .chat-list,
+    .chat-window,
+    .product-context {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        max-width: 100%;
+        border: none;
+        display: none;
+        z-index: 1;
+    }
+
+    /* Show only active panel */
+    .chat-center[data-mobile-view="list"] .chat-list { display: flex; }
+    .chat-center[data-mobile-view="chat"] .chat-window { display: flex; }
+    .chat-center[data-mobile-view="context"] .product-context { display: block; }
+
+    /* Back button */
+    .chat-header-back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        background: transparent;
+        border: none;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        font-size: 20px;
+        margin-right: var(--space-2);
+    }
+
+    .chat-header-back:hover { background: var(--color-bg-tertiary); }
+    .chat-header-back:active { transform: scale(0.95); }
+
+    /* Info button highlight */
+    .header-action-btn[title="Информация"] {
+        background: var(--color-accent);
+        color: white;
+    }
+
+    /* Compact header */
+    .chat-list-header { padding: var(--space-3) var(--space-4); }
+    .chat-list-title { font-size: 20px; }
+
+    /* Larger touch targets */
+    .chat-item {
+        padding: var(--space-3);
+        margin-bottom: var(--space-2);
+    }
+
+    .marketplace-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .chat-item-name { font-size: 14px; }
+    .chat-item-preview { font-size: 13px; }
+
+    /* Compact filters */
+    .filter-pill {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    /* Bottom sheet for advanced filters */
+    .advanced-filters {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    /* Chat messages */
+    .chat-messages { padding: var(--space-4); }
+    .message { max-width: 85%; }
+
+    /* Input */
+    .chat-input-container { padding: var(--space-3) var(--space-4); }
+    .chat-input { font-size: 15px; }
+
+    /* Product context */
+    .product-context { padding: var(--space-4); }
+    .context-header {
+        padding: var(--space-4);
+        margin: calc(var(--space-4) * -1);
+        margin-bottom: var(--space-4);
+    }
+
+    /* Hide drag indicators */
+    .chat-item[draggable="true"] { cursor: pointer; }
+
+    /* AI suggestion */
+    .ai-suggestion {
+        margin: var(--space-4);
+        padding: var(--space-4);
+    }
+    .ai-suggestion-text {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* Tablet: 2-column */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .chat-list { width: 320px; }
+    .product-context { display: none; }
+
+    .chat-center[data-tablet-context="visible"] .product-context {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: 400px;
+        z-index: 10;
+        box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+    }
+
+    .header-action-btn[title="Информация"] {
+        background: var(--color-accent);
+        color: white;
+    }
+}
+
+/* Hide back button on desktop */
+@media (min-width: 769px) {
+    .chat-header-back { display: none !important; }
+}
 </head>
 <body>
-    <div class="chat-center">
+    <div class="chat-center" data-mobile-view="list">
         <!-- LEFT PANEL: Chat List -->
         <section class="chat-list">
             <div class="chat-list-header">
@@ -1087,7 +1236,7 @@
         <!-- CENTER: Chat Window -->
         <main class="chat-window">
             <div class="chat-header">
-                <div class="chat-header-info">
+                <button class="chat-header-back" onclick="setMobileView('list')">←</button>                <div class="chat-header-info">
                     <h2>Иван Петров · Royal Canin Urinary S/O LP34</h2>
                     <div class="chat-header-meta">Wildberries · Отзыв 1★ · Сегодня, 12:34</div>
                 </div>
@@ -1557,6 +1706,46 @@
 
         // Initialize with first chat context
         updateProductContext('1');
+
+        // Mobile navigation
+        function setMobileView(view) {
+            const chatCenter = document.querySelector('.chat-center');
+            chatCenter.setAttribute('data-mobile-view', view);
+        }
+
+        // Mobile: Open chat from list
+        document.addEventListener('click', function(e) {
+            const chatItem = e.target.closest('.chat-item');
+            if (chatItem && window.innerWidth <= 768) {
+                const chatId = chatItem.getAttribute('data-chat-id');
+                if (chatId) {
+                    setMobileView('chat');
+                }
+            }
+        });
+
+        // Mobile: Info button shows context
+        document.querySelector('.header-action-btn[title="Информация"]')?.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                setMobileView('context');
+            } else if (window.innerWidth <= 1024) {
+                const chatCenter = document.querySelector('.chat-center');
+                const isVisible = chatCenter.getAttribute('data-tablet-context') === 'visible';
+                chatCenter.setAttribute('data-tablet-context', isVisible ? '' : 'visible');
+            }
+        });
+
+        // Mobile: Back from context
+        const contextHeader = document.querySelector('.product-context .context-header');
+        if (contextHeader && window.innerWidth <= 768) {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'chat-header-back';
+            backBtn.innerHTML = '←';
+            backBtn.onclick = () => setMobileView('chat');
+            backBtn.style.cssText = 'position: absolute; top: 16px; left: 16px; z-index: 10;';
+            contextHeader.style.position = 'relative';
+            contextHeader.prepend(backBtn);
+        }
     </script>
 </body>
 </html>
