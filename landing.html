@@ -1488,14 +1488,248 @@
         }
 
         /* ===== MOBILE ADJUSTMENTS ===== */
+
+        /* Small phones (≤400px) */
+        @media (max-width: 400px) {
+            .container { padding: 0 16px; }
+            .hero h1 { font-size: 26px; letter-spacing: -0.6px; }
+            .hero-subtitle { font-size: 14px; }
+            .offer-price .amount { font-size: 26px; }
+            .section-title { font-size: 22px; }
+        }
+
+        /* All mobile (≤640px) */
         @media (max-width: 640px) {
-            .hero { min-height: auto; padding: 110px 0 50px; }
-            .hero h1 { letter-spacing: -0.8px; }
-            .hero-proof { gap: 20px; }
-            .section { padding: 50px 0; }
-            .offer-card { padding: var(--space-6); }
-            .final-cta-inner { padding: 36px 20px; }
-            .modal { padding: var(--space-6); }
+            .hero {
+                min-height: auto;
+                padding: 100px 0 40px;
+            }
+
+            .hero h1 {
+                letter-spacing: -0.8px;
+                margin-bottom: 16px;
+            }
+
+            .hero-subtitle {
+                margin-bottom: 24px;
+            }
+
+            .hero-cta-group {
+                margin-bottom: 32px;
+                flex-direction: column;
+            }
+
+            .hero-cta-group .btn-primary,
+            .hero-cta-group .btn-secondary {
+                justify-content: center;
+                width: 100%;
+                padding: 16px 24px;
+                font-size: 15px;
+            }
+
+            /* Hero proof: stack vertically on mobile */
+            .hero-proof {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .hero-proof-item {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 16px;
+            }
+
+            .hero-proof-value {
+                font-size: 20px;
+                flex-shrink: 0;
+                min-width: 60px;
+            }
+
+            .hero-proof-label {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            .hero-proof-source {
+                text-align: center;
+                margin-top: 6px;
+            }
+
+            /* Sections */
+            .section { padding: 48px 0; }
+
+            .section-title {
+                font-size: 24px;
+                letter-spacing: -0.5px;
+            }
+
+            /* Pain cards */
+            .pain-card {
+                padding: 20px;
+            }
+
+            /* Comparison cards */
+            .comparison-card {
+                padding: 22px;
+            }
+
+            .comparison-card h3 {
+                font-size: 16px;
+            }
+
+            /* Feature cards */
+            .feature-card {
+                padding: 22px;
+            }
+
+            .feature-number {
+                font-size: 44px;
+                top: 14px;
+                right: 14px;
+            }
+
+            /* Money cards */
+            .money-card {
+                padding: 20px;
+            }
+
+            .money-bottom-text {
+                padding: 16px;
+                font-size: 13px;
+            }
+
+            /* Offer cards */
+            .offer-card {
+                padding: 24px;
+            }
+
+            .offer-card h3 {
+                font-size: 18px;
+            }
+
+            .btn-offer {
+                padding: 15px var(--space-5);
+                font-size: 15px;
+            }
+
+            /* Audience cards */
+            .audience-card {
+                padding: 20px;
+            }
+
+            /* Proof cards */
+            .proof-card {
+                padding: 20px;
+            }
+
+            /* Final CTA */
+            .final-cta {
+                padding: 48px 0;
+            }
+
+            .final-cta-inner {
+                padding: 28px 20px;
+                border-radius: var(--radius-xl);
+                gap: 20px;
+            }
+
+            .final-cta h2 {
+                font-size: 20px;
+            }
+
+            .final-cta .section-subtitle {
+                font-size: 14px;
+            }
+
+            .final-cta-buttons {
+                width: 100%;
+            }
+
+            .final-cta-buttons .btn-primary,
+            .final-cta-buttons .btn-secondary {
+                justify-content: center;
+                width: 100%;
+                padding: 16px 24px;
+            }
+
+            /* Footer */
+            .footer-inner {
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            /* Modal — full screen on mobile */
+            .modal-overlay {
+                padding: 0;
+                align-items: flex-end;
+            }
+
+            .modal {
+                max-width: 100%;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                padding: 28px 20px 32px;
+                max-height: 92vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modal h3 {
+                font-size: 18px;
+                padding-right: 32px;
+            }
+
+            .form-group input {
+                padding: 14px 16px;
+                font-size: 16px; /* prevents iOS zoom */
+            }
+
+            .form-submit {
+                padding: 16px;
+                font-size: 15px;
+            }
+        }
+
+        /* Mobile navbar CTA */
+        .navbar-cta-mobile {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+            border: none;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            text-decoration: none;
+        }
+
+        .navbar-cta-mobile:active {
+            transform: scale(0.96);
+        }
+
+        @media (min-width: 640px) {
+            .navbar-cta-mobile { display: none; }
+        }
+
+        /* Tap highlight for mobile */
+        @media (hover: none) {
+            .pain-card:hover,
+            .money-card:hover,
+            .audience-card:hover,
+            .feature-card:hover,
+            .proof-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
         }
     </style>
 </head>
@@ -1510,6 +1744,7 @@
             <div class="logo-icon">Aq</div>
             <span class="logo-text">AgentIQ</span>
         </a>
+        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Аудит</a>
         <a href="#" class="navbar-cta" onclick="openModal(event)">
             Заказать аудит
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
