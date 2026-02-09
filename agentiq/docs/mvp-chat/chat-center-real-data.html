@@ -1,0 +1,2576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ Chat Center — Real WB Data</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DESIGN SYSTEM ===== */
+        :root {
+            /* Colors */
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+            --color-bg-chat: #e8f2f8;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+            --color-urgent: #ea4335;
+
+            /* Spacing Scale (4px base) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            /* Typography */
+            --font-size-xs: 10px;
+            --font-size-sm: 11px;
+            --font-size-md: 12px;
+            --font-size-base: 13px;
+            --font-size-lg: 14px;
+
+            /* Border Radius */
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 14px;
+
+            /* Transitions */
+            --transition-fast: 0.12s ease;
+            --transition-medium: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            height: 100vh;
+            overflow: hidden;
+            font-size: var(--font-size-base);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .chat-center {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== LEFT PANEL: Chat List ===== */
+        .chat-list {
+            width: 340px;
+            background: var(--color-bg-primary);
+            border-right: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            padding: var(--space-4) var(--space-4) var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .chat-list-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-3);
+        }
+
+        /* Search */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: var(--space-2);
+        }
+
+        .search-box {
+            width: 100%;
+            background: var(--color-bg-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-lg);
+            padding: var(--space-2) 34px var(--space-2) 11px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .search-box:focus {
+            outline: none;
+            background: var(--color-bg-primary);
+            border-color: var(--color-border-medium);
+        }
+
+        .search-box::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .filter-icon-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            color: var(--color-text-tertiary);
+        }
+
+        .filter-icon-btn:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--color-text-primary);
+        }
+
+        .filter-icon-btn.active {
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        /* Pills Filters */
+        .filters-container {
+            position: relative;
+            margin-bottom: var(--space-3);
+        }
+
+        .filters-scroll {
+            display: flex;
+            gap: var(--space-1);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            padding: 1px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .filters-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            flex-shrink: 0;
+            padding: 5px 10px;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .filter-pill:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .filter-pill.active {
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        .filter-pill .count {
+            opacity: 0.6;
+            margin-left: 3px;
+            font-size: var(--font-size-sm);
+        }
+
+        .filter-pill.active .count {
+            opacity: 0.8;
+        }
+
+        /* Advanced Filters Dropdown */
+        .advanced-filters {
+            display: none;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2);
+            margin-bottom: var(--space-2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .advanced-filters.open {
+            display: block;
+        }
+
+        .filter-group {
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-group:last-of-type {
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-group-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* Date Range */
+        .date-range-compact {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-input-compact {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .date-input-compact:hover {
+            border-color: var(--color-border-dark);
+        }
+
+        .date-input-compact:focus {
+            outline: none;
+            border-color: var(--color-text-primary);
+        }
+
+        .date-separator {
+            color: var(--color-text-tertiary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Platform & Rating Chips */
+        .platform-chips,
+        .rating-chips {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .platform-chip,
+        .rating-chip {
+            padding: 4px 8px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .platform-chip:hover,
+        .rating-chip:hover {
+            background: var(--color-bg-primary);
+            border-color: var(--color-border-dark);
+        }
+
+        .platform-chip.active,
+        .rating-chip.active {
+            background: var(--color-text-primary);
+            border-color: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        /* Filter Actions */
+        .filter-actions {
+            display: flex;
+            gap: 6px;
+            padding-top: var(--space-2);
+            border-top: 1px solid var(--color-border-light);
+            margin-top: 2px;
+        }
+
+        .btn-clear,
+        .btn-apply {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--color-text-secondary);
+        }
+
+        .btn-clear:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .btn-apply {
+            flex: 2;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+            font-weight: 500;
+        }
+
+        .btn-apply:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-apply:active {
+            transform: scale(0.98);
+        }
+
+        /* Queues */
+        .queue-divider {
+            height: 1px;
+            background: var(--color-border-medium);
+            margin: var(--space-2) 0;
+        }
+
+        .chat-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-3) var(--space-4);
+        }
+
+        .queue-section {
+            margin-bottom: var(--space-4);
+        }
+
+        .queue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+            padding: 0 2px;
+        }
+
+        .queue-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .queue-count {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Chat Items */
+        .chat-item {
+            padding: var(--space-2);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            gap: var(--space-2);
+            align-items: flex-start;
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-1);
+            border: 1px solid transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .chat-item:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-medium);
+        }
+
+        .chat-item.active {
+            background: var(--color-bg-active);
+            border-color: #d0e7ff;
+        }
+
+        .marketplace-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .marketplace-icon.wb {
+            background: #8b33ff;
+            font-size: 9px;
+        }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-item-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+        }
+
+        .chat-item-name {
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-primary);
+            flex: 1;
+        }
+
+        .chat-item-time {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        .chat-item-meta {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+            margin-bottom: 3px;
+        }
+
+        .chat-item-preview {
+            font-size: var(--font-size-md);
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* urgent ::before removed — unified to status-dot */
+
+        .chat-item[draggable="true"] {
+            cursor: move;
+        }
+
+        .chat-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+            cursor: grabbing;
+        }
+
+        .queue-section.drag-over {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+        }
+
+        .unread-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        /* Scrollbar */
+        .chat-list-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb {
+            background: var(--color-border-dark);
+            border-radius: 2px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        /* ===== CENTER: Chat Window ===== */
+        .chat-window {
+            flex: 1;
+            background: var(--color-bg-chat);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .chat-header-meta {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--color-border-medium);
+            background: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all var(--transition-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .header-action-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .message {
+            max-width: 560px;
+        }
+
+        .message.customer {
+            align-self: flex-start;
+        }
+
+        .message.seller {
+            align-self: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message-author {
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .message-time {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: var(--font-size-lg);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        .message.seller .message-content {
+            background: #dcedff;
+            color: var(--color-text-primary);
+        }
+
+        /* Message attachments */
+        .message-attachment {
+            margin-top: 8px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .message-attachment img {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            cursor: pointer;
+            border-radius: var(--radius-lg);
+        }
+
+        .message-attachment img:hover {
+            opacity: 0.95;
+        }
+
+        /* AI Suggestion */
+        .ai-suggestion {
+            background: var(--color-bg-hover);
+            border-left: 3px solid var(--color-text-primary);
+            padding: 12px 16px;
+            margin: 0 24px 16px 24px;
+            border-radius: var(--radius-md);
+        }
+
+        .ai-suggestion-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .ai-suggestion-text {
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        /* Input */
+        .chat-input-container {
+            border-top: 1px solid var(--color-border-medium);
+            padding: 20px 24px;
+            background: white;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--color-bg-hover);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            font-size: var(--font-size-lg);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            line-height: 1.5;
+            transition: all var(--transition-medium);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .btn-send {
+            background: var(--color-text-primary);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-medium);
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== RIGHT PANEL: Product Context ===== */
+        .product-context {
+            width: 300px;
+            background: white;
+            border-left: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .product-context::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .product-context::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .product-context::-webkit-scrollbar-thumb {
+            background: var(--color-border-dark);
+            border-radius: 3px;
+        }
+
+        .product-context::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        .context-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .context-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .info-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .info-section-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            margin-bottom: 16px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+        }
+
+        .info-link {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: var(--font-size-lg);
+        }
+
+        .info-link:hover {
+            text-decoration: underline;
+        }
+
+        /* AI Insights */
+        .insight-badge {
+            display: inline-block;
+            background: var(--color-bg-hover);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            color: var(--color-text-secondary);
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+
+        .insight-badge.negative {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .insight-badge.urgent {
+            background: #fce8e6;
+            color: var(--color-urgent);
+        }
+
+        .trend-indicator {
+            font-size: var(--font-size-sm);
+            color: var(--color-urgent);
+            margin-top: 4px;
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .chat-center {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .chat-list,
+    .chat-window,
+    .product-context {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        max-width: 100%;
+        border: none;
+        display: none;
+        z-index: 1;
+    }
+
+    .chat-center[data-mobile-view="list"] .chat-list { display: flex; }
+    .chat-center[data-mobile-view="chat"] .chat-window { display: flex; }
+    .chat-center[data-mobile-view="context"] .product-context { display: block; }
+
+    .chat-header-back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        background: transparent;
+        border: none;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        font-size: 20px;
+        margin-right: var(--space-2);
+    }
+
+    .chat-header-back:hover { background: var(--color-bg-tertiary); }
+    .chat-header-back:active { transform: scale(0.95); }
+
+    .header-action-btn[title="Информация"] {
+        background: var(--color-accent);
+        color: white;
+    }
+
+    .chat-list-header { padding: var(--space-3) var(--space-4); }
+    .chat-list-title { font-size: 20px; }
+
+    .chat-item {
+        padding: var(--space-3);
+        margin-bottom: var(--space-2);
+    }
+
+    .marketplace-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .chat-item-name { font-size: 14px; }
+    .chat-item-preview { font-size: 13px; }
+
+    .filter-pill {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .advanced-filters {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .chat-messages { padding: var(--space-4); }
+    .message { max-width: 85%; }
+
+    .chat-input-container { padding: var(--space-3) var(--space-4); }
+    .chat-input { font-size: 15px; }
+
+    .product-context { padding: var(--space-4); }
+    .context-header {
+        padding: var(--space-4);
+        margin: calc(var(--space-4) * -1);
+        margin-bottom: var(--space-4);
+    }
+
+    .chat-item[draggable="true"] { cursor: pointer; }
+
+    .ai-suggestion {
+        margin: var(--space-4);
+        padding: var(--space-4);
+    }
+    .ai-suggestion-text {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .chat-list { width: 320px; }
+    .product-context { display: none; }
+
+    .chat-center[data-tablet-context="visible"] .product-context {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: 400px;
+        z-index: 10;
+        box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+    }
+
+    .header-action-btn[title="Информация"] {
+        background: var(--color-accent);
+        color: white;
+    }
+}
+
+@media (min-width: 769px) {
+    .chat-header-back { display: none !important; }
+}
+
+/* Date separator in chat */
+.date-separator {
+    text-align: center;
+    padding: 4px 0;
+    align-self: center;
+}
+.date-separator span {
+    background: rgba(0,0,0,0.06);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-md);
+    color: var(--color-text-tertiary);
+}
+
+/* System message */
+.message-system {
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    padding: 6px 16px;
+    align-self: center;
+    background: rgba(0,0,0,0.03);
+    border-radius: var(--radius-pill);
+    max-width: 80%;
+}
+
+/* Product badge in chat */
+.product-chat-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--color-border-light);
+    font-size: var(--font-size-md);
+}
+.product-chat-badge .product-article {
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.product-chat-badge .product-title {
+    color: var(--color-text-secondary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Status dot in chat list */
+.status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+.status-dot.waiting { background: #f9ab00; }
+.status-dot.client-replied { background: #4285f4; }
+.status-dot.responded { background: #34a853; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.status-dot.risk { background: #ea4335 !important; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
+.status-dot.auto-response { background: #9aa0a6; }
+.message-author.auto-tag { color: #9aa0a6; font-style: italic; }
+.empty-msg { color: #9aa0a6; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="chat-center" data-mobile-view="list">
+        <!-- LEFT PANEL: Chat List -->
+        <section class="chat-list">
+            <div class="chat-list-header">
+                <h1 class="chat-list-title">Сообщения</h1>
+
+                <!-- Search -->
+                <div class="search-wrapper">
+                    <input type="text" class="search-box" placeholder="Поиск..." id="searchBox">
+                    <button class="filter-icon-btn" id="advancedFilterBtn" title="Расширенные фильтры">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                            <path d="M2 3h12M4 6h8M6 9h4M7 12h2"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Pills Filters -->
+                <div class="filters-container">
+                    <div class="filters-scroll">
+                        <button class="filter-pill active" data-filter="all">
+                            Все <span class="count">39</span>
+                        </button>
+                        <button class="filter-pill" data-filter="urgent">
+                            Срочно <span class="count">4</span>
+                        </button>
+                        <button class="filter-pill" data-filter="unanswered">
+                            Без ответа <span class="count">8</span>
+                        </button>
+                        <button class="filter-pill" data-filter="resolved">
+                            Обработаны <span class="count">27</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="advanced-filters" id="advancedFilters">
+                    <div class="filter-group">
+                        <div class="filter-group-label">Период</div>
+                        <div class="date-range-compact">
+                            <input type="date" id="dateFrom" class="date-input-compact">
+                            <span class="date-separator">—</span>
+                            <input type="date" id="dateTo" class="date-input-compact">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-group-label">Платформа</div>
+                        <div class="platform-chips">
+                            <button class="platform-chip active" data-platform="wb">WB</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-clear" id="clearAllFilters">Сбросить</button>
+                        <button class="btn-apply" id="applyFilters">Применить</button>
+                    </div>
+                </div>
+
+                <div class="queue-divider"></div>
+            </div>
+
+            <!-- Queues -->
+            <div class="chat-list-content">
+<!-- Chats: 39 total, 105 messages from WB Chat API -->
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">В работе</div>
+                        <div class="queue-count">4</div>
+                    </div>
+
+                    <div class="chat-item urgent active" draggable="true" data-chat-id="1" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Алексей</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">24.09</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Чат · Кран (точный артикул не определён) · Ожидает ответа</div>
+                            <div class="chat-item-preview">Доброго вечера , так как заказ задерживается уже на три дня и продолжает...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item urgent" draggable="true" data-chat-id="2" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Исакович Анна Витальевна</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">10.07</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Чат · Кран (точный артикул не определён) · Ожидает ответа</div>
+                            <div class="chat-item-preview">Заказывала 2 крана</div>
+                        </div>
+                    </div>
+                    <div class="chat-item urgent" draggable="true" data-chat-id="3" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Сергей</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">02.05</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Чат · Реле (точный артикул не определён) · Ожидает ответа</div>
+                            <div class="chat-item-preview">хочу вернуть реле, потому что пришло сломаное</div>
+                        </div>
+                    </div>
+                    <div class="chat-item urgent" draggable="true" data-chat-id="4" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Олег</span>
+                                <span class="unread-badge">6</span>
+                                <span class="chat-item-time">19.03</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Чат · Ожидает ответа</div>
+                            <div class="chat-item-preview">(нет сообщения)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">Ожидают ответа</div>
+                        <div class="queue-count">8</div>
+                    </div>
+
+                    <div class="chat-item waiting" draggable="true" data-chat-id="5" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Курченко</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">22.12</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Арт. 335542810 · Ожидает ответа</div>
+                            <div class="chat-item-preview">Здравствуйте! У меня вопрос по товару "Кран шаровой ВР/ВР 1/2" бабочка, ...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="6" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Сергей</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">06.11</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Ожидает ответа</div>
+                            <div class="chat-item-preview">Не заказывал</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="7" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">14.09</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Ожидает ответа</div>
+                            <div class="chat-item-preview">Где товар</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="8" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">06.05</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Сифон (точный артикул не определён) · Ожидает ответа</div>
+                            <div class="chat-item-preview">Один из сифонов, т.е. один лишний!</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="9" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Елена</span>
+                                <span class="unread-badge">3</span>
+                                <span class="chat-item-time">29.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Арт. 233586811 · Ожидает ответа</div>
+                            <div class="chat-item-preview">Слушайте! Имейте совесть! Где товар???</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="10" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Юлия</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">27.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Шланг (точный артикул не определён) · Ожидает ответа</div>
+                            <div class="chat-item-preview">мы из Рязани</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="11" data-status="waiting">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Людмила</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">26.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Арт. 360755496 · Ожидает ответа</div>
+                            <div class="chat-item-preview">Здравствуйте! У меня вопрос по товару "Реле давления 1" 1,4-2,8 бар (со ...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item waiting" draggable="true" data-chat-id="12" data-status="client-replied">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Игорь</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">21.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot client-replied"></span>Чат · Арт. 331463403 · Клиент ответил</div>
+                            <div class="chat-item-preview">Вчера кран доставили. Спасибо за участие.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">Все сообщения</div>
+                        <div class="queue-count">27</div>
+                    </div>
+
+                    <div class="chat-item" draggable="true" data-chat-id="13" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Николай</span>
+                                
+                                <span class="chat-item-time">01.11</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Добрый день, оформите заявку на возврат, мы одобрим. Нужно чтобы упа...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="14" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Дмитрий</span>
+                                
+                                <span class="chat-item-time">14.10</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Дмитрий, здравствуйте. Приносим свои извинения за задержку с отправк...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="15" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Анастасия</span>
+                                
+                                <span class="chat-item-time">06.10</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, доставкой занимает я маркетплейс, к сожалению не можем...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="16" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">01.09</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Факт обмана опровергаем, на складе произошел пересорт....</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="17" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">01.09</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Коллектор (точный артикул не определён) · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Расходомер идёт без ответной части</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="18" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Светлана</span>
+                                
+                                <span class="chat-item-time">01.09</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Насос (точный артикул не определён) · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Гарантия действительна с даты покупки.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="19" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">19.08</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Добрый день. Ответная часть находится в коллекторе.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="20" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Алина</span>
+                                
+                                <span class="chat-item-time">03.08</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Доставкой товара занимается непосредственно маркетплей...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="21" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">31.07</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Добрый день. Мы не имеем возможности самостоятельно отменять заказы ...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="22" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">17.07</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Благодарим за Ваше обращение. Если заказ оформили букв...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="23" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Анатолий</span>
+                                
+                                <span class="chat-item-time">05.07</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Главное чтобы Манометр был целый и упаковка не нарушена</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="24" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Алексей</span>
+                                
+                                <span class="chat-item-time">21.06</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Арт. 401884254 · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, Вы можете отменить заказ самостоятельно, к сожалению м...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="25" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Алексей</span>
+                                
+                                <span class="chat-item-time">21.06</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Арт. 401884254 · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, Вы можете отменить заказ самостоятельно, к сожалению м...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="26" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Петр</span>
+                                
+                                <span class="chat-item-time">19.06</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, возврат одобрили.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="27" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Дмитрий</span>
+                                
+                                <span class="chat-item-time">07.06</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Арт. 331936730 · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Какой вопрос?</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="28" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Елена</span>
+                                
+                                <span class="chat-item-time">07.06</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Коробку можете выкинуть через 2 недели после установки.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="29" data-status="auto-response">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">27.05</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot auto-response"></span>Чат · Авто-ответ</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте! Здесь вы можете задать вопросы по возврату товара, есл...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="30" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">11.05</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, возврат подтверждаем, будем разбираться на производстве.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="31" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">11.05</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, насос захватил песок вместе с водой, по инструкции его...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="32" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">28.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте. Данная царапина на корпусе была обнаружена после того ...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="33" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Валентин</span>
+                                
+                                <span class="chat-item-time">26.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Насос (точный артикул не определён) · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Просканировали данный код, Woman fashion bot, к сожалению мы не имее...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="34" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Алексей</span>
+                                
+                                <span class="chat-item-time">24.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Арт. 233544512 · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, мы не можем влиять на доставку и регламентировать ее с...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="35" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">24.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Добрый день. Подскажите, заводская упаковка сохранена и внешний вид ...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="36" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">23.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Насос (точный артикул не определён) · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Верно, только воду чистую качает.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="37" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">22.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Возврат одобрен.</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="38" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">20.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Здравствуйте, напишите в клиентскую поддержку вайлдберриз, мы к сожа...</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" draggable="true" data-chat-id="39" data-status="responded">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Клиент</span>
+                                
+                                <span class="chat-item-time">08.04</span>
+                            </div>
+                            <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
+                            <div class="chat-item-preview">Вы: Видимо песок или камень попал внутрь.
+Возврат одобряем.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER: Chat Window -->
+        <main class="chat-window">
+            <div class="chat-header">
+                <button class="chat-header-back" onclick="setMobileView('list')">&#8592;</button>
+                <div class="chat-header-info">
+                    <h2>Алексей</h2>
+                    <div class="chat-header-meta">Wildberries · Чат покупателя</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="header-action-btn" title="Информация">&#8505;</button>
+                    <button class="header-action-btn" title="Еще">&#8942;</button>
+                </div>
+            </div>
+
+            <!-- Product badge -->
+            <div class="product-chat-badge" id="productBadge" style="display:none"></div>
+
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <!-- AI Suggestion -->
+            <div class="ai-suggestion">
+                <div class="ai-suggestion-label">AI Рекомендация</div>
+                <div class="ai-suggestion-text"></div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="chatInput" placeholder="Напишите ответ..." rows="1"></textarea>
+                    <button class="btn-send" onclick="sendMessage()">&#8594;</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Product Context -->
+        <aside class="product-context">
+            <div class="context-header">
+                <div class="context-title">Товар</div>
+                <div class="product-name">Чат покупателя</div>
+                <div class="product-rating"></div>
+                <div class="product-price"></div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Детали чата</div>
+                <div class="info-item">
+                    <div class="info-label">Статус</div>
+                    <div class="info-value">Открыт</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Последнее сообщение</div>
+                    <div class="info-value"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Непрочитанных</div>
+                    <div class="info-value"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Клиент</div>
+                    <div class="info-value"></div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">AI Анализ</div>
+                <div class="info-item">
+                    <div class="info-label">Тональность</div>
+                    <div class="info-value">
+                        <span class="insight-badge"></span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Категории</div>
+                    <div class="info-value"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Срочность</div>
+                    <div class="info-value"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Рекомендация</div>
+                    <div class="info-value"></div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Действия</div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Открыть чат на WB</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Посмотреть все чаты клиента</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let currentChatId = '1';
+
+        const contextData = {
+            '1': {
+                header: { title: 'Алексей', meta: 'Wildberries · Кран (точный артикул не определён)' },
+                product: { name: 'Кран', article: null },
+                chatHistory: [
+                        { type: 'date', text: '24 сентября 2025 г.' },
+                        { type: 'customer', author: 'Алексей', time: '17:50', text: 'Доброго вечера , так как заказ задерживается уже на три дня и продолжает задерживаться ч вынужден отказаться от вашего краника, не один нормальный человек не будет ждать больше недели задержки заказанного товара, ч уже давно купил в магазине и установил краник, так что разбирайтесь с валберис , вы теряете деньги из за доставки валберис' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Алексей, здравствуйте! Со своей стороны проверили — товар (Кран) передан в службу доставки. Иногда сроки увеличиваются на стороне логистики. Если заказ не поступит в ближайшие дни — напишите нам, поможем разобраться.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '24 сентября 2025 г., 17:50', unread: '1', client: 'Алексей' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Высокая · негативные сигналы', urgent: true }, recommendation: 'Ответить срочно' },
+                externalId: '1:8354eff6-3771-83ce-7ed5-87cf3d94d0cb'
+            },
+            '2': {
+                header: { title: 'Исакович Анна Витальевна', meta: 'Wildberries · Кран (точный артикул не определён)' },
+                product: { name: 'Кран', article: null },
+                chatHistory: [
+                        { type: 'date', text: '10 июля 2025 г.' },
+                        { type: 'customer', author: 'Исакович Анна Витальевна', time: '07:23', text: 'Добрый день,получила заказ оказались не те краны.Выписывала угловные,а пришли прямые большего размера.Как поменять.Все оплачено.' },
+                        { type: 'customer', author: 'Исакович Анна Витальевна', time: '07:25', text: 'Заказывала 2 крана' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Исакович Анна Витальевна, здравствуйте! Приносим извинения за несоответствие (Кран). Оформите возврат через ЛК WB — мы одобрим. Правильный вариант можно заказать повторно.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '10 июля 2025 г., 07:25', unread: '2', client: 'Исакович Анна Витальевна' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Не подошёл товар'], urgency: { label: 'Высокая · негативные сигналы', urgent: true }, recommendation: 'Ответить срочно' },
+                externalId: '1:2eef0aa2-b9a3-ac5a-7ff5-e6d32a0d7766'
+            },
+            '3': {
+                header: { title: 'Сергей', meta: 'Wildberries · Реле (точный артикул не определён)' },
+                product: { name: 'Реле', article: null },
+                chatHistory: [
+                        { type: 'date', text: '2 мая 2025 г.' },
+                        { type: 'customer', author: 'Сергей', time: '15:04', text: 'хочу вернуть реле, потому что пришло сломаное' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Сергей, здравствуйте! Нам очень жаль — это нештатная ситуация. Оформите возврат через ЛК WB, мы его одобрим. Информацию передали в отдел качества.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '2 мая 2025 г., 15:04', unread: '1', client: 'Сергей' },
+                ai: { sentiment: { label: 'Негативная', negative: true }, categories: ['Брак / дефект'], urgency: { label: 'Высокая · негативные сигналы', urgent: true }, recommendation: 'Ответить срочно' },
+                externalId: '1:58f218a2-27b9-ea32-2007-cfbbca7d7a7e'
+            },
+            '4': {
+                header: { title: 'Олег', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '19 марта 2025 г.' },
+                        { type: 'customer', author: 'Олег', time: '17:19', text: 'Здравствуйте! Хочу вернуть товар по заявке d7ff279e-159a-487a-9341-904559f7d1d0. Как это сделать?' },
+                        { type: 'customer', author: 'Олег', time: '17:19', text: 'Как так получилоь ?' },
+                        { type: 'customer', author: 'Олег', time: '17:20', text: 'Артикул на штрихкоде один' },
+                        { type: 'customer', author: 'Олег', time: '17:20', text: 'Артикул на упаковке другой ?' },
+                        { type: 'customer', author: 'Олег', time: '17:21', text: 'Заказан с верхним забором привезли с нижним ' },
+                        { type: 'customer', author: 'Олег', time: '17:26', text: '' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Олег, здравствуйте! Со своей стороны проверили — товар передан в доставку. Если возникнут вопросы — пишите, поможем разобраться.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '19 марта 2025 г., 17:26', unread: '6', client: 'Олег' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Высокая · 6 непрочитанных', urgent: true }, recommendation: 'Ответить срочно' },
+                externalId: '1:d608796d-3dc5-3c7d-3b28-d07c2bde2d9f'
+            },
+            '5': {
+                header: { title: 'Курченко', meta: 'Wildberries · Арт. 335542810 · Кран шаровой ВР/ВР 1/2' },
+                product: { name: 'Кран шаровой ВР/ВР 1/2', article: '335542810' },
+                chatHistory: [
+                        { type: 'date', text: '22 декабря 2025 г.' },
+                        { type: 'customer', author: 'Курченко', time: '04:33', text: 'Здравствуйте! У меня вопрос по товару \"Кран шаровой ВР/ВР 1/2\" бабочка, с накидной гайкой, бренд Zegor, артикул 335542810, товар оформлен 17.12.2025\" Мне ждать заказ и сколько? Может перезаказать?' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Курченко, здравствуйте! Рекомендуем подождать ещё 2-3 дня — иногда доставка задерживается на стороне логистики. Если товар не поступит, можно отменить заказ в ЛК WB и оформить новый. Мы на связи!',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '22 декабря 2025 г., 04:33', unread: '1', client: 'Курченко' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Средняя · 1 непрочитанных', urgent: false }, recommendation: 'Проверить статус + ответить' },
+                externalId: '1:2afade85-5391-5123-f7e7-eb6fb3b22251'
+            },
+            '6': {
+                header: { title: 'Сергей', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '6 ноября 2025 г.' },
+                        { type: 'customer', author: 'Сергей', time: '13:31', text: 'Не заказывал' },
+                        { type: 'customer', author: 'Сергей', time: '13:33', text: 'Не заказывал' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Сергей, здравствуйте! Нам жаль, что произошла ошибка. Оформите, пожалуйста, возврат через ЛК WB — мы одобрим заявку.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '6 ноября 2025 г., 13:33', unread: '2', client: 'Сергей' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Ошибочный заказ'], urgency: { label: 'Средняя · 2 непрочитанных', urgent: false }, recommendation: 'Ответить клиенту' },
+                externalId: '1:7da54043-2358-9346-02ac-31b632a89243'
+            },
+            '7': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '14 сентября 2025 г.' },
+                        { type: 'customer', author: 'Клиент', time: '10:48', text: 'Где товар' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Клиент, здравствуйте! Спасибо за обращение. Подскажите, чем можем помочь?',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '14 сентября 2025 г., 10:48', unread: '1', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре'], urgency: { label: 'Средняя · 1 непрочитанных', urgent: false }, recommendation: 'Ответить клиенту' },
+                externalId: '1:b729b9a3-3b21-8b5a-082f-93d4a6ed9fcf'
+            },
+            '8': {
+                header: { title: 'Клиент', meta: 'Wildberries · Сифон (точный артикул не определён)' },
+                product: { name: 'Сифон', article: null },
+                chatHistory: [
+                        { type: 'date', text: '6 мая 2025 г.' },
+                        { type: 'customer', author: 'Клиент', time: '17:05', text: 'Прошу убрать из доставки сифон для душевого поддона, заказан из-за некорректной работы приложения!' },
+                        { type: 'customer', author: 'Клиент', time: '17:06', text: 'Один из сифонов, т.е. один лишний!' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Клиент, здравствуйте! Со своей стороны проверили — товар (Сифон) передан в доставку. Если возникнут вопросы — пишите, поможем разобраться.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '6 мая 2025 г., 17:06', unread: '2', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка'], urgency: { label: 'Средняя · 2 непрочитанных', urgent: false }, recommendation: 'Проверить статус + ответить' },
+                externalId: '1:0d1ff1c1-f435-449a-6e62-bfe2d7607eea'
+            },
+            '9': {
+                header: { title: 'Елена', meta: 'Wildberries · Арт. 233586811 · Гофра для унитаза 350 мм, бренд Zegor...' },
+                product: { name: 'Гофра для унитаза 350 мм, бренд Zegor, артикул 233586811, товар оформлен 23.04.2025', article: '233586811' },
+                chatHistory: [
+                        { type: 'date', text: '27 апреля 2025 г.' },
+                        { type: 'customer', author: 'Елена', time: '09:18', text: 'Здравствуйте! У меня вопрос по товару \"Гофра для унитаза 350 мм, бренд Zegor, артикул 233586811, товар оформлен 23.04.2025\", должен придти 27.04.25, но с 24 апреля стоит в одном статусе -отгружено продавцом для перемещения  на склад. Разберитесь, пожалуйста . ' },
+                        { type: 'date', text: '28 апреля 2025 г.' },
+                        { type: 'customer', author: 'Елена', time: '07:17', text: 'Здравствуйте! Где товар??? Очень нужен!!!' },
+                        { type: 'date', text: '29 апреля 2025 г.' },
+                        { type: 'customer', author: 'Елена', time: '02:57', text: 'Слушайте! Имейте совесть! Где товар???' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Елена, здравствуйте! Спасибо за обращение (арт. 233586811). Рассмотрим ваш вопрос и ответим в ближайшее время.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '29 апреля 2025 г., 02:57', unread: '3', client: 'Елена' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре'], urgency: { label: 'Средняя · 3 непрочитанных', urgent: false }, recommendation: 'Ответить клиенту' },
+                externalId: '1:49f57983-d801-c46e-83db-0d019cf5e80a'
+            },
+            '10': {
+                header: { title: 'Юлия', meta: 'Wildberries · Шланг (точный артикул не определён)' },
+                product: { name: 'Шланг', article: null },
+                chatHistory: [
+                        { type: 'date', text: '27 апреля 2025 г.' },
+                        { type: 'customer', author: 'Юлия', time: '08:44', text: 'здравствуйте, купили у вас 9 шлангов , а оказалось не хватает длины, хотим перезаказать побольше. как лучше это сделать?' },
+                        { type: 'customer', author: 'Юлия', time: '08:58', text: 'мы из Рязани' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Юлия, здравствуйте! Рекомендуем подождать ещё 2-3 дня — иногда доставка задерживается на стороне логистики. Если товар не поступит, можно отменить заказ в ЛК WB и оформить новый. Мы на связи!',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '27 апреля 2025 г., 08:58', unread: '2', client: 'Юлия' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка'], urgency: { label: 'Средняя · 2 непрочитанных', urgent: false }, recommendation: 'Проверить статус + ответить' },
+                externalId: '1:62d1f2c5-4e75-d34c-1d76-75a18da7edd8'
+            },
+            '11': {
+                header: { title: 'Людмила', meta: 'Wildberries · Арт. 360755496 · Реле давления 1' },
+                product: { name: 'Реле давления 1', article: '360755496' },
+                chatHistory: [
+                        { type: 'date', text: '26 апреля 2025 г.' },
+                        { type: 'customer', author: 'Людмила', time: '17:20', text: 'Здравствуйте! У меня вопрос по товару \"Реле давления 1\" 1,4-2,8 бар (со встроенным манометром), бренд Zegor, артикул 360755496, товар оформлен 19.04.2025\" , скажите пожалуйста  а где мой заказ который должен был придти 25 апреля ????' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Людмила, здравствуйте! Спасибо за обращение (арт. 360755496). Рассмотрим ваш вопрос и ответим в ближайшее время.',
+                chatDetails: { status: 'Ожидает ответа', lastMessage: '26 апреля 2025 г., 17:20', unread: '1', client: 'Людмила' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре'], urgency: { label: 'Средняя · 1 непрочитанных', urgent: false }, recommendation: 'Ответить клиенту' },
+                externalId: '1:6cde1f9b-3698-be87-2a67-f7212a8a89c0'
+            },
+            '12': {
+                header: { title: 'Игорь', meta: 'Wildberries · Арт. 331463403 · Кран шаровой ВР/НР/НР 1/2' },
+                product: { name: 'Кран шаровой ВР/НР/НР 1/2', article: '331463403' },
+                chatHistory: [
+                        { type: 'date', text: '17 апреля 2025 г.' },
+                        { type: 'customer', author: 'Игорь', time: '18:54', text: 'Здравствуйте! У меня вопрос по товару \"Кран шаровой ВР/НР/НР 1/2\"х3/4\"х1/2\" для сантех. приборов, бренд Zegor, артикул 331463403, товар оформлен 12.04.2025\"' },
+                        { type: 'customer', author: 'Игорь', time: '18:55', text: 'Прошу сообщить, когда привезут кран. ' },
+                        { type: 'date', text: '18 апреля 2025 г.' },
+                        { type: 'customer', author: 'Игорь', time: '09:26', text: 'К сожалению продавец молчит. На вопрос: \"Когда привезут кран?\" - молчит. Кран нужен вчера. Жду ответа.\n' },
+                        { type: 'date', text: '20 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '18:36', text: 'Здравствуйте,  к сожалению не имеем возможности влиять на доставку. Мы отгружаем товар, а далее доставку регламентирует маркетплейс.' },
+                        { type: 'date', text: '21 апреля 2025 г.' },
+                        { type: 'customer', author: 'Игорь', time: '09:18', text: 'Вчера кран доставили. Спасибо за участие.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Рады помочь, Игорь! Если возникнут ещё вопросы — обращайтесь.',
+                chatDetails: { status: 'Клиент ответил', lastMessage: '21 апреля 2025 г., 09:18', unread: '1', client: 'Игорь' },
+                ai: { sentiment: { label: 'Позитивная', negative: false }, categories: ['Доставка', 'Вопрос о товаре', 'Благодарность'], urgency: { label: 'Средняя · 1 непрочитанных', urgent: false }, recommendation: 'Просмотреть ответ клиента' },
+                externalId: '1:27b53dc2-fe3d-ff56-3cab-55564d5785da'
+            },
+            '13': {
+                header: { title: 'Николай', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '1 ноября 2025 г.' },
+                        { type: 'customer', author: 'Николай', time: '04:53', text: 'Здравствуйту, товар исправен но не подошел, решил заказать весь комплект в сборе.' },
+                        { type: 'seller', author: 'Продавец', time: '07:16', text: 'Добрый день, оформите заявку на возврат, мы одобрим. Нужно чтобы упаковка была целая и товар не был в использовании.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '1 ноября 2025 г., 07:16', unread: '0', client: 'Николай' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре', 'Не подошёл товар'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:18e437c4-4117-fadc-a7f5-55dd2f62aca3'
+            },
+            '14': {
+                header: { title: 'Дмитрий', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '12 октября 2025 г.' },
+                        { type: 'customer', author: 'Дмитрий', time: '19:33', text: 'Здравствуйте. Почему не отправляете заказ?' },
+                        { type: 'date', text: '14 октября 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '22:51', text: 'Дмитрий, здравствуйте. Приносим свои извинения за задержку с отправкой заказа, в самое ближайшее время отправим товар.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '14 октября 2025 г., 22:51', unread: '0', client: 'Дмитрий' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:746c12b6-b32c-3292-68b7-6451357a94da'
+            },
+            '15': {
+                header: { title: 'Анастасия', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '5 октября 2025 г.' },
+                        { type: 'customer', author: 'Анастасия', time: '18:45', text: 'Здравствуйте. Насколько задерживается доставка?' },
+                        { type: 'date', text: '6 октября 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '06:34', text: 'Здравствуйте, доставкой занимает я маркетплейс, к сожалению не можем повлиять на скорость доставки.\nПриносим свои извинения за доставленные неудобства.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '6 октября 2025 г., 06:34', unread: '0', client: 'Анастасия' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:3989030d-d446-0b77-fd26-c89da7713664'
+            },
+            '16': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '1 сентября 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '14:19', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '14:22', text: 'Здравствуйте. Факт обмана опровергаем, на складе произошел пересорт.\nКлапан является регулируемым, вы можете настроить на 1,5 бара и использовать его.\nЕсли такой вариант вас не устраивает, товар можете вернуть.\n' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '1 сентября 2025 г., 14:22', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Негативная', negative: true }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:f3d51142-b5bd-8bdf-aacc-334a81579cf6'
+            },
+            '17': {
+                header: { title: 'Клиент', meta: 'Wildberries · Коллектор (точный артикул не определён)' },
+                product: { name: 'Коллектор', article: null },
+                chatHistory: [
+                        { type: 'date', text: '19 августа 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '07:24', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '07:24', text: 'Добрый день. Ответная часть находится на вашем коллекторе.' },
+                        { type: 'customer', author: 'Антон', time: '22:20', text: 'На картинке к товару она есть. На коллекторе у меня другая ответеая часть' },
+                        { type: 'date', text: '1 сентября 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '06:59', text: 'Расходомер идёт без ответной части' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '1 сентября 2025 г., 06:59', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:7c459268-aeb0-8e03-311b-37963ee56557'
+            },
+            '18': {
+                header: { title: 'Светлана', meta: 'Wildberries · Насос (точный артикул не определён)' },
+                product: { name: 'Насос', article: null },
+                chatHistory: [
+                        { type: 'date', text: '24 августа 2025 г.' },
+                        { type: 'customer', author: 'Светлана', time: '13:44', text: 'Здравствуйте как активировать гарантию на насос' },
+                        { type: 'customer', author: 'Светлана', time: '13:45', text: 'Написано 1 год гарантии как это сделать' },
+                        { type: 'date', text: '1 сентября 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '06:59', text: 'Здравствуйте. Гарантия действительна с даты покупки.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '1 сентября 2025 г., 06:59', unread: '0', client: 'Светлана' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Гарантия'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:d4504c3b-02fb-6bb6-bdfb-1ee46abaae81'
+            },
+            '19': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '19 августа 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '05:55', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '05:56', text: 'Добрый день. Ответная часть находится в коллекторе.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '19 августа 2025 г., 05:56', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:80af78ed-c10d-cce4-f196-2a468f6392ac'
+            },
+            '20': {
+                header: { title: 'Алина', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '3 августа 2025 г.' },
+                        { type: 'customer', author: 'Алина', time: '10:35', text: 'Добрый день, не могли бы Вы завтра прислать заказ?? Нам очень нужно' },
+                        { type: 'seller', author: 'Продавец', time: '17:26', text: 'Здравствуйте. Доставкой товара занимается непосредственно маркетплейс, и сам регламентирует время доставки, к сожалению не имеем возможности на нее влиять.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '3 августа 2025 г., 17:26', unread: '0', client: 'Алина' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:0db0157a-610c-15c4-67cc-8c093c04d008'
+            },
+            '21': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '31 июля 2025 г.' },
+                        { type: 'customer', author: 'Клиент', time: '10:20', text: 'Нужно отменить заказ не туда придет не в тот город' },
+                        { type: 'seller', author: 'Продавец', time: '11:31', text: 'Добрый день. Мы не имеем возможности самостоятельно отменять заказы клиентов, не предполагает площадка.\nОбратитесь в поддержку для клиентов, вам помогут.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '31 июля 2025 г., 11:31', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Отмена заказа'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:3ecf67e2-07b2-c3c0-78e3-452019df959d'
+            },
+            '22': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '17 июля 2025 г.' },
+                        { type: 'customer', author: 'Клиент', time: '12:30', text: 'Как отменить заказ' },
+                        { type: 'seller', author: 'Продавец', time: '18:00', text: 'Здравствуйте. Благодарим за Ваше обращение. Если заказ оформили буквально недавно, то проследуйте по следующей Инструкции: зайти в раздел \"Доставки\" -> под карточкой нужного товара кнопка \"Оформлен\" -> \"Отменить заказ\" -> \"Да, отменить\". Желаем Вам всего доброго. С уважением, представитель бренда ZEGOR.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '17 июля 2025 г., 18:00', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Позитивная', negative: false }, categories: ['Доставка', 'Вопрос о товаре', 'Благодарность', 'Отмена заказа', 'Помощь с использованием'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:371ed06f-44a4-bc93-1ac6-fd5d9ec24d32'
+            },
+            '23': {
+                header: { title: 'Анатолий', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '5 июля 2025 г.' },
+                        { type: 'customer', author: 'Анатолий', time: '02:33', text: 'Здравствуйте, ошибся с размерами можно сделать возврат?' },
+                        { type: 'seller', author: 'Продавец', time: '08:17', text: 'Здравствуйте. Да можно' },
+                        { type: 'seller', author: 'Продавец', time: '08:18', text: 'Главное чтобы Манометр был целый и упаковка не нарушена' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '5 июля 2025 г., 08:18', unread: '0', client: 'Анатолий' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:edc3c567-d211-f39a-4d42-6a66fe590b5a'
+            },
+            '24': {
+                header: { title: 'Алексей', meta: 'Wildberries · Арт. 401884254 · Вентиль ручной НР НР 1 2' },
+                product: { name: 'Вентиль ручной НР НР 1 2', article: '401884254' },
+                chatHistory: [
+                        { type: 'date', text: '20 июня 2025 г.' },
+                        { type: 'customer', author: 'Алексей', time: '14:44', text: 'Здравствуйте! У меня вопрос по товару \"Вентиль ручной НР НР 1 2\"х3 8\" для сантех. приборов, бренд Zegor, артикул 401884254, товар оформлен 20.06.2025\". Просьба отменить заказ.' },
+                        { type: 'date', text: '21 июня 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '21:34', text: 'Здравствуйте, Вы можете отменить заказ самостоятельно, к сожалению мы не имеем возможности отменять заказы клиентов. \nЕсли возникнут трудности, обратитесь к техподдержке вайлдберриз.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '21 июня 2025 г., 21:34', unread: '0', client: 'Алексей' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре', 'Отмена заказа'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:15128b57-b251-b7af-ec8b-fcfa9e6b4d9a'
+            },
+            '25': {
+                header: { title: 'Алексей', meta: 'Wildberries · Арт. 401884254 · Вентиль ручной НР НР 1 2' },
+                product: { name: 'Вентиль ручной НР НР 1 2', article: '401884254' },
+                chatHistory: [
+                        { type: 'date', text: '20 июня 2025 г.' },
+                        { type: 'customer', author: 'Алексей', time: '14:44', text: 'Здравствуйте! У меня вопрос по товару \"Вентиль ручной НР НР 1 2\"х3 8\" для сантех. приборов, бренд Zegor, артикул 401884254, товар оформлен 20.06.2025\" Просьба отменить заказ.' },
+                        { type: 'date', text: '21 июня 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '21:34', text: 'Здравствуйте, Вы можете отменить заказ самостоятельно, к сожалению мы не имеем возможности отменять заказы клиентов. Если возникнут трудности, обратитесь к техподдержке вайлдберриз.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '21 июня 2025 г., 21:34', unread: '0', client: 'Алексей' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре', 'Отмена заказа'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:71d960f7-9352-3748-daba-d03e9a7f6948'
+            },
+            '26': {
+                header: { title: 'Петр', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '19 июня 2025 г.' },
+                        { type: 'customer', author: 'Петр', time: '11:28', text: 'Добрый день. Очень маленький слив. Упаковка не вскрыта.' },
+                        { type: 'seller', author: 'Продавец', time: '19:56', text: 'Здравствуйте, возврат одобрили.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '19 июня 2025 г., 19:56', unread: '0', client: 'Петр' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:bd746c35-94e3-329a-07cd-1bf7479e7722'
+            },
+            '27': {
+                header: { title: 'Дмитрий', meta: 'Wildberries · Арт. 331936730 · Кран шаровой ВР/НР 1/2' },
+                product: { name: 'Кран шаровой ВР/НР 1/2', article: '331936730' },
+                chatHistory: [
+                        { type: 'date', text: '23 мая 2025 г.' },
+                        { type: 'customer', author: 'Дмитрий', time: '18:22', text: 'Здравствуйте! У меня вопрос по товару \"Кран шаровой ВР/НР 1/2\" ручка полнопроходной, бренд Zegor, артикул 331936730, товар оформлен 17.05.2025\"' },
+                        { type: 'date', text: '7 июня 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '11:19', text: 'Здравствуйте. Какой вопрос?' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '7 июня 2025 г., 11:19', unread: '0', client: 'Дмитрий' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:fcb9eaac-5a0d-f8cd-15e6-8f99815ec5f4'
+            },
+            '28': {
+                header: { title: 'Елена', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '31 мая 2025 г.' },
+                        { type: 'customer', author: 'Елена', time: '18:46', text: 'Здравствуйте, пока идет гарантийный срок , нужно ли сохранять коробку ? ' },
+                        { type: 'date', text: '7 июня 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '11:18', text: 'Здравствуйте. Коробку можете выкинуть через 2 недели после установки.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '7 июня 2025 г., 11:18', unread: '0', client: 'Елена' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Гарантия'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:65708585-8d4b-7e3c-5525-2612abeca32e'
+            },
+            '29': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '27 мая 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '05:09', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Клиент, здравствуйте! Подскажите, какой у вас вопрос?',
+                chatDetails: { status: 'Авто-ответ', lastMessage: '27 мая 2025 г., 05:09', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Написать реальный ответ' },
+                externalId: '1:bb314ddd-1085-9964-1b00-180a9e6c8b19'
+            },
+            '30': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '11 мая 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '12:50', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '12:51', text: 'Здравствуйте, возврат подтверждаем, будем разбираться на производстве.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '11 мая 2025 г., 12:51', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:5db3b9e3-7ab1-ba43-0f97-aacc0ac9cc34'
+            },
+            '31': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '11 мая 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '12:47', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '12:48', text: 'Здравствуйте, насос захватил песок вместе с водой, по инструкции его необходимо было поднять минимум 1,5 м от дна. \nДанный случай не является гарантийным.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '11 мая 2025 г., 12:48', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре', 'Гарантия', 'Помощь с использованием'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:c2144705-8769-8109-16d0-7feb6512c075'
+            },
+            '32': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '26 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '13:20', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '13:24', text: 'Здравствуйте, не сможем принять возврат, так как в данном случае вины продавца нет, товар не был осмотрен на ПВЗ и отказа не последовало. \nТовар является полностью технически исправным.' },
+                        { type: 'date', text: '28 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '15:40', text: 'Здравствуйте. Данная царапина на корпусе была обнаружена после того как вы забрали изделие с ПВЗ, Правилами  маркетплейса предусмотрено, что вы должны осмотреть товар перед тем как его забрать с пункта выдачи.\nМы всегда принимаем к возврату изделия, где обнаружен заводской брак или неисправность в работе товара.\nПри этом товар является полностью технически исправным, соответственно это не заводской брак. \nВернуть его производителю по причине брака невозможно.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '28 апреля 2025 г., 15:40', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Негативная', negative: true }, categories: ['Возврат', 'Вопрос о товаре', 'Брак / дефект'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:76158562-b657-1560-83c2-5df5caa9b93a'
+            },
+            '33': {
+                header: { title: 'Валентин', meta: 'Wildberries · Насос (точный артикул не определён)' },
+                product: { name: 'Насос', article: null },
+                chatHistory: [
+                        { type: 'date', text: '28 марта 2025 г.' },
+                        { type: 'customer', author: 'Валентин', time: '17:35', text: 'Добрый вечер! Купил насос: хороший. Подскажите что с этим делать?' },
+                        { type: 'customer', author: 'Валентин', time: '17:35', text: '' },
+                        { type: 'customer', author: 'Валентин', time: '17:35', text: '' },
+                        { type: 'customer', author: 'Валентин', time: '17:36', text: 'первое фото  случайно' },
+                        { type: 'date', text: '20 апреля 2025 г.' },
+                        { type: 'customer', author: 'Валентин', time: '12:02', text: 'Добрый вечер! Купил насос: хороший. Подскажите что с этим делать?' },
+                        { type: 'customer', author: 'Валентин', time: '12:02', text: '' },
+                        { type: 'customer', author: 'Валентин', time: '12:03', text: 'отзыв написал' },
+                        { type: 'date', text: '23 апреля 2025 г.' },
+                        { type: 'customer', author: 'Валентин', time: '14:05', text: 'ау' },
+                        { type: 'date', text: '24 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '19:09', text: 'Здравствуйте, данная рекламная продукция не имеет отношения к товару. Вероятнее всего, на сортировке произошел пересорт с другим продавцом. ' },
+                        { type: 'date', text: '25 апреля 2025 г.' },
+                        { type: 'customer', author: 'Валентин', time: '21:20', text: 'что значит не имеет: по коду отправляет на ваш сайт. соответственно по нему должны сделать бонус вы 200' },
+                        { type: 'customer', author: 'Валентин', time: '21:20', text: 'или ваша компания не выполняете своих условий?' },
+                        { type: 'date', text: '26 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '16:39', text: 'Напишите, на какой сайт отправляет?' },
+                        { type: 'seller', author: 'Продавец', time: '16:40', text: 'Обязательно разберемся в ситуации.' },
+                        { type: 'seller', author: 'Продавец', time: '16:47', text: 'Просканировали данный код, Woman fashion bot, к сожалению мы не имеем отношения к данному боту. Рекламная продукция не наша.\n\nНи один из наших клиентов с данной просьбой и фото кода к нам не обращался. Это относится к категории одежда. Мы данной категорией товаров не занимаемся.\n\nВы можете задать вопрос техподдержке Вайлдберриз.\n' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '26 апреля 2025 г., 16:47', unread: '0', client: 'Валентин' },
+                ai: { sentiment: { label: 'Позитивная', negative: false }, categories: ['Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:67d39c4b-d2f7-c146-b5c3-dc8fa9f5126d'
+            },
+            '34': {
+                header: { title: 'Алексей', meta: 'Wildberries · Арт. 233544512 · Насос вибрационный ZVM60B-10 верхний ...' },
+                product: { name: 'Насос вибрационный ZVM60B-10 верхний забор, кабель 10 метров, бренд Zegor, артикул 233544512, товар оформлен 19.04.2025', article: '233544512' },
+                chatHistory: [
+                        { type: 'date', text: '24 апреля 2025 г.' },
+                        { type: 'customer', author: 'Алексей', time: '14:07', text: 'Здравствуйте! У меня вопрос по товару \"Насос вибрационный ZVM60B-10 верхний забор, кабель 10 метров, бренд Zegor, артикул 233544512, товар оформлен 19.04.2025\"' },
+                        { type: 'customer', author: 'Алексей', time: '14:09', text: 'где ваш насос передали на склад и всё какието движения далее будут или нет' },
+                        { type: 'customer', author: 'Алексей', time: '14:43', text: 'почему не отвечаете на вопрос' },
+                        { type: 'seller', author: 'Продавец', time: '19:07', text: 'Здравствуйте, мы не можем влиять на доставку и регламентировать ее срок, так как этим вопросом занимается непосредственно маркетплейс и рассчитывает ее автоматически. Вы можете обратиться в клиентскую поддержку маркетплейса.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '24 апреля 2025 г., 19:07', unread: '0', client: 'Алексей' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:4d18107c-626a-3e61-e6b4-57483ddec368'
+            },
+            '35': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '24 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '13:36', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '13:38', text: 'Добрый день. Подскажите, заводская упаковка сохранена и внешний вид товара не поврежден? Отправьте пожалуйста фото. Если все в порядке, без проблем согласуем возврат.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '24 апреля 2025 г., 13:38', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:7dd73f8f-d19e-3d29-25d0-33641530716c'
+            },
+            '36': {
+                header: { title: 'Клиент', meta: 'Wildberries · Насос (точный артикул не определён)' },
+                product: { name: 'Насос', article: null },
+                chatHistory: [
+                        { type: 'date', text: '8 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '15:29', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '15:31', text: 'Здравствуйте. Чем Вас не устроил данный насос?' },
+                        { type: 'customer', author: 'Алптухан', time: '15:46', text: 'Добрый день не правильно товар заказал  мне\n Надо качат масло это насос получается толко вода правильно?' },
+                        { type: 'date', text: '23 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '16:51', text: 'Верно, только воду чистую качает.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '23 апреля 2025 г., 16:51', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:5465b6e1-dd53-837e-a612-0d279168601e'
+            },
+            '37': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '21 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '19:46', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '19:47', text: 'Здравствуйте. Вы можете продавить пластиковый квадрат, для отверстия перелива.' },
+                        { type: 'customer', author: 'Кирилл', time: '20:09', text: 'Здравствуйте,я не хочу продавливать.\nПоломаю потом не верну.Примите пожалуйста возврат.' },
+                        { type: 'date', text: '22 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '10:30', text: 'Возврат одобрен.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '22 апреля 2025 г., 10:30', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:a3a525a7-39e0-2bee-a687-d08b09c43fb9'
+            },
+            '38': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '17 апреля 2025 г.' },
+                        { type: 'customer', author: 'Клиент', time: '16:29', text: 'ваш товар на каком-то складе завис и не куда не движется товар ждать или нет' },
+                        { type: 'date', text: '20 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец', time: '18:37', text: 'Здравствуйте, напишите в клиентскую поддержку вайлдберриз, мы к сожалению не имеем возможности отследить такие моменты. Доставкой занимается вайлдберриз.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '20 апреля 2025 г., 18:37', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Доставка', 'Вопрос о товаре'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:2a1f5d20-9396-3470-d221-928abe528ceb'
+            },
+            '39': {
+                header: { title: 'Клиент', meta: 'Wildberries · Чат покупателя' },
+                product: null,
+                chatHistory: [
+                        { type: 'date', text: '8 апреля 2025 г.' },
+                        { type: 'seller', author: 'Продавец [авто]', time: '09:48', text: 'Здравствуйте! Здесь вы можете задать вопросы по возврату товара, если они у вас возникнут' },
+                        { type: 'seller', author: 'Продавец', time: '12:34', text: 'Здравствуйте.Вероятнее всего, Вы опустили насос на дно, и вместе с водой насос захватил песок. Для восстановления его производительности необходимо промыть насос.\n\nВ случае того, если данная процедура не поможет, одобрим Вам возврат.' },
+                        { type: 'customer', author: 'Екатерина', time: '12:37', text: 'Здравствуйте. А как его промыть? Там что-то гремит еще.' },
+                        { type: 'seller', author: 'Продавец', time: '15:27', text: 'Видимо песок или камень попал внутрь.\nВозврат одобряем.' }
+                ],
+                sentMessages: [],
+                aiSuggestion: 'Чат обработан. Мониторинг.',
+                chatDetails: { status: 'Отвечено', lastMessage: '8 апреля 2025 г., 15:27', unread: '0', client: 'Клиент' },
+                ai: { sentiment: { label: 'Нейтральная', negative: false }, categories: ['Возврат', 'Вопрос о товаре', 'Брак / дефект', 'Помощь с использованием'], urgency: { label: 'Низкая · Обработан', urgent: false }, recommendation: 'Мониторинг' },
+                externalId: '1:4dcea925-5020-1adf-f56e-9b89d29bb4e2'
+            }
+        };
+
+        // === RENDER CHAT HISTORY ===
+        function renderChatHistory(chatId) {
+            const context = contextData[chatId];
+            if (!context) return;
+            currentChatId = chatId;
+
+            // Update header
+            document.querySelector('.chat-header-info h2').textContent = context.header.title;
+            document.querySelector('.chat-header-meta').textContent = context.header.meta;
+
+            // Render messages
+            var container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            context.chatHistory.forEach(function(item) {
+                if (item.type === 'date') {
+                    var sep = document.createElement('div');
+                    sep.className = 'date-separator';
+                    sep.innerHTML = '<span>' + item.text + '</span>';
+                    container.appendChild(sep);
+                } else {
+                    var msg = document.createElement('div');
+                    msg.className = 'message ' + item.type;
+                    var authorClass = item.author.indexOf('[авто]') !== -1 ? ' auto-tag' : '';
+                    msg.innerHTML = '<div class="message-header">' +
+                        '<span class="message-author' + authorClass + '">' + item.author + '</span>' +
+                        '<span class="message-time">' + item.time + '</span>' +
+                        '</div>' +
+                        '<div class="message-content">' + (item.text || '<span class="empty-msg">\ud83d\udcce Изображение (не сохранилось)</span>').replace(/\n/g, '<br>') + '</div>';
+                    container.appendChild(msg);
+                }
+            });
+            container.scrollTop = container.scrollHeight;
+
+            // Update AI suggestion
+            var aiEl = document.querySelector('.ai-suggestion-text');
+            if (aiEl) aiEl.textContent = context.aiSuggestion;
+
+            // Update product card
+            var prodName = document.querySelector('.product-name');
+            var prodRating = document.querySelector('.product-rating');
+            var prodPrice = document.querySelector('.product-price');
+            if (context.product) {
+                if (prodName) prodName.textContent = context.product.name || '';
+                if (prodRating) prodRating.textContent = context.product.article ? 'Арт. ' + context.product.article : '';
+                if (prodPrice) prodPrice.textContent = '';
+            } else {
+                if (prodName) prodName.textContent = 'Товар не определён';
+                if (prodRating) prodRating.textContent = '';
+                if (prodPrice) prodPrice.textContent = '';
+            }
+
+            // Update chat details + AI analysis
+            var infoValues = document.querySelectorAll('.info-section .info-value');
+            // Section 1: Детали чата [0-3]
+            if (context.chatDetails) {
+                if (infoValues[0]) infoValues[0].textContent = context.chatDetails.status;
+                if (infoValues[1]) infoValues[1].textContent = context.chatDetails.lastMessage;
+                if (infoValues[2]) infoValues[2].textContent = context.chatDetails.unread;
+                if (infoValues[3]) infoValues[3].textContent = context.chatDetails.client;
+            }
+            // Section 2: AI Анализ [4-7]
+            if (context.ai) {
+                // [4] Тональность
+                if (infoValues[4]) {
+                    infoValues[4].innerHTML = '<span class="insight-badge' + (context.ai.sentiment.negative ? ' negative' : '') + '">' + context.ai.sentiment.label + '</span>';
+                }
+                // [5] Категории
+                if (infoValues[5]) {
+                    infoValues[5].innerHTML = context.ai.categories.map(function(c) { return '<span class="insight-badge">' + c + '</span>'; }).join(' ');
+                }
+                // [6] Срочность
+                if (infoValues[6]) {
+                    infoValues[6].innerHTML = '<span class="insight-badge' + (context.ai.urgency.urgent ? ' urgent' : '') + '">' + context.ai.urgency.label + '</span>';
+                }
+                // [7] Рекомендация
+                if (infoValues[7]) {
+                    infoValues[7].textContent = context.ai.recommendation;
+                }
+            }
+        }
+
+        // === CHAT ITEM CLICK ===
+        document.addEventListener('click', function(e) {
+            var chatItem = e.target.closest('.chat-item');
+            if (chatItem) {
+                document.querySelectorAll('.chat-item').forEach(function(i) { i.classList.remove('active'); });
+                chatItem.classList.add('active');
+                var chatId = chatItem.getAttribute('data-chat-id');
+                if (chatId) renderChatHistory(chatId);
+            }
+        });
+
+        // === FILTER PILLS ===
+        var pills = document.querySelectorAll('.filter-pill');
+        pills.forEach(function(pill) {
+            pill.addEventListener('click', function() {
+                pills.forEach(function(p) { p.classList.remove('active'); });
+                this.classList.add('active');
+
+                var filter = this.getAttribute('data-filter');
+                var items = document.querySelectorAll('.chat-item');
+                var sections = document.querySelectorAll('.queue-section');
+
+                items.forEach(function(item) {
+                    var status = item.getAttribute('data-status');
+                    if (filter === 'all') {
+                        item.style.display = 'flex';
+                    } else if (filter === 'urgent') {
+                        item.style.display = item.classList.contains('urgent') ? 'flex' : 'none';
+                    } else if (filter === 'unanswered') {
+                        item.style.display = (item.classList.contains('urgent') || status === 'waiting' || status === 'client-replied') ? 'flex' : 'none';
+                    } else if (filter === 'resolved') {
+                        item.style.display = (status === 'responded' || status === 'auto-response') ? 'flex' : 'none';
+                    }
+                });
+
+                // Hide empty sections
+                sections.forEach(function(sec) {
+                    var visible = sec.querySelectorAll('.chat-item[style*="flex"], .chat-item:not([style])');
+                    var visibleCount = 0;
+                    visible.forEach(function(v) { if (v.style.display !== 'none') visibleCount++; });
+                    sec.style.display = (filter === 'all' || visibleCount > 0) ? 'block' : 'none';
+                });
+            });
+        });
+
+        // === SEND MESSAGE ===
+        function sendMessage() {
+            var input = document.getElementById('chatInput');
+            if (input.value.trim()) {
+                console.log('Sending:', input.value);
+                input.value = '';
+            }
+        }
+
+        // === AUTO-GROW TEXTAREA ===
+        var chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+
+        // === DRAG & DROP ===
+        var draggedElement = null;
+        document.querySelectorAll('.chat-item').forEach(function(item) {
+            item.addEventListener('dragstart', function(e) {
+                draggedElement = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+
+        document.querySelectorAll('.queue-section').forEach(function(section) {
+            section.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            section.addEventListener('dragleave', function(e) {
+                if (!this.contains(e.relatedTarget)) this.classList.remove('drag-over');
+            });
+            section.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                if (draggedElement) {
+                    this.appendChild(draggedElement);
+                    document.querySelectorAll('.queue-section').forEach(function(q) {
+                        var count = q.querySelectorAll('.chat-item').length;
+                        var countEl = q.querySelector('.queue-count');
+                        if (countEl) countEl.textContent = count;
+                    });
+                }
+            });
+        });
+
+        // === MOBILE NAV ===
+        function setMobileView(view) {
+            var chatCenter = document.querySelector('.chat-center');
+            if (chatCenter) chatCenter.setAttribute('data-mobile-view', view);
+        }
+
+        document.addEventListener('click', function(e) {
+            var chatItem = e.target.closest('.chat-item');
+            if (chatItem && window.innerWidth <= 768) {
+                setMobileView('chat');
+            }
+        });
+
+        var infoBtn = document.querySelector('.header-action-btn[title="Информация"]');
+        if (infoBtn) {
+            infoBtn.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    setMobileView('context');
+                }
+            });
+        }
+
+        // === INIT ===
+        renderChatHistory('1');
+        </script>
+</body>
+</html>
