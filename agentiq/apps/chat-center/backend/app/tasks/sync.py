@@ -21,7 +21,7 @@ from app.database import AsyncSessionLocal
 from app.models.seller import Seller
 from app.models.chat import Chat
 from app.models.message import Message
-from app.services.wb_connector import WBConnector, get_wb_connector_for_seller
+from app.services.wb_connector import WBConnector, get_wb_connector_for_seller, fetch_product_name
 from app.services.ozon_connector import OzonConnector, get_connector_for_seller
 from app.services.encryption import decrypt_credentials
 
@@ -213,9 +213,14 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None):
                 "is_new_chat": msg.get("is_new_chat", False),
                 "last_message_at": msg["created_at"],
                 "last_message_text": msg["text"][:500] if msg["text"] else "",
+                "good_card": None,
             }
 
         chats_data[chat_id]["messages"].append(msg)
+
+        # Capture goodCard from first message that has it (isNewChat event)
+        if msg.get("good_card") and not chats_data[chat_id]["good_card"]:
+            chats_data[chat_id]["good_card"] = msg["good_card"]
 
         # Update last message time
         if msg["created_at"] > chats_data[chat_id]["last_message_at"]:
@@ -230,6 +235,28 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None):
             marketplace="wildberries",
             chat_data=chat_data
         )
+
+    await db.commit()
+
+    # Fetch product names from WB CDN for chats missing product_name
+    chats_needing_names = await db.execute(
+        select(Chat).where(
+            and_(
+                Chat.seller_id == seller.id,
+                Chat.product_id != None,
+                Chat.product_name == None,
+            )
+        )
+    )
+    for chat in chats_needing_names.scalars().all():
+        try:
+            nm_id = int(chat.product_id)
+            name = await fetch_product_name(nm_id)
+            if name:
+                chat.product_name = name
+                logger.debug(f"Chat {chat.id}: product name = {name[:50]}")
+        except (ValueError, TypeError):
+            pass
 
     await db.commit()
     logger.info(f"Synced {len(chats_data)} chats for seller {seller.id}")
@@ -309,6 +336,11 @@ async def _upsert_chat_and_messages(db, seller_id: int, marketplace: str, chat_d
     )
     chat = result.scalar_one_or_none()
 
+    # Extract goodCard product/order info
+    good_card = chat_data.get("good_card")
+    nm_id = good_card.get("nmID") if good_card else None
+    order_rid = good_card.get("rid", "") if good_card else ""
+
     if not chat:
         # Create new chat with temporary status (will be recalculated below)
         chat = Chat(
@@ -324,15 +356,24 @@ async def _upsert_chat_and_messages(db, seller_id: int, marketplace: str, chat_d
             last_message_preview=chat_data.get("last_message_text", ""),
             chat_status="waiting",  # Will be recalculated after messages are inserted
             sla_priority="normal",
+            product_id=str(nm_id) if nm_id else None,
+            product_article=str(nm_id) if nm_id else None,
+            order_id=order_rid or None,
         )
         db.add(chat)
         await db.flush()  # Get chat.id
-        logger.debug(f"Created new chat {chat.id} for {external_chat_id}")
+        logger.debug(f"Created new chat {chat.id} for {external_chat_id} (nmID={nm_id})")
     else:
         # Update existing chat metadata
         chat.last_message_at = chat_data["last_message_at"]
         chat.last_message_preview = chat_data.get("last_message_text", "")
         chat.customer_name = chat_data.get("client_name") or chat.customer_name
+        # Fill product_id if missing (from goodCard)
+        if nm_id and not chat.product_id:
+            chat.product_id = str(nm_id)
+            chat.product_article = str(nm_id)
+        if order_rid and not chat.order_id:
+            chat.order_id = order_rid
 
     # Insert messages (skip duplicates)
     new_buyer_messages = 0

@@ -133,13 +133,17 @@ class WBConnector:
             if since and last_message_at < since:
                 continue
 
+            # Extract goodCard (product + order data, present on every chat)
+            good_card = chat.get("goodCard")
+
             chats.append({
                 "external_chat_id": chat["chatID"],
                 "client_name": chat.get("clientName", ""),
                 "client_id": chat.get("clientID", ""),
                 "status": "open",
                 "unread_count": 0,
-                "last_message_at": last_message_at
+                "last_message_at": last_message_at,
+                "good_card": good_card,
             })
 
         return chats
@@ -202,22 +206,30 @@ class WBConnector:
             elif event.get("addTime"):
                 created_at = datetime.fromisoformat(event["addTime"].replace("Z", "+00:00"))
 
-            # Extract text and attachments
-            raw_text = event.get("message", {}).get("text", "")
-            attachments = [
-                {
-                    "type": "file",
-                    "file_name": f.get("fileName", ""),
-                    "download_id": f.get("downloadID", "")
-                }
-                for f in event.get("message", {}).get("files", [])
+            # Extract text and attachments (real API uses message.attachments, not message.files)
+            msg_data = event.get("message", {})
+            raw_text = msg_data.get("text", "")
+            att = msg_data.get("attachments", {})
+
+            # Images from attachments.images[] (real API) or files[] (legacy)
+            images = [
+                {"type": "image", "url": img.get("url", "")}
+                for img in att.get("images", [])
             ]
+            files = [
+                {"type": "file", "file_name": f.get("fileName", ""), "download_id": f.get("downloadID", "")}
+                for f in msg_data.get("files", [])
+            ]
+            attachments = images or files
+
+            # Extract goodCard (product + order info)
+            good_card = att.get("goodCard")
 
             # Normalize text for empty messages with attachments
             text = raw_text.strip() if raw_text else ""
             if not text and attachments:
-                file_count = len(attachments)
-                text = "[Изображение]" if file_count == 1 else f"[{file_count} изображений]"
+                count = len(attachments)
+                text = "[Изображение]" if count == 1 else f"[{count} изображений]"
 
             messages.append({
                 "external_message_id": message_id,
@@ -230,7 +242,8 @@ class WBConnector:
                 "is_new_chat": event.get("isNewChat", False),
                 "event_type": event.get("eventType", "message"),
                 "client_name": event.get("clientName", ""),
-                "client_id": event.get("clientID", "")
+                "client_id": event.get("clientID", ""),
+                "good_card": good_card,
             })
 
         return {
@@ -395,6 +408,49 @@ class WBConnector:
             "unread_count": client_msgs,
             "next_cursor": result["next_cursor"]
         }
+
+
+def _get_basket_number(nm_id: int) -> str:
+    """Get WB CDN basket number by nmID."""
+    vol = nm_id // 100000
+    ranges = [
+        (143, "01"), (287, "02"), (431, "03"), (719, "04"), (1007, "05"),
+        (1061, "06"), (1115, "07"), (1169, "08"), (1313, "09"), (1601, "10"),
+        (1655, "11"), (1919, "12"), (2045, "13"), (2189, "14"), (2405, "15"),
+        (2621, "16"), (2837, "17"), (3053, "18"), (3269, "19"), (3485, "20"),
+        (3701, "21"), (3917, "22"), (4133, "23"), (4349, "24"), (4565, "25"),
+    ]
+    for threshold, basket in ranges:
+        if vol <= threshold:
+            return basket
+    return "26"
+
+
+async def fetch_product_name(nm_id: int) -> Optional[str]:
+    """
+    Fetch product name from WB CDN API (no auth required).
+
+    Args:
+        nm_id: WB article number (nmID from goodCard)
+
+    Returns:
+        Product name (imt_name) or None
+    """
+    basket = _get_basket_number(nm_id)
+    vol = nm_id // 100000
+    part = nm_id // 1000
+    url = f"https://basket-{basket}.wbbasket.ru/vol{vol}/part{part}/{nm_id}/info/ru/card.json"
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("imt_name", "")
+            return None
+    except Exception as e:
+        logger.debug(f"Failed to fetch product name for nmID {nm_id}: {e}")
+        return None
 
 
 async def get_wb_connector_for_seller(seller_id: int, db_session) -> WBConnector:
