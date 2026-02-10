@@ -922,6 +922,44 @@
             overflow-wrap: break-word;
         }
 
+        .ai-suggestion-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .ai-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .ai-action-btn.use {
+            color: var(--color-accent);
+        }
+        .ai-action-btn.use:hover {
+            color: #1557b0;
+        }
+
+        .ai-action-btn.regenerate {
+            color: var(--color-text-tertiary);
+        }
+        .ai-action-btn.regenerate:hover {
+            color: var(--color-text-secondary);
+        }
+        .ai-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Input */
         .chat-input-container {
             border-top: 1px solid var(--color-border-medium);

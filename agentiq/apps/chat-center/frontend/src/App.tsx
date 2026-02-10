@@ -247,6 +247,27 @@ function App() {
     );
   }, []);
 
+  // Handle regenerate AI suggestion
+  const handleRegenerateAI = useCallback(async (chatId: number) => {
+    // Clear current suggestion to show loading state
+    setSelectedChat(prev => prev?.id === chatId
+      ? { ...prev, ai_suggestion_text: null, ai_analysis_json: null } as typeof prev
+      : prev
+    );
+    setChats(prevChats =>
+      prevChats.map(c => c.id === chatId
+        ? { ...c, ai_suggestion_text: null, ai_analysis_json: null }
+        : c
+      )
+    );
+    // Trigger re-analysis
+    const updatedChat = await chatApi.analyzeChat(chatId);
+    setSelectedChat(prev => prev?.id === chatId ? updatedChat : prev);
+    setChats(prevChats =>
+      prevChats.map(c => c.id === chatId ? updatedChat : c)
+    );
+  }, []);
+
   // Fetch chats when user changes (login/logout) or on initial load
   useEffect(() => {
     if (user) {
@@ -343,6 +364,7 @@ function App() {
         onBack={handleBackToList}
         onCloseChat={handleCloseChat}
         onReopenChat={handleReopenChat}
+        onRegenerateAI={handleRegenerateAI}
       />
 
       {/* RIGHT PANEL: Product Context */}
