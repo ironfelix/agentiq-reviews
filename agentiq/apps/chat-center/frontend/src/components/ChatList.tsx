@@ -34,7 +34,11 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
     } else if (activeFilter === 'urgent') {
       filtered = filtered.filter(chat => chat.sla_priority === 'urgent' || chat.sla_priority === 'high');
     } else if (activeFilter === 'resolved') {
-      filtered = filtered.filter(chat => chat.status === 'closed');
+      filtered = filtered.filter(chat =>
+        chat.chat_status === 'responded' ||
+        chat.chat_status === 'auto-response' ||
+        chat.chat_status === 'closed'
+      );
     }
 
     if (searchQuery) {
@@ -59,16 +63,17 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
     (c.chat_status === 'waiting' || c.chat_status === 'client-replied')
   );
   const allMessagesChats = filteredChats.filter(c =>
-    c.chat_status === 'responded' || c.chat_status === 'auto-response'
+    c.chat_status === 'responded' ||
+    c.chat_status === 'auto-response' ||
+    c.chat_status === 'closed'
   );
 
   // Handle filter change
+  // All filters except 'unanswered' are client-side only (all chats fit in page_size=50)
   const handleFilterChange = (filter: 'all' | 'urgent' | 'unanswered' | 'resolved') => {
     setActiveFilter(filter);
     const filters: ChatFilters = {};
     if (filter === 'unanswered') filters.has_unread = true;
-    if (filter === 'urgent') filters.sla_priority = 'urgent';
-    if (filter === 'resolved') filters.status = 'closed';
     onFiltersChange(filters);
   };
 
@@ -170,7 +175,11 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
 
   const unreadCount = chats.filter(c => c.unread_count > 0).length;
   const urgentCount = chats.filter(c => c.sla_priority === 'urgent').length;
-  const resolvedCount = chats.filter(c => c.status === 'closed').length;
+  const resolvedCount = chats.filter(c =>
+    c.chat_status === 'responded' ||
+    c.chat_status === 'auto-response' ||
+    c.chat_status === 'closed'
+  ).length;
 
   return (
     <section className="chat-list">
@@ -280,10 +289,10 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
             </div>
             <div className="empty-state-title">Загрузка чатов...</div>
           </div>
-        ) : filteredChats.length === 0 ? (
+        ) : chats.length === 0 && activeFilter === 'all' ? (
+          /* No chats at all — show connection/sync empty state */
           <div className="empty-state">
             {hasApiCredentials ? (
-              /* Connected state - show status based on sync */
               syncStatus === 'error' ? (
                 <>
                   <div className="empty-state-icon error">
@@ -411,6 +420,27 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
                 </div>
               </div>
             )}
+          </div>
+        ) : filteredChats.length === 0 ? (
+          /* Has chats but none match current filter */
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" width="48" height="48">
+                <circle cx="20" cy="20" r="14"/>
+                <path d="M30 30l10 10" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div className="empty-state-title">
+              Нет чатов по фильтру
+            </div>
+            <div className="empty-state-text">
+              {activeFilter === 'urgent' && 'Нет срочных чатов — все под контролем'}
+              {activeFilter === 'unanswered' && 'Нет чатов без ответа — отличная работа'}
+              {activeFilter === 'resolved' && 'Нет обработанных чатов'}
+            </div>
+            <button className="empty-state-btn" onClick={() => handleFilterChange('all')}>
+              Показать все чаты
+            </button>
           </div>
         ) : (
           <>

@@ -236,6 +236,7 @@ async def close_chat(
         require_seller_ownership(chat.seller_id, current_seller)
 
     chat.chat_status = "closed"
+    chat.status = "closed"
     chat.closed_at = datetime.now(timezone.utc)
     await db.commit()
     await db.refresh(chat)
@@ -271,6 +272,7 @@ async def reopen_chat(
         require_seller_ownership(chat.seller_id, current_seller)
 
     chat.chat_status = "waiting"
+    chat.status = "open"
     chat.closed_at = None
     await db.commit()
     await db.refresh(chat)
