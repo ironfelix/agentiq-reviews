@@ -30,11 +30,17 @@ logger = logging.getLogger(__name__)
 
 def run_async(coro):
     """Run async coroutine in sync context (for Celery tasks)."""
+    from app.database import engine
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
+        # Dispose stale connections from previous event loops
+        loop.run_until_complete(engine.dispose())
         return loop.run_until_complete(coro)
     finally:
+        # Clean up connections before closing loop
+        loop.run_until_complete(engine.dispose())
         loop.close()
 
 
