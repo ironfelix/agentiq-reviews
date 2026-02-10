@@ -21,6 +21,44 @@ from app.config import get_settings
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
+# Russian surname suffixes — if a single word ends with these, it's likely a last name
+_SURNAME_SUFFIXES = (
+    # Male: -ов, -ев, -ёв, -ин, -ын, -ский, -цкий, -ой, -ий
+    "ов", "ев", "ёв", "ин", "ын", "ский", "цкий", "ской", "цкой",
+    # Female: -ова, -ева, -ёва, -ина, -ына, -ская, -цкая
+    "ова", "ева", "ёва", "ина", "ына", "ская", "цкая",
+    # Ukrainian/common: -ко, -енко, -чук, -щук, -юк, -ук, -ич, -вич
+    "ко", "енко", "чук", "щук", "юк", "ук", "ич", "вич",
+)
+
+
+def extract_first_name(customer_name: Optional[str]) -> Optional[str]:
+    """
+    Extract first name from customer_name for greeting personalization.
+
+    WB format is typically "Фамилия Имя Отчество" or just "Фамилия".
+    Returns first name if detectable, None if only surname.
+    """
+    if not customer_name or not customer_name.strip():
+        return None
+
+    parts = customer_name.strip().split()
+
+    if len(parts) >= 2:
+        # "Исакович Анна Витальевна" → "Анна"
+        return parts[1]
+
+    # Single word — check if it looks like a surname
+    word = parts[0]
+    word_lower = word.lower()
+    for suffix in _SURNAME_SUFFIXES:
+        if word_lower.endswith(suffix) and len(word_lower) > len(suffix) + 1:
+            # Likely a surname, don't use for greeting
+            return None
+
+    # Doesn't look like a surname — could be a first name
+    return word
+
 
 # Intent types with descriptions
 INTENTS = {
@@ -420,16 +458,28 @@ class AIAnalyzer:
         # Clean up double spaces
         result = re.sub(r'\s+', ' ', result).strip()
 
-        # Skip adding greeting if LLM already included one
-        # Check for any greeting pattern (name + здравствуйте, or just здравствуйте)
-        has_greeting = bool(re.match(
-            r'^[А-ЯЁа-яё\s,]+здравствуйте|^Здравствуйте|^Добрый\s+(день|вечер|утро)',
-            result, re.IGNORECASE
-        ))
-        if customer_name and not has_greeting:
-            # Use first name only (not full "Фамилия Имя Отчество")
-            first_name = customer_name.split()[1] if len(customer_name.split()) > 1 else customer_name.split()[0]
+        # Normalize greeting: strip any existing greeting, re-add with proper first name
+        # This prevents: surname greetings ("Курченко, здравствуйте!"),
+        # double greetings, and missing greetings
+        result = re.sub(
+            r'^[А-ЯЁа-яё\s,]+здравствуйте!?\s*',
+            '', result, count=1, flags=re.IGNORECASE
+        )
+        result = re.sub(
+            r'^Здравствуйте!?\s*',
+            '', result, count=1, flags=re.IGNORECASE
+        )
+        result = re.sub(
+            r'^Добрый\s+(день|вечер|утро)!?\s*',
+            '', result, count=1, flags=re.IGNORECASE
+        )
+        result = result.strip()
+
+        first_name = extract_first_name(customer_name)
+        if first_name:
             result = f"{first_name}, здравствуйте! {result}"
+        else:
+            result = f"Здравствуйте! {result}"
 
         # Truncate to 300 chars
         if len(result) > 300:
@@ -546,7 +596,8 @@ class AIAnalyzer:
             sentiment = "positive"
 
         # Generate fallback recommendation
-        name_prefix = f"{customer_name}, здравствуйте! " if customer_name else "Здравствуйте! "
+        first_name = extract_first_name(customer_name)
+        name_prefix = f"{first_name}, здравствуйте! " if first_name else "Здравствуйте! "
 
         recommendations = {
             "delivery_status": f"{name_prefix}Проверили ваш заказ — со своей стороны товар отгружен. Отслеживайте статус в ЛК WB.",

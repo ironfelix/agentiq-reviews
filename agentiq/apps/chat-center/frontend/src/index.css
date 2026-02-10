@@ -67,6 +67,8 @@
         .chat-center {
             display: flex;
             height: 100vh;
+            overflow: hidden;
+            width: 100%;
         }
 
         /* ===== LEFT PANEL: Chat List ===== */
@@ -76,6 +78,8 @@
             border-right: 1px solid var(--color-border-medium);
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
         }
 
         .chat-list-header {
@@ -667,6 +671,10 @@
             font-weight: 500;
             color: var(--color-text-primary);
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .chat-item-time {
@@ -678,6 +686,9 @@
             font-size: var(--font-size-sm);
             color: var(--color-text-tertiary);
             margin-bottom: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .chat-item-preview {
@@ -742,6 +753,8 @@
         /* ===== CENTER: Chat Window ===== */
         .chat-window {
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
             background: var(--color-bg-chat);
             display: flex;
             flex-direction: column;
@@ -755,6 +768,13 @@
             align-items: center;
             justify-content: space-between;
             min-height: 73px;
+            gap: 12px;
+        }
+
+        .chat-header-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .chat-header-info h2 {
@@ -762,11 +782,17 @@
             font-weight: 600;
             color: var(--color-text-primary);
             margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .chat-header-meta {
             font-size: var(--font-size-base);
             color: var(--color-text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .chat-header-actions {
@@ -840,6 +866,8 @@
             font-size: var(--font-size-lg);
             line-height: 1.6;
             color: var(--color-text-primary);
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .message.seller .message-content {
@@ -890,6 +918,8 @@
             font-size: var(--font-size-base);
             line-height: 1.6;
             color: var(--color-text-primary);
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         /* Input */
@@ -1289,5 +1319,4 @@
 .status-dot.risk { background: #ea4335 !important; }
 .message-author.auto-tag { color: #9aa0a6; font-style: italic; }
 .empty-msg { color: #9aa0a6; font-style: italic; }
-.chat-header-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .product-context { min-width: 300px; max-width: 300px; flex-shrink: 0; }
