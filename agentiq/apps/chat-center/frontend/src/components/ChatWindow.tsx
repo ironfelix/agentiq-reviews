@@ -294,41 +294,41 @@ export function ChatWindow({
         </div>
       ) : chat.ai_suggestion_text ? (
         <div className="ai-suggestion">
-          <div className="ai-suggestion-label">
-            AI Рекомендация
-            {showCopied && (
-              <span style={{
-                marginLeft: '8px',
-                padding: '2px 8px',
-                background: 'var(--color-accent)',
-                color: 'white',
-                borderRadius: '4px',
-                fontSize: '10px',
-                fontWeight: 500,
-              }}>
-                Скопировано
-              </span>
-            )}
-          </div>
-          <div className="ai-suggestion-text">{chat.ai_suggestion_text}</div>
-          <div className="ai-suggestion-actions">
-            <button className="ai-action-btn use" onClick={handleUseAISuggestion}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-              Использовать
-            </button>
+          <div className="ai-suggestion-header">
+            <div className="ai-suggestion-label">
+              AI Рекомендация
+              {showCopied && (
+                <span style={{
+                  marginLeft: '8px',
+                  padding: '2px 8px',
+                  background: 'var(--color-accent)',
+                  color: 'white',
+                  borderRadius: '4px',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                }}>
+                  Скопировано
+                </span>
+              )}
+            </div>
             <button
-              className="ai-action-btn regenerate"
+              className="ai-regenerate-btn"
               onClick={handleRegenerateAI}
               disabled={isRegenerating}
+              title="Сгенерировать другой ответ"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={isRegenerating ? { animation: 'spin 1s linear infinite' } : undefined}>
                 <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
               </svg>
-              {isRegenerating ? 'Генерация...' : 'Обновить'}
             </button>
           </div>
+          <div className="ai-suggestion-text">{chat.ai_suggestion_text}</div>
+          <button className="ai-use-btn" onClick={handleUseAISuggestion}>
+            Использовать
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
       ) : (chat.unread_count > 0 || isRegenerating) ? (
         <div className="ai-suggestion ai-suggestion--pending">
