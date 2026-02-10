@@ -989,7 +989,7 @@
         }
 
         @media (min-width: 768px) {
-            .proof-grid { grid-template-columns: 1fr 1fr; }
+            .proof-grid { grid-template-columns: 1fr 1fr 1fr; }
         }
 
         .proof-card {
@@ -1007,7 +1007,6 @@
 
         .proof-screenshot {
             width: 100%;
-            height: 200px;
             background: var(--color-bg-secondary);
             border-radius: var(--radius-md);
             margin-bottom: var(--space-4);
@@ -1016,141 +1015,11 @@
             border: 1px solid var(--color-border-medium);
         }
 
-        /* Mini dashboard mockup — matching chat-center style */
-        .mock-dashboard {
-            padding: var(--space-3);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
+        .proof-screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
-
-        .mock-header {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .mock-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-        }
-
-        .mock-dot.red { background: var(--color-urgent); }
-        .mock-dot.yellow { background: var(--color-warning); }
-        .mock-dot.green { background: var(--color-success); }
-
-        .mock-bar {
-            height: 7px;
-            border-radius: 4px;
-            background: var(--color-border-medium);
-            margin-left: auto;
-            width: 100px;
-        }
-
-        .mock-content {
-            flex: 1;
-            display: flex;
-            gap: var(--space-2);
-        }
-
-        .mock-sidebar {
-            width: 35%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-1);
-        }
-
-        .mock-sidebar-item {
-            height: 22px;
-            border-radius: 4px;
-            background: var(--color-bg-tertiary);
-        }
-
-        .mock-sidebar-item.active {
-            background: var(--color-bg-active);
-            border-left: 2px solid var(--color-accent);
-        }
-
-        .mock-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-1);
-        }
-
-        .mock-line {
-            height: 9px;
-            border-radius: 3px;
-            background: var(--color-bg-tertiary);
-        }
-
-        .mock-line.short { width: 60%; }
-        .mock-line.medium { width: 80%; }
-        .mock-line.long { width: 95%; }
-        .mock-line.accent { background: var(--color-accent-bg-strong); }
-
-        .mock-stats {
-            display: flex;
-            gap: var(--space-2);
-            margin-top: auto;
-        }
-
-        .mock-stat {
-            flex: 1;
-            height: 30px;
-            border-radius: var(--radius-sm);
-            background: var(--color-bg-tertiary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mock-stat-value {
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .mock-stat.good .mock-stat-value { color: var(--color-success); }
-        .mock-stat.warn .mock-stat-value { color: var(--color-warning); }
-        .mock-stat.bad .mock-stat-value { color: var(--color-urgent); }
-
-        /* Chart mockup */
-        .mock-chart {
-            padding: var(--space-3);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .mock-chart-title {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--color-text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: var(--space-3);
-        }
-
-        .mock-chart-bars {
-            flex: 1;
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-            padding-bottom: var(--space-2);
-        }
-
-        .mock-chart-bar {
-            flex: 1;
-            border-radius: 3px 3px 0 0;
-            transition: height 1s ease;
-        }
-
-        .mock-chart-bar.g { background: linear-gradient(to top, rgba(52, 168, 83, 0.25), rgba(52, 168, 83, 0.5)); }
-        .mock-chart-bar.o { background: linear-gradient(to top, rgba(249, 171, 0, 0.25), rgba(249, 171, 0, 0.5)); }
-        .mock-chart-bar.r { background: linear-gradient(to top, rgba(234, 67, 53, 0.25), rgba(234, 67, 53, 0.5)); }
-        .mock-chart-bar.p { background: linear-gradient(to top, rgba(26, 115, 232, 0.25), rgba(26, 115, 232, 0.5)); }
 
         .proof-card h3 {
             font-size: 15px;
@@ -2029,67 +1898,31 @@
 <section class="section" id="proof">
     <div class="container">
         <div class="reveal">
-            <span class="section-label">Как это выглядит</span>
-            <h2 class="section-title">Как выглядит результат</h2>
-            <p class="section-subtitle">Фрагменты из реального интерфейса сервиса.</p>
+            <span class="section-label">Продукт</span>
+            <h2 class="section-title">Как это выглядит</h2>
+            <p class="section-subtitle">Реальные экраны сервиса и&nbsp;отчёта по&nbsp;аудиту.</p>
         </div>
         <div class="proof-grid">
             <div class="proof-card reveal reveal-delay-1">
                 <div class="proof-screenshot">
-                    <div class="mock-dashboard">
-                        <div class="mock-header">
-                            <span class="mock-dot red"></span>
-                            <span class="mock-dot yellow"></span>
-                            <span class="mock-dot green"></span>
-                            <div class="mock-bar"></div>
-                        </div>
-                        <div class="mock-content">
-                            <div class="mock-sidebar">
-                                <div class="mock-sidebar-item active"></div>
-                                <div class="mock-sidebar-item"></div>
-                                <div class="mock-sidebar-item"></div>
-                                <div class="mock-sidebar-item"></div>
-                                <div class="mock-sidebar-item"></div>
-                            </div>
-                            <div class="mock-main">
-                                <div class="mock-line long"></div>
-                                <div class="mock-line medium accent"></div>
-                                <div class="mock-line short"></div>
-                                <div class="mock-line long"></div>
-                                <div class="mock-stats">
-                                    <div class="mock-stat good"><span class="mock-stat-value">8.5</span></div>
-                                    <div class="mock-stat warn"><span class="mock-stat-value">4.2</span></div>
-                                    <div class="mock-stat bad"><span class="mock-stat-value">2.1</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <img src="screenshots/chat-center.png" alt="Центр коммуникаций — чаты, диалоги, AI-помощник" loading="lazy">
                 </div>
-                <h3>Единый дашборд коммуникаций</h3>
-                <p>Все каналы в одном месте с приоритизацией по&nbsp;срочности и влиянию на продажи.</p>
+                <h3>Все коммуникации в одном окне</h3>
+                <p>Чаты, вопросы, отзывы — единый поток с приоритизацией и AI-помощником справа.</p>
             </div>
             <div class="proof-card reveal reveal-delay-2">
                 <div class="proof-screenshot">
-                    <div class="mock-chart">
-                        <div class="mock-chart-title">Качество ответов по SKU</div>
-                        <div class="mock-chart-bars" id="chartBars">
-                            <div class="mock-chart-bar g" style="height: 75%"></div>
-                            <div class="mock-chart-bar g" style="height: 85%"></div>
-                            <div class="mock-chart-bar o" style="height: 45%"></div>
-                            <div class="mock-chart-bar g" style="height: 90%"></div>
-                            <div class="mock-chart-bar r" style="height: 25%"></div>
-                            <div class="mock-chart-bar g" style="height: 70%"></div>
-                            <div class="mock-chart-bar o" style="height: 55%"></div>
-                            <div class="mock-chart-bar g" style="height: 80%"></div>
-                            <div class="mock-chart-bar r" style="height: 30%"></div>
-                            <div class="mock-chart-bar g" style="height: 65%"></div>
-                            <div class="mock-chart-bar p" style="height: 60%"></div>
-                            <div class="mock-chart-bar g" style="height: 88%"></div>
-                        </div>
-                    </div>
+                    <img src="screenshots/quality-score.png" alt="Оценка качества ответов — 4 из 10, потери конверсии" loading="lazy">
                 </div>
-                <h3>Аналитика качества по карточкам</h3>
-                <p>Видите проблемные SKU, тренды негатива и&nbsp;эффективность ответов команды.</p>
+                <h3>Оценка качества ответов</h3>
+                <p>Видите, сколько ответов вредит продажам, и&nbsp;сколько это стоит в&nbsp;деньгах.</p>
+            </div>
+            <div class="proof-card reveal reveal-delay-3">
+                <div class="proof-screenshot">
+                    <img src="screenshots/review-analysis.png" alt="Разбор отзыва — проблема, рекомендация, как стоило ответить" loading="lazy">
+                </div>
+                <h3>Разбор каждого проблемного ответа</h3>
+                <p>Конкретная рекомендация: что не&nbsp;так и&nbsp;как стоило ответить.</p>
             </div>
         </div>
     </div>
@@ -2234,28 +2067,6 @@
             wblink: document.getElementById('wblink').value,
         };
         console.log('Form submitted:', formData);
-    }
-
-    // ===== ANIMATED CHART BARS =====
-    const chartBars = document.getElementById('chartBars');
-    if (chartBars) {
-        const chartObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const bars = entry.target.querySelectorAll('.mock-chart-bar');
-                    bars.forEach((bar, i) => {
-                        const originalHeight = bar.style.height;
-                        bar.style.height = '0%';
-                        setTimeout(() => {
-                            bar.style.height = originalHeight;
-                        }, i * 80);
-                    });
-                    chartObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.3 });
-
-        chartObserver.observe(chartBars);
     }
 
     // ===== SMOOTH SCROLL =====
