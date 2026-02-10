@@ -988,12 +988,8 @@
 
         .proof-slide {
             display: none;
-            gap: 24px;
+            gap: 20px;
             align-items: center;
-            padding: 24px;
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-xl);
         }
 
         .proof-slide.active {
@@ -1021,26 +1017,38 @@
         }
 
         .proof-slide-text {
-            flex: 0 0 240px;
+            flex: 0 0 260px;
+            padding: 8px 0;
         }
 
         @media (max-width: 767px) {
             .proof-slide-text {
                 flex: none;
+                text-align: center;
             }
         }
 
+        .proof-slide-num {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
         .proof-slide-text h3 {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: var(--space-2);
             color: var(--color-text-primary);
+            line-height: 1.3;
         }
 
         .proof-slide-text p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--color-text-secondary);
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
         .proof-nav {
@@ -1958,6 +1966,7 @@
                     <img src="screenshots/chat-center.png" alt="Центр коммуникаций">
                 </div>
                 <div class="proof-slide-text">
+                    <span class="proof-slide-num">01 / 03</span>
                     <h3>Все коммуникации в&nbsp;одном окне</h3>
                     <p>Чаты, вопросы, отзывы — единый поток с&nbsp;приоритизацией. AI-помощник подсказывает контекст и&nbsp;варианты ответа.</p>
                 </div>
@@ -1967,6 +1976,7 @@
                     <img src="screenshots/quality-score.png" alt="Оценка качества ответов">
                 </div>
                 <div class="proof-slide-text">
+                    <span class="proof-slide-num">02 / 03</span>
                     <h3>Оценка качества ответов</h3>
                     <p>Сколько ответов вредит продажам, сколько это стоит в&nbsp;деньгах и&nbsp;где конкретные проблемы.</p>
                 </div>
@@ -1976,6 +1986,7 @@
                     <img src="screenshots/review-analysis.png" alt="Разбор проблемного ответа">
                 </div>
                 <div class="proof-slide-text">
+                    <span class="proof-slide-num">03 / 03</span>
                     <h3>Разбор проблемного ответа</h3>
                     <p>Что не&nbsp;так, почему это вредит, и&nbsp;готовый текст — как стоило ответить.</p>
                 </div>
