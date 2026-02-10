@@ -451,15 +451,27 @@ function App() {
             <div className="info-section">
               <div className="info-section-title">Действия</div>
               <div className="info-item">
-                <a href="#" className="info-link" onClick={(e) => e.preventDefault()}>
-                  Открыть чат на WB
+                <a
+                  href="https://seller.wildberries.ru/communication/chats"
+                  className="info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Открыть чаты на WB
                 </a>
               </div>
-              <div className="info-item">
-                <a href="#" className="info-link" onClick={(e) => e.preventDefault()}>
-                  Посмотреть все чаты клиента
-                </a>
-              </div>
+              {selectedChat.product_article && (
+                <div className="info-item">
+                  <a
+                    href={`https://www.wildberries.ru/catalog/${selectedChat.product_article}/detail.aspx`}
+                    className="info-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Карточка товара на WB
+                  </a>
+                </div>
+              )}
             </div>
           </>
         )}

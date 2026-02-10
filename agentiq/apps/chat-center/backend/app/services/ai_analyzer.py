@@ -420,10 +420,16 @@ class AIAnalyzer:
         # Clean up double spaces
         result = re.sub(r'\s+', ' ', result).strip()
 
-        # Add customer name if missing
-        if customer_name and not result.lower().startswith(customer_name.lower()):
-            if not result.startswith("Здравствуйте"):
-                result = f"{customer_name}, здравствуйте! {result}"
+        # Skip adding greeting if LLM already included one
+        # Check for any greeting pattern (name + здравствуйте, or just здравствуйте)
+        has_greeting = bool(re.match(
+            r'^[А-ЯЁа-яё\s,]+здравствуйте|^Здравствуйте|^Добрый\s+(день|вечер|утро)',
+            result, re.IGNORECASE
+        ))
+        if customer_name and not has_greeting:
+            # Use first name only (not full "Фамилия Имя Отчество")
+            first_name = customer_name.split()[1] if len(customer_name.split()) > 1 else customer_name.split()[0]
+            result = f"{first_name}, здравствуйте! {result}"
 
         # Truncate to 300 chars
         if len(result) > 300:
