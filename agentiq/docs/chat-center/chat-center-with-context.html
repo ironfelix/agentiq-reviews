@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ Chat Center — Product Context</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DESIGN SYSTEM (from chat-center-final) ===== */
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+            --color-urgent: #ea4335;
+            --color-success: #1e8e3e;
+
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            --font-size-xs: 10px;
+            --font-size-sm: 11px;
+            --font-size-md: 12px;
+            --font-size-base: 13px;
+            --font-size-lg: 14px;
+
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 14px;
+
+            --transition-fast: 0.12s ease;
+            --transition-medium: 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            height: 100vh;
+            overflow: hidden;
+            font-size: var(--font-size-base);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .chat-center { display: flex; height: 100vh; }
+
+        /* ===== LEFT: Chat List ===== */
+        .chat-list {
+            width: 340px;
+            background: var(--color-bg-primary);
+            border-right: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            padding: var(--space-4) var(--space-4) var(--space-3);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .chat-list-title { font-size: 17px; font-weight: 600; margin-bottom: var(--space-3); }
+
+        .search-box {
+            width: 100%;
+            background: var(--color-bg-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-lg);
+            padding: var(--space-2) 11px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+        .search-box:focus { outline: none; background: var(--color-bg-primary); border-color: var(--color-border-medium); }
+
+        .chat-list-content { flex: 1; overflow-y: auto; padding: var(--space-3) var(--space-4); }
+
+        .chat-item {
+            padding: var(--space-2); cursor: pointer;
+            display: flex; gap: var(--space-2);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-1);
+            border: 1px solid transparent;
+            transition: all var(--transition-fast);
+        }
+        .chat-item:hover { background: var(--color-bg-tertiary); border-color: var(--color-border-medium); }
+        .chat-item.active { background: var(--color-bg-active); border-color: #d0e7ff; }
+
+        .marketplace-icon {
+            width: 18px; height: 18px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: white; flex-shrink: 0; margin-top: 1px;
+        }
+        .marketplace-icon.wb { background: #8b33ff; }
+
+        .chat-item-content { flex: 1; min-width: 0; }
+        .chat-item-header { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+        .chat-item-name { font-size: var(--font-size-base); font-weight: 500; flex: 1; }
+        .chat-item-time { font-size: var(--font-size-xs); color: var(--color-text-tertiary); }
+        .chat-item-meta { font-size: var(--font-size-sm); color: var(--color-text-tertiary); margin-bottom: 3px; }
+        .chat-item-preview {
+            font-size: var(--font-size-md); color: var(--color-text-secondary);
+            line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        .status-dot {
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; margin-right: 3px; vertical-align: middle;
+        }
+        .status-dot.waiting { background: #f9ab00; }
+        .status-dot.risk { background: #ea4335 !important; }
+
+        .unread-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 16px; height: 16px; padding: 0 4px;
+            background: var(--color-accent); color: white;
+            font-size: 9px; font-weight: 600; border-radius: 8px;
+        }
+
+        /* ===== MIDDLE: Chat Window ===== */
+        .chat-window {
+            flex: 1; background: var(--color-bg-secondary);
+            display: flex; flex-direction: column;
+        }
+
+        .chat-header {
+            background: white; padding: var(--space-4);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+        .chat-header-title { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: 2px; }
+        .chat-header-meta { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: var(--space-5); }
+        .message { margin-bottom: var(--space-4); max-width: 70%; }
+        .message-content {
+            background: white; padding: 12px 16px; border-radius: 12px;
+            font-size: var(--font-size-lg); line-height: 1.6;
+        }
+        .message-time { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-top: var(--space-1); }
+
+        /* AI Suggestion */
+        .ai-suggestion {
+            background: var(--color-bg-hover);
+            border-left: 3px solid var(--color-text-primary);
+            padding: 12px 16px; margin: 0 24px 16px;
+            border-radius: var(--radius-md);
+        }
+        .ai-suggestion-label {
+            font-size: var(--font-size-xs); text-transform: uppercase;
+            color: var(--color-text-tertiary); font-weight: 600;
+            letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+        .ai-suggestion-text {
+            font-size: var(--font-size-base); line-height: 1.6;
+            color: var(--color-text-primary); margin-bottom: 8px;
+        }
+        .ai-actions { display: flex; gap: var(--space-4); }
+        .ai-action-link {
+            font-size: var(--font-size-sm); color: var(--color-text-tertiary);
+            cursor: pointer; border: none; background: none;
+            font-family: inherit; padding: 0;
+            transition: color var(--transition-fast);
+        }
+        .ai-action-link:hover { color: var(--color-text-primary); }
+        .ai-action-link.copied { color: var(--color-success); }
+
+        /* Chat input */
+        .chat-input-container {
+            border-top: 1px solid var(--color-border-medium);
+            padding: var(--space-5) var(--space-6); background: white;
+        }
+        .chat-input-wrapper { display: flex; gap: 12px; align-items: flex-end; }
+        .chat-input {
+            flex: 1; background: var(--color-bg-hover);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg); padding: 12px 16px;
+            font-size: var(--font-size-lg); font-family: inherit;
+            resize: none; min-height: 44px; max-height: 120px; line-height: 1.5;
+            transition: all var(--transition-medium);
+        }
+        .chat-input:focus { outline: none; background: white; border-color: var(--color-text-primary); }
+        .btn-send {
+            background: var(--color-text-primary); border: none;
+            width: 44px; height: 44px; border-radius: var(--radius-lg);
+            color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition-medium);
+        }
+        .btn-send:hover { background: #2a2a2a; }
+
+        /* ===== RIGHT: Product Context (same as chat-center-real-data + quality score) ===== */
+        .product-context {
+            width: 300px; min-width: 300px; max-width: 300px;
+            background: white;
+            border-left: 1px solid var(--color-border-medium);
+            display: flex; flex-direction: column;
+            overflow-y: auto;
+        }
+        .product-context::-webkit-scrollbar { width: 4px; }
+        .product-context::-webkit-scrollbar-track { background: transparent; }
+        .product-context::-webkit-scrollbar-thumb { background: var(--color-border-dark); border-radius: 2px; }
+
+        .context-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+        .context-title {
+            font-size: var(--font-size-md); text-transform: uppercase;
+            color: var(--color-text-tertiary); font-weight: 600;
+            letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+        .product-name-ctx { font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+        .product-rating { font-size: var(--font-size-base); color: var(--color-text-secondary); margin-bottom: 4px; }
+        .product-price { font-size: 16px; font-weight: 600; }
+
+        .info-section {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+        .info-section:last-child { border-bottom: none; }
+        .info-section-title {
+            font-size: var(--font-size-md); text-transform: uppercase;
+            color: var(--color-text-tertiary); font-weight: 600;
+            letter-spacing: 0.5px; margin-bottom: 16px;
+        }
+        .info-item { margin-bottom: 16px; }
+        .info-item:last-child { margin-bottom: 0; }
+        .info-label { font-size: var(--font-size-md); color: var(--color-text-tertiary); margin-bottom: 4px; }
+        .info-value { font-size: var(--font-size-lg); color: var(--color-text-primary); }
+        .info-link { color: var(--color-accent); text-decoration: none; font-size: var(--font-size-lg); }
+        .info-link:hover { text-decoration: underline; }
+
+        .insight-badge {
+            display: inline-block; background: var(--color-bg-hover);
+            padding: 4px 8px; border-radius: var(--radius-sm);
+            font-size: var(--font-size-md); color: var(--color-text-secondary);
+            margin-right: 4px; margin-bottom: 4px;
+        }
+        .insight-badge.negative { background: #fce8e6; color: #c5221f; }
+        .insight-badge.urgent { background: #fce8e6; color: var(--color-urgent); }
+
+        /* Quality Score (new) */
+        .quality-score {
+            display: flex; align-items: center; gap: var(--space-3);
+        }
+        .score-number { font-size: 28px; font-weight: 700; color: var(--color-success); }
+        .score-details { flex: 1; }
+        .score-label { font-size: var(--font-size-md); font-weight: 500; margin-bottom: 2px; }
+        .reviews-count { font-size: var(--font-size-xs); color: var(--color-text-tertiary); }
+
+        /* Scrollbar shared */
+        .chat-list-content::-webkit-scrollbar,
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-list-content::-webkit-scrollbar-track,
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-list-content::-webkit-scrollbar-thumb,
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--color-border-dark); border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div class="chat-center">
+        <!-- LEFT: Chat List -->
+        <section class="chat-list">
+            <div class="chat-list-header">
+                <h1 class="chat-list-title">Сообщения</h1>
+                <input type="text" class="search-box" placeholder="Поиск...">
+            </div>
+
+            <div class="chat-list-content">
+                <div class="chat-item urgent active">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Курченко</span>
+                            <span class="unread-badge">1</span>
+                            <span class="chat-item-time">22.12</span>
+                        </div>
+                        <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Арт. 335542810 · Ожидает ответа</div>
+                        <div class="chat-item-preview">Здравствуйте! У меня вопрос по товару "Кран шаровой ВР/ВР 1/2"...</div>
+                    </div>
+                </div>
+
+                <div class="chat-item">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Алексей</span>
+                            <span class="unread-badge">1</span>
+                            <span class="chat-item-time">24.09</span>
+                        </div>
+                        <div class="chat-item-meta"><span class="status-dot waiting"></span>Кран · Ожидает ответа</div>
+                        <div class="chat-item-preview">Доброго вечера, так как заказ задерживается уже на три дня...</div>
+                    </div>
+                </div>
+
+                <div class="chat-item">
+                    <div class="marketplace-icon wb">W</div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-header">
+                            <span class="chat-item-name">Сергей</span>
+                            <span class="unread-badge">1</span>
+                            <span class="chat-item-time">02.05</span>
+                        </div>
+                        <div class="chat-item-meta"><span class="status-dot waiting"></span>Реле · Ожидает ответа</div>
+                        <div class="chat-item-preview">хочу вернуть реле, потому что пришло сломаное</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MIDDLE: Chat Window -->
+        <section class="chat-window">
+            <div class="chat-header">
+                <div>
+                    <div class="chat-header-title">Курченко</div>
+                    <div class="chat-header-meta">Wildberries · Арт. 335542810 · Кран шаровой ВР/ВР 1/2"</div>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+                <div class="message">
+                    <div class="message-content">
+                        Здравствуйте! У меня вопрос по товару "Кран шаровой ВР/ВР 1/2" бабочка, с накидной гайкой, бренд Zegor, артикул 335542810, товар оформлен 17.12.2025. Мне ждать заказ и сколько? Может перезаказать?
+                    </div>
+                    <div class="message-time">22 декабря, 04:33</div>
+                </div>
+            </div>
+
+            <div class="ai-suggestion">
+                <div class="ai-suggestion-label">AI предлагает</div>
+                <div class="ai-suggestion-text" id="aiText">Здравствуйте! Со своей стороны проверили — товар (Кран шаровой ВР/ВР 1/2") передан в службу доставки. Иногда сроки увеличиваются на стороне логистики. Если заказ не поступит в ближайшие дни — напишите нам, поможем разобраться.</div>
+                <div class="ai-actions">
+                    <button class="ai-action-link" id="copyBtn" onclick="copySuggestion()">Скопировать</button>
+                    <button class="ai-action-link" onclick="regenerate()" id="regenBtn">Ответ не подходит</button>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" placeholder="Введите сообщение..." rows="1"></textarea>
+                    <button class="btn-send">→</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT: Product Context -->
+        <aside class="product-context">
+            <div class="context-header">
+                <div class="context-title">Товар</div>
+                <div class="product-name-ctx">Кран шаровой ВР/ВР 1/2" бабочка, с накидной гайкой</div>
+                <div class="product-rating">4.6 · 123 отзыва</div>
+                <div class="product-price">289 ₽</div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Анализ отзывов</div>
+                <div class="quality-score">
+                    <div class="score-number">9.2</div>
+                    <div class="score-details">
+                        <div class="score-label">Quality Score</div>
+                        <div class="reviews-count">На основе 123 отзывов</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Детали чата</div>
+                <div class="info-item">
+                    <div class="info-label">Статус</div>
+                    <div class="info-value">Ожидает ответа</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Последнее сообщение</div>
+                    <div class="info-value">22 декабря, 04:33</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Непрочитанных</div>
+                    <div class="info-value">1</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Клиент</div>
+                    <div class="info-value">Курченко</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">AI Анализ</div>
+                <div class="info-item">
+                    <div class="info-label">Тональность</div>
+                    <div class="info-value"><span class="insight-badge">Нейтральная</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Категории</div>
+                    <div class="info-value">
+                        <span class="insight-badge">Доставка</span>
+                        <span class="insight-badge">Вопрос о товаре</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Срочность</div>
+                    <div class="info-value"><span class="insight-badge urgent">Высокая</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Рекомендация</div>
+                    <div class="info-value">Ответить срочно</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Действия</div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Открыть чат на WB</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Посмотреть все чаты клиента</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Chat items
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Copy to clipboard
+        function copySuggestion() {
+            var text = document.getElementById('aiText').textContent.trim();
+            navigator.clipboard.writeText(text).then(function() {
+                var btn = document.getElementById('copyBtn');
+                btn.textContent = 'Скопировано';
+                btn.classList.add('copied');
+                setTimeout(function() { btn.textContent = 'Скопировать'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        // Regenerate
+        function regenerate() {
+            var el = document.getElementById('aiText');
+            var btn = document.getElementById('regenBtn');
+            btn.textContent = 'Генерирую...';
+            el.style.opacity = '0.4';
+            setTimeout(function() {
+                el.textContent = 'Курченко, здравствуйте! По артикулу 335542810 — товар оформлен 17.12, сейчас находится на этапе доставки. Рекомендуем подождать ещё 2-3 дня. Если не поступит — оформите новый заказ, а по текущему мы поможем с возвратом.';
+                el.style.opacity = '1';
+                btn.textContent = 'Ответ не подходит';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

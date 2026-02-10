@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#1a2633"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#1a73e8" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1a73e8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <rect x="0" y="0" width="1200" height="3" fill="#1a73e8"/>
+
+  <text x="80" y="120" font-family="sans-serif" font-size="28" font-weight="700" letter-spacing="1.2">
+    <tspan fill="#ffffff">AGENT</tspan><tspan fill="#1a73e8">IQ</tspan>
+  </text>
+
+  <text x="80" y="290" font-family="sans-serif" font-size="52" font-weight="800" fill="#ffffff">Центр контроля</text>
+  <text x="80" y="355" font-family="sans-serif" font-size="52" font-weight="800" fill="#ffffff">коммуникаций</text>
+  <text x="80" y="420" font-family="sans-serif" font-size="52" font-weight="800">
+    <tspan fill="#ffffff">для </tspan><tspan fill="#1a73e8">маркетплейсов</tspan>
+  </text>
+
+  <text x="80" y="490" font-family="sans-serif" font-size="20" fill="#8899aa">Чаты, вопросы и отзывы в одном рабочем пространстве</text>
+
+  <rect x="80" y="560" width="60" height="3" rx="1.5" fill="#1a73e8"/>
+  <text x="156" y="566" font-family="sans-serif" font-size="14" fill="#5f7080" font-weight="500">agentiq.ru</text>
+</svg>
