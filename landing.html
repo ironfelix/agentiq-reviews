@@ -980,75 +980,114 @@
             line-height: 1.5;
         }
 
-        /* ===== SOCIAL PROOF ===== */
-        .proof-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--space-5);
-            margin-top: 40px;
-        }
-
-        .proof-grid .proof-card:first-child {
-            grid-column: 1 / -1;
-        }
-
-        @media (min-width: 768px) {
-            .proof-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .proof-card {
-            padding: var(--space-6);
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-lg);
-            transition: all var(--transition-medium);
-        }
-
-        .proof-card:hover {
-            border-color: var(--color-border-dark);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        .proof-screenshot {
-            width: 100%;
-            background: var(--color-bg-secondary);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-4);
-            overflow: hidden;
+        /* ===== SOCIAL PROOF — SLIDER ===== */
+        .proof-slider {
+            margin-top: 32px;
             position: relative;
         }
 
-        .proof-screenshot img {
+        .proof-slide {
+            display: none;
+            gap: 24px;
+            align-items: center;
+            padding: 24px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-xl);
+        }
+
+        .proof-slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .proof-slide.active {
+                flex-direction: row;
+            }
+        }
+
+        .proof-slide-img {
+            flex: 1;
+            min-width: 0;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .proof-slide-img img {
             width: 100%;
             height: auto;
             display: block;
         }
 
-        .proof-card-text {
-            max-width: 560px;
+        .proof-slide-text {
+            flex: 0 0 240px;
         }
 
-        .proof-card h3 {
-            font-size: 15px;
-            font-weight: 600;
+        @media (max-width: 767px) {
+            .proof-slide-text {
+                flex: none;
+            }
+        }
+
+        .proof-slide-text h3 {
+            font-size: 17px;
+            font-weight: 700;
             margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
 
-        .proof-card:first-child h3 {
-            font-size: 18px;
-        }
-
-        .proof-card p {
+        .proof-slide-text p {
             font-size: 13px;
             color: var(--color-text-secondary);
-            line-height: 1.5;
+            line-height: 1.55;
         }
 
-        .proof-card:first-child p {
-            font-size: 14px;
+        .proof-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .proof-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border-medium);
+            background: var(--color-bg-primary);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .proof-nav-btn:hover {
+            border-color: var(--color-text-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .proof-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .proof-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-border-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .proof-dot.active {
+            background: var(--color-text-primary);
+            width: 20px;
+            border-radius: 4px;
         }
 
         /* ===== FINAL CTA ===== */
@@ -1504,11 +1543,6 @@
                 padding: 20px;
             }
 
-            /* Proof cards */
-            .proof-card {
-                padding: 20px;
-            }
-
             /* Final CTA */
             .final-cta {
                 padding: 48px 0;
@@ -1611,8 +1645,7 @@
             .pain-card:hover,
             .money-card:hover,
             .audience-card:hover,
-            .feature-card:hover,
-            .proof-card:hover {
+            .feature-card:hover {
                 transform: none;
                 box-shadow: none;
             }
@@ -1919,33 +1952,46 @@
             <h2 class="section-title">Как это выглядит</h2>
             <p class="section-subtitle">Реальные экраны сервиса и&nbsp;отчёта по&nbsp;аудиту.</p>
         </div>
-        <div class="proof-grid">
-            <div class="proof-card reveal reveal-delay-1">
-                <div class="proof-screenshot">
-                    <img src="screenshots/chat-center.png" alt="Центр коммуникаций — чаты, диалоги, AI-помощник" loading="lazy">
+        <div class="proof-slider reveal" id="proofSlider">
+            <div class="proof-slide active" data-slide="0">
+                <div class="proof-slide-img">
+                    <img src="screenshots/chat-center.png" alt="Центр коммуникаций">
                 </div>
-                <div class="proof-card-text">
-                    <h3>Все коммуникации в одном окне</h3>
-                    <p>Чаты, вопросы, отзывы — единый поток с&nbsp;приоритизацией. AI-помощник справа подсказывает контекст и&nbsp;варианты ответа.</p>
+                <div class="proof-slide-text">
+                    <h3>Все коммуникации в&nbsp;одном окне</h3>
+                    <p>Чаты, вопросы, отзывы — единый поток с&nbsp;приоритизацией. AI-помощник подсказывает контекст и&nbsp;варианты ответа.</p>
                 </div>
             </div>
-            <div class="proof-card reveal reveal-delay-2">
-                <div class="proof-screenshot">
-                    <img src="screenshots/quality-score.png" alt="Оценка качества ответов — 4 из 10, потери конверсии" loading="lazy">
+            <div class="proof-slide" data-slide="1">
+                <div class="proof-slide-img">
+                    <img src="screenshots/quality-score.png" alt="Оценка качества ответов">
                 </div>
-                <div class="proof-card-text">
+                <div class="proof-slide-text">
                     <h3>Оценка качества ответов</h3>
-                    <p>Видите, сколько ответов вредит продажам, и&nbsp;сколько это стоит в&nbsp;деньгах.</p>
+                    <p>Сколько ответов вредит продажам, сколько это стоит в&nbsp;деньгах и&nbsp;где конкретные проблемы.</p>
                 </div>
             </div>
-            <div class="proof-card reveal reveal-delay-3">
-                <div class="proof-screenshot">
-                    <img src="screenshots/review-analysis.png" alt="Разбор отзыва — проблема, рекомендация, как стоило ответить" loading="lazy">
+            <div class="proof-slide" data-slide="2">
+                <div class="proof-slide-img">
+                    <img src="screenshots/review-analysis.png" alt="Разбор проблемного ответа">
                 </div>
-                <div class="proof-card-text">
-                    <h3>Разбор каждого проблемного ответа</h3>
-                    <p>Конкретная рекомендация: что не&nbsp;так и&nbsp;как стоило ответить.</p>
+                <div class="proof-slide-text">
+                    <h3>Разбор проблемного ответа</h3>
+                    <p>Что не&nbsp;так, почему это вредит, и&nbsp;готовый текст — как стоило ответить.</p>
                 </div>
+            </div>
+            <div class="proof-nav">
+                <button class="proof-nav-btn" onclick="changeSlide(-1)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="proof-dots">
+                    <div class="proof-dot active" onclick="goToSlide(0)"></div>
+                    <div class="proof-dot" onclick="goToSlide(1)"></div>
+                    <div class="proof-dot" onclick="goToSlide(2)"></div>
+                </div>
+                <button class="proof-nav-btn" onclick="changeSlide(1)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -2090,6 +2136,34 @@
             wblink: document.getElementById('wblink').value,
         };
         console.log('Form submitted:', formData);
+    }
+
+    // ===== PROOF SLIDER =====
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.proof-slide');
+    const dots = document.querySelectorAll('.proof-dot');
+
+    function goToSlide(n) {
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+
+    function changeSlide(dir) {
+        goToSlide(currentSlide + dir);
+    }
+
+    // Swipe support
+    let touchStartX = 0;
+    const slider = document.getElementById('proofSlider');
+    if (slider) {
+        slider.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+        slider.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+        }, { passive: true });
     }
 
     // ===== SMOOTH SCROLL =====
