@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgentIQ — Центр контроля коммуникаций Wildberries</title>
+    <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
+    <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
+    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный аудит коммуникаций.">
+    <meta property="og:type" content="website">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-weight='700' font-size='16' fill='white' letter-spacing='0.5'%3EIQ%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -350,16 +354,14 @@
 
         .hero-proof {
             display: flex;
-            flex-direction: row;
-            gap: 16px;
+            flex-direction: column;
+            gap: 12px;
             animation: fade-up 0.6s ease 0.4s forwards;
             opacity: 0;
         }
 
         @media (min-width: 768px) {
             .hero-proof {
-                flex-direction: column;
-                gap: 12px;
                 flex-shrink: 0;
                 width: 200px;
                 padding-top: 60px;
@@ -502,6 +504,7 @@
 
         .pain-card:hover {
             border-color: var(--color-border-dark);
+            border-left-color: var(--color-accent);
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             transform: translateY(-2px);
         }
@@ -913,6 +916,7 @@
 
         .audience-card:hover {
             border-color: var(--color-border-dark);
+            border-top-color: var(--color-accent);
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
@@ -933,6 +937,7 @@
         .proof-slider {
             margin-top: 32px;
             position: relative;
+            overflow: hidden;
         }
 
         .proof-slide {
@@ -961,8 +966,13 @@
             width: 100%;
             height: auto;
             display: block;
-            transform: scale(1.08);
-            transform-origin: center center;
+        }
+
+        @media (min-width: 768px) {
+            .proof-slide-img img {
+                transform: scale(1.08);
+                transform-origin: center center;
+            }
         }
 
         .proof-slide-text {
