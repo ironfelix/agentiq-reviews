@@ -57,7 +57,12 @@ export function ChatList({ chats, selectedChatId, onSelectChat, onFiltersChange,
   // 1. "В работе" — only urgent priority (red dot risk)
   // 2. "Ожидают ответа" — waiting/client-replied (not urgent)
   // 3. "Все сообщения" — responded/auto-response
-  const inWorkChats = filteredChats.filter(c => c.sla_priority === 'urgent');
+  const inWorkChats = filteredChats.filter(c =>
+    c.sla_priority === 'urgent' &&
+    c.chat_status !== 'responded' &&
+    c.chat_status !== 'auto-response' &&
+    c.chat_status !== 'closed'
+  );
   const waitingChats = filteredChats.filter(c =>
     c.sla_priority !== 'urgent' &&
     (c.chat_status === 'waiting' || c.chat_status === 'client-replied')

@@ -260,8 +260,21 @@ export function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* AI Suggestion - show status based on analysis state */}
-      {chat.ai_suggestion_text ? (
+      {/* AI Suggestion - context-aware based on chat status */}
+      {chat.chat_status === 'responded' || chat.chat_status === 'auto-response' ? (
+        /* Seller already responded — don't show recommendation to reply again */
+        <div className="ai-suggestion" style={{ opacity: 0.6, cursor: 'default' }}>
+          <div className="ai-suggestion-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-success, #4ecb71)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Вы ответили
+          </div>
+          <div className="ai-suggestion-text" style={{ color: 'var(--color-text-tertiary)' }}>
+            Рекомендация появится, когда покупатель напишет снова
+          </div>
+        </div>
+      ) : chat.ai_suggestion_text ? (
         <div className="ai-suggestion" onClick={handleUseAISuggestion} style={{ cursor: 'pointer', position: 'relative' }}>
           <div className="ai-suggestion-label">
             AI Рекомендация
