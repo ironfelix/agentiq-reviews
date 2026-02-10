@@ -188,12 +188,13 @@ function App() {
   const handleAnalyzeChat = useCallback(async () => {
     if (!selectedChat || isAnalyzing) return;
 
+    const analyzedChatId = selectedChat.id;
     setIsAnalyzing(true);
     try {
-      const updatedChat = await chatApi.analyzeChat(selectedChat.id);
-      setSelectedChat(updatedChat);
+      const updatedChat = await chatApi.analyzeChat(analyzedChatId);
+      setSelectedChat(prev => prev?.id === analyzedChatId ? updatedChat : prev);
       setChats(prevChats =>
-        prevChats.map(c => c.id === selectedChat.id ? updatedChat : c)
+        prevChats.map(c => c.id === analyzedChatId ? updatedChat : c)
       );
     } catch (error) {
       console.error('Failed to analyze chat:', error);

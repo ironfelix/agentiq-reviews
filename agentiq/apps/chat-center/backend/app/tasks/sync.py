@@ -166,24 +166,42 @@ def sync_seller_chats(self, seller_id: int, marketplace: str):
 
 
 async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None):
-    """Sync WB chats and messages."""
+    """Sync WB chats and messages with full cursor pagination."""
     api_token = decrypt_credentials(seller.api_key_encrypted)
     connector = WBConnector(api_token=api_token)
 
-    # Fetch new messages
-    result = await connector.fetch_messages(since_cursor=last_cursor)
-    messages = result["messages"]
-    next_cursor = result["next_cursor"]
+    # Fetch ALL pages of messages via cursor pagination
+    all_messages = []
+    cursor = last_cursor
+    max_pages = 20  # Safety limit to prevent infinite loops
+    pages_fetched = 0
 
-    if not messages:
+    for page in range(max_pages):
+        result = await connector.fetch_messages(since_cursor=cursor)
+        page_messages = result["messages"]
+        next_cursor = result["next_cursor"]
+
+        if not page_messages:
+            break
+
+        all_messages.extend(page_messages)
+        pages_fetched += 1
+        logger.info(f"Fetched page {pages_fetched}: {len(page_messages)} messages for seller {seller.id}")
+
+        if not result["has_more"] or not next_cursor:
+            break
+
+        cursor = next_cursor
+
+    if not all_messages:
         logger.debug(f"No new messages for seller {seller.id}")
         return
 
-    logger.info(f"Fetched {len(messages)} messages for seller {seller.id}")
+    logger.info(f"Fetched total {len(all_messages)} messages across {pages_fetched} pages for seller {seller.id}")
 
     # Group messages by chat
     chats_data = {}
-    for msg in messages:
+    for msg in all_messages:
         chat_id = msg["chat_id"]
 
         if chat_id not in chats_data:
@@ -659,22 +677,20 @@ def analyze_pending_chats():
     Periodic task: Analyze chats that need AI suggestions.
 
     Runs every 2 minutes via Celery Beat.
-    Finds chats with unread messages but no AI suggestion.
+    Finds chats without AI analysis regardless of status.
     """
     logger.info("Looking for chats to analyze with AI")
 
     async def _find_and_analyze():
         async with AsyncSessionLocal() as db:
             # Find chats that need analysis:
-            # - Has unread messages (unread_count > 0)
-            # - No AI suggestion yet (ai_suggestion_text is null)
-            # - Status is waiting or client-replied
+            # - No AI analysis yet (ai_analysis_json is null)
+            # - Not closed (skip fully resolved chats)
             result = await db.execute(
                 select(Chat.id).where(
                     and_(
-                        Chat.unread_count > 0,
-                        Chat.ai_suggestion_text == None,
-                        Chat.chat_status.in_(["waiting", "client-replied"])
+                        Chat.ai_analysis_json == None,
+                        Chat.chat_status != "closed"
                     )
                 ).limit(10)  # Process 10 at a time
             )
