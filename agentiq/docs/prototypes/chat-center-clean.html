@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ — Clean Filters + DatePicker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafbfc;
+            color: #1a1a1a;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-center {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== ЛЕВАЯ ПАНЕЛЬ ===== */
+        .chat-list {
+            width: 340px;
+            background: white;
+            border-right: 1px solid #e8eaed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            padding: 16px 16px 12px 16px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .chat-list-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            background: #f8f9fa;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            padding: 8px 34px 8px 11px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a1a;
+            transition: all 0.12s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            background: white;
+            border-color: #e8eaed;
+        }
+
+        .search-box::placeholder {
+            color: #9aa0a6;
+        }
+
+        .filter-icon-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.12s;
+            color: #9aa0a6;
+        }
+
+        .filter-icon-btn:hover {
+            background: rgba(0,0,0,0.04);
+            color: #1a1a1a;
+        }
+
+        .filter-icon-btn.active {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        /* Funnel icon */
+        .filter-icon {
+            width: 16px;
+            height: 16px;
+            position: relative;
+        }
+
+        /* Simple SVG approach */
+        .filter-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ===== CLEAN PILLS FILTERS ===== */
+        .filters-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .filters-scroll {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            padding: 1px 0;
+            margin: 0 -1px;
+
+            /* Hide scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .filters-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            flex-shrink: 0;
+            padding: 5px 10px;
+            background: transparent;
+            border: none;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f6368;
+            cursor: pointer;
+            transition: all 0.12s;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .filter-pill:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .filter-pill.active {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .filter-pill .count {
+            opacity: 0.6;
+            margin-left: 3px;
+            font-size: 11px;
+        }
+
+        .filter-pill.active .count {
+            opacity: 0.8;
+        }
+
+        /* Fade gradient for scroll indication */
+        .filters-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            background: linear-gradient(to left, white, transparent);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .filters-container.has-scroll::after {
+            opacity: 1;
+        }
+
+        /* ===== ADVANCED FILTERS DROPDOWN (Ultra Compact) ===== */
+        .advanced-filters {
+            display: none;
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .advanced-filters.open {
+            display: block;
+        }
+
+        .filter-group {
+            margin-bottom: 10px;
+        }
+
+        .filter-group:last-of-type {
+            margin-bottom: 8px;
+        }
+
+        .filter-group-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* Ultra Compact Date Range */
+        .date-range-compact {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-input-compact {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #e8eaed;
+            border-radius: 5px;
+            font-size: 11px;
+            font-family: inherit;
+            color: #1a1a1a;
+            transition: all 0.12s;
+        }
+
+        .date-input-compact:hover {
+            border-color: #dadce0;
+        }
+
+        .date-input-compact:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .date-separator {
+            color: #9aa0a6;
+            font-size: 11px;
+        }
+
+        /* Platform Toggle Chips (like rating) */
+        .platform-chips {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .platform-chip {
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 5px;
+            font-size: 11px;
+            font-family: inherit;
+            color: #5f6368;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .platform-chip:hover {
+            background: white;
+            border-color: #dadce0;
+        }
+
+        .platform-chip.active {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            color: white;
+        }
+
+        /* Rating Chips (smaller) */
+        .rating-chips {
+            display: flex;
+            gap: 3px;
+        }
+
+        .rating-chip {
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 5px;
+            font-size: 11px;
+            font-family: inherit;
+            color: #5f6368;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .rating-chip:hover {
+            background: white;
+            border-color: #dadce0;
+        }
+
+        .rating-chip.active {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            color: white;
+        }
+
+        /* Filter Actions (smaller) */
+        .filter-actions {
+            display: flex;
+            gap: 6px;
+            padding-top: 8px;
+            border-top: 1px solid #f5f6f7;
+            margin-top: 2px;
+        }
+
+        .btn-clear {
+            flex: 1;
+            padding: 6px;
+            background: transparent;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: inherit;
+            color: #5f6368;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .btn-clear:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .btn-apply {
+            flex: 2;
+            padding: 6px;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .btn-apply:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-apply:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== QUEUES ===== */
+        .chat-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+        }
+
+        .queue-section {
+            margin-bottom: 16px;
+        }
+
+        .queue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 2px;
+        }
+
+        .queue-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #9aa0a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .queue-count {
+            font-size: 10px;
+            color: #9aa0a6;
+        }
+
+        .chat-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.12s;
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+        }
+
+        .chat-item:hover {
+            background: #f8f9fa;
+            border-color: #e8eaed;
+        }
+
+        .chat-item.active {
+            background: #f0f7ff;
+            border-color: #d0e7ff;
+        }
+
+        .marketplace-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .marketplace-icon.wb { background: #8b33ff; }
+        .marketplace-icon.ozon { background: #005bff; }
+        .marketplace-icon.yandex { background: #ff6600; }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-item-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+        }
+
+        .chat-item-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            flex: 1;
+        }
+
+        .chat-item-time {
+            font-size: 10px;
+            color: #9aa0a6;
+        }
+
+        .chat-item-meta {
+            font-size: 11px;
+            color: #9aa0a6;
+            margin-bottom: 3px;
+        }
+
+        .chat-item-preview {
+            font-size: 12px;
+            color: #5f6368;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .chat-item.urgent .chat-item-name::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background: #ea4335;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .unread-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            background: #1a73e8;
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        /* ===== RIGHT PANEL: Demo Info ===== */
+        .demo-panel {
+            flex: 1;
+            background: #fafbfc;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .demo-section {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .demo-section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .demo-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .demo-section p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #5f6368;
+            margin-bottom: 12px;
+        }
+
+        .demo-section ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .demo-section li {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #5f6368;
+        }
+
+        .pros {
+            color: #1e8e3e;
+            font-weight: 500;
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+
+        /* Scrollbar styling */
+        .chat-list-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb {
+            background: #dadce0;
+            border-radius: 3px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-center">
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <section class="chat-list">
+            <div class="chat-list-header">
+                <h1 class="chat-list-title">Сообщения</h1>
+
+                <!-- Search -->
+                <div class="search-wrapper">
+                    <input type="text" class="search-box" placeholder="Поиск..." id="searchBox">
+                    <button class="filter-icon-btn" id="advancedFilterBtn" title="Расширенные фильтры">
+                        <div class="filter-icon">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M2 3h12M4 6h8M6 9h4M7 12h2"/>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Clean Pills Filters — Priority-based -->
+                <div class="filters-container" id="filtersContainer">
+                    <div class="filters-scroll" id="filtersScroll">
+                        <button class="filter-pill active" data-filter="all">
+                            Все <span class="count">12</span>
+                        </button>
+                        <button class="filter-pill" data-filter="urgent">
+                            Срочно <span class="count">2</span>
+                        </button>
+                        <button class="filter-pill" data-filter="unanswered">
+                            Без ответа <span class="count">5</span>
+                        </button>
+                        <button class="filter-pill" data-filter="resolved">
+                            Обработаны <span class="count">5</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters Dropdown (hidden by default) -->
+                <div class="advanced-filters" id="advancedFilters">
+                    <div class="filter-group">
+                        <div class="filter-group-label">Период</div>
+                        <div class="date-range-compact">
+                            <input type="date" id="dateFrom" class="date-input-compact" placeholder="От">
+                            <span class="date-separator">—</span>
+                            <input type="date" id="dateTo" class="date-input-compact" placeholder="До">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-group-label">Платформа</div>
+                        <div class="platform-chips">
+                            <button class="platform-chip active" data-platform="wb">WB</button>
+                            <button class="platform-chip active" data-platform="ozon">Ozon</button>
+                            <button class="platform-chip active" data-platform="yandex">Яндекс</button>
+                            <button class="platform-chip active" data-platform="avito">Avito</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-group-label">Оценка</div>
+                        <div class="rating-chips">
+                            <button class="rating-chip" data-rating="1">1★</button>
+                            <button class="rating-chip" data-rating="2">2★</button>
+                            <button class="rating-chip" data-rating="3">3★</button>
+                            <button class="rating-chip" data-rating="4">4★</button>
+                            <button class="rating-chip" data-rating="5">5★</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-clear" id="clearAllFilters">Сбросить</button>
+                        <button class="btn-apply" id="applyFilters">Применить</button>
+                    </div>
+                </div>
+
+                <div class="queue-divider"></div>
+            </div>
+
+            <!-- Queues -->
+            <div class="chat-list-content">
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">В работе</div>
+                        <div class="queue-count">2</div>
+                    </div>
+
+                    <div class="chat-item urgent active">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Иван Петров</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">2 мин</span>
+                            </div>
+                            <div class="chat-item-meta">1★ Отзыв · Осталось 22 мин</div>
+                            <div class="chat-item-preview">
+                                Пришел порванный пакет, корм рассыпался по всей коробке...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-item">
+                        <div class="marketplace-icon yandex">Я</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Ольга Николаева</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">8 мин</span>
+                            </div>
+                            <div class="chat-item-meta">2★ Отзыв · Осталось 38 мин</div>
+                            <div class="chat-item-preview">
+                                Корм не подошел, у кошки началась аллергия...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">Ожидают ответа</div>
+                        <div class="queue-count">4</div>
+                    </div>
+
+                    <div class="chat-item">
+                        <div class="marketplace-icon ozon">O</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Мария Соколова</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">15 мин</span>
+                            </div>
+                            <div class="chat-item-meta">Вопрос на карточке</div>
+                            <div class="chat-item-preview">
+                                Подскажите, какой размер гранул? Моя кошка привередливая...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-item">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Елена Смирнова</span>
+                                <span class="chat-item-time">1 ч</span>
+                            </div>
+                            <div class="chat-item-meta">5★ Отзыв</div>
+                            <div class="chat-item-preview">
+                                Отличный корм! Кот ест с удовольствием...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-item">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Александр Ковалев</span>
+                                <span class="chat-item-time">2 ч</span>
+                            </div>
+                            <div class="chat-item-meta">Чат покупателя</div>
+                            <div class="chat-item-preview">
+                                Вы: Заказ будет доставлен завтра до 18:00...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ: Demo Info -->
+        <div class="demo-panel">
+            <div class="demo-section">
+                <h2>✨ Ultra Compact Pro UX</h2>
+
+                <h3>Priority Filters (4 pills)</h3>
+                <ul>
+                    <li><span class="pros">✓</span> <strong>Все</strong> — весь список</li>
+                    <li><span class="pros">✓</span> <strong>Срочно</strong> — harmful + risky + мало времени</li>
+                    <li><span class="pros">✓</span> <strong>Без ответа</strong> — требуют действия</li>
+                    <li><span class="pros">✓</span> <strong>Обработаны</strong> — можно архивировать</li>
+                </ul>
+                <p><strong>Tight spacing:</strong> 5-10px padding, 12px font → больше места для чатов</p>
+
+                <h3>Advanced Filters (~180px height)</h3>
+                <p><strong>Клик на воронку</strong> → ультра-компактный dropdown:</p>
+                <ul>
+                    <li><span class="pros">✓</span> <strong>Дата:</strong> два date inputs рядом (без пресетов)</li>
+                    <li><span class="pros">✓</span> <strong>Платформа:</strong> toggle chips (WB, Ozon, Яндекс, Avito)</li>
+                    <li><span class="pros">✓</span> <strong>Оценка:</strong> toggle chips (1★-5★)</li>
+                    <li><span class="pros">✓</span> Tight: 10px padding, 6px margins, 11px fonts</li>
+                    <li><span class="pros">✓</span> Было 330px → стало ~180px</li>
+                </ul>
+
+                <h3>Search + Filter Icon</h3>
+                <ul>
+                    <li><span class="pros">✓</span> Воронка справа в поиске — SVG линии</li>
+                    <li><span class="pros">✓</span> Hover: легкий серый фон</li>
+                    <li><span class="pros">✓</span> Active: черный фон (показывает что фильтры открыты)</li>
+                    <li><span class="pros">✓</span> Dropdown привязан к кнопке, закрывается при клике вне</li>
+                </ul>
+
+                <h3>Chat Items</h3>
+                <ul>
+                    <li><span class="pros">✓</span> Увеличен radius до 10px — softer</li>
+                    <li><span class="pros">✓</span> Hover: фон + тонкая рамка</li>
+                    <li><span class="pros">✓</span> Active: голубой фон (#f0f7ff) вместо левой границы</li>
+                    <li><span class="pros">✓</span> Urgent dot: маленький кружок перед именем</li>
+                    <li><span class="pros">✓</span> Badge: меньше размер, компактнее</li>
+                </ul>
+
+                <h3>Spacing & Padding</h3>
+                <ul>
+                    <li>Ширина панели: 340px (было 320px) — чуть просторнее</li>
+                    <li>Отступы: везде кратны 4px для гармонии</li>
+                    <li>Gaps между элементами: 6-12px</li>
+                    <li>Border radius: 8-10px для мягкости</li>
+                </ul>
+
+                <h3>Inspiration</h3>
+                <p>Референсы для этого дизайна:</p>
+                <ul>
+                    <li><strong>Telegram Web</strong> — pills фильтры с горизонтальным скроллом</li>
+                    <li><strong>Linear</strong> — минималистичные chips, fade-gradient</li>
+                    <li><strong>Notion</strong> — чистый date picker без лишних элементов</li>
+                    <li><strong>Gmail</strong> — search bar с иконкой фильтра</li>
+                </ul>
+
+                <h3>Как использовать</h3>
+                <ol style="margin-left: 20px;">
+                    <li>Кликни на <strong>воронку в поиске</strong> → откроется advanced filters</li>
+                    <li>Выбери период:
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Клик на "7 дней" / "30 дней" / "90 дней" → auto-fill</li>
+                            <li>Или выбери custom даты через нативный календарь</li>
+                        </ul>
+                    </li>
+                    <li>Toggle платформы (чекбоксы)</li>
+                    <li>Toggle оценки (chips 1★-5★)</li>
+                    <li>Кликни <strong>"Применить"</strong> → dropdown закроется, фильтры применятся</li>
+                    <li>Кликни <strong>"Сбросить"</strong> → всё вернется к дефолту</li>
+                </ol>
+
+                <h3>Что можно улучшить</h3>
+                <ul>
+                    <li>Показывать badge на воронке с количеством активных фильтров</li>
+                    <li>Добавить фильтр "Тип" (Отзыв / Вопрос / Чат)</li>
+                    <li>Сохранять выбранные фильтры в localStorage</li>
+                    <li>Анимация появления dropdown (slide down)</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h2>🎨 Design Principles</h2>
+                <ul>
+                    <li><strong>Minimalism</strong> — только необходимые элементы</li>
+                    <li><strong>Breathing room</strong> — достаточно воздуха между элементами</li>
+                    <li><strong>Subtle interactions</strong> — мягкие transitions без резких эффектов</li>
+                    <li><strong>Hierarchy</strong> — четкая визуальная иерархия (заголовок → фильтры → контент)</li>
+                    <li><strong>Accessibility</strong> — контраст текста, размер touch targets ≥28px</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pills filters
+        const pills = document.querySelectorAll('.filter-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                pills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                console.log('Filter:', this.dataset.filter);
+            });
+        });
+
+        // Check if filters need scroll
+        const filtersContainer = document.getElementById('filtersContainer');
+        const filtersScroll = document.getElementById('filtersScroll');
+
+        function checkScroll() {
+            if (filtersScroll.scrollWidth > filtersScroll.clientWidth) {
+                filtersContainer.classList.add('has-scroll');
+            } else {
+                filtersContainer.classList.remove('has-scroll');
+            }
+        }
+
+        checkScroll();
+        window.addEventListener('resize', checkScroll);
+
+        // Advanced Filters Toggle
+        const advancedFilterBtn = document.getElementById('advancedFilterBtn');
+        const advancedFilters = document.getElementById('advancedFilters');
+
+        advancedFilterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            advancedFilters.classList.toggle('open');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!advancedFilters.contains(e.target) && !advancedFilterBtn.contains(e.target)) {
+                advancedFilters.classList.remove('open');
+                advancedFilterBtn.classList.remove('active');
+            }
+        });
+
+        // Prevent closing when clicking inside
+        advancedFilters.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Date inputs
+        const dateFrom = document.getElementById('dateFrom');
+        const dateTo = document.getElementById('dateTo');
+
+        // Platform chips toggle
+        const platformChips = document.querySelectorAll('.platform-chip');
+        platformChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Rating chips toggle
+        const ratingChips = document.querySelectorAll('.rating-chip');
+        ratingChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Apply filters
+        const applyFilters = document.getElementById('applyFilters');
+        applyFilters.addEventListener('click', function() {
+            console.log('Filters applied!');
+            console.log('Date from:', dateFrom.value);
+            console.log('Date to:', dateTo.value);
+
+            const selectedPlatforms = Array.from(document.querySelectorAll('.platform-chip.active'))
+                .map(chip => chip.dataset.platform);
+            console.log('Platforms:', selectedPlatforms);
+
+            const selectedRatings = Array.from(document.querySelectorAll('.rating-chip.active'))
+                .map(chip => chip.dataset.rating);
+            console.log('Ratings:', selectedRatings);
+
+            // Close dropdown
+            advancedFilters.classList.remove('open');
+            advancedFilterBtn.classList.remove('active');
+        });
+
+        // Clear all filters
+        const clearAllFilters = document.getElementById('clearAllFilters');
+        clearAllFilters.addEventListener('click', function() {
+            dateFrom.value = '';
+            dateTo.value = '';
+            platformChips.forEach(c => c.classList.add('active')); // Reset to all selected
+            ratingChips.forEach(c => c.classList.remove('active'));
+        });
+
+        // Chat items click
+        const chatItems = document.querySelectorAll('.chat-item');
+        chatItems.forEach(item => {
+            item.addEventListener('click', function() {
+                chatItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

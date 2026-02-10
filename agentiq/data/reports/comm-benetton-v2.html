@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Анализ коммуникации · Артикул 110737323</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #fafbfc;
+  color: #1a1a1a;
+  padding: 40px 24px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.header .meta {
+  font-size: 14px;
+  color: #5f6368;
+  line-height: 1.5;
+}
+
+/* Section */
+.section {
+  background: white;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: #9aa0a6;
+  margin-bottom: 24px;
+}
+
+/* Score */
+.score-box {
+  text-align: center;
+  padding: 40px 24px;
+  margin-bottom: 24px;
+}
+
+.score-value {
+  font-size: 64px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 24px;
+  color: #9aa0a6;
+  font-weight: 400;
+}
+
+.score-label {
+  font-size: 12px;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 20px 16px;
+  background: #f5f6f7;
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Alert Box */
+.alert {
+  background: #f5f6f7;
+  border-left: 3px solid #1a1a1a;
+  padding: 16px 20px;
+  margin: 24px 0;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5f6368;
+}
+
+/* Bar Chart */
+.bar-chart {
+  margin: 24px 0;
+}
+
+.bar-item {
+  margin-bottom: 16px;
+}
+
+.bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.bar-label {
+  font-size: 13px;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.bar-count {
+  font-size: 12px;
+  color: #5f6368;
+  font-weight: 600;
+}
+
+.bar-track {
+  height: 8px;
+  background: #e8eaed;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #1a1a1a;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #e8eaed;
+  margin: 32px 0;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+}
+
+th {
+  font-size: 11px;
+  color: #9aa0a6;
+  text-align: left;
+  padding: 12px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e8eaed;
+  font-weight: 600;
+}
+
+td {
+  font-size: 14px;
+  color: #1a1a1a;
+  padding: 16px 8px;
+  border-bottom: 1px solid #f5f6f7;
+}
+
+td.number {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sample Review */
+.sample {
+  margin: 24px 0;
+}
+
+.sample-label {
+  font-size: 11px;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.sample-box {
+  background: #f5f6f7;
+  border-left: 3px solid #1a1a1a;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.sample-text {
+  font-size: 14px;
+  color: #1a1a1a;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.sample-reply {
+  font-size: 13px;
+  color: #5f6368;
+  line-height: 1.6;
+  padding-left: 16px;
+  border-left: 2px solid #e8eaed;
+  margin-top: 12px;
+}
+
+.sample-meta {
+  font-size: 11px;
+  color: #9aa0a6;
+  margin-top: 12px;
+}
+
+.sample-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #e8eaed;
+  color: #5f6368;
+  margin-top: 8px;
+  margin-right: 4px;
+}
+
+/* Details/Summary */
+details {
+  margin-top: 16px;
+}
+
+summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #1a1a1a;
+  padding: 12px 16px;
+  background: #f5f6f7;
+  border: 1px solid #e8eaed;
+  border-radius: 6px;
+  list-style: none;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+summary:hover {
+  background: #e8eaed;
+}
+
+summary::after {
+  content: ' →';
+  float: right;
+}
+
+details[open] summary::after {
+  content: ' ↓';
+}
+
+.recommendation {
+  margin-top: 16px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+}
+
+.recommendation-label {
+  font-size: 10px;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.recommendation-text {
+  font-size: 14px;
+  color: #1a1a1a;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.recommendation-why {
+  font-size: 12px;
+  color: #5f6368;
+  line-height: 1.5;
+  padding-top: 12px;
+  border-top: 1px solid #e8eaed;
+}
+
+/* List */
+.simple-list {
+  list-style: none;
+  padding: 0;
+}
+
+.simple-list li {
+  font-size: 14px;
+  color: #5f6368;
+  padding: 12px 0 12px 20px;
+  border-bottom: 1px solid #f5f6f7;
+  line-height: 1.6;
+  position: relative;
+}
+
+.simple-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* Action List */
+.action-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: action;
+}
+
+.action-list li {
+  font-size: 14px;
+  color: #5f6368;
+  padding: 16px 0 16px 48px;
+  border-bottom: 1px solid #f5f6f7;
+  line-height: 1.6;
+  position: relative;
+}
+
+.action-list li::before {
+  counter-increment: action;
+  content: counter(action);
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-priority {
+  font-size: 10px;
+  color: #1a1a1a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+/* Loss Box */
+.loss-box {
+  background: #f5f6f7;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.loss-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.loss-label {
+  font-size: 12px;
+  color: #5f6368;
+  margin-bottom: 16px;
+}
+
+.loss-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 12px;
+}
+
+.loss-note {
+  font-size: 11px;
+  color: #9aa0a6;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Артикул 110737323 · Анализ коммуникации</h1>
+    <div class="meta">
+      United Colors of Benetton · Водолазка<br>
+      215 отзывов за 12 месяцев · февраль 2024 — февраль 2026
+    </div>
+  </div>
+
+  <!-- Quality Score -->
+  <div class="section">
+    <h2 class="section-title">Качество ответов продавца</h2>
+    <p class="section-subtitle">25 негативных + 190 позитивных отзывов · 215 из 215 с ответом</p>
+
+    <div class="alert">
+      Продавец отвечает молниеносно (медиана 1.1 часа) и покрывает 100% отзывов. Но используется один шаблон на все ситуации: от «спасибо, отличная вещь» до «прислали подделку». Ни одного ответа с конкретным решением за 12 месяцев. Для fashion-бренда, где доверие к подлинности = конверсия, это критическая ошибка.
+    </div>
+
+    <div class="score-box">
+      <span class="score-value">2<span class="score-max">/10</span></span>
+      <div class="score-label">Оценка качества ответов</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-value">21</span>
+        <span class="stat-label">Вредят продажам</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">31</span>
+        <span class="stat-label">Есть проблемы</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">0</span>
+        <span class="stat-label">Хорошие</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">163</span>
+        <span class="stat-label">Нормальные</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="loss-box">
+      <div class="loss-value">~4-7%</div>
+      <div class="loss-label">Приблизительные потери конверсии из-за качества ответов</div>
+      <div class="loss-amount">50,000 - 120,000₽/мес</div>
+      <div class="loss-note">
+        Текущая цена 1,921₽, средняя за 3 мес. ~2,100₽ (данные WB). Оценка при 500-800 заказов/мес.
+      </div>
+    </div>
+
+    <div class="alert">
+      <strong>0 из 215 ответов содержат конкретное решение проблемы</strong><br>
+      Ни одного хорошего ответа за 12 месяцев. Максимум — «приносим извинения за неудобства». На жалобы о подделке, браке, несоответствии цвета — один и тот же шаблон.
+    </div>
+  </div>
+
+  <!-- Response Speed -->
+  <div class="section">
+    <h2 class="section-title">Скорость ответа</h2>
+    <p class="section-subtitle">Время от публикации отзыва до ответа продавца</p>
+
+    <div class="bar-chart">
+      <div style="font-size: 11px; color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; font-weight: 600;">
+        Негативные отзывы (1-3 звезды)
+      </div>
+
+      <div class="bar-item">
+        <div class="bar-header">
+          <span class="bar-label">Медиана</span>
+          <span class="bar-count">1.2 часа</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 5%"></div>
+        </div>
+      </div>
+
+      <div class="bar-item">
+        <div class="bar-header">
+          <span class="bar-label">Среднее</span>
+          <span class="bar-count">1.4 дня</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 29%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar-chart">
+      <div style="font-size: 11px; color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; font-weight: 600;">
+        Все отзывы (215 шт.)
+      </div>
+
+      <div class="bar-item">
+        <div class="bar-header">
+          <span class="bar-label">Медиана</span>
+          <span class="bar-count">1.1 часа</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 5%"></div>
+        </div>
+      </div>
+
+      <div class="bar-item">
+        <div class="bar-header">
+          <span class="bar-label">Среднее</span>
+          <span class="bar-count">3.3 дня</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 68%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert">
+      Медиана 1.1 часа — отлично. 169 из 215 отвечены в первые сутки, 45 — менее чем за 30 минут (вероятно, автоматизация). Но быстрый шаблонный ответ хуже медленного вдумчивого.
+    </div>
+  </div>
+
+  <!-- Response Quality Breakdown -->
+  <div class="section">
+    <h2 class="section-title">Качество ответов</h2>
+    <p class="section-subtitle">Классификация 215 ответов (все отзывы 1-5★)</p>
+
+    <div style="font-size: 11px; color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; font-weight: 600;">
+      Хорошие ответы
+    </div>
+
+    <div class="bar-item">
+      <div class="bar-header">
+        <span class="bar-label">Хороший ответ</span>
+        <span class="bar-count">0</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 0%"></div>
+      </div>
+      <div style="font-size: 12px; color: #9aa0a6; margin-top: 4px;">Эмпатия + конкретное решение или объяснение</div>
+    </div>
+
+    <div class="bar-item">
+      <div class="bar-header">
+        <span class="bar-label">Нормальный ответ</span>
+        <span class="bar-count">163</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 100%"></div>
+      </div>
+      <div style="font-size: 12px; color: #9aa0a6; margin-top: 4px;">Вежливый шаблон на позитивный отзыв — не вредит, но и не помогает</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="font-size: 11px; color: #9aa0a6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; font-weight: 600;">
+      Ошибки в ответах
+    </div>
+
+    <div class="bar-item">
+      <div class="bar-header">
+        <span class="bar-label">Копипаст-шаблон</span>
+        <span class="bar-count">51</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 76%"></div>
+      </div>
+      <div style="font-size: 12px; color: #9aa0a6; margin-top: 4px;">Один и тот же текст на жалобы и похвалы — покупатель видит, что никто не читает отзывы</div>
+    </div>
+
+    <div class="bar-item">
+      <div class="bar-header">
+        <span class="bar-label">Перекладывает вину</span>
+        <span class="bar-count">1</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 1.5%"></div>
+      </div>
+      <div style="font-size: 12px; color: #9aa0a6; margin-top: 4px;">«Производитель не контролирует доставку» — обвиняет WB вместо решения</div>
+    </div>
+  </div>
+
+  <!-- Fashion Analysis -->
+  <div class="section">
+    <h2 class="section-title">Размер, ткань и цвет</h2>
+    <p class="section-subtitle">Fashion-анализ на основе 215 отзывов за 12 месяцев</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Проблема</th>
+          <th style="text-align: right;">Упоминания</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="sample-tag">ткань</span> Тонкая / просвечивает / мнётся</td>
+          <td class="number">33</td>
+        </tr>
+        <tr>
+          <td><span class="sample-tag">размер</span> Маломерит / обтягивает</td>
+          <td class="number">7</td>
+        </tr>
+        <tr>
+          <td><span class="sample-tag">размер</span> Великоват / длинноват</td>
+          <td class="number">4</td>
+        </tr>
+        <tr>
+          <td><span class="sample-tag">цвет</span> Не соответствует фото</td>
+          <td class="number">4</td>
+        </tr>
+        <tr>
+          <td><span class="sample-tag">подмена</span> Не Benetton / другая фирма / без бирок</td>
+          <td class="number">3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert">
+      <strong>Главная боль — тонкая ткань (33 упоминания)</strong><br>
+      Каждый 6-й покупатель упоминает тонкость или просвечивание. Это свойство 100% хлопка, но покупатели ожидают плотную водолазку. Продавец ни разу за 12 месяцев не объяснил это в ответе.
+    </div>
+  </div>
+
+  <!-- TOP-3 Worst -->
+  <div class="section">
+    <h2 class="section-title">ТОП-3 худших ответа</h2>
+    <p class="section-subtitle">Ответы, которые активно отпугивают покупателей</p>
+
+    <div class="sample">
+      <div class="sample-label">#1 · Вместо Benetton пришла FinFlare — шаблон</div>
+      <div class="sample-box">
+        <div class="sample-text">
+          <strong>Покупатель (1 звезда):</strong> Недостатки: «Вместо водолазки Benetton пришла водолазка FinFlare.»
+        </div>
+        <div class="sample-reply">
+          <strong>Продавец:</strong> «Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы по товару, доставке или возврату, пожалуйста, обратитесь в службу поддержки интернет магазина.»
+        </div>
+        <div class="sample-meta">★1 · черный M · 2025-09-03</div>
+        <span class="sample-tag">копипаст-шаблон</span>
+      </div>
+
+      <div class="alert">
+        Покупатель получил товар ДРУГОГО бренда. Это подмена. Продавец — стандартный шаблон «обратитесь в поддержку». Для потенциального покупателя это сигнал: продавец знает о подменах, но не реагирует.
+      </div>
+
+      <details>
+        <summary>Как стоило ответить</summary>
+        <div class="recommendation">
+          <div class="recommendation-label">Рекомендация</div>
+          <div class="recommendation-text">
+            «Нам очень жаль за эту ситуацию. Это недопустимо — вы заказывали Benetton и должны были получить именно его. Оформите, пожалуйста, возврат через ЛК WB с пометкой "не соответствует описанию" — возврат бесплатный. Мы уже передали информацию для проверки комплектации на складе.»
+          </div>
+          <div class="recommendation-why">
+            Признание проблемы. Конкретная инструкция по бесплатному возврату. Действие (проверка склада). Не обещает компенсацию.
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="sample">
+      <div class="sample-label">#2 · Подделка с разными бирками — шаблон</div>
+      <div class="sample-box">
+        <div class="sample-text">
+          <strong>Покупатель (1 звезда):</strong> «На вороте бирка Benetton и страна Тунис, а на вшитой бирке — другая фирма и страна Россия.» Недостатки: «Подделка.»
+        </div>
+        <div class="sample-reply">
+          <strong>Продавец:</strong> «Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы... обратитесь в службу поддержки интернет магазина.»
+        </div>
+        <div class="sample-meta">★1 · черный XS · 2025-09-18</div>
+        <span class="sample-tag">копипаст-шаблон</span>
+      </div>
+
+      <div class="alert">
+        Покупатель детально описывает признаки подделки (две разные бирки, разные страны). Ответ — шаблон. Три покупателя за год заявляют о подмене — ни одного расследования.
+      </div>
+
+      <details>
+        <summary>Как стоило ответить</summary>
+        <div class="recommendation">
+          <div class="recommendation-label">Рекомендация</div>
+          <div class="recommendation-text">
+            «Спасибо, что сообщили — мы относимся к этому крайне серьёзно. Все наши изделия проходят контроль подлинности. Описанная ситуация нетипична — возможно, произошла ошибка при комплектации. Оформите возврат через ЛК WB как "не соответствует описанию". Мы запустили проверку этой партии.»
+          </div>
+          <div class="recommendation-why">
+            Серьёзное отношение к заявлению. Не отрицает в лоб. Конкретная инструкция. Действие (проверка партии).
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="sample">
+      <div class="sample-label">#3 · Тонкая ткань просвечивает — шаблон</div>
+      <div class="sample-box">
+        <div class="sample-text">
+          <strong>Покупатель (2 звезды):</strong> «Полупрозрачная, на фото недостоверное изображение плотной ткани. Очень мнущаяся. Не стоит таких денег за такой вид.»
+        </div>
+        <div class="sample-reply">
+          <strong>Продавец:</strong> «Добрый день! Благодарим за вашу оценку и обратную связь. В случае, если у вас возникли вопросы... обратитесь в службу поддержки интернет магазина.»
+        </div>
+        <div class="sample-meta">★2 · белый 42-44 · 2025-02-21</div>
+        <span class="sample-tag">копипаст-шаблон</span>
+      </div>
+
+      <div class="alert">
+        Самая частая жалоба (33 упоминания за год): ткань тонкая, просвечивает, мнётся. Покупатель указывает на несоответствие фото. Ответ — тот же шаблон. 33 раза одна и та же проблема, 0 конкретных ответов.
+      </div>
+
+      <details>
+        <summary>Как стоило ответить</summary>
+        <div class="recommendation">
+          <div class="recommendation-label">Рекомендация</div>
+          <div class="recommendation-text">
+            «Благодарим за обратную связь. Эта модель из 100% хлопка — лёгкая и дышащая, поэтому светлые оттенки могут просвечивать. Для белого/кремового рекомендуем нижнее бельё в тон. Мы обновим фотографии, чтобы точнее передать плотность ткани.»
+          </div>
+          <div class="recommendation-why">
+            Объясняет свойство ткани как преимущество. Практический совет. Конкретное действие (обновление фото).
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- What Buyer Sees -->
+  <div class="section">
+    <h2 class="section-title">Что видит потенциальный покупатель</h2>
+    <p class="section-subtitle">Восприятие ответов при чтении негативных отзывов</p>
+
+    <ul class="simple-list">
+      <li>80% ответов на негатив — один и тот же шаблон: «Благодарим за оценку. Обратитесь в поддержку». Покупатель видит: жалобы никто не читает</li>
+      <li>3 покупателя за год сообщают о подмене/подделке — продавец ни разу не расследовал, только шаблон</li>
+      <li>33 упоминания тонкой ткани — продавец ни разу не объяснил, что это 100% хлопок. Покупатель делает вывод: ткань действительно плохая</li>
+      <li>4 жалобы на цвет (коричневый = болотный, розовый = зелёный) — фото так и не обновлены</li>
+      <li>Паттерн: быстрый ответ-робот, который не различает «спасибо, всё отлично» и «прислали подделку»</li>
+    </ul>
+  </div>
+
+  <!-- Action Plan -->
+  <div class="section">
+    <h2 class="section-title">Что делать продавцу</h2>
+    <p class="section-subtitle">Конкретные шаги для улучшения качества ответов</p>
+
+    <ol class="action-list">
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Заменить шаблон на негативные отзывы ручными ответами. Каждый негатив (1-3 звезды) — ответ, адресующий конкретную жалобу. «Обратитесь в поддержку» — не ответ.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Расследовать подмену товара. 3 покупателя за год получили не-Benetton (FinFlare, другие бирки). Нужен аудит складских процессов. В ответах — признавать проблему и давать инструкцию по бесплатному возврату через ЛК WB.
+      </li>
+      <li>
+        <span class="action-priority">Критично</span><br>
+        Добавить в описание карточки честную информацию о плотности ткани: «лёгкий 100% хлопок, светлые цвета могут просвечивать». 33 жалобы за год — это системное ожидание, которое нужно корректировать на входе.
+      </li>
+      <li>
+        <span class="action-priority">Важно</span><br>
+        Обновить фото для коричневого/бежевого/красного цветов. Минимум 4 покупателя жалуются на расхождение реального цвета с карточкой.
+      </li>
+      <li>
+        <span class="action-priority">Важно</span><br>
+        На жалобы о тонкости ткани отвечать: «100% хлопок — лёгкий и дышащий, для светлых цветов рекомендуем нижнее бельё в тон». Превращать свойство в преимущество вместо молчания.
+      </li>
+      <li>
+        <span class="action-priority">Важно</span><br>
+        В позитивных отзывах с недостатками — отвечать на конкретный минус. Особенно для повторных покупателей: их конкретные замечания помогают улучшить карточку и укрепляют лояльность.
+      </li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    Оценка: 2/10 · 215 отзывов за 12 мес. (февраль 2024 — февраль 2026) · WBCON API · Fashion-контекст
+  </div>
+</div>
+
+</body>
+</html>

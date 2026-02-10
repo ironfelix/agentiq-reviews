@@ -1,68 +1,68 @@
-# LLM Processing Plan for Chat Center
+# План обработки LLM для Chat Center
 
-**Created:** 2026-02-10
-**Status:** Research & Planning
-**Author:** Claude Code Analysis
-
----
-
-## Executive Summary
-
-This document analyzes the current state of LLM processing in Chat Center and proposes improvements for handling empty messages, timing of AI analysis, and AI suggestion display.
+**Создан:** 2026-02-10
+**Статус:** Исследование и планирование
+**Автор:** Claude Code
 
 ---
 
-## 1. Current State Analysis
+## Краткое содержание
 
-### 1.1 Message Processing Flow
+Документ анализирует текущее состояние LLM-обработки в Chat Center и предлагает улучшения для обработки пустых сообщений, тайминга AI-анализа и отображения AI-рекомендаций.
+
+---
+
+## 1. Анализ текущего состояния
+
+### 1.1 Поток обработки сообщений
 
 ```
 WB API Events → WBConnector.fetch_messages() → sync.py → Database
                                                    ↓
-                                           analyze_pending_chats (Celery Beat, every 2 min)
+                                           analyze_pending_chats (Celery Beat, каждые 2 мин)
                                                    ↓
                                            AIAnalyzer.analyze_chat()
                                                    ↓
                                            Chat.ai_suggestion_text, Chat.ai_analysis_json
 ```
 
-**Key Files:**
-- `/backend/app/services/wb_connector.py` - WB API integration
-- `/backend/app/tasks/sync.py` - Sync tasks and AI analysis triggers
-- `/backend/app/services/ai_analyzer.py` - LLM integration (DeepSeek)
-- `/backend/app/api/chats.py` - REST API with manual analyze endpoint
+**Ключевые файлы:**
+- `/backend/app/services/wb_connector.py` — интеграция с WB API
+- `/backend/app/tasks/sync.py` — задачи синхронизации и триггеры AI-анализа
+- `/backend/app/services/ai_analyzer.py` — интеграция с LLM (DeepSeek)
+- `/backend/app/api/chats.py` — REST API с эндпоинтом ручного анализа
 
-### 1.2 What Works
+### 1.2 Что работает
 
-| Feature | Status | Location |
-|---------|--------|----------|
-| Message sync from WB | Working | `sync.py:_sync_wb()` |
-| AI analysis task | Working | `sync.py:analyze_chat_with_ai()` |
-| Periodic analysis | Working | Celery Beat every 2 min |
-| Manual analyze button | Working | `POST /api/chats/{id}/analyze` |
-| AI suggestion in right panel | Working | `App.tsx` context panel |
-| AI suggestion in ChatWindow | Working | `ChatWindow.tsx:224-244` |
-| Guardrails application | Working | `ai_analyzer.py:_apply_guardrails()` |
+| Функция | Статус | Расположение |
+|---------|--------|--------------|
+| Синхронизация сообщений из WB | Работает | `sync.py:_sync_wb()` |
+| Задача AI-анализа | Работает | `sync.py:analyze_chat_with_ai()` |
+| Периодический анализ | Работает | Celery Beat каждые 2 мин |
+| Кнопка ручного анализа | Работает | `POST /api/chats/{id}/analyze` |
+| AI-рекомендация в правой панели | Работает | `App.tsx` панель контекста |
+| AI-рекомендация в ChatWindow | Работает | `ChatWindow.tsx:224-244` |
+| Применение guardrails | Работает | `ai_analyzer.py:_apply_guardrails()` |
 
-### 1.3 What Does NOT Work / Needs Improvement
+### 1.3 Что НЕ работает / требует улучшения
 
-| Issue | Impact | Priority |
-|-------|--------|----------|
-| Empty messages not handled | Users see blank messages | High |
-| No "Analyzing..." indicator | Users don't know analysis is running | Medium |
-| AI suggestions appear after 2+ minutes | Poor real-time UX | High |
-| No image placeholders | Confusing for image-only messages | Medium |
-| Attachments not displayed | Missed context from images | Medium |
+| Проблема | Влияние | Приоритет |
+|----------|---------|-----------|
+| Пустые сообщения не обрабатываются | Пользователи видят пустые сообщения | Высокий |
+| Нет индикатора «Анализируется...» | Пользователи не знают, что анализ запущен | Средний |
+| AI-рекомендации появляются через 2+ минуты | Плохой UX в реальном времени | Высокий |
+| Нет плейсхолдеров для изображений | Путаница при сообщениях только с картинками | Средний |
+| Вложения не отображаются | Потеря контекста из изображений | Средний |
 
 ---
 
-## 2. Issue Analysis & Solutions
+## 2. Анализ проблем и решения
 
-### 2.1 Empty Messages and Images
+### 2.1 Пустые сообщения и изображения
 
-#### Current Behavior
+#### Текущее поведение
 
-**WB API returns:**
+**WB API возвращает:**
 ```json
 {
   "message": {
@@ -72,7 +72,7 @@ WB API Events → WBConnector.fetch_messages() → sync.py → Database
 }
 ```
 
-**Current code in `wb_connector.py:205-224`:**
+**Текущий код в `wb_connector.py:205-224`:**
 ```python
 messages.append({
     "text": event.get("message", {}).get("text", ""),
@@ -88,16 +88,16 @@ messages.append({
 })
 ```
 
-**Problem:** Text is empty string, attachments are saved but never displayed in frontend.
+**Проблема:** Текст — пустая строка, вложения сохраняются, но не отображаются во фронтенде.
 
-#### Proposed Solution
+#### Предлагаемое решение
 
-**Backend changes (`wb_connector.py`):**
+**Изменения бэкенда (`wb_connector.py`):**
 
 ```python
-# Add after line 224
+# Добавить после строки 224
 def _normalize_message_text(text: str, attachments: list) -> str:
-    """Generate display text for messages with images/files."""
+    """Генерирует отображаемый текст для сообщений с изображениями/файлами."""
     if text and text.strip():
         return text.strip()
 
@@ -107,13 +107,13 @@ def _normalize_message_text(text: str, attachments: list) -> str:
             return "[Изображение]"
         return f"[{file_count} изображений]"
 
-    return ""  # Truly empty message - will be filtered out
+    return ""  # Действительно пустое сообщение — будет отфильтровано
 ```
 
-**Frontend changes (`ChatWindow.tsx`):**
+**Изменения фронтенда (`ChatWindow.tsx`):**
 
 ```tsx
-// Add to renderMessages()
+// Добавить в renderMessages()
 const getMessageContent = (message: Message) => {
   if (message.text && message.text.trim()) {
     return message.text;
@@ -134,88 +134,88 @@ const getMessageContent = (message: Message) => {
 };
 ```
 
-#### MVP Rules for Empty Messages
+#### MVP-правила для пустых сообщений
 
-1. **If `text` is empty but `attachments` exist** - Show "[Изображение]" placeholder
-2. **If `text` is empty AND no attachments** - Filter out, don't show in UI
-3. **For AI analysis** - Skip empty messages, note in context: "Клиент отправил изображение (недоступно)"
-4. **Unread count** - Don't increment for truly empty messages
-5. **Last message preview** - Show "[Изображение]" if text empty but has attachments
+1. **Если `text` пуст, но есть `attachments`** — показывать плейсхолдер «[Изображение]»
+2. **Если `text` пуст И нет attachments** — фильтровать, не показывать в UI
+3. **Для AI-анализа** — пропускать пустые сообщения, добавлять в контекст: «Клиент отправил изображение (недоступно)»
+4. **Счётчик непрочитанных** — не увеличивать для действительно пустых сообщений
+5. **Превью последнего сообщения** — показывать «[Изображение]», если текст пуст, но есть вложения
 
 ---
 
-### 2.2 Timing of Intent Detection & AI Analysis
+### 2.2 Тайминг определения интента и AI-анализа
 
-#### Current Implementation
+#### Текущая реализация
 
 ```
-sync_all_sellers (every 30s)
+sync_all_sellers (каждые 30с)
     → sync_seller_chats()
         → _upsert_chat_and_messages()
 
-analyze_pending_chats (every 2 min)
-    → find chats where:
+analyze_pending_chats (каждые 2 мин)
+    → найти чаты где:
         - unread_count > 0
         - ai_suggestion_text IS NULL
         - chat_status IN ('waiting', 'client-replied')
-    → analyze_chat_with_ai() for each (max 10)
+    → analyze_chat_with_ai() для каждого (макс 10)
 ```
 
-**Problem:** 2-minute delay is too long for real-time customer support.
+**Проблема:** Задержка 2 минуты — слишком долго для поддержки в реальном времени.
 
-#### Analysis of Options
+#### Анализ вариантов
 
-| Option | Pros | Cons | Latency |
-|--------|------|------|---------|
-| **A: Sync-time analysis** | Immediate | Blocks sync, timeout risk | ~5s |
-| **B: On-open analysis** | Only for viewed chats | Delay on first open | ~3s |
-| **C: Background after sync (current)** | Non-blocking | 2+ min delay | ~120s |
-| **D: Event-driven immediate** | Near real-time | Complex, needs WebSocket | ~5s |
+| Вариант | Плюсы | Минусы | Задержка |
+|---------|-------|--------|----------|
+| **A: Анализ при синхронизации** | Мгновенно | Блокирует синхронизацию, риск таймаута | ~5с |
+| **B: Анализ при открытии** | Только для просматриваемых чатов | Задержка при первом открытии | ~3с |
+| **C: Фоновый после синхронизации (текущий)** | Неблокирующий | Задержка 2+ мин | ~120с |
+| **D: Event-driven мгновенный** | Почти реальное время | Сложно, нужен WebSocket | ~5с |
 
-#### Recommended Approach: Hybrid (B + C)
+#### Рекомендуемый подход: Гибридный (B + C)
 
-**Phase 1 (MVP):** Keep background analysis, add on-demand when opening chat
+**Фаза 1 (MVP):** Оставить фоновый анализ, добавить on-demand при открытии чата
 
 ```python
-# In chats.py get_chat() or new endpoint
+# В chats.py get_chat() или новый эндпоинт
 @router.get("/{chat_id}", response_model=ChatResponse)
 async def get_chat(chat_id: int, ...):
     chat = await get_chat_by_id(chat_id, db)
 
-    # Trigger analysis if needed (non-blocking)
+    # Запустить анализ если нужно (неблокирующий)
     if chat.ai_suggestion_text is None and chat.unread_count > 0:
         analyze_chat_with_ai.delay(chat_id)
-        chat.analysis_status = "pending"  # New field
+        chat.analysis_status = "pending"  # Новое поле
 
     return chat
 ```
 
-**Phase 2:** Reduce Celery Beat interval to 30 seconds for faster background updates
+**Фаза 2:** Уменьшить интервал Celery Beat до 30 секунд
 
 ```python
-# In tasks/__init__.py
+# В tasks/__init__.py
 "analyze-pending-chats-every-30s": {
     "task": "app.tasks.sync.analyze_pending_chats",
-    "schedule": 30.0,  # Was 120s
+    "schedule": 30.0,  # Было 120с
 },
 ```
 
-**Phase 3:** WebSocket for real-time updates (future)
+**Фаза 3:** WebSocket для обновлений в реальном времени (будущее)
 
-#### "Analyzing..." Indicator
+#### Индикатор «Анализируется...»
 
-**Backend:** Add `analysis_status` field to Chat model
+**Бэкенд:** Добавить поле `analysis_status` в модель Chat
 
 ```python
-# In models/chat.py
+# В models/chat.py
 analysis_status = Column(String(20), default=None, nullable=True)
-# Values: null, "pending", "analyzing", "complete", "error"
+# Значения: null, "pending", "analyzing", "complete", "error"
 ```
 
-**Frontend:** Show indicator in context panel
+**Фронтенд:** Показывать индикатор в панели контекста
 
 ```tsx
-// In App.tsx context panel
+// В App.tsx панель контекста
 {selectedChat?.analysis_status === 'pending' && (
   <div className="analysis-status">
     <div className="spinner" />
@@ -224,19 +224,19 @@ analysis_status = Column(String(20), default=None, nullable=True)
 )}
 ```
 
-**Update flow:**
-1. Chat opened with `ai_suggestion_text = null` → set `analysis_status = "pending"`
-2. Celery task starts → set `analysis_status = "analyzing"`
-3. Task completes → set `analysis_status = "complete"`, populate `ai_suggestion_text`
-4. Frontend polls or WebSocket updates
+**Поток обновления:**
+1. Чат открыт с `ai_suggestion_text = null` → установить `analysis_status = "pending"`
+2. Celery-задача стартует → установить `analysis_status = "analyzing"`
+3. Задача завершена → установить `analysis_status = "complete"`, заполнить `ai_suggestion_text`
+4. Фронтенд получает обновление через polling или WebSocket
 
 ---
 
-### 2.3 AI Suggestions in ChatWindow
+### 2.3 AI-рекомендации в ChatWindow
 
-#### Current State
+#### Текущее состояние
 
-**AI suggestion IS displayed** in `ChatWindow.tsx:224-244`:
+**AI-рекомендация УЖЕ отображается** в `ChatWindow.tsx:224-244`:
 
 ```tsx
 {chat.ai_suggestion_text && (
@@ -247,29 +247,29 @@ analysis_status = Column(String(20), default=None, nullable=True)
 )}
 ```
 
-**Why it might not appear:**
+**Почему может не появляться:**
 
-1. **`ai_suggestion_text` is null** - Analysis hasn't run yet
-2. **Analysis failed** - DeepSeek API error, no fallback stored
-3. **Chat doesn't meet criteria** - `unread_count = 0` or `chat_status` not waiting
-4. **Last message is from seller** - Analysis returns `recommendation: null` by design
+1. **`ai_suggestion_text` равен null** — анализ ещё не запускался
+2. **Анализ упал** — ошибка DeepSeek API, fallback не сохранён
+3. **Чат не соответствует критериям** — `unread_count = 0` или `chat_status` не waiting
+4. **Последнее сообщение от продавца** — анализ возвращает `recommendation: null` по дизайну
 
-#### Diagnostic Checklist
+#### Диагностический чеклист
 
-| Check | Expected | Actual |
-|-------|----------|--------|
-| `chat.ai_suggestion_text` in API response | String or null | ? |
-| `ai_analysis_json` populated | JSON string | ? |
-| DeepSeek API key configured | `DEEPSEEK_API_KEY` in .env | ? |
-| Celery worker running | `celery -A app.tasks worker` | ? |
-| Celery beat running | `celery -A app.tasks beat` | ? |
+| Проверка | Ожидаемо | Фактически |
+|----------|----------|------------|
+| `chat.ai_suggestion_text` в ответе API | Строка или null | ? |
+| `ai_analysis_json` заполнен | JSON-строка | ? |
+| DeepSeek API ключ настроен | `DEEPSEEK_API_KEY` в .env | ? |
+| Celery worker запущен | `celery -A app.tasks worker` | ? |
+| Celery beat запущен | `celery -A app.tasks beat` | ? |
 
-#### Fixes
+#### Исправления
 
-**1. Always show AI panel, indicate status:**
+**1. Всегда показывать AI-панель, индицировать статус:**
 
 ```tsx
-// In ChatWindow.tsx
+// В ChatWindow.tsx
 {chat.ai_suggestion_text ? (
   <div className="ai-suggestion" onClick={handleUseAISuggestion}>
     <div className="ai-suggestion-label">AI Рекомендация</div>
@@ -292,36 +292,36 @@ analysis_status = Column(String(20), default=None, nullable=True)
 )}
 ```
 
-**2. Trigger analysis on chat open if missing:**
+**2. Запускать анализ при открытии чата, если отсутствует:**
 
 ```tsx
-// In App.tsx handleSelectChat()
+// В App.tsx handleSelectChat()
 const handleSelectChat = useCallback(async (chat: Chat) => {
   setSelectedChat(chat);
   fetchMessages(chat.id);
 
-  // Trigger AI analysis if missing and has unread
+  // Запустить AI-анализ если отсутствует и есть непрочитанные
   if (!chat.ai_suggestion_text && chat.unread_count > 0) {
     try {
       await chatApi.analyzeChat(chat.id, { async_mode: true });
     } catch (e) {
-      console.warn('Failed to trigger analysis:', e);
+      console.warn('Не удалось запустить анализ:', e);
     }
   }
   ...
 }, []);
 ```
 
-**3. Ensure fallback analysis stores result:**
+**3. Обеспечить сохранение fallback-анализа:**
 
 ```python
-# In ai_analyzer.py analyze_chat_for_db()
+# В ai_analyzer.py analyze_chat_for_db()
 if analysis:
     chat.ai_analysis_json = json.dumps(analysis, ensure_ascii=False, default=str)
     chat.ai_suggestion_text = analysis.get("recommendation")
-    # ^ This line already exists, but check if recommendation is null
+    # ^ Эта строка уже есть, но проверить если recommendation = null
     if not chat.ai_suggestion_text and analysis.get("intent"):
-        # Generate fallback if LLM returned no recommendation
+        # Сгенерировать fallback если LLM не вернул рекомендацию
         chat.ai_suggestion_text = analyzer._fallback_analysis(
             messages_data, chat.customer_name
         ).get("recommendation")
@@ -329,174 +329,254 @@ if analysis:
 
 ---
 
-## 3. Industry Best Practices
+## 3. Лучшие практики индустрии
 
-### 3.1 Intent Detection Timing
+### 3.1 Тайминг определения интента
 
 **Zendesk Answer Bot / Intercom Fin / Freshdesk Freddy:**
 
-| Tool | Approach | Latency |
-|------|----------|---------|
-| Zendesk | Real-time during typing | <1s |
-| Intercom | On message send (webhook) | 2-3s |
-| Freshdesk | Background + on-demand | 5-10s |
-| Gorgias | Real-time streaming | <2s |
+| Инструмент | Подход | Задержка |
+|------------|--------|----------|
+| Zendesk | Реальное время при наборе | <1с |
+| Intercom | При отправке сообщения (webhook) | 2-3с |
+| Freshdesk | Фоновый + on-demand | 5-10с |
+| Gorgias | Реальное время со стримингом | <2с |
 
-**Best practice:** Analyze on message arrival (webhook/event), not periodic polling.
+**Лучшая практика:** Анализировать при получении сообщения (webhook/event), а не периодическим polling.
 
-### 3.2 AI Suggestion Display Patterns
+### 3.2 Паттерны отображения AI-рекомендаций
 
-**Common patterns:**
+**Распространённые паттерны:**
 
-1. **Inline below messages** (Intercom) - AI suggestion appears as a "draft" bubble
-2. **Side panel** (Zendesk) - Context panel with suggestion + edit
-3. **Quick actions** (Freshdesk) - Buttons for common responses
-4. **Streaming response** (Gorgias) - Token-by-token display
+1. **Inline под сообщениями** (Intercom) — AI-рекомендация как «черновик» пузырём
+2. **Боковая панель** (Zendesk) — панель контекста с рекомендацией + редактирование
+3. **Быстрые действия** (Freshdesk) — кнопки для типовых ответов
+4. **Стриминг ответа** (Gorgias) — посимвольное отображение
 
-**Recommended for AgentIQ:**
-- Primary: Inline in ChatWindow (current implementation)
-- Secondary: Context panel for editing
-- Add: Quick action buttons for template responses
+**Рекомендация для AgentIQ:**
+- Основной: Inline в ChatWindow (текущая реализация)
+- Вторичный: Панель контекста для редактирования
+- Добавить: Кнопки быстрых действий для шаблонных ответов
 
-### 3.3 Handling Attachments/Media
+### 3.3 Обработка вложений/медиа
 
-**Industry approaches:**
+**Подходы индустрии:**
 
-1. **Thumbnail display** - Show small preview, click to expand
-2. **OCR/Vision analysis** - Extract text from images with GPT-4V
-3. **Placeholder with download** - "[Image] Click to download"
-4. **File type icons** - Different icons for images, PDFs, etc.
+1. **Миниатюры** — маленькое превью, клик для увеличения
+2. **OCR/Vision анализ** — извлечение текста из изображений через GPT-4V
+3. **Плейсхолдер со скачиванием** — «[Изображение] Нажмите для скачивания»
+4. **Иконки типов файлов** — разные иконки для изображений, PDF и т.д.
 
-**MVP recommendation:** Placeholder with note, future: GPT-4V integration
+**MVP-рекомендация:** Плейсхолдер с пояснением, в будущем: интеграция GPT-4V
 
-### 3.4 Confidence & Editing
+### 3.4 Уверенность и редактирование
 
-**Best practices:**
-- Show confidence score (high/medium/low)
-- Allow one-click edit before send
-- Track edited suggestions for model improvement
-- Provide multiple suggestion options
-
----
-
-## 4. Implementation Plan
-
-### Phase 1: MVP Fixes (1-2 days)
-
-| Task | File | Priority |
-|------|------|----------|
-| Handle empty messages with attachments | `wb_connector.py`, `ChatWindow.tsx` | High |
-| Add "Analyzing..." indicator | `ChatWindow.tsx`, `App.tsx` | High |
-| Trigger analysis on chat open | `App.tsx` | High |
-| Ensure fallback suggestion always saved | `ai_analyzer.py` | High |
-
-### Phase 2: UX Improvements (3-5 days)
-
-| Task | File | Priority |
-|------|------|----------|
-| Reduce analysis interval to 30s | `tasks/__init__.py` | Medium |
-| Add `analysis_status` field to Chat | `models/chat.py`, `schemas/chat.py` | Medium |
-| Show analysis status in UI | `App.tsx`, `ChatWindow.tsx` | Medium |
-| Attachment placeholders with icons | `ChatWindow.tsx`, `index.css` | Medium |
-
-### Phase 3: Real-time (Future)
-
-| Task | Complexity | Impact |
-|------|------------|--------|
-| WebSocket for live updates | High | High |
-| GPT-4V for image analysis | Medium | Medium |
-| Streaming AI responses | Medium | High |
-| Multiple suggestion variants | Medium | Medium |
+**Лучшие практики:**
+- Показывать оценку уверенности (высокая/средняя/низкая)
+- Разрешать редактирование одним кликом перед отправкой
+- Отслеживать отредактированные рекомендации для улучшения модели
+- Предоставлять несколько вариантов рекомендаций
 
 ---
 
-## 5. MVP Rules Summary
+## 4. Pre-purchase интенты и приоритизация
 
-### Empty Messages
+### 4.1 Проблема
+
+Текущий список интентов покрывает только post-purchase сценарии (доставка, брак, возврат). Но **pre-purchase вопросы — это потенциальные продажи**, и быстрый ответ критичен для конверсии.
+
+### 4.2 Новые интенты
+
+```python
+# Добавить в INTENTS (ai_analyzer.py)
+INTENTS = {
+    # ... существующие ...
+    "pre_purchase": "Вопрос перед покупкой",
+    "sizing_fit": "Какой размер выбрать?",
+    "availability": "Есть ли в наличии?",
+    "compatibility": "Подойдёт ли к...?",
+}
+```
+
+### 4.3 Обновлённая приоритизация
+
+| Приоритет | Интенты | SLA | Логика |
+|-----------|---------|-----|--------|
+| **P0 (urgent)** | `defect_not_working`, `wrong_item` | <1ч | Клиент заплатил, проблема критичная |
+| **P1 (high)** | `pre_purchase`, `sizing_fit`, `availability`, `compatibility`, `delivery_delay`, `cancel_request` | <1ч | **Pre-purchase = деньги в руках, вот-вот купит!** |
+| **P2 (normal)** | `refund_exchange`, `delivery_status` | <4ч | Вопрос по заказу, не срочно |
+| **P3 (low)** | `usage_howto`, `product_spec`, `thanks` | <24ч | Информационный вопрос |
+
+```python
+# Обновить SLA_PRIORITIES (ai_analyzer.py)
+SLA_PRIORITIES = {
+    "defect_not_working": "urgent",
+    "wrong_item": "urgent",
+
+    "pre_purchase": "high",      # P1 — вот-вот купит!
+    "sizing_fit": "high",        # P1 — выбирает размер
+    "availability": "high",      # P1 — проверяет наличие
+    "compatibility": "high",     # P1 — проверяет совместимость
+    "delivery_delay": "high",
+    "cancel_request": "high",
+
+    "refund_exchange": "normal",
+    "delivery_status": "normal",
+
+    "usage_howto": "low",
+    "product_spec": "low",
+    "thanks": "low",
+    "other": "normal",
+}
+```
+
+### 4.4 Источники pre-purchase вопросов
+
+| Канал | Тип | Статус интеграции |
+|-------|-----|-------------------|
+| **Чаты по заказам** | Post-purchase | Интегрирован (WB Chat API) |
+| **Вопросы о товаре** | Pre-purchase | **НЕ интегрирован** — отдельный API |
+
+**Важно:** Для полноценной поддержки pre-purchase нужна интеграция с API «Вопросы о товаре» (WB/Ozon).
+
+### 4.5 Сигналы pre-purchase интента
+
+| Сигнал | Пример | Интент |
+|--------|--------|--------|
+| Вопрос о размере без номера заказа | «Какой размер брать на 42?» | `sizing_fit` |
+| Вопрос о наличии | «Когда будет в наличии S?» | `availability` |
+| Совместимость | «Подойдёт к iPhone 15?» | `compatibility` |
+| Общий вопрос перед покупкой | «А это оригинал?» | `pre_purchase` |
+
+---
+
+## 5. План реализации
+
+### Фаза 1: MVP-исправления (1-2 дня)
+
+| Задача | Файл | Приоритет |
+|--------|------|-----------|
+| Обработка пустых сообщений с вложениями | `wb_connector.py`, `ChatWindow.tsx` | Высокий |
+| Добавить индикатор «Анализируется...» | `ChatWindow.tsx`, `App.tsx` | Высокий |
+| Запускать анализ при открытии чата | `App.tsx` | Высокий |
+| Обеспечить сохранение fallback-рекомендации | `ai_analyzer.py` | Высокий |
+
+### Фаза 2: Улучшения UX (3-5 дней)
+
+| Задача | Файл | Приоритет |
+|--------|------|-----------|
+| Уменьшить интервал анализа до 30с | `tasks/__init__.py` | Средний |
+| Добавить поле `analysis_status` в Chat | `models/chat.py`, `schemas/chat.py` | Средний |
+| Показывать статус анализа в UI | `App.tsx`, `ChatWindow.tsx` | Средний |
+| Плейсхолдеры вложений с иконками | `ChatWindow.tsx`, `index.css` | Средний |
+
+### Фаза 3: Pre-purchase и расширение
+
+| Задача | Сложность | Влияние |
+|--------|-----------|---------|
+| Добавить pre-purchase интенты в ai_analyzer.py | Низкая | Высокое |
+| Интеграция API «Вопросы о товаре» WB | Средняя | **Высокое** (конверсия!) |
+| Интеграция API «Вопросы о товаре» Ozon | Средняя | Высокое |
+| Объединённый inbox для чатов + вопросов | Средняя | Высокое |
+
+### Фаза 4: Реальное время (будущее)
+
+| Задача | Сложность | Влияние |
+|--------|-----------|---------|
+| WebSocket для live-обновлений | Высокая | Высокое |
+| GPT-4V для анализа изображений | Средняя | Среднее |
+| Стриминг AI-ответов | Средняя | Высокое |
+| Несколько вариантов рекомендаций | Средняя | Среднее |
+
+---
+
+## 6. Краткие MVP-правила
+
+### Пустые сообщения
 
 ```
-IF text.trim() == "" AND attachments.length > 0:
-    display_text = "[Изображение]" or "[{n} изображений]"
+ЕСЛИ text.trim() == "" И attachments.length > 0:
+    display_text = "[Изображение]" или "[{n} изображений]"
     for_ai_context = "Клиент отправил изображение (содержимое недоступно)"
     increment_unread = true
 
-IF text.trim() == "" AND attachments.length == 0:
-    display_text = null (filter out)
+ЕСЛИ text.trim() == "" И attachments.length == 0:
+    display_text = null (отфильтровать)
     increment_unread = false
 ```
 
-### AI Analysis Timing
+### Тайминг AI-анализа
 
 ```
-ON sync_complete:
-    trigger analyze_pending_chats async (every 30s)
+ПРИ sync_complete:
+    запустить analyze_pending_chats async (каждые 30с)
 
-ON chat_open:
-    IF ai_suggestion_text == null AND unread_count > 0:
-        trigger analyze_chat_with_ai async
-        show "Анализируется..."
+ПРИ chat_open:
+    ЕСЛИ ai_suggestion_text == null И unread_count > 0:
+        запустить analyze_chat_with_ai async
+        показать "Анализируется..."
 
-ON analysis_complete:
-    update chat.ai_suggestion_text
-    update chat.analysis_status = "complete"
-    refresh UI (polling or WebSocket)
+ПРИ analysis_complete:
+    обновить chat.ai_suggestion_text
+    обновить chat.analysis_status = "complete"
+    обновить UI (polling или WebSocket)
 ```
 
-### AI Suggestion Display
+### Отображение AI-рекомендаций
 
 ```
-IF ai_suggestion_text != null:
-    show suggestion in ChatWindow (clickable to use)
-    show details in context panel
+ЕСЛИ ai_suggestion_text != null:
+    показать рекомендацию в ChatWindow (кликабельную для использования)
+    показать детали в панели контекста
 
-IF ai_suggestion_text == null AND unread_count > 0:
-    show "Генерируется..." placeholder
+ЕСЛИ ai_suggestion_text == null И unread_count > 0:
+    показать плейсхолдер "Генерируется..."
 
-IF ai_suggestion_text == null AND unread_count == 0:
-    show "Нет ожидающих сообщений"
+ЕСЛИ ai_suggestion_text == null И unread_count == 0:
+    показать "Нет ожидающих сообщений"
 ```
 
 ---
 
-## 6. Technical Debt & Notes
+## 7. Технический долг и заметки
 
-1. **Sync cursor not persisted** - Each sync starts from beginning (see `sync.py:117-121`)
-2. **DeepSeek timeout** - 30s may be too short for complex chats
-3. **No retry on analysis failure** - Failed analyses don't retry automatically
-4. **Polling vs WebSocket** - Current polling (10s) is inefficient
-
----
-
-## 7. Success Metrics
-
-| Metric | Current | Target |
-|--------|---------|--------|
-| Time to first AI suggestion | ~2 min | <10s |
-| Suggestion display rate | Unknown | >90% of waiting chats |
-| Empty message confusion | High | Zero |
-| User-reported missing suggestions | Unknown | <5% |
+1. **Курсор синхронизации не сохраняется** — каждая синхронизация начинается сначала (см. `sync.py:117-121`)
+2. **Таймаут DeepSeek** — 30с может быть мало для сложных чатов
+3. **Нет retry при ошибке анализа** — неудачные анализы не повторяются автоматически
+4. **Polling vs WebSocket** — текущий polling (10с) неэффективен
 
 ---
 
-## Appendix: Code References
+## 8. Метрики успеха
 
-### Key Files
+| Метрика | Текущее | Цель |
+|---------|---------|------|
+| Время до первой AI-рекомендации | ~2 мин | <10с |
+| Доля чатов с рекомендацией | Неизвестно | >90% ожидающих чатов |
+| Путаница с пустыми сообщениями | Высокая | Ноль |
+| Жалобы на отсутствие рекомендаций | Неизвестно | <5% |
 
-| File | Purpose |
-|------|---------|
-| `backend/app/tasks/sync.py` | Celery tasks for sync and analysis |
-| `backend/app/services/wb_connector.py` | WB API client |
-| `backend/app/services/ai_analyzer.py` | DeepSeek LLM integration |
-| `backend/app/api/chats.py` | REST API endpoints |
-| `frontend/src/components/ChatWindow.tsx` | Chat message display |
-| `frontend/src/App.tsx` | Main app with context panel |
+---
 
-### API Endpoints
+## Приложение: Ссылки на код
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/chats` | GET | List chats with filters |
-| `/api/chats/{id}` | GET | Get single chat |
-| `/api/chats/{id}/analyze` | POST | Trigger AI analysis |
-| `/api/chats/{id}/messages` | GET | Get chat messages |
-| `/api/messages` | POST | Send message |
+### Ключевые файлы
+
+| Файл | Назначение |
+|------|------------|
+| `backend/app/tasks/sync.py` | Celery-задачи синхронизации и анализа |
+| `backend/app/services/wb_connector.py` | Клиент WB API |
+| `backend/app/services/ai_analyzer.py` | Интеграция с DeepSeek LLM |
+| `backend/app/api/chats.py` | REST API эндпоинты |
+| `frontend/src/components/ChatWindow.tsx` | Отображение сообщений чата |
+| `frontend/src/App.tsx` | Главное приложение с панелью контекста |
+
+### API-эндпоинты
+
+| Эндпоинт | Метод | Назначение |
+|----------|-------|------------|
+| `/api/chats` | GET | Список чатов с фильтрами |
+| `/api/chats/{id}` | GET | Получить один чат |
+| `/api/chats/{id}/analyze` | POST | Запустить AI-анализ |
+| `/api/chats/{id}/messages` | GET | Получить сообщения чата |
+| `/api/messages` | POST | Отправить сообщение |

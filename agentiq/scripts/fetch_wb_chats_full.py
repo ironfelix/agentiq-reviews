@@ -22,7 +22,7 @@ BASE_URL = "https://buyer-chat-api.wildberries.ru"
 # Загружаем токен из .env.wb-tokens
 ENV_PATH = os.path.join(
     os.path.dirname(__file__),
-    "..", "mvp-chat", "backend", ".env.wb-tokens"
+    "..", "apps", "chat-center", "backend", ".env.wb-tokens"
 )
 
 def load_token():

@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/reviews/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - apps/reviews/.env
+    depends_on:
+      - redis
+    volumes:
+      - db_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/agentiq.db
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/reviews/Dockerfile.worker
+    env_file:
+      - apps/reviews/.env
+    depends_on:
+      - redis
+    volumes:
+      - db_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/agentiq.db
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  db_data:

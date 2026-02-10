@@ -4,5 +4,7 @@ __pycache__/
 .DS_Store
 .env
 *.log
+.pids
+=1.0.0
 agentiq/architecture.md
 CLAUDE.md

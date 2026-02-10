@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ Chat Center — Full 3-Column Layout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DESIGN SYSTEM ===== */
+        :root {
+            /* Colors */
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+            --color-bg-chat: #e8f2f8;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+            --color-urgent: #ea4335;
+
+            /* Spacing Scale (4px base) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            /* Typography */
+            --font-size-xs: 10px;
+            --font-size-sm: 11px;
+            --font-size-md: 12px;
+            --font-size-base: 13px;
+            --font-size-lg: 14px;
+
+            /* Border Radius */
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 14px;
+
+            /* Transitions */
+            --transition-fast: 0.12s ease;
+            --transition-medium: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            height: 100vh;
+            overflow: hidden;
+            font-size: var(--font-size-base);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .chat-center {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== LEFT PANEL: Chat List ===== */
+        .chat-list {
+            width: 340px;
+            background: var(--color-bg-primary);
+            border-right: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            padding: var(--space-4) var(--space-4) var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .chat-list-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-3);
+        }
+
+        /* Search */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: var(--space-2);
+        }
+
+        .search-box {
+            width: 100%;
+            background: var(--color-bg-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-lg);
+            padding: var(--space-2) 34px var(--space-2) 11px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .search-box:focus {
+            outline: none;
+            background: var(--color-bg-primary);
+            border-color: var(--color-border-medium);
+        }
+
+        .search-box::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .filter-icon-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            color: var(--color-text-tertiary);
+        }
+
+        .filter-icon-btn:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--color-text-primary);
+        }
+
+        .filter-icon-btn.active {
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        /* Pills Filters */
+        .filters-container {
+            position: relative;
+            margin-bottom: var(--space-3);
+        }
+
+        .filters-scroll {
+            display: flex;
+            gap: var(--space-1);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            padding: 1px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .filters-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            flex-shrink: 0;
+            padding: 5px 10px;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .filter-pill:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .filter-pill.active {
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        .filter-pill .count {
+            opacity: 0.6;
+            margin-left: 3px;
+            font-size: var(--font-size-sm);
+        }
+
+        .filter-pill.active .count {
+            opacity: 0.8;
+        }
+
+        /* Advanced Filters Dropdown */
+        .advanced-filters {
+            display: none;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2);
+            margin-bottom: var(--space-2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .advanced-filters.open {
+            display: block;
+        }
+
+        .filter-group {
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-group:last-of-type {
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-group-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* Date Range */
+        .date-range-compact {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-input-compact {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .date-input-compact:hover {
+            border-color: var(--color-border-dark);
+        }
+
+        .date-input-compact:focus {
+            outline: none;
+            border-color: var(--color-text-primary);
+        }
+
+        .date-separator {
+            color: var(--color-text-tertiary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Platform & Rating Chips */
+        .platform-chips,
+        .rating-chips {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .platform-chip,
+        .rating-chip {
+            padding: 4px 8px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            font-family: inherit;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .platform-chip:hover,
+        .rating-chip:hover {
+            background: var(--color-bg-primary);
+            border-color: var(--color-border-dark);
+        }
+
+        .platform-chip.active,
+        .rating-chip.active {
+            background: var(--color-text-primary);
+            border-color: var(--color-text-primary);
+            color: var(--color-bg-primary);
+        }
+
+        /* Filter Actions */
+        .filter-actions {
+            display: flex;
+            gap: 6px;
+            padding-top: var(--space-2);
+            border-top: 1px solid var(--color-border-light);
+            margin-top: 2px;
+        }
+
+        .btn-clear,
+        .btn-apply {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--color-text-secondary);
+        }
+
+        .btn-clear:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .btn-apply {
+            flex: 2;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+            font-weight: 500;
+        }
+
+        .btn-apply:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-apply:active {
+            transform: scale(0.98);
+        }
+
+        /* Queues */
+        .queue-divider {
+            height: 1px;
+            background: var(--color-border-medium);
+            margin: var(--space-2) 0;
+        }
+
+        .chat-list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-3) var(--space-4);
+        }
+
+        .queue-section {
+            margin-bottom: var(--space-4);
+        }
+
+        .queue-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+            padding: 0 2px;
+        }
+
+        .queue-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .queue-count {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Chat Items */
+        .chat-item {
+            padding: var(--space-2);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            gap: var(--space-2);
+            align-items: flex-start;
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-1);
+            border: 1px solid transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .chat-item:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-medium);
+        }
+
+        .chat-item.active {
+            background: var(--color-bg-active);
+            border-color: #d0e7ff;
+        }
+
+        .marketplace-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* Real Favicon Icons */
+        .marketplace-icon.wb {
+            background: #8b33ff url('./assets/icons/wildberries.ico') center/contain no-repeat;
+            text-indent: -9999px;
+        }
+
+        .marketplace-icon.ozon {
+            background: #005bff url('./assets/icons/ozon.ico') center/16px no-repeat;
+            text-indent: -9999px;
+        }
+
+        .marketplace-icon.yandex {
+            background: #ff6600 url('./assets/icons/yandex-market.ico') center/contain no-repeat;
+            text-indent: -9999px;
+        }
+
+        .marketplace-icon.avito {
+            background: #00a046 url('./assets/icons/avito.ico') center/contain no-repeat;
+            text-indent: -9999px;
+        }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-item-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+        }
+
+        .chat-item-name {
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-primary);
+            flex: 1;
+        }
+
+        .chat-item-time {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+        }
+
+        .chat-item-meta {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+            margin-bottom: 3px;
+        }
+
+        .chat-item-preview {
+            font-size: var(--font-size-md);
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .chat-item.urgent .chat-item-name::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background: var(--color-urgent);
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .chat-item[draggable="true"] {
+            cursor: move;
+        }
+
+        .chat-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+            cursor: grabbing;
+        }
+
+        .queue-section.drag-over {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+        }
+
+        .unread-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        /* Scrollbar */
+        .chat-list-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb {
+            background: var(--color-border-dark);
+            border-radius: 2px;
+        }
+
+        .chat-list-content::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        /* ===== CENTER: Chat Window ===== */
+        .chat-window {
+            flex: 1;
+            background: var(--color-bg-chat);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .chat-header-meta {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--color-border-medium);
+            background: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all var(--transition-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .header-action-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .message {
+            max-width: 560px;
+        }
+
+        .message.customer {
+            align-self: flex-start;
+        }
+
+        .message.seller {
+            align-self: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message-author {
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .message-time {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: var(--font-size-lg);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        .message.seller .message-content {
+            background: #dcedff;
+            color: var(--color-text-primary);
+        }
+
+        /* Message attachments */
+        .message-attachment {
+            margin-top: 8px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .message-attachment img {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            cursor: pointer;
+            border-radius: var(--radius-lg);
+        }
+
+        .message-attachment img:hover {
+            opacity: 0.95;
+        }
+
+        /* AI Suggestion */
+        .ai-suggestion {
+            background: var(--color-bg-hover);
+            border-left: 3px solid var(--color-text-primary);
+            padding: 12px 16px;
+            margin: 0 24px 16px 24px;
+            border-radius: var(--radius-md);
+        }
+
+        .ai-suggestion-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .ai-suggestion-text {
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        /* Input */
+        .chat-input-container {
+            border-top: 1px solid var(--color-border-medium);
+            padding: 20px 24px;
+            background: white;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--color-bg-hover);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            font-size: var(--font-size-lg);
+            font-family: inherit;
+            color: var(--color-text-primary);
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            line-height: 1.5;
+            transition: all var(--transition-medium);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--color-text-primary);
+        }
+
+        .chat-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .btn-send {
+            background: var(--color-text-primary);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-medium);
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== RIGHT PANEL: Product Context ===== */
+        .product-context {
+            width: 300px;
+            background: white;
+            border-left: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .product-context::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .product-context::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .product-context::-webkit-scrollbar-thumb {
+            background: var(--color-border-dark);
+            border-radius: 3px;
+        }
+
+        .product-context::-webkit-scrollbar-thumb:hover {
+            background: #bdc1c6;
+        }
+
+        .context-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .context-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .info-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .info-section-title {
+            font-size: var(--font-size-md);
+            text-transform: uppercase;
+            color: var(--color-text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            margin-bottom: 16px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: var(--font-size-md);
+            color: var(--color-text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-primary);
+        }
+
+        .info-link {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: var(--font-size-lg);
+        }
+
+        .info-link:hover {
+            text-decoration: underline;
+        }
+
+        /* AI Insights */
+        .insight-badge {
+            display: inline-block;
+            background: var(--color-bg-hover);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-md);
+            color: var(--color-text-secondary);
+            margin-right: 4px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: 400px;
+        z-index: 10;
+        box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+    }
+
+    .header-action-btn[title="Информация"] {
+        background: var(--color-accent);
+        color: white;
+    }
+}
+
+/* Hide back button on desktop */
+@media (min-width: 769px) {
+    .chat-header-back { display: none !important; }
+}
+</head>
+<body>
+    <div class="chat-center" data-mobile-view="list">
+        <!-- LEFT PANEL: Chat List -->
+        <section class="chat-list">
+            <div class="chat-list-header">
+                <h1 class="chat-list-title">Сообщения</h1>
+
+                <!-- Search -->
+                <div class="search-wrapper">
+                    <input type="text" class="search-box" placeholder="Поиск..." id="searchBox">
+                    <button class="filter-icon-btn" id="advancedFilterBtn" title="Расширенные фильтры">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                            <path d="M2 3h12M4 6h8M6 9h4M7 12h2"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Pills Filters -->
+                <div class="filters-container">
+                    <div class="filters-scroll">
+                        <button class="filter-pill active" data-filter="all">
+                            Все <span class="count">12</span>
+                        </button>
+                        <button class="filter-pill" data-filter="urgent">
+                            Срочно <span class="count">2</span>
+                        </button>
+                        <button class="filter-pill" data-filter="unanswered">
+                            Без ответа <span class="count">5</span>
+                        </button>
+                        <button class="filter-pill" data-filter="resolved">
+                            Обработаны <span class="count">5</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="advanced-filters" id="advancedFilters">
+                    <div class="filter-group">
+                        <div class="filter-group-label">Период</div>
+                        <div class="date-range-compact">
+                            <input type="date" id="dateFrom" class="date-input-compact">
+                            <span class="date-separator">—</span>
+                            <input type="date" id="dateTo" class="date-input-compact">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-group-label">Платформа</div>
+                        <div class="platform-chips">
+                            <button class="platform-chip active" data-platform="wb">WB</button>
+                            <button class="platform-chip active" data-platform="ozon">Ozon</button>
+                            <button class="platform-chip active" data-platform="yandex">Яндекс</button>
+                            <button class="platform-chip active" data-platform="avito">Avito</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-group-label">Оценка</div>
+                        <div class="rating-chips">
+                            <button class="rating-chip" data-rating="1">1★</button>
+                            <button class="rating-chip" data-rating="2">2★</button>
+                            <button class="rating-chip" data-rating="3">3★</button>
+                            <button class="rating-chip" data-rating="4">4★</button>
+                            <button class="rating-chip" data-rating="5">5★</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-clear" id="clearAllFilters">Сбросить</button>
+                        <button class="btn-apply" id="applyFilters">Применить</button>
+                    </div>
+                </div>
+
+                <div class="queue-divider"></div>
+            </div>
+
+            <!-- Queues -->
+            <div class="chat-list-content">
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">В работе</div>
+                        <div class="queue-count">2</div>
+                    </div>
+
+                    <!-- Chat 1: WB Urgent -->
+                    <div class="chat-item urgent active" draggable="true" data-chat-id="1">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Иван Петров</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">2 мин</span>
+                            </div>
+                            <div class="chat-item-meta">1★ Отзыв · Осталось 22 мин</div>
+                            <div class="chat-item-preview">
+                                Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat 5: Yandex Urgent -->
+                    <div class="chat-item urgent" draggable="true" data-chat-id="5">
+                        <div class="marketplace-icon yandex">Я</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Ольга Николаева</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">8 мин</span>
+                            </div>
+                            <div class="chat-item-meta">2★ Отзыв · Осталось 38 мин</div>
+                            <div class="chat-item-preview">
+                                Корм не подошел, у кошки началась аллергия...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-section">
+                    <div class="queue-header">
+                        <div class="queue-label">Ожидают ответа</div>
+                        <div class="queue-count">4</div>
+                    </div>
+
+                    <!-- Chat 2: Ozon -->
+                    <div class="chat-item" draggable="true" data-chat-id="2">
+                        <div class="marketplace-icon ozon">O</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Мария Соколова</span>
+                                <span class="unread-badge">2</span>
+                                <span class="chat-item-time">15 мин</span>
+                            </div>
+                            <div class="chat-item-meta">Вопрос на карточке</div>
+                            <div class="chat-item-preview">
+                                Подскажите, какой размер гранул? Моя кошка привередливая...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat 3: WB -->
+                    <div class="chat-item" draggable="true" data-chat-id="3">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Елена Смирнова</span>
+                                <span class="chat-item-time">1 ч</span>
+                            </div>
+                            <div class="chat-item-meta">5★ Отзыв</div>
+                            <div class="chat-item-preview">
+                                Отличный корм! Кот ест с удовольствием...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat 4: WB -->
+                    <div class="chat-item" draggable="true" data-chat-id="4">
+                        <div class="marketplace-icon wb">W</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Александр Ковалев</span>
+                                <span class="chat-item-time">2 ч</span>
+                            </div>
+                            <div class="chat-item-meta">Чат покупателя</div>
+                            <div class="chat-item-preview">
+                                Вы: Заказ будет доставлен завтра до 18:00...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat 6: Avito -->
+                    <div class="chat-item" draggable="true" data-chat-id="6">
+                        <div class="marketplace-icon avito">A</div>
+                        <div class="chat-item-content">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">Дмитрий Соловьев</span>
+                                <span class="unread-badge">1</span>
+                                <span class="chat-item-time">4 ч</span>
+                            </div>
+                            <div class="chat-item-meta">Чат покупателя</div>
+                            <div class="chat-item-preview">
+                                Здравствуйте! Можете сегодня привезти? Готов встретить...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER: Chat Window -->
+        <main class="chat-window">
+            <div class="chat-header">
+                <button class="chat-header-back" onclick="setMobileView('list')">←</button>                <div class="chat-header-info">
+                    <h2>Иван Петров · Royal Canin Urinary S/O LP34</h2>
+                    <div class="chat-header-meta">Wildberries · Отзыв 1★ · Сегодня, 12:34</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="header-action-btn" title="Информация">ℹ</button>
+                    <button class="header-action-btn" title="Еще">⋮</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:34</span>
+                    </div>
+                    <div class="message-content">
+                        Пришел порванный пакет, корм рассыпался по всей коробке! Это уже второй раз за месяц. Что с упаковкой??
+                    </div>
+                </div>
+
+                <div class="message customer">
+                    <div class="message-header">
+                        <span class="message-author">Иван Петров</span>
+                        <span class="message-time">12:35</span>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-attachment">
+                            <img src="fs-2.webp" alt="Фото поврежденной упаковки" title="Нажмите для увеличения">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Suggestion -->
+            <div class="ai-suggestion">
+                <div class="ai-suggestion-label">AI Рекомендация</div>
+                <div class="ai-suggestion-text">
+                    Иван, добрый день! Приносим извинения за проблему с упаковкой. Нам жаль, что это произошло повторно.
+                    <br><br>
+                    Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы". Средства вернутся на вашу карту в течение 3-5 рабочих дней.
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="chatInput" placeholder="Напишите ответ..." rows="1"></textarea>
+                    <button class="btn-send" onclick="sendMessage()">→</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Product Context -->
+        <aside class="product-context">
+            <div class="context-header">
+                <div class="context-title">Товар</div>
+                <div class="product-name">Royal Canin Urinary S/O LP34 Feline 1.5 кг</div>
+                <div class="product-rating">★ 4.8 · 1,234 отзыва · Артикул 123456</div>
+                <div class="product-price">₽2,340</div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Детали отзыва</div>
+                <div class="info-item">
+                    <div class="info-label">Оценка</div>
+                    <div class="info-value">1★ · Негативный</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Дата</div>
+                    <div class="info-value">09.02.2026, 12:34</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Вариант</div>
+                    <div class="info-value">1.5 кг</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Автор</div>
+                    <div class="info-value">Иван Петров</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">AI Анализ</div>
+                <div class="info-item">
+                    <div class="info-label">Тональность</div>
+                    <div class="info-value">
+                        <span class="insight-badge negative">Негативная (-0.8)</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Категории проблем</div>
+                    <div class="info-value">
+                        <span class="insight-badge">Брак упаковки</span>
+                        <span class="insight-badge">Повторная проблема</span>
+                        <span class="insight-badge">Требует возврата</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Срочность</div>
+                    <div class="info-value">
+                        <span class="insight-badge urgent">Высокая · Осталось 22 мин</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Рекомендация</div>
+                    <div class="info-value">Извиниться + инструкция по возврату</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Похожие проблемы</div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "упаковка"</div>
+                    <div class="info-value">
+                        12 отзывов за 30 дней
+                        <div class="trend-indicator">↑ Тренд растёт</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Упоминание "рассыпался"</div>
+                    <div class="info-value">5 отзывов за 30 дней</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Повторные жалобы</div>
+                    <div class="info-value">
+                        3 клиента (упаковка)
+                        <div class="trend-indicator">⚠️ Требует внимания</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Действия</div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Посмотреть все отзывы о товаре</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Похожие проблемы с упаковкой</a>
+                </div>
+                <div class="info-item">
+                    <a href="#" class="info-link">Открыть карточку товара на WB</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Current chat ID
+        let currentChatId = '1';
+
+        // Context data for all 6 chats
+        const contextData = {
+            '1': {
+                header: { title: 'Иван Петров · Royal Canin Urinary S/O LP34', meta: 'Wildberries · Отзыв 1★ · Сегодня, 12:34' },
+                message: { author: 'Иван Петров', time: '12:34', text: 'Забирал корм муж, уже дома обратили внимание что пришел для длинношерстных, а нам был нужен для обычных! Проверяйте что вы отправляете!!', attachments: [{ type: 'image', url: 'fs-2.webp', alt: 'Фото неправильного товара' }] },
+                messages: [],
+                aiSuggestion: 'Иван, добрый день! Приносим извинения за ошибку при комплектации заказа.<br><br>Оформите, пожалуйста, возврат через личный кабинет Wildberries в разделе "Мои заказы" и закажите правильный вариант. Средства вернутся на вашу карту в течение 3-5 рабочих дней.',
+                product: { name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг', rating: '★ 4.8 · 1,234 отзыва · Артикул 123456', price: '₽2,340' },
+                review: { rating: '1★ · Негативный', date: '08.02.2026, 12:34', variant: '1.5 кг', author: 'Иван Петров' },
+                ai: { sentiment: { label: 'Негативная (-0.7)', negative: true }, categories: ['Ошибка комплектации', 'Неправильный товар', 'Требует возврата'], urgency: { label: 'Высокая · Осталось 22 мин', urgent: true }, recommendation: 'Извиниться + инструкция по возврату' },
+                similar: [{ label: 'Ошибки комплектации', value: '8 отзывов за 30 дней', trend: '↑ Тренд растёт' }, { label: 'Упоминание "не тот товар"', value: '5 отзывов за 30 дней' }, { label: 'Проблемы на складе', value: '3 случая', trend: '⚠️ Требует внимания' }]
+            },
+            '2': {
+                header: { title: 'Мария Соколова · Royal Canin British Shorthair', meta: 'Ozon · Вопрос на карточке · Сегодня, 11:19' },
+                message: { author: 'Мария Соколова', time: '11:19', text: 'Подскажите, пожалуйста, какой размер гранул в этом корме? Моя кошка привередливая, ест только мелкие гранулы. Не хочется заказывать и потом возвращать, если не подойдет.' },
+                messages: [],
+                aiSuggestion: 'Мария, добрый день! Размер гранул в Royal Canin British Shorthair составляет примерно 8-10 мм. Это средний размер, разработанный специально для британских короткошерстных кошек.<br><br>Если ваша кошка предпочитает более мелкие гранулы, рекомендуем обратить внимание на линейку Instinctive — там гранулы меньше (5-7 мм).',
+                product: { name: 'Royal Canin British Shorthair Adult 2 кг', rating: '★ 4.9 · 2,567 отзывов · Артикул 234567', price: '₽1,890' },
+                review: { rating: 'Вопрос на карточке', date: '08.02.2026, 11:19', variant: '2 кг', author: 'Мария Соколова' },
+                ai: { sentiment: { label: 'Нейтральная (0.0)', negative: false }, categories: ['Технические характеристики', 'Размер гранул'], urgency: { label: 'Низкая · Осталось 3 ч 45 мин', urgent: false }, recommendation: 'Предоставить информацию о размере гранул' },
+                similar: [{ label: 'Упоминание "гранулы"', value: '8 вопросов за 30 дней' }, { label: 'Упоминание "размер"', value: '15 вопросов за 30 дней' }]
+            },
+            '3': {
+                header: { title: 'Елена Смирнова · Royal Canin Urinary S/O LP34', meta: 'Wildberries · Отзыв 5★ · Сегодня, 10:34' },
+                message: { author: 'Елена Смирнова', time: '10:34', text: 'Отличный корм! Кот ест с удовольствием, шерсть стала блестеть, стал более активным. Заказываем уже третий раз, результатом очень довольны. Рекомендую!' },
+                messages: [],
+                aiSuggestion: 'Елена, спасибо большое за такой подробный и позитивный отзыв! Очень приятно знать, что корм подошел вашему питомцу и вы видите положительные результаты.<br><br>Рады, что вы с нами! 🐱',
+                product: { name: 'Royal Canin Urinary S/O LP34 Feline 1.5 кг', rating: '★ 4.8 · 1,234 отзыва · Артикул 123456', price: '₽2,340' },
+                review: { rating: '5★ · Позитивный', date: '08.02.2026, 10:34', variant: '1.5 кг', author: 'Елена Смирнова' },
+                ai: { sentiment: { label: 'Позитивная (+0.9)', negative: false }, categories: ['Качество товара', 'Повторная покупка', 'Эффективность'], urgency: { label: 'Низкая · Можно ответить позже', urgent: false }, recommendation: 'Поблагодарить за отзыв' },
+                similar: [{ label: 'Упоминание "отличный"', value: '45 отзывов за 30 дней', trend: '↑ Тренд растёт' }, { label: 'Повторные покупки', value: '89 клиентов', trend: '✓ Высокая лояльность' }]
+            },
+            '4': {
+                header: { title: 'Александр Ковалев · Royal Canin Gastrointestinal', meta: 'Wildberries · Чат покупателя · Сегодня, 09:15' },
+                message: { author: 'Александр Ковалев', time: '09:15', text: 'Здравствуйте! Подскажите, когда ожидать доставку? Заказ оформил 3 дня назад, а статус до сих пор "в обработке". Нужен корм срочно для кота после операции.' },
+                messages: [],
+                aiSuggestion: 'Александр, добрый день! Проверили ваш заказ — он уже передан в доставку. Заказ будет доставлен завтра до 18:00 на пункт выдачи.<br><br>Приносим извинения за задержку обновления статуса. Спасибо за ожидание!',
+                product: { name: 'Royal Canin Gastrointestinal Moderate Calorie 400г', rating: '★ 4.7 · 892 отзыва · Артикул 345678', price: '₽580' },
+                review: { rating: 'Чат покупателя', date: '08.02.2026, 09:15', variant: '400г', author: 'Александр Ковалев' },
+                ai: { sentiment: { label: 'Нейтральная (0.0)', negative: false }, categories: ['Вопрос о доставке', 'Решен'], urgency: { label: 'Низкая · Вопрос решен', urgent: false }, recommendation: 'Подтвердить информацию о доставке' },
+                similar: [{ label: 'Вопросы о доставке', value: '23 обращения за 30 дней' }]
+            },
+            '5': {
+                header: { title: 'Ольга Николаева · Royal Canin Sterilised 37', meta: 'Яндекс.Маркет · Отзыв 2★ · Сегодня, 08:34' },
+                message: { author: 'Ольга Николаева', time: '08:34', text: 'Корм не подошел, у кошки началась аллергия через 3 дня после начала кормления. Сильный зуд, выпадение шерсти. Пришлось срочно обращаться к ветеринару. Очень разочарована, хотя отзывы были хорошие.' },
+                messages: [],
+                aiSuggestion: 'Ольга, приносим искренние извинения за ситуацию с вашей кошкой. Действительно, в редких случаях может возникнуть индивидуальная непереносимость компонентов корма.<br><br>Рекомендуем оформить возврат через личный кабинет в разделе "Мои заказы". Также советуем проконсультироваться с ветеринаром для подбора гипоаллергенного корма.<br><br>Желаем скорейшего выздоровления вашему питомцу! 🐱',
+                product: { name: 'Royal Canin Sterilised 37 Feline 4 кг', rating: '★ 4.6 · 3,421 отзыв · Артикул 456789', price: '₽3,150' },
+                review: { rating: '2★ · Негативный', date: '08.02.2026, 08:34', variant: '4 кг', author: 'Ольга Николаева' },
+                ai: { sentiment: { label: 'Негативная (-0.6)', negative: true }, categories: ['Аллергическая реакция', 'Здоровье животного', 'Требует возврата'], urgency: { label: 'Высокая · Осталось 38 мин', urgent: true }, recommendation: 'Извиниться + инструкция по возврату + рекомендация ветеринара' },
+                similar: [{ label: 'Упоминание "аллергия"', value: '7 отзывов за 30 дней', trend: '⚠️ Требует внимания' }, { label: 'Проблемы со здоровьем', value: '4 отзыва за 30 дней' }]
+            },
+            '6': {
+                header: { title: 'Дмитрий Соловьев · Royal Canin Persian Adult', meta: 'Avito · Чат покупателя · Сегодня, 07:15' },
+                message: { author: 'Дмитрий Соловьев', time: '07:15', text: 'Здравствуйте! Можете сегодня привезти? Готов встретить в любое время. Нужен срочно корм для кошки, заканчивается. Район метро Площадь Революции подойдет?' },
+                messages: [],
+                aiSuggestion: 'Дмитрий, добрый день! Да, могу привезти сегодня. Удобно будет в 18:00 у метро Площадь Революции?<br><br>Корм Royal Canin Persian 2 кг в наличии, упакован, срок годности до июня 2027. Оплата наличными или переводом на карту.',
+                product: { name: 'Royal Canin Persian Adult 2 кг', rating: '★ 4.9 · 156 отзывов · Avito', price: '₽1,650' },
+                review: { rating: 'Чат покупателя', date: '08.02.2026, 07:15', variant: '2 кг', author: 'Дмитрий Соловьев' },
+                ai: { sentiment: { label: 'Позитивная (+0.5)', negative: false }, categories: ['Срочная доставка', 'Готов встретить'], urgency: { label: 'Средняя · Нужна договоренность', urgent: false }, recommendation: 'Предложить время и подтвердить наличие' },
+                similar: [{ label: 'Запросы доставки', value: '23 обращения за 30 дней' }, { label: 'Срочные заказы', value: '12 обращений за 30 дней', trend: '↑ Тренд растёт' }]
+            }
+        };
+
+        // Pills filters
+        const pills = document.querySelectorAll('.filter-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                pills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Advanced Filters Toggle
+        const advancedFilterBtn = document.getElementById('advancedFilterBtn');
+        const advancedFilters = document.getElementById('advancedFilters');
+
+        advancedFilterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            advancedFilters.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!advancedFilters.contains(e.target) && !advancedFilterBtn.contains(e.target)) {
+                advancedFilters.classList.remove('open');
+                advancedFilterBtn.classList.remove('active');
+            }
+        });
+
+        advancedFilters.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Platform chips
+        const platformChips = document.querySelectorAll('.platform-chip');
+        platformChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Rating chips
+        const ratingChips = document.querySelectorAll('.rating-chip');
+        ratingChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Apply filters
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            advancedFilters.classList.remove('open');
+            advancedFilterBtn.classList.remove('active');
+        });
+
+        // Clear filters
+        document.getElementById('clearAllFilters').addEventListener('click', function() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            platformChips.forEach(c => c.classList.add('active'));
+            ratingChips.forEach(c => c.classList.remove('active'));
+        });
+
+        // Update product context panel
+        function updateProductContext(chatId) {
+            const context = contextData[chatId];
+            if (!context) return;
+            currentChatId = chatId;
+
+            // Update chat window header
+            document.querySelector('.chat-header-info h2').textContent = context.header.title;
+            document.querySelector('.chat-header-meta').textContent = context.header.meta;
+
+            // Update customer messages
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+
+            // Add first message (text)
+            const textMessage = document.createElement('div');
+            textMessage.className = 'message customer';
+            textMessage.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">${context.message.author}</span>
+                    <span class="message-time">${context.message.time}</span>
+                </div>
+                <div class="message-content">${context.message.text}</div>
+            `;
+            messagesContainer.appendChild(textMessage);
+
+            // Add attachments if any
+            if (context.message.attachments) {
+                context.message.attachments.forEach(attachment => {
+                    const attachmentMessage = document.createElement('div');
+                    attachmentMessage.className = 'message customer';
+                    attachmentMessage.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-author">${context.message.author}</span>
+                            <span class="message-time">${context.message.time}</span>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-attachment">
+                                <img src="${attachment.url}" alt="${attachment.alt}" title="Нажмите для увеличения">
+                            </div>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(attachmentMessage);
+                });
+            }
+
+            // Add seller messages for this chat
+            context.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message seller';
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">Вы</span>
+                        <span class="message-time">
+                            ${msg.time}
+                            <span class="message-status ${msg.status}" title="${msg.statusTitle}">${msg.statusIcon}</span>
+                        </span>
+                    </div>
+                    <div class="message-content">${msg.text.replace(/\n/g, '<br>')}</div>
+                `;
+                messagesContainer.appendChild(messageDiv);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Update AI suggestion
+            document.querySelector('.ai-suggestion-text').innerHTML = context.aiSuggestion;
+
+            // Update product info
+            document.querySelector('.product-name').textContent = context.product.name;
+            document.querySelector('.product-rating').textContent = context.product.rating;
+            document.querySelector('.product-price').textContent = context.product.price;
+
+            // Update review details
+            const reviewSection = document.querySelectorAll('.info-section')[0];
+            reviewSection.querySelectorAll('.info-value')[0].textContent = context.review.rating;
+            reviewSection.querySelectorAll('.info-value')[1].textContent = context.review.date;
+            reviewSection.querySelectorAll('.info-value')[2].textContent = context.review.variant;
+            reviewSection.querySelectorAll('.info-value')[3].textContent = context.review.author;
+
+            // Update AI insights
+            const aiSection = document.querySelectorAll('.info-section')[1];
+            const sentimentBadge = aiSection.querySelector('.insight-badge');
+            sentimentBadge.textContent = context.ai.sentiment.label;
+            sentimentBadge.className = context.ai.sentiment.negative ? 'insight-badge negative' : 'insight-badge';
+
+            const categoriesContainer = aiSection.querySelectorAll('.info-value')[1];
+            categoriesContainer.innerHTML = context.ai.categories.map(cat => `<span class="insight-badge">${cat}</span>`).join('');
+
+            const urgencyValue = aiSection.querySelectorAll('.info-value')[2];
+            urgencyValue.innerHTML = `<span class="insight-badge ${context.ai.urgency.urgent ? 'urgent' : ''}">${context.ai.urgency.label}</span>`;
+
+            aiSection.querySelectorAll('.info-value')[3].textContent = context.ai.recommendation;
+
+            // Update similar issues
+            const similarSection = document.querySelectorAll('.info-section')[2];
+            const similarItems = similarSection.querySelectorAll('.info-item');
+            context.similar.forEach((issue, index) => {
+                if (similarItems[index]) {
+                    similarItems[index].querySelector('.info-label').textContent = issue.label;
+                    const valueDiv = similarItems[index].querySelector('.info-value');
+                    valueDiv.innerHTML = issue.value;
+                    if (issue.trend) {
+                        valueDiv.innerHTML += `<div class="trend-indicator">${issue.trend}</div>`;
+                    }
+                    similarItems[index].style.display = 'block';
+                }
+            });
+            for (let i = context.similar.length; i < similarItems.length; i++) {
+                if (similarItems[i]) similarItems[i].style.display = 'none';
+            }
+        }
+
+        // Chat items - с переключением контента
+        document.addEventListener('click', function(e) {
+            const chatItem = e.target.closest('.chat-item');
+            if (chatItem) {
+                // Remove active from all
+                document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+                chatItem.classList.add('active');
+
+                // Get chat ID and update context
+                const chatId = chatItem.getAttribute('data-chat-id');
+                if (chatId) {
+                    updateProductContext(chatId);
+                }
+            }
+        });
+
+        // Drag & Drop
+        let draggedElement = null;
+
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedElement = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+
+        // Queue sections as drop targets
+        document.querySelectorAll('.queue-section').forEach(section => {
+            section.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            section.addEventListener('dragleave', function(e) {
+                if (!this.contains(e.relatedTarget)) {
+                    this.classList.remove('drag-over');
+                }
+            });
+
+            section.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                if (draggedElement) {
+                    // Append to the content area of this queue
+                    const contentArea = this;
+                    contentArea.appendChild(draggedElement);
+
+                    // Update counts (simplified)
+                    document.querySelectorAll('.queue-section').forEach(q => {
+                        const count = q.querySelectorAll('.chat-item').length;
+                        const countEl = q.querySelector('.queue-count');
+                        if (countEl) {
+                            countEl.textContent = count;
+                        }
+                    });
+                }
+            });
+        });
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (input.value.trim()) {
+                console.log('Sending:', input.value);
+                input.value = '';
+            }
+        }
+
+        // Auto-grow textarea
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Initialize with first chat context
+        updateProductContext('1');
+
+        // Mobile navigation
+        function setMobileView(view) {
+            const chatCenter = document.querySelector('.chat-center');
+            chatCenter.setAttribute('data-mobile-view', view);
+        }
+
+        // Mobile: Open chat from list
+        document.addEventListener('click', function(e) {
+            const chatItem = e.target.closest('.chat-item');
+            if (chatItem && window.innerWidth <= 768) {
+                const chatId = chatItem.getAttribute('data-chat-id');
+                if (chatId) {
+                    setMobileView('chat');
+                }
+            }
+        });
+
+        // Mobile: Info button shows context
+        document.querySelector('.header-action-btn[title="Информация"]')?.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                setMobileView('context');
+            } else if (window.innerWidth <= 1024) {
+                const chatCenter = document.querySelector('.chat-center');
+                const isVisible = chatCenter.getAttribute('data-tablet-context') === 'visible';
+                chatCenter.setAttribute('data-tablet-context', isVisible ? '' : 'visible');
+            }
+        });
+
+        // Mobile: Back from context
+        const contextHeader = document.querySelector('.product-context .context-header');
+        if (contextHeader && window.innerWidth <= 768) {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'chat-header-back';
+            backBtn.innerHTML = '←';
+            backBtn.onclick = () => setMobileView('chat');
+            backBtn.style.cssText = 'position: absolute; top: 16px; left: 16px; z-index: 10;';
+            contextHeader.style.position = 'relative';
+            contextHeader.prepend(backBtn);
+        }
+    </script>
+</body>
+</html>

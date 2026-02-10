@@ -10,8 +10,14 @@ from urllib.error import URLError
 
 try:
     from dotenv import load_dotenv
-    # Load .env from mvp/ directory (where credentials live)
-    _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mvp", ".env")
+    # Load .env from apps/reviews (where credentials live)
+    _env_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "apps",
+        "reviews",
+        ".env",
+    )
     if os.path.exists(_env_path):
         load_dotenv(_env_path)
 except ImportError:
@@ -37,12 +43,14 @@ def _wb_basket_num(nm_id: int) -> str:
         (1007, "05"), (1061, "06"), (1115, "07"), (1169, "08"),
         (1313, "09"), (1601, "10"), (1655, "11"), (1919, "12"),
         (2045, "13"), (2189, "14"), (2405, "15"), (2621, "16"),
-        (2837, "17"),
+        (2837, "17"), (3053, "18"), (3269, "19"), (3485, "20"),
+        (3701, "21"), (3917, "22"), (4133, "23"), (4349, "24"),
+        (4565, "25"),
     ]
     for threshold, num in ranges:
         if vol <= threshold:
             return num
-    return "18"
+    return "26"
 
 
 def fetch_wb_card_info(nm_id: int):
@@ -76,14 +84,167 @@ def fetch_wb_card_info(nm_id: int):
         if o.get("name") and o.get("value")
     )
 
+    # Extract price from sizes[0].price (in kopeks)
+    # Prefer 'product' (sale price) > 'total' (with WB wallet) > 'basic' (full price)
+    price_kopeks = 0
+    sizes = data.get("sizes", [])
+    if sizes and isinstance(sizes, list):
+        price_data = sizes[0].get("price", {})
+        price_kopeks = price_data.get("product") or price_data.get("total") or price_data.get("basic", 0)
+    price_rub = round(price_kopeks / 100, 2) if price_kopeks else None
+
     result = {
         "imt_name": data.get("imt_name", ""),
         "description": description,
         "options": options_str,
         "subj_name": data.get("subj_name", ""),
+        "price": price_rub,
     }
-    print(f"[WB card] OK: {result['imt_name'][:60]}")
+    print(f"[WB card] OK: {result['imt_name'][:60]}, price: {price_rub}₽")
     return result
+
+
+def fetch_wb_price_history(nm_id: int):
+    """Fetch price history from WB CDN (no auth needed).
+
+    URL: basket-{N}.wbbasket.ru/vol{V}/part{P}/{nmId}/info/price-history.json
+    Returns list of {"dt": unix_ts, "price_rub": float} sorted by date,
+    or None on error.
+    Prices in the API are in kopecks (÷100 for rubles).
+    """
+    try:
+        nm_id = int(nm_id)
+    except (TypeError, ValueError):
+        return None
+
+    vol = nm_id // 100000
+    part = nm_id // 1000
+    basket = _wb_basket_num(nm_id)
+    url = f"https://basket-{basket}.wbbasket.ru/vol{vol}/part{part}/{nm_id}/info/price-history.json"
+
+    try:
+        req = Request(url, headers={"User-Agent": "Mozilla/5.0", "Accept-Encoding": "gzip"})
+        with urlopen(req, timeout=5) as resp:
+            raw = resp.read()
+            # Handle gzip encoding
+            if resp.headers.get("Content-Encoding") == "gzip":
+                import gzip
+                raw = gzip.decompress(raw)
+            data = json.loads(raw.decode())
+    except (URLError, json.JSONDecodeError, OSError) as e:
+        print(f"[WB price] Failed to fetch {nm_id}: {e}")
+        return None
+
+    if not isinstance(data, list) or len(data) == 0:
+        return None
+
+    result = []
+    for entry in data:
+        dt = entry.get("dt")
+        price_info = entry.get("price", {})
+        rub_kopecks = price_info.get("RUB", 0)
+        if dt and rub_kopecks:
+            result.append({
+                "dt": dt,
+                "price_rub": round(rub_kopecks / 100, 2),
+            })
+
+    result.sort(key=lambda x: x["dt"])
+    if result:
+        print(f"[WB price] OK: {len(result)} data points, latest: {result[-1]['price_rub']}₽")
+    return result if result else None
+
+
+def avg_price_from_history(price_history, months=3):
+    """Calculate average price from last N months of price history.
+
+    Returns float (average price in rubles) or None.
+    """
+    if not price_history:
+        return None
+
+    import time
+    now = time.time()
+    cutoff = now - (months * 30 * 86400)
+
+    recent = [p["price_rub"] for p in price_history if p["dt"] >= cutoff]
+    if not recent:
+        # Fall back to all data
+        recent = [p["price_rub"] for p in price_history]
+    if not recent:
+        return None
+
+    return round(sum(recent) / len(recent), 2)
+
+
+def calculate_money_loss(review_count, period_months, price_rub, quality_score):
+    """Calculate estimated money loss from poor communication quality.
+
+    Args:
+        review_count: Total reviews received
+        period_months: Period in months
+        price_rub: Product price in rubles
+        quality_score: LLM quality score (1-10)
+
+    Returns:
+        {
+            "purchases_per_month_min": int,
+            "purchases_per_month_max": int,
+            "revenue_per_month_min": int,
+            "revenue_per_month_max": int,
+            "loss_per_month_min": int,
+            "loss_per_month_max": int,
+        }
+        or None if price is not available
+    """
+    if not price_rub or price_rub <= 0:
+        return None
+
+    # Review rate assumptions (3-5% for functional products)
+    review_rate_min = 0.03
+    review_rate_max = 0.05
+
+    # Calculate purchases
+    total_purchases_min = int(review_count / review_rate_max)  # conservative
+    total_purchases_max = int(review_count / review_rate_min)  # optimistic
+
+    purchases_per_month_min = int(total_purchases_min / period_months)
+    purchases_per_month_max = int(total_purchases_max / period_months)
+
+    # Calculate revenue
+    revenue_per_month_min = int(purchases_per_month_min * price_rub)
+    revenue_per_month_max = int(purchases_per_month_max * price_rub)
+
+    # CR impact based on quality score (inverse relationship)
+    # Note: risky weight = 1 (not 2), harm index calculation adjusted accordingly
+    cr_impact_min = 0.02  # 2% for quality 4-6
+    cr_impact_max = 0.04  # 4% for quality 1-3
+
+    if quality_score >= 7:
+        cr_impact_min, cr_impact_max = 0.01, 0.02
+    elif quality_score >= 4:
+        cr_impact_min, cr_impact_max = 0.02, 0.04
+    else:
+        cr_impact_min, cr_impact_max = 0.03, 0.06
+
+    # Calculate losses
+    loss_per_month_min = int(revenue_per_month_min * cr_impact_min)
+    loss_per_month_max = int(revenue_per_month_max * cr_impact_max)
+
+    return {
+        "purchases_per_month_min": purchases_per_month_min,
+        "purchases_per_month_max": purchases_per_month_max,
+        "revenue_per_month_min": revenue_per_month_min,
+        "revenue_per_month_max": revenue_per_month_max,
+        "loss_per_month_min": loss_per_month_min,
+        "loss_per_month_max": loss_per_month_max,
+        "price_rub": round(price_rub),
+        "review_count": review_count,
+        "period_months": period_months,
+        "conversion_loss_pct_min": round(cr_impact_min * 100),
+        "conversion_loss_pct_max": round(cr_impact_max * 100),
+    }
+
 
 # ─── WBCON Questions API ─────────────────────────────────────
 def fetch_wbcon_questions(nm_id, email, password):
@@ -724,6 +885,28 @@ def main():
         print(f"Dedup: {len(feedbacks)} -> {len(unique_feedbacks)} feedbacks")
     feedbacks = unique_feedbacks
 
+    # Filter feedbacks to last 12 months (366 days to include boundary dates)
+    now_utc = datetime.now(timezone.utc)
+    cutoff_12months = now_utc - timedelta(days=366)
+    filtered_feedbacks = []
+    for fb in feedbacks:
+        created_str = fb.get("created_at") or fb.get("fb_created_at") or ""
+        if not created_str:
+            continue
+        try:
+            # Parse ISO date: "2025-02-07T12:34:56Z" or "2025-02-07 12:34:56"
+            created_dt = datetime.fromisoformat(created_str.replace('Z', '+00:00'))
+            if created_dt.tzinfo is None:
+                created_dt = created_dt.replace(tzinfo=timezone.utc)
+            if created_dt >= cutoff_12months:
+                filtered_feedbacks.append(fb)
+        except (ValueError, AttributeError):
+            # If date parse fails, include (safer to include than exclude)
+            filtered_feedbacks.append(fb)
+    if len(filtered_feedbacks) < len(feedbacks):
+        print(f"12-month filter: {len(feedbacks)} -> {len(filtered_feedbacks)} feedbacks")
+    feedbacks = filtered_feedbacks
+
     # Build article -> display_name mapping
     # Group by article, use article as variant key (reliable), color as display name
     # WBCON may return different color names for same article (renamed over time)
@@ -1058,7 +1241,7 @@ def main():
     if feedbacks:
         article = feedbacks[0].get("article")
 
-    data_window = f"{WINDOW_DAYS} дней" if use_recent else "весь период"
+    data_window = f"{WINDOW_DAYS} дней" if use_recent else "12 месяцев"
 
     # Check if there's a statistically significant signal
     has_signal = False
@@ -1232,15 +1415,56 @@ def main():
         except Exception as e:
             print(f"[Communication] error: {e}")
 
+    # --- Money loss estimation ---
+    money_loss = None
+    # Use average price from CDN price history (more accurate), fall back to card price
+    card_price = (wb_card or {}).get("price")
+    price = card_price
+    avg_price_3m = None
+    if nm_id:
+        price_history = fetch_wb_price_history(nm_id)
+        avg_price_3m = avg_price_from_history(price_history, months=3)
+        if avg_price_3m:
+            print(f"[Money loss] Using avg price from history: {avg_price_3m}₽ (card price: {card_price}₽)")
+            price = avg_price_3m
+    if communication and price:
+        # Calculate period in months
+        dates = [parse_date(f.get("fb_created_at") or "") for f in feedbacks]
+        dates = [d for d in dates if d]
+        if dates:
+            period_days = (max(dates) - min(dates)).days
+            period_months = max(1, round(period_days / 30))
+
+            quality_score = communication.get("quality_score", 5)
+            money_loss = calculate_money_loss(
+                review_count=len(feedbacks),
+                period_months=period_months,
+                price_rub=price,
+                quality_score=quality_score
+            )
+            if money_loss:
+                if card_price:
+                    money_loss["card_price"] = round(card_price)
+                if avg_price_3m:
+                    money_loss["avg_price_3m"] = round(avg_price_3m)
+                print(f"[Money loss] Est. loss: {money_loss['loss_per_month_min']:,} - "
+                      f"{money_loss['loss_per_month_max']:,}₽/мес "
+                      f"(price: {price}₽, period: {period_months}мес, {len(feedbacks)} reviews)")
+            else:
+                print("[Money loss] Calculation skipped (no price)")
+        else:
+            print("[Money loss] Calculation skipped (no dates)")
+
     result = {
         "header": {
             "title": f"Артикул {article or ''} · Риск по {cat_label['type']}",
-            "subtitle": f"WB · {total} отзывов · рейтинг {rating} · данные за {data_window}",
+            "subtitle": f"WB · {len(feedbacks)} отзывов · рейтинг {rating} · данные за {data_window}",
             "rating": rating,
-            "feedback_count": total,
+            "feedback_count": len(feedbacks),
             "analyzed_count": len(feedbacks),
             "unanswered_count": unanswered_count,
             "category": category,
+            "product_name": product_name or (wb_card or {}).get("imt_name", ""),
         },
         "signal": {
             "title": signal_title,
@@ -1305,6 +1529,8 @@ def main():
         },
         "response_speed": response_speed,
         "communication": communication,
+        "money_loss": money_loss,
+        "price": price,
     }
 
     with open(out_path, "w", encoding="utf-8") as f:

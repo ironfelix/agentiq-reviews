@@ -3,8 +3,8 @@
 Генерирует chat-center-real-data.html из полных данных WB Chat API.
 
 Вход: /tmp/wb_chats_full.json (результат fetch_wb_chats_full.py)
-Шаблон: docs/mvp-chat/chat-center-real-data.html (CSS + JS структура)
-Выход: обновлённый docs/mvp-chat/chat-center-real-data.html
+Шаблон: docs/chat-center/chat-center-real-data.html (CSS + JS структура)
+Выход: обновлённый docs/chat-center/chat-center-real-data.html
 
 Правила сниппетов:
   Мета-строка: [dot] Чат · [Арт. NNN / Товар] · [Статус]
@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.join(SCRIPT_DIR, "..")
 DATA_FILE = "/tmp/wb_chats_full.json"
-TEMPLATE_FILE = os.path.join(PROJECT_ROOT, "docs", "mvp-chat", "chat-center-real-data.html")
+TEMPLATE_FILE = os.path.join(PROJECT_ROOT, "docs", "chat-center", "chat-center-real-data.html")
 OUTPUT_FILE = TEMPLATE_FILE  # overwrite
 
 # === LOAD DATA ===
