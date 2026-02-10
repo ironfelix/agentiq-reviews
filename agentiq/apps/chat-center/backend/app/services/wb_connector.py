@@ -202,20 +202,30 @@ class WBConnector:
             elif event.get("addTime"):
                 created_at = datetime.fromisoformat(event["addTime"].replace("Z", "+00:00"))
 
+            # Extract text and attachments
+            raw_text = event.get("message", {}).get("text", "")
+            attachments = [
+                {
+                    "type": "file",
+                    "file_name": f.get("fileName", ""),
+                    "download_id": f.get("downloadID", "")
+                }
+                for f in event.get("message", {}).get("files", [])
+            ]
+
+            # Normalize text for empty messages with attachments
+            text = raw_text.strip() if raw_text else ""
+            if not text and attachments:
+                file_count = len(attachments)
+                text = "[Изображение]" if file_count == 1 else f"[{file_count} изображений]"
+
             messages.append({
                 "external_message_id": message_id,
                 "event_id": event.get("eventID", ""),
                 "chat_id": event["chatID"],
                 "author_type": "buyer" if event["sender"] == "client" else "seller",
-                "text": event.get("message", {}).get("text", ""),
-                "attachments": [
-                    {
-                        "type": "file",
-                        "file_name": f.get("fileName", ""),
-                        "download_id": f.get("downloadID", "")
-                    }
-                    for f in event.get("message", {}).get("files", [])
-                ],
+                "text": text,
+                "attachments": attachments,
                 "created_at": created_at,
                 "is_new_chat": event.get("isNewChat", False),
                 "event_type": event.get("eventType", "message"),

@@ -447,6 +447,51 @@ def check_sla_escalation():
         raise
 
 
+@celery_app.task(name="app.tasks.sync.auto_close_inactive_chats")
+def auto_close_inactive_chats():
+    """
+    Auto-close chats that have been inactive for 10 days.
+
+    Runs daily via Celery Beat.
+    Only closes chats in 'responded' or 'auto-response' status.
+    """
+    logger.info("Checking for inactive chats to auto-close")
+
+    async def _close():
+        async with AsyncSessionLocal() as db:
+            # Find chats inactive for 10+ days
+            threshold = datetime.utcnow() - timedelta(days=10)
+
+            result = await db.execute(
+                select(Chat).where(
+                    and_(
+                        Chat.last_message_at < threshold,
+                        Chat.chat_status.in_(["responded", "auto-response"]),
+                    )
+                )
+            )
+            chats = result.scalars().all()
+
+            if not chats:
+                logger.debug("No chats to auto-close")
+                return
+
+            logger.info(f"Auto-closing {len(chats)} inactive chats")
+
+            for chat in chats:
+                chat.chat_status = "closed"
+                chat.closed_at = datetime.utcnow()
+                logger.debug(f"Auto-closed chat {chat.id}")
+
+            await db.commit()
+
+    try:
+        run_async(_close())
+    except Exception as e:
+        logger.error(f"Error in auto_close_inactive_chats: {e}")
+        raise
+
+
 @celery_app.task(
     name="app.tasks.sync.send_message_to_marketplace",
     bind=True,

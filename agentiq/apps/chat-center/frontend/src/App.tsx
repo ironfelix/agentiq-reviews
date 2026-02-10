@@ -155,6 +155,21 @@ function App() {
     setMobileView('chat');
     fetchMessages(chat.id);
 
+    // Trigger AI analysis if missing and has unread messages
+    if (!chat.ai_suggestion_text && chat.unread_count > 0) {
+      try {
+        // Fire and forget - don't block UI
+        chatApi.analyzeChat(chat.id).then(updatedChat => {
+          setSelectedChat(prev => prev?.id === chat.id ? updatedChat : prev);
+          setChats(prevChats =>
+            prevChats.map(c => c.id === chat.id ? updatedChat : c)
+          );
+        }).catch(e => console.warn('Auto-analysis failed:', e));
+      } catch (e) {
+        console.warn('Failed to trigger auto-analysis:', e);
+      }
+    }
+
     // Mark as read if has unread messages
     if (chat.unread_count > 0) {
       try {
@@ -211,6 +226,24 @@ function App() {
   // Handle back to list (mobile)
   const handleBackToList = useCallback(() => {
     setMobileView('list');
+  }, []);
+
+  // Handle close chat
+  const handleCloseChat = useCallback(async (chatId: number) => {
+    const updatedChat = await chatApi.closeChat(chatId);
+    setSelectedChat(prev => prev?.id === chatId ? updatedChat : prev);
+    setChats(prevChats =>
+      prevChats.map(c => c.id === chatId ? updatedChat : c)
+    );
+  }, []);
+
+  // Handle reopen chat
+  const handleReopenChat = useCallback(async (chatId: number) => {
+    const updatedChat = await chatApi.reopenChat(chatId);
+    setSelectedChat(prev => prev?.id === chatId ? updatedChat : prev);
+    setChats(prevChats =>
+      prevChats.map(c => c.id === chatId ? updatedChat : c)
+    );
   }, []);
 
   // Fetch chats when user changes (login/logout) or on initial load
@@ -307,6 +340,8 @@ function App() {
         onSendMessage={handleSendMessage}
         isLoadingMessages={isLoadingMessages}
         onBack={handleBackToList}
+        onCloseChat={handleCloseChat}
+        onReopenChat={handleReopenChat}
       />
 
       {/* RIGHT PANEL: Product Context */}
@@ -334,6 +369,7 @@ function App() {
                   {selectedChat.chat_status === 'waiting' ? 'Ожидает ответа' :
                    selectedChat.chat_status === 'responded' ? 'Отвечено' :
                    selectedChat.chat_status === 'client-replied' ? 'Клиент ответил' :
+                   selectedChat.chat_status === 'closed' ? 'Закрыт' :
                    selectedChat.chat_status || 'Открыт'}
                 </div>
               </div>

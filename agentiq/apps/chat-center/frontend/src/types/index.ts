@@ -20,6 +20,7 @@ export interface Chat {
   product_name: string | null;
   product_article: string | null;
   chat_status: string | null;
+  closed_at: string | null;
   created_at: string;
   updated_at: string;
 }

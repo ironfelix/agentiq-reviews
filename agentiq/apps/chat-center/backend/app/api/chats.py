@@ -147,36 +147,6 @@ async def mark_chat_as_read(
     return ChatResponse.model_validate(chat)
 
 
-@router.post("/{chat_id}/close", response_model=ChatResponse)
-async def close_chat(
-    chat_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
-    db: AsyncSession = Depends(get_db)
-):
-    """Close chat"""
-    result = await db.execute(
-        select(Chat).where(Chat.id == chat_id)
-    )
-    chat = result.scalar_one_or_none()
-
-    if not chat:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Chat {chat_id} not found"
-        )
-
-    # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
-
-    chat.status = "closed"
-    await db.commit()
-    await db.refresh(chat)
-
-    logger.info(f"Closed chat {chat_id}")
-    return ChatResponse.model_validate(chat)
-
-
 @router.post("/{chat_id}/analyze", response_model=ChatResponse)
 async def analyze_chat(
     chat_id: int,
@@ -235,4 +205,75 @@ async def analyze_chat(
         await db.refresh(chat)
 
     logger.info(f"AI analysis completed for chat {chat_id}")
+    return ChatResponse.model_validate(chat)
+
+
+@router.post("/{chat_id}/close", response_model=ChatResponse)
+async def close_chat(
+    chat_id: int,
+    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Close a chat manually.
+
+    Sets chat_status to 'closed' and records closed_at timestamp.
+    Can be reopened if customer writes again.
+    """
+    result = await db.execute(
+        select(Chat).where(Chat.id == chat_id)
+    )
+    chat = result.scalar_one_or_none()
+
+    if not chat:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat not found"
+        )
+
+    # Seller isolation
+    if current_seller:
+        require_seller_ownership(chat.seller_id, current_seller)
+
+    chat.chat_status = "closed"
+    chat.closed_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(chat)
+
+    logger.info(f"Chat {chat_id} closed")
+    return ChatResponse.model_validate(chat)
+
+
+@router.post("/{chat_id}/reopen", response_model=ChatResponse)
+async def reopen_chat(
+    chat_id: int,
+    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reopen a closed chat.
+
+    Sets chat_status to 'waiting' and clears closed_at.
+    """
+    result = await db.execute(
+        select(Chat).where(Chat.id == chat_id)
+    )
+    chat = result.scalar_one_or_none()
+
+    if not chat:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat not found"
+        )
+
+    # Seller isolation
+    if current_seller:
+        require_seller_ownership(chat.seller_id, current_seller)
+
+    chat.chat_status = "waiting"
+    chat.closed_at = None
+    await db.commit()
+    await db.refresh(chat)
+
+    logger.info(f"Chat {chat_id} reopened")
     return ChatResponse.model_validate(chat)

@@ -31,6 +31,7 @@ class ChatResponse(ChatBase):
     product_name: Optional[str] = Field(None, description="Product name")
     product_article: Optional[str] = Field(None, description="Product article/SKU")
     chat_status: Optional[str] = Field("waiting", description="Chat workflow status")
+    closed_at: Optional[datetime] = Field(None, description="When chat was closed")
     created_at: datetime
     updated_at: datetime
 

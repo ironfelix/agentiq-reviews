@@ -125,6 +125,16 @@ export const chatApi = {
     const response = await api.post<Chat>(`/chats/${chatId}/analyze`);
     return response.data;
   },
+
+  closeChat: async (chatId: number): Promise<Chat> => {
+    const response = await api.post<Chat>(`/chats/${chatId}/close`);
+    return response.data;
+  },
+
+  reopenChat: async (chatId: number): Promise<Chat> => {
+    const response = await api.post<Chat>(`/chats/${chatId}/reopen`);
+    return response.data;
+  },
 };
 
 export default api;

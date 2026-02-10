@@ -45,5 +45,9 @@ celery_app.conf.update(
             "task": "app.tasks.sync.analyze_pending_chats",
             "schedule": 120.0,  # Every 2 minutes
         },
+        "auto-close-inactive-chats-daily": {
+            "task": "app.tasks.sync.auto_close_inactive_chats",
+            "schedule": 86400.0,  # Every 24 hours
+        },
     },
 )

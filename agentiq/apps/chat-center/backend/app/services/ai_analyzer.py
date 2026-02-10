@@ -24,6 +24,7 @@ settings = get_settings()
 
 # Intent types with descriptions
 INTENTS = {
+    # Post-purchase intents
     "delivery_status": "Где мой заказ?",
     "delivery_delay": "Заказ задерживается",
     "cancel_request": "Хочу отменить",
@@ -33,19 +34,32 @@ INTENTS = {
     "product_spec": "Характеристики товара",
     "refund_exchange": "Возврат или обмен",
     "thanks": "Благодарность",
+    # Pre-purchase intents (HIGH priority - potential sale!)
+    "pre_purchase": "Вопрос перед покупкой",
+    "sizing_fit": "Какой размер выбрать?",
+    "availability": "Есть ли в наличии?",
+    "compatibility": "Подойдёт ли к...?",
     "other": "Другое",
 }
 
 # SLA priorities by intent
 SLA_PRIORITIES = {
-    "defect_not_working": "urgent",    # P0 < 1 hour
-    "wrong_item": "urgent",             # P0 < 1 hour
-    "delivery_delay": "high",           # P1 < 1 hour (if repeated)
-    "cancel_request": "high",           # P1 < 1 hour
-    "refund_exchange": "normal",        # P2 < 4 hours
-    "delivery_status": "normal",        # P2 < 4 hours
-    "usage_howto": "low",               # P3 < 24 hours
-    "product_spec": "low",              # P3 < 24 hours
+    # P0 (urgent) < 1 hour - critical issues
+    "defect_not_working": "urgent",
+    "wrong_item": "urgent",
+    # P1 (high) < 1 hour - pre-purchase = potential sale!
+    "pre_purchase": "high",
+    "sizing_fit": "high",
+    "availability": "high",
+    "compatibility": "high",
+    "delivery_delay": "high",
+    "cancel_request": "high",
+    # P2 (normal) < 4 hours
+    "refund_exchange": "normal",
+    "delivery_status": "normal",
+    # P3 (low) < 24 hours
+    "usage_howto": "low",
+    "product_spec": "low",
     "thanks": "low",
     "other": "normal",
 }
@@ -494,6 +508,15 @@ class AIAnalyzer:
             intent = "cancel_request"
         elif any(w in all_text for w in ["спасибо", "благодар"]):
             intent = "thanks"
+        # Pre-purchase intents (HIGH priority!)
+        elif any(w in all_text for w in ["какой размер", "посоветуйте размер", "на какой рост", "на какой вес"]):
+            intent = "sizing_fit"
+        elif any(w in all_text for w in ["есть в наличии", "когда будет", "будет ли"]):
+            intent = "availability"
+        elif any(w in all_text for w in ["подойдёт ли", "подойдет ли", "совместим", "подходит к"]):
+            intent = "compatibility"
+        elif any(w in all_text for w in ["хочу купить", "собираюсь брать", "думаю взять", "стоит ли брать"]):
+            intent = "pre_purchase"
         elif any(w in all_text for w in ["как", "размер", "характеристик"]):
             intent = "usage_howto"
 
@@ -516,6 +539,11 @@ class AIAnalyzer:
             "cancel_request": f"{name_prefix}Вы можете отменить заказ в ЛК WB: раздел Доставки → Отменить.",
             "thanks": f"{name_prefix}Рады помочь! Если возникнут вопросы — обращайтесь.",
             "usage_howto": f"{name_prefix}Подскажите, пожалуйста, какой именно вопрос у вас возник?",
+            # Pre-purchase recommendations
+            "sizing_fit": f"{name_prefix}Подскажите ваши параметры (рост, вес), и мы поможем с выбором размера!",
+            "availability": f"{name_prefix}Уточняем наличие, напишем вам в ближайшее время!",
+            "compatibility": f"{name_prefix}Уточните, пожалуйста, модель вашего устройства, и мы проверим совместимость.",
+            "pre_purchase": f"{name_prefix}Будем рады помочь с выбором! Какой вопрос у вас возник?",
             "other": f"{name_prefix}Подскажите, что именно произошло? Мы постараемся помочь!",
         }
 

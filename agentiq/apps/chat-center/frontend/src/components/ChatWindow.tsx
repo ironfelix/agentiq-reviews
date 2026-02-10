@@ -7,6 +7,8 @@ interface ChatWindowProps {
   onSendMessage: (text: string) => Promise<void>;
   isLoadingMessages: boolean;
   onBack?: () => void;
+  onCloseChat?: (chatId: number) => Promise<void>;
+  onReopenChat?: (chatId: number) => Promise<void>;
 }
 
 export function ChatWindow({
@@ -15,12 +17,36 @@ export function ChatWindow({
   onSendMessage,
   isLoadingMessages,
   onBack,
+  onCloseChat,
+  onReopenChat,
 }: ChatWindowProps) {
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
+  const [isClosingChat, setIsClosingChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Check if chat is closed
+  const isChatClosed = chat?.chat_status === 'closed';
+
+  // Handle close/reopen chat
+  const handleCloseOrReopenChat = async () => {
+    if (!chat || isClosingChat) return;
+    setIsClosingChat(true);
+    try {
+      if (isChatClosed) {
+        await onReopenChat?.(chat.id);
+      } else {
+        await onCloseChat?.(chat.id);
+      }
+    } catch (error) {
+      console.error('Failed to close/reopen chat:', error);
+      alert(isChatClosed ? 'Ошибка открытия чата' : 'Ошибка закрытия чата');
+    } finally {
+      setIsClosingChat(false);
+    }
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -189,8 +215,22 @@ export function ChatWindow({
           <div className="chat-header-meta">{headerMeta}</div>
         </div>
         <div className="chat-header-actions">
-          <button className="header-action-btn" title="Информация">&#8505;</button>
-          <button className="header-action-btn" title="Еще">&#8942;</button>
+          <button
+            className={`header-action-btn ${isChatClosed ? 'reopen' : 'close'}`}
+            title={isChatClosed ? 'Открыть чат' : 'Закрыть чат'}
+            onClick={handleCloseOrReopenChat}
+            disabled={isClosingChat}
+            style={{
+              fontSize: '12px',
+              padding: '6px 12px',
+              background: isChatClosed ? 'var(--color-success, #4ecb71)' : 'var(--color-text-tertiary)',
+              color: 'white',
+              borderRadius: '4px',
+              opacity: isClosingChat ? 0.6 : 1,
+            }}
+          >
+            {isClosingChat ? '...' : (isChatClosed ? 'Открыть' : 'Закрыть')}
+          </button>
         </div>
       </div>
 
@@ -220,8 +260,8 @@ export function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* AI Suggestion - always shown from chat data */}
-      {chat.ai_suggestion_text && (
+      {/* AI Suggestion - show status based on analysis state */}
+      {chat.ai_suggestion_text ? (
         <div className="ai-suggestion" onClick={handleUseAISuggestion} style={{ cursor: 'pointer', position: 'relative' }}>
           <div className="ai-suggestion-label">
             AI Рекомендация
@@ -241,7 +281,23 @@ export function ChatWindow({
           </div>
           <div className="ai-suggestion-text">{chat.ai_suggestion_text}</div>
         </div>
-      )}
+      ) : chat.unread_count > 0 ? (
+        <div className="ai-suggestion ai-suggestion--pending">
+          <div className="ai-suggestion-label">AI Рекомендация</div>
+          <div className="ai-suggestion-text" style={{ color: 'var(--color-text-tertiary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              display: 'inline-block',
+              width: '12px',
+              height: '12px',
+              border: '2px solid var(--color-border-medium)',
+              borderTop: '2px solid var(--color-accent)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+            Анализируется...
+          </div>
+        </div>
+      ) : null}
 
       {/* Input */}
       <div className="chat-input-container">

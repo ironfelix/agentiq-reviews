@@ -43,7 +43,9 @@ class Chat(Base):
     last_message_preview = Column(String(500), nullable=True)
     product_name = Column(String(255), nullable=True)
     product_article = Column(String(100), nullable=True)
+    # Chat status: waiting, responded, client-replied, auto-response, resolved, closed
     chat_status = Column(String(50), default="waiting", nullable=True)
+    closed_at = Column(DateTime(timezone=True), nullable=True)  # When chat was closed
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
