@@ -227,14 +227,17 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None):
             chats_data[chat_id]["last_message_at"] = msg["created_at"]
             chats_data[chat_id]["last_message_text"] = msg["text"][:500] if msg["text"] else ""
 
-    # Upsert chats and messages
+    # Upsert chats and messages, track which need AI analysis
+    chats_needing_analysis = []
     for chat_id, chat_data in chats_data.items():
-        await _upsert_chat_and_messages(
+        db_chat_id = await _upsert_chat_and_messages(
             db,
             seller_id=seller.id,
             marketplace="wildberries",
             chat_data=chat_data
         )
+        if db_chat_id:
+            chats_needing_analysis.append(db_chat_id)
 
     await db.commit()
 
@@ -260,6 +263,29 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None):
 
     await db.commit()
     logger.info(f"Synced {len(chats_data)} chats for seller {seller.id}")
+
+    # Immediately queue AI analysis for chats with new buyer messages
+    if chats_needing_analysis:
+        logger.info(f"Queuing immediate AI analysis for {len(chats_needing_analysis)} chats")
+        for chat_id in chats_needing_analysis:
+            analyze_chat_with_ai.delay(chat_id)
+
+    # Also analyze any chats that have no AI analysis yet (e.g. first-time sync)
+    already_queued = set(chats_needing_analysis)
+    result = await db.execute(
+        select(Chat.id).where(
+            and_(
+                Chat.seller_id == seller.id,
+                Chat.ai_analysis_json == None,
+                Chat.chat_status != "closed",
+            )
+        ).limit(20)
+    )
+    chats_without_analysis = [row[0] for row in result.all() if row[0] not in already_queued]
+    if chats_without_analysis:
+        logger.info(f"Queuing AI analysis for {len(chats_without_analysis)} chats without analysis")
+        for chat_id in chats_without_analysis:
+            analyze_chat_with_ai.delay(chat_id)
 
 
 async def _sync_ozon(db, seller: Seller, last_cursor: Optional[str] = None):
@@ -410,10 +436,18 @@ async def _upsert_chat_and_messages(db, seller_id: int, marketplace: str, chat_d
     # Increment unread count for new buyer messages
     chat.unread_count += new_buyer_messages
 
+    # Invalidate stale AI analysis when new buyer messages arrive
+    if new_buyer_messages > 0 and chat.ai_analysis_json is not None:
+        chat.ai_analysis_json = None
+        chat.ai_suggestion_text = None
+
     # CRITICAL: Recalculate chat_status based on ALL messages in the chat
     await _recalculate_chat_status(db, chat)
 
     logger.debug(f"Upserted {len(chat_data['messages'])} messages for chat {chat.id}")
+
+    # Return chat.id if new buyer messages need analysis
+    return chat.id if new_buyer_messages > 0 else None
 
 
 async def _recalculate_chat_status(db, chat: Chat):
