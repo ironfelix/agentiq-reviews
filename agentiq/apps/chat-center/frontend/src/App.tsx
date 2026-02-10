@@ -247,24 +247,30 @@ function App() {
     );
   }, []);
 
-  // Handle regenerate AI suggestion
+  // Handle regenerate AI suggestion (only updates suggestion, not context panel)
   const handleRegenerateAI = useCallback(async (chatId: number) => {
-    // Clear current suggestion to show loading state
+    // Clear only suggestion text to show loading state — keep ai_analysis_json for context panel
     setSelectedChat(prev => prev?.id === chatId
-      ? { ...prev, ai_suggestion_text: null, ai_analysis_json: null } as typeof prev
+      ? { ...prev, ai_suggestion_text: null } as typeof prev
       : prev
     );
     setChats(prevChats =>
       prevChats.map(c => c.id === chatId
-        ? { ...c, ai_suggestion_text: null, ai_analysis_json: null }
+        ? { ...c, ai_suggestion_text: null }
         : c
       )
     );
     // Trigger re-analysis
     const updatedChat = await chatApi.analyzeChat(chatId);
-    setSelectedChat(prev => prev?.id === chatId ? updatedChat : prev);
+    // Only merge suggestion fields — don't replace entire chat to preserve context panel state
+    const mergeSuggestion = (chat: Chat): Chat => ({
+      ...chat,
+      ai_suggestion_text: updatedChat.ai_suggestion_text,
+      ai_analysis_json: updatedChat.ai_analysis_json,
+    });
+    setSelectedChat(prev => prev?.id === chatId ? mergeSuggestion(prev!) : prev);
     setChats(prevChats =>
-      prevChats.map(c => c.id === chatId ? updatedChat : c)
+      prevChats.map(c => c.id === chatId ? mergeSuggestion(c) : c)
     );
   }, []);
 

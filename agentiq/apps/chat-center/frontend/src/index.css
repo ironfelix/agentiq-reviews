@@ -954,28 +954,22 @@
         }
 
         .ai-use-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-            margin-top: 12px;
-            padding: 8px 16px;
-            background: var(--color-accent);
-            color: white;
+            gap: 5px;
+            background: none;
             border: none;
-            border-radius: var(--radius-md);
+            padding: 0;
+            margin-top: 10px;
             font-family: inherit;
-            font-size: var(--font-size-base);
+            font-size: var(--font-size-md);
             font-weight: 500;
+            color: var(--color-accent);
             cursor: pointer;
-            transition: background var(--transition-fast);
+            transition: color var(--transition-fast);
         }
         .ai-use-btn:hover {
-            background: #1557b0;
-        }
-        .ai-use-btn:active {
-            transform: scale(0.98);
+            color: #1557b0;
         }
 
         /* Input */
