@@ -2043,18 +2043,6 @@ body {
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
 }
-.promo-help-panel.left {
-    right: auto;
-    left: 0;
-    border-left: none;
-    border-right: 1px solid var(--color-border-medium);
-    box-shadow: 4px 0 16px rgba(0,0,0,0.08);
-    animation: slideInLeft 0.2s ease;
-}
-@keyframes slideInLeft {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
 .promo-help-close {
     position: absolute;
     top: 16px;
@@ -2129,7 +2117,7 @@ body {
 }
 .promo-help-link-ext:hover { text-decoration: underline; }
 
-/* Dashboard KPI context (tooltip + left slide-out) */
+/* Dashboard KPI context (tooltip + right slide-out) */
 .kpi-context-actions {
     display: flex;
     align-items: center;
@@ -2485,7 +2473,7 @@ body {
         flex-shrink: 0;
     }
 
-    .promo-help-panel.left {
+    .promo-help-panel {
         width: 100%;
         max-width: 100%;
     }
@@ -4811,7 +4799,7 @@ html, body {
 </div>
 
 <!-- Dashboard context panel -->
-<div class="promo-help-panel left" id="dashboardContextPanel">
+<div class="promo-help-panel" id="dashboardContextPanel">
     <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
     <div class="promo-help-title">Как простые действия двигают выручку</div>
 
