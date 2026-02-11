@@ -1356,6 +1356,309 @@ body {
     color: var(--color-text-tertiary);
 }
 
+/* KPI strip */
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.kpi-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kpi-unit {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+
+.kpi-trend {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+.kpi-trend.up { color: var(--color-success); }
+.kpi-trend.down { color: var(--color-urgent); }
+.kpi-trend.neutral { color: var(--color-text-tertiary); }
+
+/* Analytics two-column grid */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* Rating distribution */
+.rating-dist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-stars {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 18px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.rating-star-icon {
+    color: #fbbc04;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.rating-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: #fbbc04;
+}
+
+.rating-count {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Conversion funnel */
+.funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.funnel-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.funnel-bar-wrap {
+    flex: 1;
+}
+
+.funnel-bar-track {
+    height: 24px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.funnel-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent);
+    transition: width 0.5s ease;
+}
+
+.funnel-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.funnel-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: 56px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.funnel-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 92px;
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    gap: 4px;
+}
+
+.funnel-arrow svg {
+    width: 10px;
+    height: 10px;
+}
+
+.funnel-conversion {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+/* Response time distribution */
+.time-dist {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 60px;
+    margin-top: 12px;
+}
+
+.time-dist-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+}
+
+.time-dist-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.time-dist-label {
+    font-size: 9px;
+    color: var(--color-text-tertiary);
+}
+
+/* SLA compliance bar */
+.sla-bar-wrap {
+    margin-top: 16px;
+}
+
+.sla-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.sla-bar-track {
+    height: 6px;
+    background: var(--color-bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.sla-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+/* Top complaints */
+.complaint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.complaint-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.complaint-rank {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    width: 20px;
+    flex-shrink: 0;
+}
+
+.complaint-text {
+    font-size: 13px;
+    color: var(--color-text-primary);
+    flex: 1;
+}
+
+.complaint-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+/* Volume stacked chart */
+.volume-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.stacked-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.stacked-bar {
+    width: 100%;
+    max-width: 28px;
+    border-radius: 0;
+}
+
+.stacked-bar:first-child {
+    border-radius: 3px 3px 0 0;
+}
+
+.stacked-bar:last-of-type {
+    border-radius: 0 0 0 0;
+}
+
 /* ========================================================
    SETTINGS
    ======================================================== */
@@ -2091,6 +2394,7 @@ body {
     /* --- Screen 6: Analytics --- */
     .analytics-page {
         padding: 16px;
+        padding-bottom: 80px;
     }
 
     .analytics-header {
@@ -2121,11 +2425,35 @@ body {
         flex-shrink: 0;
     }
 
+    .kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .kpi-card {
+        padding: 14px;
+    }
+
+    .kpi-value {
+        font-size: 22px;
+    }
+
+    .kpi-unit {
+        font-size: 11px;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
     .quality-card {
         flex-direction: column;
         gap: 24px;
         padding: 20px;
-        margin-bottom: 16px;
+        margin-bottom: 0;
     }
 
     .gauge-circle {
@@ -2146,17 +2474,17 @@ body {
     }
 
     .speed-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr !important;
         gap: 10px;
         margin-bottom: 16px;
     }
 
     .speed-card {
-        padding: 16px;
+        padding: 14px;
     }
 
     .speed-value {
-        font-size: 22px;
+        font-size: 18px !important;
     }
 
     .chart-card {
@@ -2165,6 +2493,26 @@ body {
 
     .chart-area {
         height: 140px;
+    }
+
+    .funnel-label {
+        width: 64px;
+        font-size: 11px;
+    }
+
+    .funnel-value {
+        width: 48px;
+        font-size: 11px;
+    }
+
+    .funnel-arrow {
+        padding-left: 76px;
+    }
+
+    /* Revenue impact grid mobile */
+    .chart-card [style*="grid-template-columns: repeat(3"] {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
     }
 
     /* --- Screen 7: Settings --- */
@@ -2370,13 +2718,21 @@ body {
         padding: 24px;
     }
 
+    .kpi-strip {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
     .quality-card {
         gap: 32px;
         padding: 24px;
     }
 
     .speed-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr) !important;
     }
 
     /* Settings: nav stays as left sidebar but narrower */
@@ -2811,13 +3167,6 @@ html, body {
                     </div>
                 </div>
                 <div class="msg-list-body">
-                    <!-- Sync banner (Apple Mail style) -->
-                    <div class="sync-banner" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--color-accent-light); border-radius: var(--radius-md); margin-bottom: 12px; font-size: 12px; color: var(--color-accent);">
-                        <div style="width: 14px; height: 14px; border: 2px solid var(--color-border-medium); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;"></div>
-                        <span>Загрузка... 50 из ~200 чатов</span>
-                        <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 11px;">в фоне</span>
-                    </div>
-
                     <div class="msg-queue-label"><span class="msg-status-dot red"></span> В работе</div>
                     <div class="msg-chat-item active">
                         <div class="msg-chat-icon">W</div>
@@ -2904,6 +3253,12 @@ html, body {
                             <div class="msg-chat-meta"><span class="msg-status-dot" style="background: var(--color-text-tertiary);"></span>Чат &middot; Рюкзак городской 25л</div>
                             <div class="msg-chat-preview" style="color: var(--color-text-tertiary);">AI: Спасибо за высокую оценку! Приятного использования...</div>
                         </div>
+                    </div>
+
+                    <!-- Sync banner (Apple Mail style) — bottom of list -->
+                    <div class="sync-banner" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: var(--color-text-tertiary); border-top: 1px solid var(--color-border-light);">
+                        <div style="width: 12px; height: 12px; border: 1.5px solid var(--color-border-medium); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;"></div>
+                        <span>Загрузка... 50 из ~200 чатов</span>
                     </div>
                 </div>
             </div>
@@ -3045,74 +3400,326 @@ html, body {
                     </div>
                 </div>
 
-                <!-- Quality Score -->
-                <div class="quality-card">
-                    <div class="quality-gauge">
-                        <div class="gauge-circle">
-                            <div class="gauge-value">8.2</div>
-                            <div class="gauge-label">из 10</div>
+                <!-- KPI Strip — 4 key numbers -->
+                <div class="kpi-strip">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Отвечено</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: var(--color-success);">96%</div>
                         </div>
-                        <div class="gauge-verdict">Хорошо</div>
+                        <div class="kpi-trend up">156 из 162</div>
                     </div>
-                    <div class="quality-breakdown">
-                        <div style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Качество ответов</div>
-                        <div class="quality-row">
-                            <div class="quality-bar-label">Хорошие</div>
-                            <div class="quality-bar-track"><div class="quality-bar-fill good" style="width: 62%"></div></div>
-                            <div class="quality-bar-value">62%</div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Медиана ответа</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value">2ч 10м</div>
                         </div>
-                        <div class="quality-row">
-                            <div class="quality-bar-label">Допустимые</div>
-                            <div class="quality-bar-track"><div class="quality-bar-fill acceptable" style="width: 24%"></div></div>
-                            <div class="quality-bar-value">24%</div>
+                        <div class="kpi-trend up">-18% vs прошлый месяц</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Средний рейтинг</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: #fbbc04;">4.3</div>
+                            <div class="kpi-unit">/ 5</div>
                         </div>
-                        <div class="quality-row">
-                            <div class="quality-bar-label">Рискованные</div>
-                            <div class="quality-bar-track"><div class="quality-bar-fill risky" style="width: 10%"></div></div>
-                            <div class="quality-bar-value">10%</div>
+                        <div class="kpi-trend up">+0.2 vs прошлый месяц</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Без ответа</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: var(--color-urgent);">6</div>
+                            <div class="kpi-unit">отзывов</div>
                         </div>
-                        <div class="quality-row">
-                            <div class="quality-bar-label">Вредные</div>
-                            <div class="quality-bar-track"><div class="quality-bar-fill harmful" style="width: 4%"></div></div>
-                            <div class="quality-bar-value">4%</div>
+                        <div class="kpi-trend neutral">+ 3 вопроса</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Quality Score + Speed -->
+                <div class="analytics-grid">
+                    <!-- Quality Score -->
+                    <div class="quality-card" style="margin-bottom: 0;">
+                        <div class="quality-gauge">
+                            <div class="gauge-circle">
+                                <div class="gauge-value">8.2</div>
+                                <div class="gauge-label">из 10</div>
+                            </div>
+                            <div class="gauge-verdict">Хорошо</div>
+                        </div>
+                        <div class="quality-breakdown">
+                            <div style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Качество ответов</div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Хорошие</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill good" style="width: 62%"></div></div>
+                                <div class="quality-bar-value">62%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Допустимые</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill acceptable" style="width: 24%"></div></div>
+                                <div class="quality-bar-value">24%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Рискованные</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill risky" style="width: 10%"></div></div>
+                                <div class="quality-bar-value">10%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Вредные</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill harmful" style="width: 4%"></div></div>
+                                <div class="quality-bar-value">4%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Speed + SLA -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Скорость ответа</div>
+                        <div class="speed-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+                            <div class="speed-card" style="margin: 0;">
+                                <div class="speed-label">Негатив (1-2)</div>
+                                <div class="speed-value" style="color: var(--color-warning); font-size: 20px;">47м</div>
+                                <div class="speed-target missed">Цель: &lt;30 мин</div>
+                            </div>
+                            <div class="speed-card" style="margin: 0;">
+                                <div class="speed-label">Вопросы</div>
+                                <div class="speed-value" style="color: var(--color-success); font-size: 20px;">38м</div>
+                                <div class="speed-target met">Цель: &lt;1 час</div>
+                            </div>
+                        </div>
+                        <!-- Response time distribution -->
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Распределение времени ответа</div>
+                        <div class="time-dist">
+                            <div class="time-dist-bar" style="height: 55%; background: var(--color-success);" title="< 1 час: 89 ответов"></div>
+                            <div class="time-dist-bar" style="height: 25%; background: var(--color-accent);" title="1-4 часа: 40 ответов"></div>
+                            <div class="time-dist-bar" style="height: 12%; background: var(--color-warning);" title="4-12 часов: 19 ответов"></div>
+                            <div class="time-dist-bar" style="height: 5%; background: var(--color-urgent);" title="12-24 часа: 6 ответов"></div>
+                            <div class="time-dist-bar" style="height: 3%; background: #9e1010;" title="> 24 часа: 2 ответа"></div>
+                        </div>
+                        <div class="time-dist-labels">
+                            <span class="time-dist-label">&lt;1ч</span>
+                            <span class="time-dist-label">1-4ч</span>
+                            <span class="time-dist-label">4-12ч</span>
+                            <span class="time-dist-label">12-24ч</span>
+                            <span class="time-dist-label">&gt;24ч</span>
+                        </div>
+                        <!-- SLA compliance -->
+                        <div class="sla-bar-wrap">
+                            <div class="sla-bar-label">
+                                <span>SLA выполнение (негатив &lt;1ч)</span>
+                                <span style="font-weight: 600; color: var(--color-warning);">78%</span>
+                            </div>
+                            <div class="sla-bar-track">
+                                <div class="sla-bar-fill" style="width: 78%; background: var(--color-warning);"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Speed metrics -->
-                <div class="speed-grid">
-                    <div class="speed-card">
-                        <div class="speed-label">Медиана ответа (негатив)</div>
-                        <div class="speed-value" style="color: var(--color-warning);">47м</div>
-                        <div class="speed-target missed">Цель: <span>&lt;30 мин</span></div>
+                <!-- Row 3: Rating Distribution + Conversion Funnel -->
+                <div class="analytics-grid">
+                    <!-- Rating distribution -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Распределение оценок</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px;">
+                            <span style="font-size: 32px; font-weight: 700; color: #fbbc04;">4.3</span>
+                            <span style="font-size: 12px; color: var(--color-text-tertiary);">из 5 (162 отзыва)</span>
+                        </div>
+                        <div class="rating-dist">
+                            <div class="rating-row">
+                                <div class="rating-stars">5</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 58%;"></div></div>
+                                <div class="rating-count">94</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">4</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 18%;"></div></div>
+                                <div class="rating-count">29</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">3</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 10%; background: var(--color-warning);"></div></div>
+                                <div class="rating-count">16</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">2</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 6%; background: var(--color-urgent);"></div></div>
+                                <div class="rating-count">10</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">1</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 8%; background: var(--color-urgent);"></div></div>
+                                <div class="rating-count">13</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="speed-card">
-                        <div class="speed-label">Медиана ответа (все)</div>
-                        <div class="speed-value" style="color: var(--color-success);">2ч 10м</div>
-                        <div class="speed-target met">Цель: <span>&lt;4 часа</span></div>
-                    </div>
-                    <div class="speed-card">
-                        <div class="speed-label">Отвечено за период</div>
-                        <div class="speed-value">156</div>
-                        <div class="speed-target">Из 162 чатов <span>(96%)</span></div>
+
+                    <!-- Conversion funnel from WB Analytics API -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 4px;">Воронка продаж</div>
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 16px;">Данные WB Analytics API</div>
+                        <div class="funnel">
+                            <div class="funnel-step">
+                                <div class="funnel-label">Просмотры</div>
+                                <div class="funnel-bar-wrap">
+                                    <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 100%; opacity: 0.3;"></div></div>
+                                </div>
+                                <div class="funnel-value">12 480</div>
+                            </div>
+                            <div class="funnel-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                <span class="funnel-conversion">18.3% в корзину</span>
+                            </div>
+                            <div class="funnel-step">
+                                <div class="funnel-label">В корзину</div>
+                                <div class="funnel-bar-wrap">
+                                    <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 46%; opacity: 0.5;"></div></div>
+                                </div>
+                                <div class="funnel-value">2 284</div>
+                            </div>
+                            <div class="funnel-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                <span class="funnel-conversion">42.1% в заказ</span>
+                            </div>
+                            <div class="funnel-step">
+                                <div class="funnel-label">Заказы</div>
+                                <div class="funnel-bar-wrap">
+                                    <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 19.3%; opacity: 0.75;"></div></div>
+                                </div>
+                                <div class="funnel-value">962</div>
+                            </div>
+                            <div class="funnel-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                <span class="funnel-conversion">87% выкуп</span>
+                            </div>
+                            <div class="funnel-step">
+                                <div class="funnel-label">Выкуплено</div>
+                                <div class="funnel-bar-wrap">
+                                    <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 16.8%;"></div></div>
+                                </div>
+                                <div class="funnel-value">837</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Volume chart -->
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <div class="chart-title">Объём сообщений</div>
+                <!-- Row 4: Top complaints + Volume chart -->
+                <div class="analytics-grid">
+                    <!-- Top complaints from cons field -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Топ жалоб из отзывов</div>
+                        <div class="complaint-list">
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">1</div>
+                                <div class="complaint-text">Быстро разряжается</div>
+                                <div class="complaint-count" style="color: var(--color-urgent);">18</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">2</div>
+                                <div class="complaint-text">Не совпадает размер</div>
+                                <div class="complaint-count" style="color: var(--color-urgent);">12</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">3</div>
+                                <div class="complaint-text">Дешёвые материалы</div>
+                                <div class="complaint-count" style="color: var(--color-warning);">9</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">4</div>
+                                <div class="complaint-text">Долгая доставка</div>
+                                <div class="complaint-count">7</div>
+                            </div>
+                            <div class="complaint-item">
+                                <div class="complaint-rank">5</div>
+                                <div class="complaint-text">Отличается от фото</div>
+                                <div class="complaint-count">5</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 12px;">Извлечено из поля «Недостатки» в отзывах WB</div>
                     </div>
-                    <div class="chart-area">
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 40px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Пн</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 65px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Вт</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 80px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Ср</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 55px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Чт</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 90px; background: var(--color-accent);"></div><div class="chart-bar-label">Пт</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 120px; background: var(--color-accent);"></div><div class="chart-bar-label">Сб</div></div>
-                        <div class="chart-bar-group"><div class="chart-bar" style="height: 100px; background: var(--color-accent);"></div><div class="chart-bar-label">Вс</div></div>
+
+                    <!-- Volume chart with stacked bars -->
+                    <div class="chart-card">
+                        <div class="chart-header" style="margin-bottom: 12px;">
+                            <div class="chart-title">Объём по каналам</div>
+                        </div>
+                        <div class="volume-legend">
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-accent);"></div>Отзывы</div>
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-success);"></div>Вопросы</div>
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-warning);"></div>Чаты</div>
+                        </div>
+                        <div class="chart-area" style="height: 140px;">
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 30px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 8px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Пн</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 45px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 18px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 10px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Вт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 55px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 15px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Ср</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 38px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 10px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 6px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Чт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 62px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 20px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 14px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Пт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 80px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 22px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 18px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Сб</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 68px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 16px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Вс</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Row 5: Revenue Impact -->
+                <div class="chart-card" style="margin-bottom: 24px;">
+                    <div class="chart-title" style="margin-bottom: 16px;">Влияние на продажи</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Потери от плохих ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-urgent);">~42K</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">руб/мес упущенной выручки</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Экономия от быстрых ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-success);">+20%</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">конверсия при ответе &lt;1ч (WB стат.)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Спасённые рейтинги</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-accent);">7</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">негативных отзывов → решены в чате</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
