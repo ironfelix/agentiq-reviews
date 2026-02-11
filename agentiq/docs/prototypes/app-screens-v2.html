@@ -53,6 +53,26 @@ body {
     height: 100vh;
 }
 
+/* Thin scrollbars (Telegram-like) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.25);
+}
+
 /* ===== SCREEN NAVIGATOR (dev only) ===== */
 .screen-nav {
     position: relative;
@@ -87,7 +107,14 @@ body {
     height: calc(100vh - 38px);
     width: 100%;
 }
-.screen.active { display: flex; }
+.screen.active {
+    display: flex;
+    animation: screenIn 0.18s ease-out;
+}
+@keyframes screenIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
 /* ===== CJM ANNOTATION ===== */
 .cjm-note {
@@ -477,7 +504,7 @@ body {
    ======================================================== */
 .app-shell {
     display: flex;
-    height: 100vh;
+    height: 100%;
     width: 100%;
 }
 
@@ -629,6 +656,7 @@ body {
    ======================================================== */
 .dashboard {
     padding: 32px;
+    padding-bottom: 48px;
     max-width: 960px;
 }
 
@@ -3043,7 +3071,8 @@ html, body {
     <button onclick="showScreen('dashboard')" id="nav-dashboard">4. Главная</button>
     <button onclick="showScreen('messages')" id="nav-messages">5. Сообщения</button>
     <button onclick="showScreen('analytics')" id="nav-analytics">6. Аналитика</button>
-    <button onclick="showScreen('settings')" id="nav-settings">7. Настройки</button>
+    <button onclick="showScreen('promo')" id="nav-promo">7. Промокоды</button>
+    <button onclick="showScreen('settings')" id="nav-settings">8. Настройки</button>
 </div>
 
 <!-- CJM annotation -->
@@ -3155,6 +3184,10 @@ html, body {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                         <span class="sidebar-label">Аналитика</span>
                     </button>
+                    <button class="sidebar-item" onclick="showScreen('promo')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                        <span class="sidebar-label">Промокоды</span>
+                    </button>
                 </div>
                 <div class="sidebar-bottom">
                     <button class="sidebar-item" onclick="showScreen('settings')">
@@ -3242,6 +3275,10 @@ html, body {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span>Аналитика</span>
             </button>
+            <button class="bottom-nav-item" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
             <button class="bottom-nav-item" onclick="showScreen('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Настройки</span>
@@ -3274,6 +3311,10 @@ html, body {
                 <button class="sidebar-item" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                     <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
@@ -3408,6 +3449,10 @@ html, body {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span>Аналитика</span>
             </button>
+            <button class="bottom-nav-item" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
             <button class="bottom-nav-item" onclick="showScreen('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Настройки</span>
@@ -3439,6 +3484,10 @@ html, body {
                 <button class="sidebar-item" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                     <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
@@ -3650,6 +3699,10 @@ html, body {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span>Аналитика</span>
             </button>
+            <button class="bottom-nav-item" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
             <button class="bottom-nav-item" onclick="showScreen('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Настройки</span>
@@ -3681,6 +3734,10 @@ html, body {
                 <button class="sidebar-item active" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                     <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
@@ -4114,6 +4171,10 @@ html, body {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span>Аналитика</span>
             </button>
+            <button class="bottom-nav-item" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
             <button class="bottom-nav-item" onclick="showScreen('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Настройки</span>
@@ -4123,7 +4184,280 @@ html, body {
 </div>
 
 <!-- ========================================================
-     SCREEN 7: SETTINGS
+     SCREEN 7: PROMO CODES
+     ======================================================== -->
+<div class="screen" id="screen-promo">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item active" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="settings-content" style="padding: 32px; max-width: 700px;">
+                <div class="settings-section-title">Промокоды</div>
+
+                <!-- Cabinet selector -->
+                <div class="promo-cabinet-selector">
+                    <div class="promo-cabinet-icon">W</div>
+                    <div class="promo-cabinet-info">
+                        <div class="promo-cabinet-name">CRM Group</div>
+                        <div class="promo-cabinet-mp">Wildberries</div>
+                    </div>
+                    <div class="promo-cabinet-arrow">&#9662;</div>
+                </div>
+
+                <!-- Description -->
+                <div class="settings-section-desc">Промокоды создаются в ЛК Wildberries. Здесь вы указываете их для AI &mdash; он будет предлагать промокод в ответах, когда это уместно.</div>
+
+                <!-- Active promo codes + help link on same line -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div class="promo-count" style="margin-bottom: 0;">Активные промокоды (2 из 10)</div>
+                    <button class="promo-help-link" onclick="document.getElementById('promoHelpPanel').classList.add('open')">Как это работает?</button>
+                </div>
+
+                <!-- Promo card 1 -->
+                <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                    <div class="promo-card-header">
+                        <div class="promo-code-name">THANKS10</div>
+                        <div class="promo-badge active">Активен</div>
+                    </div>
+                    <div class="promo-meta">Скидка 10% &middot; до 28 февраля &middot; Все товары</div>
+                    <div class="promo-channels">
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                    </div>
+                    <div class="promo-card-footer">
+                        <div class="promo-sends">Отправлено: 23 раза</div>
+                        <div class="promo-actions">
+                            <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                            <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод THANKS10?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo card 2 -->
+                <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                    <div class="promo-card-header">
+                        <div class="promo-code-name">SORRY15</div>
+                        <div class="promo-badge active">Активен</div>
+                    </div>
+                    <div class="promo-meta">Скидка 15% &middot; до 15 марта &middot; Все товары</div>
+                    <div class="promo-channels">
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                    </div>
+                    <div class="promo-card-footer">
+                        <div class="promo-sends">Отправлено: 8 раз</div>
+                        <div class="promo-actions">
+                            <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                            <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод SORRY15?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add button + inline form -->
+                <button class="promo-add-btn" id="promoAddBtn" onclick="document.getElementById('promoAddForm').style.display='block';this.style.display='none'">+ Добавить промокод</button>
+
+                <!-- Inline add form (hidden by default) -->
+                <div id="promoAddForm" class="promo-card" style="display: none; cursor: default; border-color: var(--color-accent); border-width: 2px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Новый промокод</div>
+                    <div class="profile-form" style="max-width: 100%;">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Код</label>
+                                <input type="text" class="form-input" placeholder="WELCOME20" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">Скопируйте из ЛК WB</div>
+                            </div>
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Скидка</label>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <input type="number" class="form-input" placeholder="10" min="3" max="50" style="width: 80px;">
+                                    <span style="font-size: 14px; color: var(--color-text-secondary);">%</span>
+                                </div>
+                            </div>
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Действует до</label>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label class="form-label">Товары</label>
+                            <div style="display: flex; gap: 16px; font-size: 13px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="promo-products" checked> Все товары
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="promo-products"> Выбранные артикулы
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label class="form-label">Где предлагать</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); overflow: hidden;">
+                                <div style="padding: 10px 12px; background: var(--color-bg-tertiary); font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">Чаты (приватно)</div>
+                                <div style="padding: 10px 12px; background: #fff8e1; font-size: 11px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Отзывы (публично!)</div>
+                                <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Позитивные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Негативные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked> Вопросы по товару</label>
+                                </div>
+                                <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox"> Позитивные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox"> Негативные</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="form-save" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Сохранить</button>
+                            <button class="form-save" style="background: none; color: var(--color-text-secondary); border: 1px solid var(--color-border-medium);" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Отмена</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="promo-divider"></div>
+
+                <!-- Automation settings -->
+                <div class="promo-count">Настройки автоподстановки</div>
+
+                <div class="ai-setting-card">
+                    <div class="ai-setting-header">
+                        <div class="ai-setting-title">AI предлагает промокод в ответах</div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="ai-setting-desc">
+                        AI добавит промокод в черновик ответа, когда это уместно. Вы увидите его перед отправкой и сможете убрать.
+                    </div>
+                </div>
+
+                <div class="ai-setting-card">
+                    <div class="ai-setting-header">
+                        <div class="ai-setting-title">Предупреждать об отзывах</div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="ai-setting-desc">
+                        Показывать напоминание, что промокод в ответе на отзыв виден всем посетителям карточки товара.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help slide-out panel -->
+            <div class="promo-help-panel" id="promoHelpPanel">
+                <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="promo-help-title">Как работают промокоды</div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Создание</div>
+                    <div class="promo-help-text">
+                        Промокоды создаются в ЛК Wildberries:<br>
+                        <strong>Товары и цены &rarr; Календарь акций &rarr; По промокодам</strong>
+                    </div>
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Параметры</div>
+                    <table class="promo-help-table">
+                        <tr><td>Скидка</td><td>3% &mdash; 50%</td></tr>
+                        <tr><td>Длительность</td><td>1 &mdash; 31 день</td></tr>
+                        <tr><td>Макс. акций</td><td>10 одновременно</td></tr>
+                        <tr><td>Код</td><td>Авто или свой</td></tr>
+                        <tr><td>Использование</td><td>Многоразовый</td></tr>
+                    </table>
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Как применяется</div>
+                    <div class="promo-help-text">
+                        Покупатель вводит код в корзине на WB. Код многоразовый &mdash; его может использовать любой покупатель.
+                    </div>
+                </div>
+
+                <div class="promo-help-warning">
+                    <strong>Важно:</strong><br>
+                    &bull; Скидка не суммируется с акциями &gt; 45%<br>
+                    &bull; Скидка полностью за счёт продавца<br>
+                    &bull; В ответах на отзывы код виден <strong>всем</strong> посетителям карточки
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Чаты vs отзывы</div>
+                    <table class="promo-help-table">
+                        <tr><td>Чат</td><td>Приватно, видит только покупатель</td></tr>
+                        <tr><td>Ответ на отзыв</td><td>Публично, видят все</td></tr>
+                    </table>
+                </div>
+
+                <a href="https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes" target="_blank" class="promo-help-link-ext">
+                    &#128206; Инструкция Wildberries &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 8: SETTINGS
      ======================================================== -->
 <div class="screen" id="screen-settings">
     <div class="app-shell">
@@ -4146,6 +4480,10 @@ html, body {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                     <span class="sidebar-label">Аналитика</span>
                 </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
             </div>
             <div class="sidebar-bottom">
                 <button class="sidebar-item active" onclick="showScreen('settings')">
@@ -4165,10 +4503,6 @@ html, body {
                 <button class="settings-nav-item" onclick="showSettingsTab('ai')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     AI-ассистент
-                </button>
-                <button class="settings-nav-item" onclick="showSettingsTab('promo')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-                    Промокоды
                 </button>
                 <button class="settings-nav-item" onclick="showSettingsTab('profile')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -4266,214 +4600,6 @@ html, body {
                     </div>
                 </div>
 
-                <!-- Promo codes tab -->
-                <div id="settings-promo" style="display: none;">
-                    <div class="settings-section-title">Промокоды</div>
-
-                    <!-- Cabinet selector -->
-                    <div class="promo-cabinet-selector">
-                        <div class="promo-cabinet-icon">W</div>
-                        <div class="promo-cabinet-info">
-                            <div class="promo-cabinet-name">CRM Group</div>
-                            <div class="promo-cabinet-mp">Wildberries</div>
-                        </div>
-                        <div class="promo-cabinet-arrow">&#9662;</div>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="settings-section-desc">Промокоды создаются в ЛК Wildberries. Здесь вы указываете их для AI &mdash; он будет предлагать промокод в ответах, когда это уместно.</div>
-
-                    <!-- Active promo codes + help link on same line -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <div class="promo-count" style="margin-bottom: 0;">Активные промокоды (2 из 10)</div>
-                        <button class="promo-help-link" onclick="document.getElementById('promoHelpPanel').classList.add('open')">Как это работает?</button>
-                    </div>
-
-                    <!-- Promo card 1 -->
-                    <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
-                        <div class="promo-card-header">
-                            <div class="promo-code-name">THANKS10</div>
-                            <div class="promo-badge active">Активен</div>
-                        </div>
-                        <div class="promo-meta">Скидка 10% &middot; до 28 февраля &middot; Все товары</div>
-                        <div class="promo-channels">
-                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
-                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
-                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
-                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
-                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
-                        </div>
-                        <div class="promo-card-footer">
-                            <div class="promo-sends">Отправлено: 23 раза</div>
-                            <div class="promo-actions">
-                                <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
-                                <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод THANKS10?'))this.closest('.promo-card').style.display='none'">Удалить</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Promo card 2 -->
-                    <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
-                        <div class="promo-card-header">
-                            <div class="promo-code-name">SORRY15</div>
-                            <div class="promo-badge active">Активен</div>
-                        </div>
-                        <div class="promo-meta">Скидка 15% &middot; до 15 марта &middot; Все товары</div>
-                        <div class="promo-channels">
-                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
-                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
-                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
-                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
-                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
-                        </div>
-                        <div class="promo-card-footer">
-                            <div class="promo-sends">Отправлено: 8 раз</div>
-                            <div class="promo-actions">
-                                <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
-                                <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод SORRY15?'))this.closest('.promo-card').style.display='none'">Удалить</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add button + inline form -->
-                    <button class="promo-add-btn" id="promoAddBtn" onclick="document.getElementById('promoAddForm').style.display='block';this.style.display='none'">+ Добавить промокод</button>
-
-                    <!-- Inline add form (hidden by default) -->
-                    <div id="promoAddForm" class="promo-card" style="display: none; cursor: default; border-color: var(--color-accent); border-width: 2px;">
-                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Новый промокод</div>
-                        <div class="profile-form" style="max-width: 100%;">
-                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                                <div class="form-field" style="margin: 0;">
-                                    <label class="form-label">Код</label>
-                                    <input type="text" class="form-input" placeholder="WELCOME20" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">
-                                    <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">Скопируйте из ЛК WB</div>
-                                </div>
-                                <div class="form-field" style="margin: 0;">
-                                    <label class="form-label">Скидка</label>
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        <input type="number" class="form-input" placeholder="10" min="3" max="50" style="width: 80px;">
-                                        <span style="font-size: 14px; color: var(--color-text-secondary);">%</span>
-                                    </div>
-                                </div>
-                                <div class="form-field" style="margin: 0;">
-                                    <label class="form-label">Действует до</label>
-                                    <input type="date" class="form-input">
-                                </div>
-                            </div>
-
-                            <div style="margin-bottom: 16px;">
-                                <label class="form-label">Товары</label>
-                                <div style="display: flex; gap: 16px; font-size: 13px;">
-                                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                        <input type="radio" name="promo-products" checked> Все товары
-                                    </label>
-                                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                        <input type="radio" name="promo-products"> Выбранные артикулы
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div style="margin-bottom: 16px;">
-                                <label class="form-label">Где предлагать</label>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); overflow: hidden;">
-                                    <div style="padding: 10px 12px; background: var(--color-bg-tertiary); font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">Чаты (приватно)</div>
-                                    <div style="padding: 10px 12px; background: #fff8e1; font-size: 11px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Отзывы (публично!)</div>
-                                    <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
-                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Позитивные</label>
-                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Негативные</label>
-                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked> Вопросы по товару</label>
-                                    </div>
-                                    <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
-                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox"> Позитивные</label>
-                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox"> Негативные</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="display: flex; gap: 8px;">
-                                <button class="form-save" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Сохранить</button>
-                                <button class="form-save" style="background: none; color: var(--color-text-secondary); border: 1px solid var(--color-border-medium);" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Отмена</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="promo-divider"></div>
-
-                    <!-- Automation settings -->
-                    <div class="promo-count">Настройки автоподстановки</div>
-
-                    <div class="ai-setting-card">
-                        <div class="ai-setting-header">
-                            <div class="ai-setting-title">AI предлагает промокод в ответах</div>
-                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-                        </div>
-                        <div class="ai-setting-desc">
-                            AI добавит промокод в черновик ответа, когда это уместно. Вы увидите его перед отправкой и сможете убрать.
-                        </div>
-                    </div>
-
-                    <div class="ai-setting-card">
-                        <div class="ai-setting-header">
-                            <div class="ai-setting-title">Предупреждать об отзывах</div>
-                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-                        </div>
-                        <div class="ai-setting-desc">
-                            Показывать напоминание, что промокод в ответе на отзыв виден всем посетителям карточки товара.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Help slide-out panel -->
-                <div class="promo-help-panel" id="promoHelpPanel">
-                    <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
-                    <div class="promo-help-title">Как работают промокоды</div>
-
-                    <div class="promo-help-section">
-                        <div class="promo-help-label">Создание</div>
-                        <div class="promo-help-text">
-                            Промокоды создаются в ЛК Wildberries:<br>
-                            <strong>Товары и цены &rarr; Календарь акций &rarr; По промокодам</strong>
-                        </div>
-                    </div>
-
-                    <div class="promo-help-section">
-                        <div class="promo-help-label">Параметры</div>
-                        <table class="promo-help-table">
-                            <tr><td>Скидка</td><td>3% &mdash; 50%</td></tr>
-                            <tr><td>Длительность</td><td>1 &mdash; 31 день</td></tr>
-                            <tr><td>Макс. акций</td><td>10 одновременно</td></tr>
-                            <tr><td>Код</td><td>Авто или свой</td></tr>
-                            <tr><td>Использование</td><td>Многоразовый</td></tr>
-                        </table>
-                    </div>
-
-                    <div class="promo-help-section">
-                        <div class="promo-help-label">Как применяется</div>
-                        <div class="promo-help-text">
-                            Покупатель вводит код в корзине на WB. Код многоразовый &mdash; его может использовать любой покупатель.
-                        </div>
-                    </div>
-
-                    <div class="promo-help-warning">
-                        <strong>Важно:</strong><br>
-                        &bull; Скидка не суммируется с акциями &gt; 45%<br>
-                        &bull; Скидка полностью за счёт продавца<br>
-                        &bull; В ответах на отзывы код виден <strong>всем</strong> посетителям карточки
-                    </div>
-
-                    <div class="promo-help-section">
-                        <div class="promo-help-label">Чаты vs отзывы</div>
-                        <table class="promo-help-table">
-                            <tr><td>Чат</td><td>Приватно, видит только покупатель</td></tr>
-                            <tr><td>Ответ на отзыв</td><td>Публично, видят все</td></tr>
-                        </table>
-                    </div>
-
-                    <a href="https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes" target="_blank" class="promo-help-link-ext">
-                        &#128206; Инструкция Wildberries &rarr;
-                    </a>
-                </div>
-
                 <!-- Profile tab -->
                 <div id="settings-profile" style="display: none;">
                     <div class="settings-section-title">Профиль</div>
@@ -4513,6 +4639,10 @@ html, body {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span>Аналитика</span>
             </button>
+            <button class="bottom-nav-item" onclick="showScreen('promo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                <span>Промокоды</span>
+            </button>
             <button class="bottom-nav-item active" onclick="showScreen('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Настройки</span>
@@ -4531,7 +4661,8 @@ const cjmNotes = {
     dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек: 7 без ответа, 3 срочных, quality 8.2. Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
     messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
     analytics: '<strong>CJM:</strong> ROI для продавца. Quality Score = дифференциатор. Скорость = SLA compliance. График объёма = понимание нагрузки.',
-    settings: '<strong>CJM:</strong> Настроить и забыть. Авто-ответы, промокоды (per-cabinet, help-панель), профиль. Промокоды: создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Slide-out справка объясняет механику.'
+    promo: '<strong>CJM:</strong> Промокоды создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Per-cabinet привязка. Help-панель объясняет механику. Чаты = приватно, отзывы = публично.',
+    settings: '<strong>CJM:</strong> Настроить и забыть. Подключения, AI-тон, авто-ответы, профиль.'
 };
 
 // Map screen names to bottom nav index (0=dashboard, 1=messages, 2=analytics, 3=settings)
@@ -4540,7 +4671,8 @@ const bottomNavMap = {
     dashboard: 0,
     messages: 1,
     analytics: 2,
-    settings: 3
+    promo: 3,
+    settings: 4
 };
 
 function showScreen(name) {
@@ -4596,7 +4728,6 @@ function showSettingsTab(tab) {
     // Hide all tabs
     document.getElementById('settings-connections').style.display = 'none';
     document.getElementById('settings-ai').style.display = 'none';
-    document.getElementById('settings-promo').style.display = 'none';
     document.getElementById('settings-profile').style.display = 'none';
 
     // Close help panel if open

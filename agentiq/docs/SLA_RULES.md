@@ -32,18 +32,29 @@
 
 **Почему:** 3★ восстановимы, но менее срочны. Ответы в течение 24-48ч «закрепляются» вверху ленты отзывов.
 
-### 3. PRE-PURCHASE ВОПРОСЫ — HIGH
+### 3. PRE-PURCHASE ВОПРОСЫ — HIGH (время = деньги)
+
+#### 3a. Чат (pre-purchase) — покупатель СЕЙЧАС на карточке
 
 | Metric | Target | Hard Deadline |
 |--------|--------|---------------|
-| First response | **< 1 hour** | 2 hours |
-| Follow-up | < 30 min | 1 hour |
+| First response | **< 2 min** (AI auto) | 10 minutes |
+| Follow-up | < 1 min | 5 minutes |
 
-**Почему:**
-- Официальная статистика WB: **+20% конверсия** при ответе на вопрос в течение 1ч ([WB Pro](https://pro.wildberries.ru/))
-- Покупатель сравнивает товары в real-time, окно решения **10-20 секунд**
+#### 3b. Публичный вопрос (Questions API) — покупатель может вернуться
+
+| Metric | Target | Hard Deadline |
+|--------|--------|---------------|
+| First response | **< 5 min** (AI draft) | 30 minutes |
+| Follow-up | < 5 min | 15 minutes |
+
+**Почему такие жёсткие тайминги:**
+- Покупатель сравнивает товары в real-time, **окно решения 10-20 секунд** — если ответа нет, он уходит к конкуренту
+- Официальная статистика WB: **+20% конверсия** при ответе в течение 1ч ([WB Pro](https://pro.wildberries.ru/)) — но это **минимальный порог**, а не цель. Быстрее = ещё выше конверсия
+- С AI автоответом мы можем бить < 2 мин — это **конкурентное преимущество**, большинство продавцов отвечают часами
 - Игнорирование вопросов → WB может **понизить товар в выдаче** ([totalcrm.ru](https://totalcrm.ru/blog/2025/11/otzyvy-i-voprosy-wildberries/))
-- **52% покупателей** ожидают ответ в течение 1ч ([LiveChatAI](https://livechatai.com/blog/customer-support-response-time-statistics))
+- **52% покупателей** ожидают ответ в течение 1ч ([LiveChatAI](https://livechatai.com/blog/customer-support-response-time-statistics)) — но те, кто ответил за 2 мин, получают покупателя, пока он ещё "горячий"
+- **Ключевой инсайт:** 1 час SLA имеет смысл для человека. AI отвечает за секунды → SLA должен это отражать
 
 ### 4. ЧАТЫ (post-purchase, общие) — NORMAL
 
@@ -129,7 +140,8 @@
 
 | Критерий | SLA | Эскалация |
 |----------|-----|-----------|
-| Pre-purchase: `sizing_fit`, `availability`, `compatibility` | < 1 час | на 30 мин |
+| Pre-purchase чат (покупатель на карточке) | **< 2 мин** (AI auto) | на 5 мин |
+| Pre-purchase вопрос (публичный) | **< 5 мин** (AI draft) | на 15 мин |
 | Интенты: `delivery_problem`, `return_refund`, `missing_parts` | < 1 час | на 30 мин |
 | Негатив 3★ | < 1 час | на 30 мин |
 | Client replied (продолжение диалога) | < 2 часа | на 1 час |
@@ -166,6 +178,16 @@ SLA_CONFIG = {
         "hard_deadline": 120,   # 2 часа
         "escalation_at": 30,    # Эскалация на 30 мин
     },
+    "high_pre_purchase_chat": {
+        "target": 2,            # 2 минуты — покупатель на карточке СЕЙЧАС
+        "hard_deadline": 10,    # 10 минут — дальше он ушёл
+        "escalation_at": 5,     # Эскалация на 5 мин
+    },
+    "high_pre_purchase_question": {
+        "target": 5,            # 5 минут — публичный вопрос
+        "hard_deadline": 30,    # 30 минут
+        "escalation_at": 15,    # Эскалация на 15 мин
+    },
     "normal": {
         "target": 240,          # 4 часа
         "hard_deadline": 1440,  # 24 часа
@@ -183,6 +205,8 @@ AUTO_RESPONSE_DELAY = {
     "normal_chat": {"min_seconds": 5, "max_seconds": 8},
     "review_positive": {"min_seconds": 5, "max_seconds": 10},
     "review_negative": None,  # NO auto-send — human approval required
+    "pre_purchase_chat": {"min_seconds": 3, "max_seconds": 5},  # Быстро — покупатель ждёт
+    "pre_purchase_question": {"min_seconds": 3, "max_seconds": 5},  # AI draft → auto-send
     "first_message_ack": {"min_seconds": 2, "max_seconds": 3},
     "word_count_factor": 0.025,  # +секунды за длину
     "max_delay": 12,
