@@ -55,17 +55,14 @@ body {
 
 /* ===== SCREEN NAVIGATOR (dev only) ===== */
 .screen-nav {
-    position: fixed;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
     z-index: 9999;
     display: flex;
     gap: 4px;
-    background: rgba(0,0,0,0.85);
-    padding: 6px 8px;
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(12px);
+    background: #1a1a1a;
+    padding: 8px 12px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .screen-nav button {
@@ -87,28 +84,23 @@ body {
 /* ===== SCREEN CONTAINER ===== */
 .screen {
     display: none;
-    height: 100vh;
+    height: calc(100vh - 38px);
     width: 100%;
 }
 .screen.active { display: flex; }
 
 /* ===== CJM ANNOTATION ===== */
 .cjm-note {
-    position: fixed;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
     z-index: 9998;
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
-    font-size: 12px;
-    backdrop-filter: blur(12px);
-    max-width: 600px;
+    background: #2a2a2a;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 16px;
+    font-size: 11px;
     text-align: center;
     line-height: 1.4;
 }
+.cjm-note:empty { display: none; }
 .cjm-note strong { color: var(--color-warning); }
 
 /* ========================================================
@@ -2055,38 +2047,31 @@ body {
         height: auto;
     }
 
-    /* Screen nav (dev): horizontal scroll at bottom */
+    /* Screen nav (dev): horizontal scroll on mobile */
     .screen-nav {
-        bottom: 4px;
-        left: 4px;
-        right: 4px;
-        transform: none;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        white-space: nowrap;
-        padding: 4px 6px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding: 6px 8px;
     }
 
     .screen-nav button {
         padding: 4px 8px;
         font-size: 10px;
+        flex-shrink: 0;
     }
 
     /* CJM note on mobile */
     .cjm-note {
-        bottom: 64px;
-        left: 8px;
-        right: 8px;
-        transform: none;
-        font-size: 11px;
-        padding: 6px 12px;
-        max-width: none;
+        font-size: 10px;
+        padding: 4px 8px;
     }
 
-    /* Screens should be scrollable */
+    /* Screens should fill remaining space */
     .screen {
         height: auto;
-        min-height: 100vh;
+        min-height: calc(100vh - 34px);
     }
 
     /* --- Screen 1: Onboarding --- */
