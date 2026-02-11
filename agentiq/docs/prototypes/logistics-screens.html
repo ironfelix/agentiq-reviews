@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentIQ Logistics — Prototype Screens</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN SYSTEM — Light Theme (from app-screens-v2) ===== */
+:root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafbfc;
+    --color-bg-tertiary: #f8f9fa;
+    --color-bg-hover: #f5f6f7;
+    --color-bg-active: #f0f7ff;
+
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5f6368;
+    --color-text-tertiary: #9aa0a6;
+
+    --color-border-light: #f5f6f7;
+    --color-border-medium: #e8eaed;
+    --color-border-dark: #dadce0;
+
+    --color-accent: #1a73e8;
+    --color-accent-light: #e8f0fe;
+    --color-accent-dark: #1557b0;
+    --color-danger: #ea4335;
+    --color-warning: #f9ab00;
+    --color-success: #34a853;
+    --color-info: #1a73e8;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 100px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+    --transition-fast: 0.15s ease;
+    --transition-medium: 0.25s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Thin scrollbars */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+/* ===== SCREEN NAVIGATOR ===== */
+.screen-nav {
+    position: relative;
+    z-index: 9999;
+    display: flex;
+    gap: 4px;
+    background: #1a1a1a;
+    padding: 8px 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.screen-nav button {
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+.screen-nav button:hover { background: rgba(255,255,255,0.1); color: white; }
+.screen-nav button.active { background: var(--color-accent); color: white; }
+
+/* ===== CJM ANNOTATION ===== */
+.cjm-note {
+    position: relative;
+    z-index: 9998;
+    background: #2a2a2a;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 16px;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.4;
+}
+.cjm-note:empty { display: none; }
+.cjm-note strong { color: var(--color-warning); }
+.cjm-note .api-tag { color: var(--color-accent); font-weight: 500; }
+
+/* ===== SCREEN CONTAINER ===== */
+.screen {
+    display: none;
+    height: calc(100vh - 72px);
+    width: 100%;
+    overflow-y: auto;
+}
+.screen.active {
+    display: flex;
+    animation: screenIn 0.18s ease-out;
+}
+@keyframes screenIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ========================================================
+   SCREEN 1: ONBOARDING — API KEY
+   ======================================================== */
+.onboarding {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+    position: relative;
+}
+
+.onboarding-card {
+    width: 100%;
+    max-width: 520px;
+    padding: 48px 40px;
+    text-align: center;
+}
+
+.onboarding-logo {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+.onboarding-logo span { color: var(--color-accent); }
+.onboarding-logo .sub { color: var(--color-text-tertiary); font-size: 14px; font-weight: 500; letter-spacing: 2px; display: block; margin-top: 2px; }
+
+.onboarding-subtitle {
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    margin-bottom: 48px;
+}
+
+.onboarding-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.onboarding-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.features-list {
+    text-align: left;
+    margin-bottom: 32px;
+}
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.feature-item:last-child { border-bottom: none; }
+.feature-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--color-bg-tertiary);
+}
+.feature-text { flex: 1; }
+.feature-text strong { font-size: 13px; font-weight: 600; display: block; margin-bottom: 2px; }
+.feature-text span { font-size: 12px; color: var(--color-text-tertiary); }
+
+.api-key-section {
+    text-align: left;
+    margin-top: 8px;
+}
+
+.api-key-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.api-key-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.api-key-field {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--color-text-primary);
+    background: var(--color-bg-secondary);
+    transition: border-color var(--transition-fast);
+}
+.api-key-field:focus { outline: none; border-color: var(--color-accent); }
+.api-key-field::placeholder { color: var(--color-text-tertiary); }
+
+.api-key-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+}
+.api-key-hint a { color: var(--color-accent); text-decoration: none; }
+.api-key-hint a:hover { text-decoration: underline; }
+
+/* Buttons */
+.btn-cta {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 24px;
+}
+.btn-cta:hover { background: var(--color-accent-dark); }
+.btn-cta:active { transform: scale(0.98); }
+
+/* ========================================================
+   SCREEN 2: SYNCING
+   ======================================================== */
+.sync-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+}
+
+.sync-animation {
+    width: 64px;
+    height: 64px;
+    border: 3px solid var(--color-border-medium);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 32px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sync-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.sync-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+.sync-progress {
+    width: 320px;
+    height: 4px;
+    background: var(--color-border-medium);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.sync-progress-bar {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    animation: progress 3s ease infinite;
+}
+@keyframes progress {
+    0% { width: 15%; }
+    50% { width: 70%; }
+    100% { width: 15%; }
+}
+
+.sync-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 320px;
+    text-align: left;
+}
+.sync-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+.sync-step.done { color: var(--color-success); }
+.sync-step.active { color: var(--color-text-primary); }
+.sync-step-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    border: 2px solid var(--color-border-medium);
+}
+.sync-step.done .sync-step-icon { background: var(--color-success); border-color: var(--color-success); color: white; }
+.sync-step.active .sync-step-icon { border-color: var(--color-accent); animation: pulse 1.5s infinite; }
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(26,115,232,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(26,115,232,0); }
+}
+
+.sync-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+}
+.sync-stat { text-align: center; }
+.sync-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-accent);
+}
+.sync-stat-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+/* ========================================================
+   SCREEN 3+: DASHBOARD LAYOUT
+   ======================================================== */
+.dash-layout {
+    flex-direction: column;
+    width: 100%;
+}
+
+.dash-content {
+    padding: 28px 32px;
+    padding-bottom: 48px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+.dash-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+.dash-subtitle {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+.dash-period {
+    display: flex;
+    gap: 4px;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 3px;
+}
+.dash-period button {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+.dash-period button.active { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+.dash-period button:hover { color: var(--color-text-secondary); }
+
+/* KPI Cards */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.kpi-grid.four { grid-template-columns: repeat(4, 1fr); }
+
+.kpi-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: all var(--transition-fast);
+}
+.kpi-card:hover { border-color: var(--color-border-medium); }
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.kpi-value.danger { color: var(--color-danger); }
+.kpi-value.warning { color: var(--color-warning); }
+.kpi-value.success { color: var(--color-success); }
+.kpi-value.accent { color: var(--color-accent); }
+
+.kpi-change {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.kpi-change.positive { color: var(--color-success); }
+.kpi-change.negative { color: var(--color-danger); }
+.kpi-change.neutral { color: var(--color-text-tertiary); }
+
+.kpi-card.highlight {
+    border-color: var(--color-accent);
+    background: linear-gradient(135deg, rgba(26,115,232,0.06), var(--color-bg-secondary));
+}
+.kpi-card.saving {
+    border-color: var(--color-success);
+    background: linear-gradient(135deg, rgba(52,168,83,0.06), var(--color-bg-secondary));
+}
+
+/* Chart placeholders */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.chart-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+.chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Stacked bar chart (CSS only) */
+.stacked-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.stacked-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.stacked-bar-label {
+    width: 36px;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    text-align: right;
+    flex-shrink: 0;
+}
+.stacked-bar-track {
+    flex: 1;
+    height: 20px;
+    display: flex;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.stacked-bar-track > div {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+.bar-logistics { background: var(--color-accent); }
+.bar-storage { background: #8b5cf6; }
+.bar-acceptance { background: var(--color-warning); }
+.bar-ktr { background: var(--color-danger); }
+
+.stacked-bar-value {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* Line chart (CSS only) */
+.line-chart-area {
+    height: 140px;
+    position: relative;
+    border-bottom: 1px solid var(--color-border-light);
+    border-left: 1px solid var(--color-border-light);
+    margin-top: 8px;
+}
+.line-chart-svg {
+    width: 100%;
+    height: 100%;
+}
+.line-chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+.line-chart-labels span {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+.line-chart-y {
+    position: absolute;
+    top: 0;
+    left: -30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.line-chart-y span {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+
+/* ========================================================
+   SCREEN 4: WAREHOUSE MAP / TABLE
+   ======================================================== */
+.warehouses-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.warehouse-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border-medium);
+    background: var(--color-bg-tertiary);
+}
+.warehouse-table th:first-child { border-radius: var(--radius-md) 0 0 0; }
+.warehouse-table th:last-child { border-radius: 0 var(--radius-md) 0 0; }
+.warehouse-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: middle;
+}
+.warehouse-table tr:hover td { background: var(--color-bg-hover); }
+.warehouse-table tr:last-child td { border-bottom: none; }
+
+.coef-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+}
+.coef-badge.free { background: rgba(52,168,83,0.1); color: var(--color-success); }
+.coef-badge.low { background: rgba(26,115,232,0.1); color: var(--color-accent); }
+.coef-badge.medium { background: rgba(249,171,0,0.12); color: #b87a00; }
+.coef-badge.high { background: rgba(234,67,53,0.1); color: var(--color-danger); }
+
+.coef-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.coef-badge.free .coef-dot { background: var(--color-success); }
+.coef-badge.low .coef-dot { background: var(--color-accent); }
+.coef-badge.medium .coef-dot { background: var(--color-warning); }
+.coef-badge.high .coef-dot { background: var(--color-danger); }
+
+.slots-badge {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+.slots-badge strong { color: var(--color-text-primary); }
+
+.region-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-secondary);
+}
+
+.hot-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: rgba(52,168,83,0.1);
+    color: var(--color-success);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.warehouse-name {
+    font-weight: 600;
+}
+
+/* Update time */
+.update-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+.update-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+    animation: blink 2s infinite;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ========================================================
+   SCREEN 5: SUPPLY CALCULATION
+   ======================================================== */
+.supply-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.supply-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border-medium);
+    background: var(--color-bg-tertiary);
+}
+.supply-table th:first-child { border-radius: var(--radius-md) 0 0 0; }
+.supply-table th:last-child { border-radius: 0 var(--radius-md) 0 0; }
+.supply-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: middle;
+}
+.supply-table tr:hover td { background: var(--color-bg-hover); }
+.supply-table tr:last-child td { border-bottom: none; }
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+}
+.status-pill.deficit { background: rgba(234,67,53,0.1); color: var(--color-danger); }
+.status-pill.low { background: rgba(249,171,0,0.12); color: #b87a00; }
+.status-pill.ok { background: rgba(52,168,83,0.1); color: var(--color-success); }
+
+.supply-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+}
+.summary-item { text-align: center; }
+.summary-value {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.summary-label {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+
+.btn-create-supply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 16px;
+}
+.btn-create-supply:hover { background: var(--color-accent-dark); }
+.btn-create-supply:active { transform: scale(0.98); }
+
+/* ========================================================
+   SCREEN 6: SLOT BOOKING
+   ======================================================== */
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.booking-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all var(--transition-fast);
+}
+.booking-card:hover { border-color: var(--color-border-medium); }
+
+.booking-status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.booking-status-icon.searching { background: rgba(249,171,0,0.12); animation: pulse-warn 2s infinite; }
+.booking-status-icon.booked { background: rgba(52,168,83,0.1); }
+.booking-status-icon.shipped { background: rgba(26,115,232,0.1); }
+.booking-status-icon.alert { background: rgba(234,67,53,0.1); }
+@keyframes pulse-warn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249,171,0,0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(249,171,0,0); }
+}
+
+.booking-info { flex: 1; min-width: 0; }
+.booking-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.booking-meta { font-size: 12px; color: var(--color-text-secondary); }
+.booking-meta span { margin-right: 12px; }
+
+.booking-right { text-align: right; flex-shrink: 0; }
+.booking-coef { font-size: 14px; font-weight: 600; }
+.booking-date { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+.booking-action {
+    padding: 8px 16px;
+    border: 1px solid var(--color-accent);
+    background: transparent;
+    color: var(--color-accent);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+.booking-action:hover { background: var(--color-accent); color: white; }
+
+/* Notification banner */
+.notification-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(52,168,83,0.08), rgba(52,168,83,0.03));
+    border: 1px solid rgba(52,168,83,0.25);
+    border-radius: var(--radius-lg);
+    margin-bottom: 16px;
+}
+.notification-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.notification-text { flex: 1; font-size: 13px; }
+.notification-text strong { color: var(--color-success); }
+.notification-action {
+    padding: 8px 16px;
+    background: var(--color-success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+.notification-action:hover { filter: brightness(1.1); }
+
+/* ========================================================
+   SCREEN 7: ROI DASHBOARD
+   ======================================================== */
+.roi-hero {
+    text-align: center;
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(52,168,83,0.06), rgba(26,115,232,0.03));
+    border: 1px solid rgba(52,168,83,0.15);
+    border-radius: var(--radius-xl);
+    margin-bottom: 24px;
+}
+.roi-hero-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+.roi-hero-value {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--color-success);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+.roi-hero-sub {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+.roi-hero-sub strong { color: var(--color-text-primary); }
+
+.roi-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.roi-box {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+}
+.roi-box-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.roi-box-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+.roi-box.before .roi-box-value { color: var(--color-danger); }
+.roi-box.after .roi-box-value { color: var(--color-success); }
+.roi-arrow {
+    font-size: 24px;
+    color: var(--color-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.savings-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.savings-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+}
+.savings-row-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--color-bg-tertiary);
+}
+.savings-row-info { flex: 1; }
+.savings-row-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.savings-row-desc { font-size: 12px; color: var(--color-text-tertiary); }
+.savings-row-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-success);
+    flex-shrink: 0;
+}
+
+.roi-footer {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.roi-footer-text { font-size: 14px; }
+.roi-footer-text strong { color: var(--color-accent); }
+.roi-footer-badge {
+    padding: 8px 20px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Cumulative chart */
+.cumulative-chart {
+    height: 160px;
+    position: relative;
+    margin-top: 16px;
+}
+
+/* ========================================================
+   SCREEN 8: SETTINGS
+   ======================================================== */
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-section {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+.settings-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.settings-section-desc {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.form-row:last-child { margin-bottom: 0; }
+.form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+.form-input {
+    padding: 10px 14px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background: var(--color-bg-primary);
+    transition: border-color var(--transition-fast);
+}
+.form-input:focus { outline: none; border-color: var(--color-accent); }
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.slider-row input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-border-medium);
+    outline: none;
+}
+.slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    cursor: pointer;
+}
+.slider-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-accent);
+    min-width: 40px;
+    text-align: right;
+}
+
+.priority-warehouses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.priority-tag {
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.priority-tag.active {
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+.priority-tag:hover { border-color: var(--color-border-dark); }
+
+.plan-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(26,115,232,0.06), rgba(26,115,232,0.02));
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+}
+.plan-info .plan-name { font-size: 14px; font-weight: 600; color: var(--color-accent); }
+.plan-info .plan-price { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.plan-badge {
+    padding: 6px 16px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Connection item */
+.api-connection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.api-connection:last-child { border-bottom: none; }
+.api-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0;
+}
+.api-icon.wb { background: #8b33ff; }
+.api-icon.ozon { background: #005bff; }
+.api-icon.tg { background: #26a5e4; }
+.api-info { flex: 1; }
+.api-name { font-size: 13px; font-weight: 600; }
+.api-status { font-size: 11px; display: flex; align-items: center; gap: 4px; }
+.api-status.connected { color: var(--color-success); }
+.api-status.upcoming { color: var(--color-text-tertiary); }
+.api-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.api-status.connected .api-status-dot { background: var(--color-success); }
+.api-status.upcoming .api-status-dot { background: var(--color-border-dark); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .screen-nav {
+        padding: 6px 8px;
+        gap: 2px;
+    }
+    .screen-nav button {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpi-grid.four { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .supply-summary { grid-template-columns: repeat(2, 1fr); }
+    .roi-comparison { grid-template-columns: 1fr; }
+    .roi-arrow { transform: rotate(90deg); }
+
+    .dash-content { padding: 16px; }
+    .onboarding-card { padding: 24px 20px; }
+
+    .warehouse-table, .supply-table {
+        font-size: 12px;
+    }
+    .warehouse-table th, .warehouse-table td,
+    .supply-table th, .supply-table td {
+        padding: 8px;
+    }
+
+    .roi-hero-value { font-size: 36px; }
+    .kpi-value { font-size: 22px; }
+
+    .booking-card { flex-wrap: wrap; }
+    .booking-right { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN NAVIGATOR ===== -->
+<div class="screen-nav">
+    <button onclick="showScreen('onboarding')" id="nav-onboarding">1. Подключение</button>
+    <button onclick="showScreen('syncing')" id="nav-syncing">2. Загрузка</button>
+    <button onclick="showScreen('dashboard')" id="nav-dashboard">3. Dashboard</button>
+    <button onclick="showScreen('warehouses')" id="nav-warehouses">4. Склады</button>
+    <button onclick="showScreen('supply')" id="nav-supply">5. Расчёт поставки</button>
+    <button onclick="showScreen('booking')" id="nav-booking">6. Бронирование</button>
+    <button onclick="showScreen('roi')" id="nav-roi">7. Экономия</button>
+    <button onclick="showScreen('settings')" id="nav-settings">8. Настройки</button>
+</div>
+
+<!-- ===== CJM NOTE ===== -->
+<div class="cjm-note" id="cjm-note"></div>
+
+
+<!-- ========================================================
+     SCREEN 1: ONBOARDING — API KEY
+     ======================================================== -->
+<div class="screen onboarding" id="screen-onboarding">
+    <div class="onboarding-card">
+        <div class="onboarding-logo">AGENT<span>IQ</span><span class="sub">LOGISTICS</span></div>
+        <div class="onboarding-subtitle">AI-оптимизатор поставок на Wildberries</div>
+
+        <div class="onboarding-title">Подключите Wildberries</div>
+        <div class="onboarding-desc">Вставьте API-ключ из личного кабинета WB, чтобы мы загрузили ваши данные и рассчитали потенциальную экономию.</div>
+
+        <div class="features-list">
+            <div class="feature-item">
+                <div class="feature-icon">&#128200;</div>
+                <div class="feature-text">
+                    <strong>Прогноз спроса по регионам</strong>
+                    <span>AI предсказывает продажи на 2-4 недели для каждого склада</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">&#128230;</div>
+                <div class="feature-text">
+                    <strong>Оптимальный расчёт поставки</strong>
+                    <span>Сколько и куда отправить для минимизации расходов</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">&#128276;</div>
+                <div class="feature-text">
+                    <strong>Мониторинг коэффициентов 24/7</strong>
+                    <span>Бот бронирует слоты при появлении бесплатной приёмки</span>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">&#128176;</div>
+                <div class="feature-text">
+                    <strong>Снижение КТР и расходов на логистику</strong>
+                    <span>Рост индекса локализации = скидки до 50% на логистику</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-key-section">
+            <div class="api-key-label">API-ключ WB (Статистика + Поставки)</div>
+            <div class="api-key-input-row">
+                <input type="text" class="api-key-field" value="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVC..." placeholder="Вставьте ключ">
+            </div>
+            <div class="api-key-hint">
+                Создать ключ: <a href="#">Настройки WB &rarr; Доступ к API &rarr; Новый токен</a>
+                <br>Нужны разрешения: Аналитика, Статистика, Поставки, Тарифы
+            </div>
+        </div>
+
+        <button class="btn-cta" onclick="showScreen('syncing')">Подключить и загрузить данные</button>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 2: SYNCING
+     ======================================================== -->
+<div class="screen sync-screen" id="screen-syncing">
+    <div class="sync-animation"></div>
+    <div class="sync-title">Загружаем ваши данные...</div>
+    <div class="sync-desc">Это займёт около 2 минут. Не закрывайте страницу.</div>
+
+    <div class="sync-progress">
+        <div class="sync-progress-bar"></div>
+    </div>
+
+    <div class="sync-steps">
+        <div class="sync-step done">
+            <div class="sync-step-icon">&#10003;</div>
+            <span>Каталог товаров — 2,847 SKU</span>
+        </div>
+        <div class="sync-step done">
+            <div class="sync-step-icon">&#10003;</div>
+            <span>История продаж — 90 дней</span>
+        </div>
+        <div class="sync-step done">
+            <div class="sync-step-icon">&#10003;</div>
+            <span>Текущие остатки по складам</span>
+        </div>
+        <div class="sync-step active">
+            <div class="sync-step-icon"></div>
+            <span>Коэффициенты приёмки — 30 складов...</span>
+        </div>
+        <div class="sync-step">
+            <div class="sync-step-icon"></div>
+            <span>Тарифы и расходы</span>
+        </div>
+        <div class="sync-step">
+            <div class="sync-step-icon"></div>
+            <span>Расчёт индекса локализации</span>
+        </div>
+    </div>
+
+    <div class="sync-stats">
+        <div class="sync-stat">
+            <div class="sync-stat-value">2,847</div>
+            <div class="sync-stat-label">товаров</div>
+        </div>
+        <div class="sync-stat">
+            <div class="sync-stat-value">~3,000</div>
+            <div class="sync-stat-label">заказов/день</div>
+        </div>
+        <div class="sync-stat">
+            <div class="sync-stat-value">30</div>
+            <div class="sync-stat-label">складов</div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 3: DASHBOARD
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-dashboard">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">AgentIQ Logistics</div>
+                <div class="dash-subtitle">Февраль 2026 &middot; ООО "Макаренко Трейд"</div>
+            </div>
+            <div class="dash-period">
+                <button>7 дн</button>
+                <button class="active">30 дн</button>
+                <button>90 дн</button>
+            </div>
+        </div>
+
+        <!-- KPI row 1 -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="kpi-card">
+                <div class="kpi-label">Расходы на логистику</div>
+                <div class="kpi-value">10.2M &#8381;</div>
+                <div class="kpi-change positive">&#8595; 8% vs прошлый месяц</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Индекс локализации</div>
+                <div class="kpi-value warning">62%</div>
+                <div class="kpi-change neutral">Цель: >75% &middot; КТР средний: 1.35</div>
+            </div>
+            <div class="kpi-card saving">
+                <div class="kpi-label">Потенциальная экономия</div>
+                <div class="kpi-value success">1.8M &#8381;/мес</div>
+                <div class="kpi-change positive">При ИЛ 78% и КТР &le;1.05</div>
+            </div>
+        </div>
+
+        <!-- KPI row 2 -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+            <div class="kpi-card">
+                <div class="kpi-label">КТР средний</div>
+                <div class="kpi-value warning">x1.35</div>
+                <div class="kpi-change negative">Переплата ~35% за логистику</div>
+            </div>
+            <div class="kpi-card highlight">
+                <div class="kpi-label">Активных поставок</div>
+                <div class="kpi-value accent">12</div>
+                <div class="kpi-change neutral">4 в пути &middot; 8 планируются</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Забронировано слотов</div>
+                <div class="kpi-value">8</div>
+                <div class="kpi-change positive">5 с коэф. 0 &middot; 3 с коэф. x1</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <!-- Stacked bar: expenses by category -->
+            <div class="chart-card">
+                <div class="chart-title">Расходы по категориям (тыс. &#8381;)</div>
+                <div class="stacked-bars">
+                    <div class="stacked-bar-row">
+                        <div class="stacked-bar-label">Янв</div>
+                        <div class="stacked-bar-track">
+                            <div class="bar-logistics" style="width:45%"></div>
+                            <div class="bar-storage" style="width:20%"></div>
+                            <div class="bar-acceptance" style="width:15%"></div>
+                            <div class="bar-ktr" style="width:20%"></div>
+                        </div>
+                        <div class="stacked-bar-value">11,100</div>
+                    </div>
+                    <div class="stacked-bar-row">
+                        <div class="stacked-bar-label">Фев</div>
+                        <div class="stacked-bar-track">
+                            <div class="bar-logistics" style="width:47%"></div>
+                            <div class="bar-storage" style="width:18%"></div>
+                            <div class="bar-acceptance" style="width:12%"></div>
+                            <div class="bar-ktr" style="width:15%"></div>
+                        </div>
+                        <div class="stacked-bar-value">10,200</div>
+                    </div>
+                    <div class="stacked-bar-row">
+                        <div class="stacked-bar-label">Мар*</div>
+                        <div class="stacked-bar-track">
+                            <div class="bar-logistics" style="width:50%"></div>
+                            <div class="bar-storage" style="width:18%"></div>
+                            <div class="bar-acceptance" style="width:10%"></div>
+                            <div class="bar-ktr" style="width:10%"></div>
+                        </div>
+                        <div class="stacked-bar-value">8,400*</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--color-accent)"></div> Логистика</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Хранение</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--color-warning)"></div> Приёмка</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--color-danger)"></div> КТР-надбавка</div>
+                </div>
+                <div style="font-size:10px; color:var(--color-text-tertiary); margin-top:8px;">* Прогноз при выполнении рекомендаций</div>
+            </div>
+
+            <!-- Line chart: localization index -->
+            <div class="chart-card">
+                <div class="chart-title">Индекс локализации (30 дней)</div>
+                <div class="line-chart-area">
+                    <svg class="line-chart-svg" viewBox="0 0 300 140" preserveAspectRatio="none">
+                        <!-- Grid -->
+                        <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                        <line x1="0" y1="70" x2="300" y2="70" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                        <line x1="0" y1="105" x2="300" y2="105" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                        <!-- Target line 75% -->
+                        <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(52,168,83,0.2)" stroke-dasharray="6,3" stroke-width="1.5"/>
+                        <text x="304" y="38" fill="rgba(52,168,83,0.5)" font-size="9" font-family="Inter">75%</text>
+                        <!-- Actual line -->
+                        <polyline points="0,120 30,115 60,112 90,105 120,98 150,91 180,85 210,78 240,72 270,65 300,53"
+                                  fill="none" stroke="#1a73e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Fill area -->
+                        <polygon points="0,120 30,115 60,112 90,105 120,98 150,91 180,85 210,78 240,72 270,65 300,53 300,140 0,140"
+                                 fill="url(#lineGrad)" opacity="0.3"/>
+                        <defs>
+                            <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#1a73e8" stop-opacity="0.4"/>
+                                <stop offset="1" stop-color="#1a73e8" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Current point -->
+                        <circle cx="300" cy="53" r="4" fill="#1a73e8"/>
+                    </svg>
+                </div>
+                <div class="line-chart-labels">
+                    <span>12 янв</span>
+                    <span>19 янв</span>
+                    <span>26 янв</span>
+                    <span>02 фев</span>
+                    <span>11 фев</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px;">
+                    <div style="font-size:12px; color:var(--color-text-secondary);">Было: <strong style="color:var(--color-warning);">48%</strong></div>
+                    <div style="font-size:12px; color:var(--color-text-secondary);">Сейчас: <strong style="color:var(--color-accent);">62%</strong></div>
+                    <div style="font-size:12px; color:var(--color-text-secondary);">Цель: <strong style="color:var(--color-success);">75%+</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 4: WAREHOUSES
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-warehouses">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Склады WB &mdash; Коэффициенты приёмки</div>
+                <div class="dash-subtitle" style="display:flex; align-items:center; gap:12px;">
+                    <span>Обновлено только что</span>
+                    <span class="update-info"><span class="update-dot"></span> Live каждые 30 сек</span>
+                </div>
+            </div>
+            <div class="dash-period">
+                <button class="active">Все</button>
+                <button>Бесплатные</button>
+                <button>Мои</button>
+            </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+            <div class="kpi-card">
+                <div class="kpi-label">Всего складов</div>
+                <div class="kpi-value">30</div>
+                <div class="kpi-change neutral">РФ, без СГТ</div>
+            </div>
+            <div class="kpi-card saving">
+                <div class="kpi-label">Бесплатная приёмка</div>
+                <div class="kpi-value success">5</div>
+                <div class="kpi-change positive">Коэффициент 0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Низкий коэф. (x1)</div>
+                <div class="kpi-value accent">8</div>
+                <div class="kpi-change neutral">Базовая стоимость</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Высокий коэф. (x3+)</div>
+                <div class="kpi-value danger">4</div>
+                <div class="kpi-change negative">Не рекомендуется</div>
+            </div>
+        </div>
+
+        <!-- Warehouses table -->
+        <div class="chart-card" style="padding: 0; overflow: hidden;">
+            <table class="warehouse-table">
+                <thead>
+                    <tr>
+                        <th>Склад</th>
+                        <th>Регион</th>
+                        <th>Коэф. приёмки</th>
+                        <th>Свободные слоты</th>
+                        <th>Тип отгрузки</th>
+                        <th>Рекомендация</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="warehouse-name">Коледино</span><span class="hot-badge">HOT</span></td>
+                        <td><span class="region-tag">Москва</span></td>
+                        <td><span class="coef-badge free"><span class="coef-dot"></span> 0 &mdash; бесплатно</span></td>
+                        <td><span class="slots-badge"><strong>3</strong> слота</span></td>
+                        <td>Короба / Паллеты</td>
+                        <td><span style="color:var(--color-success); font-weight:600; font-size:12px;">Отгрузить сейчас</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Новосибирск</span><span class="hot-badge">HOT</span></td>
+                        <td><span class="region-tag">Сибирь</span></td>
+                        <td><span class="coef-badge free"><span class="coef-dot"></span> 0 &mdash; бесплатно</span></td>
+                        <td><span class="slots-badge"><strong>5</strong> слотов</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-success); font-weight:600; font-size:12px;">Отгрузить сейчас</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Казань</span></td>
+                        <td><span class="region-tag">Поволжье</span></td>
+                        <td><span class="coef-badge low"><span class="coef-dot"></span> x1</span></td>
+                        <td><span class="slots-badge"><strong>8</strong> слотов</span></td>
+                        <td>Короба / Паллеты</td>
+                        <td><span style="color:var(--color-accent); font-size:12px;">Хороший вариант</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Хабаровск</span></td>
+                        <td><span class="region-tag">ДФО</span></td>
+                        <td><span class="coef-badge low"><span class="coef-dot"></span> x1</span></td>
+                        <td><span class="slots-badge"><strong>15</strong> слотов</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-accent); font-size:12px;">Для покрытия ДФО</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Екатеринбург</span></td>
+                        <td><span class="region-tag">Урал</span></td>
+                        <td><span class="coef-badge low"><span class="coef-dot"></span> x1</span></td>
+                        <td><span class="slots-badge"><strong>10</strong> слотов</span></td>
+                        <td>Короба / Паллеты</td>
+                        <td><span style="color:var(--color-accent); font-size:12px;">Хороший вариант</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Тула</span></td>
+                        <td><span class="region-tag">ЦФО</span></td>
+                        <td><span class="coef-badge medium"><span class="coef-dot"></span> x2</span></td>
+                        <td><span class="slots-badge"><strong>6</strong> слотов</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-warning); font-size:12px;">Ждать снижения</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Электросталь</span></td>
+                        <td><span class="region-tag">Москва</span></td>
+                        <td><span class="coef-badge medium"><span class="coef-dot"></span> x3</span></td>
+                        <td><span class="slots-badge"><strong>12</strong> слотов</span></td>
+                        <td>Короба / Паллеты</td>
+                        <td><span style="color:var(--color-warning); font-size:12px;">Дорого, ждать</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Краснодар</span></td>
+                        <td><span class="region-tag">ЮФО</span></td>
+                        <td><span class="coef-badge high"><span class="coef-dot"></span> x5</span></td>
+                        <td><span class="slots-badge"><strong>2</strong> слота</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-danger); font-size:12px;">Не отгружать</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Подольск</span></td>
+                        <td><span class="region-tag">Москва</span></td>
+                        <td><span class="coef-badge free"><span class="coef-dot"></span> 0 &mdash; бесплатно</span></td>
+                        <td><span class="slots-badge"><strong>1</strong> слот</span></td>
+                        <td>Паллеты</td>
+                        <td><span style="color:var(--color-success); font-weight:600; font-size:12px;">Забронировать!</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Санкт-Петербург</span></td>
+                        <td><span class="region-tag">СЗФО</span></td>
+                        <td><span class="coef-badge low"><span class="coef-dot"></span> x1</span></td>
+                        <td><span class="slots-badge"><strong>7</strong> слотов</span></td>
+                        <td>Короба / Паллеты</td>
+                        <td><span style="color:var(--color-accent); font-size:12px;">Хороший вариант</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Ростов-на-Дону</span></td>
+                        <td><span class="region-tag">ЮФО</span></td>
+                        <td><span class="coef-badge medium"><span class="coef-dot"></span> x2</span></td>
+                        <td><span class="slots-badge"><strong>4</strong> слота</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-warning); font-size:12px;">Ждать снижения</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="warehouse-name">Белая Дача</span><span class="hot-badge">HOT</span></td>
+                        <td><span class="region-tag">Москва</span></td>
+                        <td><span class="coef-badge free"><span class="coef-dot"></span> 0 &mdash; бесплатно</span></td>
+                        <td><span class="slots-badge"><strong>2</strong> слота</span></td>
+                        <td>Короба</td>
+                        <td><span style="color:var(--color-success); font-weight:600; font-size:12px;">Отгрузить сейчас</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 5: SUPPLY CALCULATION
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-supply">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Расчёт поставки &mdash; AI рекомендация</div>
+                <div class="dash-subtitle">Прогноз спроса на 2 недели &middot; оптимальное распределение по складам</div>
+            </div>
+            <div class="update-info"><span class="update-dot"></span> Рассчитано: 11 фев 2026, 14:32</div>
+        </div>
+
+        <!-- Supply table -->
+        <div class="chart-card" style="padding: 0; overflow: hidden; margin-bottom: 20px;">
+            <table class="supply-table">
+                <thead>
+                    <tr>
+                        <th>Артикул</th>
+                        <th>Товар</th>
+                        <th>Остаток</th>
+                        <th>Спрос 2 нед</th>
+                        <th>Статус</th>
+                        <th>Рекомендация</th>
+                        <th>Склад назначения</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">28431</td>
+                        <td style="font-weight: 500;">Футболка M белая</td>
+                        <td>45 шт</td>
+                        <td>120 шт</td>
+                        <td><span class="status-pill low">&#9679; Мало</span></td>
+                        <td style="font-weight:600; color:var(--color-warning);">+80 шт &rarr; Коледино</td>
+                        <td>Коледино <span class="coef-badge free" style="font-size:10px; padding:2px 6px;"><span class="coef-dot"></span> 0</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">28432</td>
+                        <td style="font-weight: 500;">Футболка L чёрная</td>
+                        <td>12 шт</td>
+                        <td>95 шт</td>
+                        <td><span class="status-pill deficit">&#9679; Дефицит</span></td>
+                        <td style="font-weight:600; color:var(--color-danger);">+85 шт &rarr; Казань</td>
+                        <td>Казань <span class="coef-badge low" style="font-size:10px; padding:2px 6px;"><span class="coef-dot"></span> x1</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">39211</td>
+                        <td style="font-weight: 500;">Кроссовки 42</td>
+                        <td style="color: var(--color-danger); font-weight: 600;">3 шт</td>
+                        <td>67 шт</td>
+                        <td><span class="status-pill deficit">&#9679; ДЕФИЦИТ!</span></td>
+                        <td style="font-weight:600; color:var(--color-danger);">СРОЧНО +70 &rarr; Новосибирск</td>
+                        <td>Новосибирск <span class="coef-badge free" style="font-size:10px; padding:2px 6px;"><span class="coef-dot"></span> 0</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">51023</td>
+                        <td style="font-weight: 500;">Рюкзак городской</td>
+                        <td>200 шт</td>
+                        <td>80 шт</td>
+                        <td><span class="status-pill ok">&#9679; OK</span></td>
+                        <td style="color: var(--color-text-tertiary);">Не отгружать</td>
+                        <td style="color: var(--color-text-tertiary);">&mdash;</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">44107</td>
+                        <td style="font-weight: 500;">Худи оверсайз S</td>
+                        <td>28 шт</td>
+                        <td>110 шт</td>
+                        <td><span class="status-pill deficit">&#9679; Дефицит</span></td>
+                        <td style="font-weight:600; color:var(--color-danger);">+90 шт &rarr; Екатеринбург</td>
+                        <td>Екатеринбург <span class="coef-badge low" style="font-size:10px; padding:2px 6px;"><span class="coef-dot"></span> x1</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">55892</td>
+                        <td style="font-weight: 500;">Носки набор 6 пар</td>
+                        <td>340 шт</td>
+                        <td>280 шт</td>
+                        <td><span class="status-pill ok">&#9679; OK</span></td>
+                        <td style="color: var(--color-text-tertiary);">Перераспределить 50 &rarr; Хабаровск</td>
+                        <td>Хабаровск <span class="coef-badge low" style="font-size:10px; padding:2px 6px;"><span class="coef-dot"></span> x1</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--color-text-tertiary);">61234</td>
+                        <td style="font-weight: 500;">Пуховик женский M</td>
+                        <td>15 шт</td>
+                        <td>8 шт</td>
+                        <td><span class="status-pill ok">&#9679; OK</span></td>
+                        <td style="color: var(--color-text-tertiary);">Сезон заканчивается</td>
+                        <td style="color: var(--color-text-tertiary);">&mdash;</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary -->
+        <div class="supply-summary">
+            <div class="summary-item">
+                <div class="summary-value" style="color: var(--color-accent);">375</div>
+                <div class="summary-label">Единиц к отгрузке</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">12</div>
+                <div class="summary-label">Коробов</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">4</div>
+                <div class="summary-label">Склада назначения</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" style="color: var(--color-success);">~47K &#8381;</div>
+                <div class="summary-label">Стоимость приёмки</div>
+            </div>
+        </div>
+
+        <button class="btn-create-supply" onclick="showScreen('booking')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Создать поставку и забронировать слоты
+        </button>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 6: SLOT BOOKING
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-booking">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Бронирование слотов</div>
+                <div class="dash-subtitle">Мониторинг коэффициентов 24/7 &middot; Автобронирование при появлении дешёвых слотов</div>
+            </div>
+        </div>
+
+        <!-- Alert notification -->
+        <div class="notification-banner">
+            <div class="notification-icon">&#128994;</div>
+            <div class="notification-text">
+                <strong>Найден слот с коэф. 0 на Коледино</strong>, 14 февраля &mdash; бесплатная приёмка! Осталось 2 слота.
+            </div>
+            <button class="notification-action">Забронировать</button>
+        </div>
+
+        <!-- Booking list -->
+        <div class="booking-list">
+            <div class="booking-card" style="border-color: rgba(52,168,83,0.2);">
+                <div class="booking-status-icon booked">&#10003;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1247 &mdash; Коледино</div>
+                    <div class="booking-meta">
+                        <span>80 шт &middot; 3 короба</span>
+                        <span>Футболки M белая</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-success);">Коэф. 0</div>
+                    <div class="booking-date">14 фев 2026, 10:00</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-size:11px; font-weight:600;">Забронировано</div>
+            </div>
+
+            <div class="booking-card" style="border-color: rgba(52,168,83,0.2);">
+                <div class="booking-status-icon booked">&#10003;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1248 &mdash; Новосибирск</div>
+                    <div class="booking-meta">
+                        <span>70 шт &middot; 2 короба</span>
+                        <span>Кроссовки 42</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-success);">Коэф. 0</div>
+                    <div class="booking-date">15 фев 2026, 14:00</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-size:11px; font-weight:600;">Забронировано</div>
+            </div>
+
+            <div class="booking-card">
+                <div class="booking-status-icon searching">&#128269;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1249 &mdash; Казань</div>
+                    <div class="booking-meta">
+                        <span>85 шт &middot; 3 короба</span>
+                        <span>Футболки L чёрная</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-warning);">Ждём коэф. &le;1</div>
+                    <div class="booking-date">Целевая: 16-18 фев</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(210,153,34,0.15); color: var(--color-warning); border-radius: var(--radius-pill); font-size:11px; font-weight:600; animation: pulse-warn 2s infinite;">Ищем слот...</div>
+            </div>
+
+            <div class="booking-card">
+                <div class="booking-status-icon searching">&#128269;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1250 &mdash; Екатеринбург</div>
+                    <div class="booking-meta">
+                        <span>90 шт &middot; 3 короба</span>
+                        <span>Худи оверсайз S</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-warning);">Ждём коэф. &le;1</div>
+                    <div class="booking-date">Целевая: 17-20 фев</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(210,153,34,0.15); color: var(--color-warning); border-radius: var(--radius-pill); font-size:11px; font-weight:600;">Ищем слот...</div>
+            </div>
+
+            <div class="booking-card" style="border-color: rgba(26,115,232,0.2);">
+                <div class="booking-status-icon shipped">&#128666;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1241 &mdash; Белая Дача</div>
+                    <div class="booking-meta">
+                        <span>120 шт &middot; 4 короба</span>
+                        <span>Микс артикулов</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-accent);">Коэф. x1</div>
+                    <div class="booking-date">10 фев 2026</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(26,115,232,0.1); color: var(--color-accent); border-radius: var(--radius-pill); font-size:11px; font-weight:600;">Отгружено</div>
+            </div>
+
+            <div class="booking-card" style="border-color: rgba(26,115,232,0.2);">
+                <div class="booking-status-icon shipped">&#128666;</div>
+                <div class="booking-info">
+                    <div class="booking-title">Поставка #1238 &mdash; Коледино</div>
+                    <div class="booking-meta">
+                        <span>200 шт &middot; 6 коробов</span>
+                        <span>Носки + рюкзаки</span>
+                    </div>
+                </div>
+                <div class="booking-right">
+                    <div class="booking-coef" style="color: var(--color-success);">Коэф. 0</div>
+                    <div class="booking-date">8 фев 2026</div>
+                </div>
+                <div style="padding:4px 12px; background: rgba(26,115,232,0.1); color: var(--color-accent); border-radius: var(--radius-pill); font-size:11px; font-weight:600;">На складе WB</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 7: ROI DASHBOARD
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-roi">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Экономия &mdash; ROI дашборд</div>
+                <div class="dash-subtitle">Сравнение расходов: до и после оптимизации</div>
+            </div>
+            <div class="dash-period">
+                <button>1 мес</button>
+                <button class="active">3 мес</button>
+                <button>6 мес</button>
+            </div>
+        </div>
+
+        <!-- Hero savings -->
+        <div class="roi-hero">
+            <div class="roi-hero-label">За 3 месяца сэкономлено</div>
+            <div class="roi-hero-value">4.8M &#8381;</div>
+            <div class="roi-hero-sub">
+                Средняя экономия <strong>1.6M &#8381;/мес</strong> &mdash; 16% от общих расходов на логистику
+            </div>
+        </div>
+
+        <!-- Before vs After -->
+        <div class="roi-comparison">
+            <div class="roi-box before">
+                <div class="roi-box-label">Было (без AgentIQ)</div>
+                <div class="roi-box-value">11.1M &#8381;/мес</div>
+                <div style="font-size:12px; color:var(--color-text-tertiary); margin-top:6px;">
+                    ИЛ: 48% &middot; КТР: 1.65 &middot; Коэф. приёмки: x2.8 ср.
+                </div>
+            </div>
+            <div class="roi-arrow">&rarr;</div>
+            <div class="roi-box after">
+                <div class="roi-box-label">Стало (с AgentIQ)</div>
+                <div class="roi-box-value">9.5M &#8381;/мес</div>
+                <div style="font-size:12px; color:var(--color-text-tertiary); margin-top:6px;">
+                    ИЛ: 62% &middot; КТР: 1.35 &middot; Коэф. приёмки: x0.8 ср.
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings breakdown -->
+        <div style="font-size:14px; font-weight:600; margin-bottom:12px;">Экономия по категориям</div>
+        <div class="savings-breakdown">
+            <div class="savings-row">
+                <div class="savings-row-icon">&#128666;</div>
+                <div class="savings-row-info">
+                    <div class="savings-row-name">Логистика доставки</div>
+                    <div class="savings-row-desc">Снижение КТР с 1.65 до 1.35 за счёт лучшей локализации</div>
+                </div>
+                <div class="savings-row-value">+620K &#8381;</div>
+            </div>
+            <div class="savings-row">
+                <div class="savings-row-icon">&#128230;</div>
+                <div class="savings-row-info">
+                    <div class="savings-row-name">Коэффициенты приёмки</div>
+                    <div class="savings-row-desc">Автобронирование слотов с коэф. 0 вместо x3-x5</div>
+                </div>
+                <div class="savings-row-value">+540K &#8381;</div>
+            </div>
+            <div class="savings-row">
+                <div class="savings-row-icon">&#127970;</div>
+                <div class="savings-row-info">
+                    <div class="savings-row-name">Хранение</div>
+                    <div class="savings-row-desc">Точные поставки = меньше излишков, используем бесплатные 60 дней</div>
+                </div>
+                <div class="savings-row-value">+280K &#8381;</div>
+            </div>
+            <div class="savings-row">
+                <div class="savings-row-icon">&#9888;&#65039;</div>
+                <div class="savings-row-info">
+                    <div class="savings-row-name">Штрафы и потери</div>
+                    <div class="savings-row-desc">Нет просрочек, нет недовоза, правильная маркировка</div>
+                </div>
+                <div class="savings-row-value">+160K &#8381;</div>
+            </div>
+        </div>
+
+        <!-- Cumulative chart -->
+        <div class="chart-card" style="margin-bottom:24px;">
+            <div class="chart-title">Накопленная экономия (3 месяца)</div>
+            <div class="line-chart-area" style="height:140px;">
+                <svg class="line-chart-svg" viewBox="0 0 300 140" preserveAspectRatio="none">
+                    <line x1="0" y1="35" x2="300" y2="35" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                    <line x1="0" y1="70" x2="300" y2="70" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                    <line x1="0" y1="105" x2="300" y2="105" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                    <!-- Cumulative line -->
+                    <polyline points="0,130 50,112 100,90 150,68 200,48 250,30 300,10"
+                              fill="none" stroke="#34a853" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polygon points="0,130 50,112 100,90 150,68 200,48 250,30 300,10 300,140 0,140"
+                             fill="url(#savingsGrad)" opacity="0.3"/>
+                    <defs>
+                        <linearGradient id="savingsGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#34a853" stop-opacity="0.5"/>
+                            <stop offset="1" stop-color="#34a853" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Points -->
+                    <circle cx="0" cy="130" r="3" fill="#34a853"/>
+                    <circle cx="100" cy="90" r="3" fill="#34a853"/>
+                    <circle cx="200" cy="48" r="3" fill="#34a853"/>
+                    <circle cx="300" cy="10" r="4" fill="#34a853"/>
+                </svg>
+            </div>
+            <div class="line-chart-labels">
+                <span>Нояб</span>
+                <span>Декабрь</span>
+                <span>Январь</span>
+                <span>Февраль</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:12px;">
+                <span style="color:var(--color-text-tertiary);">0 &#8381;</span>
+                <span style="color:var(--color-text-tertiary);">1.2M &#8381;</span>
+                <span style="color:var(--color-text-tertiary);">3.0M &#8381;</span>
+                <span style="color:var(--color-success); font-weight:600;">4.8M &#8381;</span>
+            </div>
+        </div>
+
+        <!-- ROI footer -->
+        <div class="roi-footer">
+            <div class="roi-footer-text">
+                Подписка <strong>30,000 &#8381;/мес</strong> &rarr; экономия <strong>1,600,000 &#8381;/мес</strong>
+            </div>
+            <div class="roi-footer-badge">ROI 53x</div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     SCREEN 8: SETTINGS
+     ======================================================== -->
+<div class="screen dash-layout" id="screen-settings">
+    <div class="dash-content">
+        <div class="dash-header">
+            <div>
+                <div class="dash-title">Настройки</div>
+                <div class="dash-subtitle">Подключения, параметры оптимизации, уведомления</div>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            <!-- Connections -->
+            <div class="settings-section">
+                <div class="settings-section-title">Подключения</div>
+                <div class="settings-section-desc">API-ключи маркетплейсов и каналы уведомлений.</div>
+
+                <div class="api-connection">
+                    <div class="api-icon wb">W</div>
+                    <div class="api-info">
+                        <div class="api-name">Wildberries</div>
+                        <div class="api-status connected"><span class="api-status-dot"></span> Подключён &middot; Макаренко Трейд</div>
+                    </div>
+                    <button style="padding:6px 12px; border:1px solid var(--color-border-medium); background:transparent; color:var(--color-text-secondary); border-radius:var(--radius-md); font-size:12px; font-family:inherit; cursor:pointer;">Настроить</button>
+                </div>
+
+                <div class="api-connection">
+                    <div class="api-icon ozon" style="font-size:11px;">Oz</div>
+                    <div class="api-info">
+                        <div class="api-name">Ozon</div>
+                        <div class="api-status upcoming"><span class="api-status-dot"></span> Скоро</div>
+                    </div>
+                    <button style="padding:6px 12px; border:1px solid var(--color-border-medium); background:transparent; color:var(--color-text-tertiary); border-radius:var(--radius-md); font-size:12px; font-family:inherit; cursor:not-allowed; opacity:0.5;">Скоро</button>
+                </div>
+
+                <div class="api-connection">
+                    <div class="api-icon tg">T</div>
+                    <div class="api-info">
+                        <div class="api-name">Telegram</div>
+                        <div class="api-status connected"><span class="api-status-dot"></span> @makarenko_trade</div>
+                    </div>
+                    <button style="padding:6px 12px; border:1px solid var(--color-border-medium); background:transparent; color:var(--color-text-secondary); border-radius:var(--radius-md); font-size:12px; font-family:inherit; cursor:pointer;">Изменить</button>
+                </div>
+            </div>
+
+            <!-- Optimization parameters -->
+            <div class="settings-section">
+                <div class="settings-section-title">Параметры оптимизации</div>
+                <div class="settings-section-desc">Настройте целевые показатели и ограничения.</div>
+
+                <div class="form-row">
+                    <div class="form-label">Целевой индекс локализации</div>
+                    <div class="slider-row">
+                        <input type="range" min="50" max="100" value="75" id="locSlider" oninput="document.getElementById('locValue').textContent=this.value+'%'">
+                        <div class="slider-value" id="locValue">75%</div>
+                    </div>
+                    <div style="font-size:11px; color:var(--color-text-tertiary);">При ИЛ >75% КТР снижается до минимума, экономия до 50% на логистике</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-label">Максимальный коэффициент приёмки для автобронирования</div>
+                    <div class="slider-row">
+                        <input type="range" min="0" max="5" value="1" id="coefSlider" oninput="document.getElementById('coefValue').textContent=this.value==0?'Только 0 (бесплатно)':'x'+this.value+' или ниже'">
+                        <div class="slider-value" id="coefValue" style="min-width:130px;">x1 или ниже</div>
+                    </div>
+                    <div style="font-size:11px; color:var(--color-text-tertiary);">Бот будет автоматически бронировать слоты при коэффициенте не выше указанного</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-label">Приоритетные склады</div>
+                    <div class="priority-warehouses">
+                        <span class="priority-tag active">Коледино</span>
+                        <span class="priority-tag active">Новосибирск</span>
+                        <span class="priority-tag active">Казань</span>
+                        <span class="priority-tag">Электросталь</span>
+                        <span class="priority-tag active">Екатеринбург</span>
+                        <span class="priority-tag">Краснодар</span>
+                        <span class="priority-tag active">Хабаровск</span>
+                        <span class="priority-tag">Тула</span>
+                        <span class="priority-tag">СПб</span>
+                        <span class="priority-tag">Белая Дача</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--color-text-tertiary); margin-top:4px;">Выбранные склады будут приоритетными при расчёте поставок</div>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-section">
+                <div class="settings-section-title">Уведомления</div>
+                <div class="settings-section-desc">Что присылать в Telegram.</div>
+
+                <div style="display:flex; flex-direction: column; gap: 12px;">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" checked style="accent-color:var(--color-accent); width:16px; height:16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:500;">Бесплатные слоты (коэф. 0)</div>
+                            <div style="font-size:11px; color:var(--color-text-tertiary);">Мгновенное уведомление при появлении</div>
+                        </div>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" checked style="accent-color:var(--color-accent); width:16px; height:16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:500;">Автобронирование выполнено</div>
+                            <div style="font-size:11px; color:var(--color-text-tertiary);">Подтверждение успешного бронирования</div>
+                        </div>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" checked style="accent-color:var(--color-accent); width:16px; height:16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:500;">Дефицит товара (прогноз)</div>
+                            <div style="font-size:11px; color:var(--color-text-tertiary);">Когда остатки заканчиваются быстрее прогноза</div>
+                        </div>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" style="accent-color:var(--color-accent); width:16px; height:16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:500;">Еженедельный отчёт</div>
+                            <div style="font-size:11px; color:var(--color-text-tertiary);">Итоги недели: экономия, ИЛ, рекомендации</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Subscription -->
+            <div class="settings-section" style="padding:0;">
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <div class="plan-name">AgentIQ Logistics Pro</div>
+                        <div class="plan-price">30,000 &#8381;/мес &middot; до 5,000 SKU &middot; все склады &middot; автобронирование</div>
+                    </div>
+                    <div class="plan-badge">Активна</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// CJM notes for each screen
+const cjmNotes = {
+    onboarding: '<strong>CJM:</strong> Продавец узнал о сервисе (Telegram-канал / рекомендация) &rarr; хочет попробовать &rarr; подключает API-ключ. <span class="api-tag">API: Нужен токен с правами Аналитика + Статистика + Поставки + Тарифы.</span> Одна задача: ввести ключ и увидеть свои данные.',
+    syncing: '<strong>CJM:</strong> Система собирает историю продаж (90 дней), текущие остатки на складах, коэффициенты приёмки (30 складов), тарифы. <span class="api-tag">API: GET /analytics, GET /statistics, GET /tariffs/v1/acceptance/coefficients, GET /v1/tariffs/box.</span> Не блокируем: можно перейти к дашборду когда основные данные загружены.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 5 сек продавец видит: расходы на логистику, ИЛ, потенциальную экономию, статус поставок. <span class="api-tag">Данные: продажи + остатки + коэффициенты + расчёт КТР. Не хватает: исторические коэфф. (собираем сами), прогноз промо WB.</span>',
+    warehouses: '<strong>CJM:</strong> Продавец видит все склады WB с текущими коэффициентами приёмки в реальном времени. <span class="api-tag">API: GET /tariffs/v1/acceptance/coefficients (6 req/min, обновление каждые ~30 сек). Поля: warehouseID, date, coefficient, allowUnload.</span> Подсветка "горячих" складов с бесплатной приёмкой.',
+    supply: '<strong>CJM:</strong> Главная ценность. AI прогнозирует спрос по регионам &rarr; рекомендует сколько и куда отправить. <span class="api-tag">Данные: история продаж по регионам (Analytics API, max 31 день) + остатки + коэффициенты. ML-модель: Prophet/LightGBM на исторических данных. Нет в API: прогноз спроса, нужно строить самим.</span>',
+    booking: '<strong>CJM:</strong> Бот мониторит коэффициенты 24/7 и бронирует при появлении дешёвых слотов. <span class="api-tag">API: POST /supplies (создание поставки) + GET /acceptance/coefficients каждые 30 сек. Ограничение: 6 req/min. Риск: WB может ввести анти-бот защиту.</span> Продавец видит статус каждой поставки.',
+    roi: '<strong>CJM:</strong> Продавец видит конкретную экономию в рублях &rarr; подтверждает ценность сервиса &rarr; продлевает подписку. <span class="api-tag">Данные: фактические расходы из Reports API vs расчётные без оптимизации. Формула: экономия = расходы_без_оптимизации - расходы_факт.</span> ROI 53x = главный аргумент для продления.',
+    settings: '<strong>CJM:</strong> Настроить и забыть. API ключи, Telegram, целевой ИЛ, макс. коэффициент приёмки, приоритетные склады. <span class="api-tag">Хранится: PostgreSQL. Используется: Celery-таски для мониторинга и автобронирования по заданным параметрам.</span>'
+};
+
+function showScreen(name) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+
+    // Show target
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+
+    // Update CJM note
+    document.getElementById('cjm-note').innerHTML = cjmNotes[name] || '';
+}
+
+// Toggle priority tags
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('priority-tag')) {
+        e.target.classList.toggle('active');
+    }
+});
+
+// Start with onboarding
+showScreen('onboarding');
+</script>
+
+</body>
+</html>
