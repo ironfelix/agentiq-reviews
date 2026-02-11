@@ -481,24 +481,26 @@ body {
     width: 100%;
 }
 
-/* Sidebar */
+/* ===== SIDEBAR — light theme, design system tokens ===== */
 .sidebar {
-    width: 56px;
+    width: 220px;
     background: var(--color-bg-primary);
     border-right: 1px solid var(--color-border-medium);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 12px 0;
+    padding: 20px 12px 16px;
     flex-shrink: 0;
+    position: relative;
+    transition: width var(--transition-fast);
 }
 
 .sidebar-logo {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: -0.3px;
-    margin-bottom: 24px;
     color: var(--color-text-primary);
+    padding: 0 8px;
+    margin-bottom: 24px;
     cursor: pointer;
 }
 .sidebar-logo span { color: var(--color-accent); }
@@ -506,86 +508,114 @@ body {
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     flex: 1;
 }
 
 .sidebar-item {
-    width: 40px;
-    height: 40px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    padding: 8px 10px;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-fast);
-    color: var(--color-text-tertiary);
-    position: relative;
+    color: var(--color-text-secondary);
     background: transparent;
     border: none;
     font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
 }
-.sidebar-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
-.sidebar-item.active { background: var(--color-accent-light); color: var(--color-accent); }
+.sidebar-item:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+.sidebar-item.active {
+    background: var(--color-bg-active);
+    color: var(--color-accent);
+    font-weight: 500;
+}
 
 .sidebar-item svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-label {
+    flex: 1;
 }
 
 .sidebar-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 16px;
-    height: 16px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
     background: var(--color-urgent);
     color: white;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--color-bg-primary);
 }
 
 .sidebar-bottom {
+    margin-top: auto;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    align-items: center;
+    gap: 2px;
+    padding-top: 8px;
 }
 
-.sidebar-avatar {
-    width: 32px;
-    height: 32px;
-    background: var(--color-accent);
-    border-radius: 50%;
+/* Tooltip — hidden when labels are visible */
+.sidebar-item[data-tooltip]:hover::after {
+    display: none;
+}
+
+/* Sidebar collapse toggle */
+.sidebar-collapse-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
     cursor: pointer;
-    transition: all var(--transition-fast);
-}
-.sidebar-avatar:hover { opacity: 0.85; }
-
-/* Tooltip */
-.sidebar-item[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 52px;
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 4px 10px;
     border-radius: var(--radius-sm);
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 100;
+    color: var(--color-text-tertiary);
+    transition: all var(--transition-fast);
+    position: absolute;
+    top: 20px;
+    right: 12px;
 }
+.sidebar-collapse-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+.sidebar-collapse-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Collapsed sidebar state */
+.sidebar.collapsed {
+    width: 56px;
+    padding: 16px 8px 12px;
+    align-items: center;
+}
+.sidebar.collapsed .sidebar-label { display: none; }
+.sidebar.collapsed .sidebar-item { padding: 10px; justify-content: center; gap: 0; }
+.sidebar.collapsed .sidebar-logo { font-size: 0; }
+.sidebar.collapsed .sidebar-logo::before { content: 'AQ'; font-size: 13px; font-weight: 700; color: var(--color-accent); }
+.sidebar.collapsed .sidebar-logo { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; padding: 0; }
+.sidebar.collapsed .sidebar-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; font-size: 9px; padding: 0 4px; }
+.sidebar.collapsed .sidebar-collapse-btn { position: static; margin: 0 auto 12px; }
+.sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
 
 /* Content area */
 .app-content {
@@ -1122,6 +1152,7 @@ body {
    ======================================================== */
 .analytics-page {
     padding: 32px;
+    padding-bottom: 64px;
     max-width: 960px;
 }
 
@@ -1698,6 +1729,7 @@ body {
 .settings-content {
     flex: 1;
     padding: 32px;
+    padding-bottom: 64px;
     overflow-y: auto;
 }
 
@@ -1769,6 +1801,284 @@ body {
 .connection-action:hover { border-color: var(--color-border-dark); background: var(--color-bg-tertiary); }
 .connection-action.primary { background: var(--color-accent); color: white; border-color: var(--color-accent); }
 .connection-action.primary:hover { background: #1557b0; }
+
+/* Promo Codes Settings */
+.promo-cabinet-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+}
+.promo-cabinet-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    background: #8b33ff;
+    flex-shrink: 0;
+}
+.promo-cabinet-info { flex: 1; }
+.promo-cabinet-name { font-size: 13px; font-weight: 600; }
+.promo-cabinet-mp { font-size: 11px; color: var(--color-text-tertiary); }
+.promo-cabinet-arrow {
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+}
+
+.promo-desc-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.promo-desc-row .settings-section-desc { margin-bottom: 0; }
+.promo-help-link {
+    color: var(--color-accent);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+}
+.promo-help-link:hover { text-decoration: underline; }
+
+.promo-count {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.promo-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 12px;
+}
+.promo-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.promo-code-name {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 1px;
+}
+.promo-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+}
+.promo-badge.active { background: rgba(52,168,83,0.1); color: var(--color-success); }
+.promo-badge.expired { background: var(--color-bg-tertiary); color: var(--color-text-tertiary); }
+
+.promo-meta {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+}
+
+.promo-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.promo-channel {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-text-secondary);
+    background: var(--color-bg-primary);
+}
+.promo-channel:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    cursor: pointer;
+}
+.promo-channel.on {
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+.promo-card:hover {
+    border-color: var(--color-border-dark);
+    box-shadow: var(--shadow-sm);
+}
+.promo-card.expanded {
+    border-color: var(--color-accent);
+}
+
+.promo-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border-light);
+}
+.promo-sends {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+.promo-actions {
+    display: flex;
+    gap: 12px;
+}
+.promo-action-btn {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    background: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+.promo-action-btn:hover { color: var(--color-text-primary); }
+.promo-action-btn.danger:hover { color: var(--color-urgent); }
+
+.promo-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px;
+    background: none;
+    border: 2px dashed var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: 32px;
+}
+.promo-add-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+
+.promo-divider {
+    height: 1px;
+    background: var(--color-border-medium);
+    margin: 32px 0 24px;
+}
+
+/* Promo help slide-out panel */
+.promo-help-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 360px;
+    height: 100vh;
+    background: var(--color-bg-primary);
+    border-left: 1px solid var(--color-border-medium);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 24px;
+    animation: slideInRight 0.2s ease;
+}
+.promo-help-panel.open { display: block; }
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+.promo-help-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-tertiary);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+.promo-help-close:hover { background: var(--color-bg-hover); }
+.promo-help-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-right: 32px;
+}
+.promo-help-section {
+    margin-bottom: 20px;
+}
+.promo-help-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.promo-help-text {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+.promo-help-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+.promo-help-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.promo-help-table td:first-child {
+    color: var(--color-text-tertiary);
+    width: 50%;
+}
+.promo-help-warning {
+    background: #fff8e1;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+.promo-help-link-ext {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-accent);
+    font-size: 13px;
+    text-decoration: none;
+    padding: 10px 0;
+    border-top: 1px solid var(--color-border-light);
+}
+.promo-help-link-ext:hover { text-decoration: underline; }
 
 /* AI Settings */
 .ai-setting-card {
@@ -1895,7 +2205,7 @@ body {
     gap: 12px;
     padding: 10px 16px;
     background: #fffbeb;
-    border-bottom: 1px solid #fde68a;
+    border-bottom: 1px solid var(--color-border-medium);
     font-size: 13px;
     color: #92400e;
     flex-shrink: 0;
@@ -1917,20 +2227,20 @@ body {
 }
 
 .demo-banner-btn {
-    padding: 5px 14px;
-    background: #1a1a1a;
-    color: white;
+    padding: 0;
+    background: none;
+    color: var(--color-accent);
     border: none;
-    border-radius: var(--radius-pill);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
     transition: all var(--transition-fast);
     white-space: nowrap;
     flex-shrink: 0;
+    text-decoration: none;
 }
-.demo-banner-btn:hover { background: #333; }
+.demo-banner-btn:hover { color: #1557b0; text-decoration: underline; }
 
 @media (max-width: 768px) {
     .demo-banner {
@@ -1939,8 +2249,7 @@ body {
         gap: 8px;
     }
     .demo-banner-btn {
-        padding: 4px 12px;
-        font-size: 11px;
+        font-size: 12px;
     }
 }
 
@@ -2650,30 +2959,14 @@ body {
    ======================================================== */
 @media (min-width: 769px) and (max-width: 1024px) {
 
-    /* Sidebar stays visible but slightly narrower */
-    .sidebar {
-        width: 48px;
-    }
-
-    .sidebar-item {
-        width: 36px;
-        height: 36px;
-    }
-
-    .sidebar-item svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .sidebar-avatar {
-        width: 28px;
-        height: 28px;
-        font-size: 10px;
-    }
-
-    .sidebar-logo {
-        font-size: 10px;
-    }
+    /* Sidebar — force collapse on tablet */
+    .sidebar { width: 56px; padding: 16px 8px 12px; align-items: center; }
+    .sidebar-label { display: none; }
+    .sidebar-item { padding: 10px; justify-content: center; gap: 0; position: relative; }
+    .sidebar-logo { font-size: 0 !important; width: 32px !important; height: 32px !important; display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 20px !important; padding: 0 !important; }
+    .sidebar-logo::before { content: 'AQ'; font-size: 13px; font-weight: 700; color: var(--color-accent); }
+    .sidebar-collapse-btn { display: none !important; }
+    .sidebar-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; font-size: 9px; padding: 0 4px; }
 
     /* Bottom nav stays hidden on tablet */
     .bottom-nav {
@@ -2844,24 +3137,30 @@ html, body {
         </div>
         <div style="display: flex; flex: 1; overflow: hidden;">
             <nav class="sidebar">
-                <div class="sidebar-logo">A<span>IQ</span></div>
+                <div class="sidebar-logo">AGENT<span>IQ</span></div>
+                <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                </button>
                 <div class="sidebar-nav">
-                    <button class="sidebar-item active" data-tooltip="Главная" onclick="showScreen('dashboard-empty')">
+                    <button class="sidebar-item active" onclick="showScreen('dashboard-empty')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span class="sidebar-label">Главная</span>
                     </button>
-                    <button class="sidebar-item" data-tooltip="Сообщения">
+                    <button class="sidebar-item" onclick="showScreen('messages')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="sidebar-label">Сообщения</span>
                         <div class="sidebar-badge">3</div>
                     </button>
-                    <button class="sidebar-item" data-tooltip="Аналитика">
+                    <button class="sidebar-item" onclick="showScreen('analytics')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        <span class="sidebar-label">Аналитика</span>
                     </button>
                 </div>
                 <div class="sidebar-bottom">
-                    <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <button class="sidebar-item" onclick="showScreen('settings')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <span class="sidebar-label">Настройки</span>
                     </button>
-                    <div class="sidebar-avatar">ИИ</div>
                 </div>
             </nav>
 
@@ -2958,24 +3257,30 @@ html, body {
     <div class="app-shell">
         <!-- Sidebar -->
         <nav class="sidebar">
-            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
             <div class="sidebar-nav">
-                <button class="sidebar-item active" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                <button class="sidebar-item active" onclick="showScreen('dashboard')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
                 </button>
-                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                <button class="sidebar-item" onclick="showScreen('messages')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
                     <div class="sidebar-badge">3</div>
                 </button>
-                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                <button class="sidebar-item" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
-                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                <button class="sidebar-item" onclick="showScreen('settings')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
                 </button>
-                <div class="sidebar-avatar">ИИ</div>
             </div>
         </nav>
 
@@ -3117,24 +3422,30 @@ html, body {
 <div class="screen" id="screen-messages">
     <div class="app-shell">
         <nav class="sidebar">
-            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
             <div class="sidebar-nav">
-                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
                 </button>
-                <button class="sidebar-item active" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                <button class="sidebar-item active" onclick="showScreen('messages')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
                     <div class="sidebar-badge">3</div>
                 </button>
-                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                <button class="sidebar-item" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
-                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                <button class="sidebar-item" onclick="showScreen('settings')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
                 </button>
-                <div class="sidebar-avatar">ИИ</div>
             </div>
         </nav>
 
@@ -3353,24 +3664,30 @@ html, body {
 <div class="screen" id="screen-analytics">
     <div class="app-shell">
         <nav class="sidebar">
-            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
             <div class="sidebar-nav">
-                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
                 </button>
-                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                <button class="sidebar-item" onclick="showScreen('messages')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
                     <div class="sidebar-badge">3</div>
                 </button>
-                <button class="sidebar-item active" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                <button class="sidebar-item active" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
-                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                <button class="sidebar-item" onclick="showScreen('settings')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
                 </button>
-                <div class="sidebar-avatar">ИИ</div>
             </div>
         </nav>
 
@@ -3460,7 +3777,7 @@ html, body {
                         <div class="chart-title" style="margin-bottom: 16px;">Скорость ответа</div>
                         <div class="speed-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
                             <div class="speed-card" style="margin: 0;">
-                                <div class="speed-label">Негатив (1-2)</div>
+                                <div class="speed-label">Негатив (1-3)</div>
                                 <div class="speed-value" style="color: var(--color-warning); font-size: 20px;">47м</div>
                                 <div class="speed-target missed">Цель: &lt;30 мин</div>
                             </div>
@@ -3495,6 +3812,28 @@ html, body {
                             <div class="sla-bar-track">
                                 <div class="sla-bar-fill" style="width: 78%; background: var(--color-warning);"></div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Impact — high visibility, right after quality -->
+                <div class="chart-card" style="margin-bottom: 24px;">
+                    <div class="chart-title" style="margin-bottom: 16px;">Влияние на продажи</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Потери от плохих ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-urgent);">~42K</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">руб/мес упущенной выручки</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Экономия от быстрых ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-success);">+20%</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">конверсия при ответе &lt;1ч (WB стат.)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Спасённые рейтинги</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-accent);">7</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">негативных отзывов &rarr; решены в чате</div>
                         </div>
                     </div>
                 </div>
@@ -3552,7 +3891,7 @@ html, body {
                                 <button class="period-btn" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('funnel-all').style.display='none';document.getElementById('funnel-products').style.display='block';">По товарам</button>
                             </div>
                         </div>
-                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 16px;">WB Analytics API &middot; nmReport</div>
+                        <div style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 16px;">Данные из Wildberries за выбранный период</div>
 
                         <!-- Cabinet-level funnel -->
                         <div id="funnel-all">
@@ -3756,27 +4095,6 @@ html, body {
                     </div>
                 </div>
 
-                <!-- Row 5: Revenue Impact -->
-                <div class="chart-card" style="margin-bottom: 24px;">
-                    <div class="chart-title" style="margin-bottom: 16px;">Влияние на продажи</div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-                        <div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Потери от плохих ответов</div>
-                            <div style="font-size: 24px; font-weight: 700; color: var(--color-urgent);">~42K</div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary);">руб/мес упущенной выручки</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Экономия от быстрых ответов</div>
-                            <div style="font-size: 24px; font-weight: 700; color: var(--color-success);">+20%</div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary);">конверсия при ответе &lt;1ч (WB стат.)</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Спасённые рейтинги</div>
-                            <div style="font-size: 24px; font-weight: 700; color: var(--color-accent);">7</div>
-                            <div style="font-size: 11px; color: var(--color-text-tertiary);">негативных отзывов → решены в чате</div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -3810,24 +4128,30 @@ html, body {
 <div class="screen" id="screen-settings">
     <div class="app-shell">
         <nav class="sidebar">
-            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
             <div class="sidebar-nav">
-                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
                 </button>
-                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                <button class="sidebar-item" onclick="showScreen('messages')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
                     <div class="sidebar-badge">3</div>
                 </button>
-                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                <button class="sidebar-item" onclick="showScreen('analytics')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
                 </button>
             </div>
             <div class="sidebar-bottom">
-                <button class="sidebar-item active" data-tooltip="Настройки" onclick="showScreen('settings')">
+                <button class="sidebar-item active" onclick="showScreen('settings')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
                 </button>
-                <div class="sidebar-avatar">ИИ</div>
             </div>
         </nav>
 
@@ -3841,6 +4165,10 @@ html, body {
                 <button class="settings-nav-item" onclick="showSettingsTab('ai')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     AI-ассистент
+                </button>
+                <button class="settings-nav-item" onclick="showSettingsTab('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    Промокоды
                 </button>
                 <button class="settings-nav-item" onclick="showSettingsTab('profile')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -3938,6 +4266,214 @@ html, body {
                     </div>
                 </div>
 
+                <!-- Promo codes tab -->
+                <div id="settings-promo" style="display: none;">
+                    <div class="settings-section-title">Промокоды</div>
+
+                    <!-- Cabinet selector -->
+                    <div class="promo-cabinet-selector">
+                        <div class="promo-cabinet-icon">W</div>
+                        <div class="promo-cabinet-info">
+                            <div class="promo-cabinet-name">CRM Group</div>
+                            <div class="promo-cabinet-mp">Wildberries</div>
+                        </div>
+                        <div class="promo-cabinet-arrow">&#9662;</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="settings-section-desc">Промокоды создаются в ЛК Wildberries. Здесь вы указываете их для AI &mdash; он будет предлагать промокод в ответах, когда это уместно.</div>
+
+                    <!-- Active promo codes + help link on same line -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div class="promo-count" style="margin-bottom: 0;">Активные промокоды (2 из 10)</div>
+                        <button class="promo-help-link" onclick="document.getElementById('promoHelpPanel').classList.add('open')">Как это работает?</button>
+                    </div>
+
+                    <!-- Promo card 1 -->
+                    <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                        <div class="promo-card-header">
+                            <div class="promo-code-name">THANKS10</div>
+                            <div class="promo-badge active">Активен</div>
+                        </div>
+                        <div class="promo-meta">Скидка 10% &middot; до 28 февраля &middot; Все товары</div>
+                        <div class="promo-channels">
+                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                        </div>
+                        <div class="promo-card-footer">
+                            <div class="promo-sends">Отправлено: 23 раза</div>
+                            <div class="promo-actions">
+                                <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                                <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод THANKS10?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promo card 2 -->
+                    <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                        <div class="promo-card-header">
+                            <div class="promo-code-name">SORRY15</div>
+                            <div class="promo-badge active">Активен</div>
+                        </div>
+                        <div class="promo-meta">Скидка 15% &middot; до 15 марта &middot; Все товары</div>
+                        <div class="promo-channels">
+                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                            <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                            <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                        </div>
+                        <div class="promo-card-footer">
+                            <div class="promo-sends">Отправлено: 8 раз</div>
+                            <div class="promo-actions">
+                                <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                                <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод SORRY15?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add button + inline form -->
+                    <button class="promo-add-btn" id="promoAddBtn" onclick="document.getElementById('promoAddForm').style.display='block';this.style.display='none'">+ Добавить промокод</button>
+
+                    <!-- Inline add form (hidden by default) -->
+                    <div id="promoAddForm" class="promo-card" style="display: none; cursor: default; border-color: var(--color-accent); border-width: 2px;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Новый промокод</div>
+                        <div class="profile-form" style="max-width: 100%;">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                                <div class="form-field" style="margin: 0;">
+                                    <label class="form-label">Код</label>
+                                    <input type="text" class="form-input" placeholder="WELCOME20" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">
+                                    <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">Скопируйте из ЛК WB</div>
+                                </div>
+                                <div class="form-field" style="margin: 0;">
+                                    <label class="form-label">Скидка</label>
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        <input type="number" class="form-input" placeholder="10" min="3" max="50" style="width: 80px;">
+                                        <span style="font-size: 14px; color: var(--color-text-secondary);">%</span>
+                                    </div>
+                                </div>
+                                <div class="form-field" style="margin: 0;">
+                                    <label class="form-label">Действует до</label>
+                                    <input type="date" class="form-input">
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 16px;">
+                                <label class="form-label">Товары</label>
+                                <div style="display: flex; gap: 16px; font-size: 13px;">
+                                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                        <input type="radio" name="promo-products" checked> Все товары
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                        <input type="radio" name="promo-products"> Выбранные артикулы
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 16px;">
+                                <label class="form-label">Где предлагать</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); overflow: hidden;">
+                                    <div style="padding: 10px 12px; background: var(--color-bg-tertiary); font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">Чаты (приватно)</div>
+                                    <div style="padding: 10px 12px; background: #fff8e1; font-size: 11px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Отзывы (публично!)</div>
+                                    <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Позитивные</label>
+                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Негативные</label>
+                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked> Вопросы по товару</label>
+                                    </div>
+                                    <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox"> Позитивные</label>
+                                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox"> Негативные</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 8px;">
+                                <button class="form-save" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Сохранить</button>
+                                <button class="form-save" style="background: none; color: var(--color-text-secondary); border: 1px solid var(--color-border-medium);" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Отмена</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="promo-divider"></div>
+
+                    <!-- Automation settings -->
+                    <div class="promo-count">Настройки автоподстановки</div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">AI предлагает промокод в ответах</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">
+                            AI добавит промокод в черновик ответа, когда это уместно. Вы увидите его перед отправкой и сможете убрать.
+                        </div>
+                    </div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">Предупреждать об отзывах</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">
+                            Показывать напоминание, что промокод в ответе на отзыв виден всем посетителям карточки товара.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help slide-out panel -->
+                <div class="promo-help-panel" id="promoHelpPanel">
+                    <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                    <div class="promo-help-title">Как работают промокоды</div>
+
+                    <div class="promo-help-section">
+                        <div class="promo-help-label">Создание</div>
+                        <div class="promo-help-text">
+                            Промокоды создаются в ЛК Wildberries:<br>
+                            <strong>Товары и цены &rarr; Календарь акций &rarr; По промокодам</strong>
+                        </div>
+                    </div>
+
+                    <div class="promo-help-section">
+                        <div class="promo-help-label">Параметры</div>
+                        <table class="promo-help-table">
+                            <tr><td>Скидка</td><td>3% &mdash; 50%</td></tr>
+                            <tr><td>Длительность</td><td>1 &mdash; 31 день</td></tr>
+                            <tr><td>Макс. акций</td><td>10 одновременно</td></tr>
+                            <tr><td>Код</td><td>Авто или свой</td></tr>
+                            <tr><td>Использование</td><td>Многоразовый</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="promo-help-section">
+                        <div class="promo-help-label">Как применяется</div>
+                        <div class="promo-help-text">
+                            Покупатель вводит код в корзине на WB. Код многоразовый &mdash; его может использовать любой покупатель.
+                        </div>
+                    </div>
+
+                    <div class="promo-help-warning">
+                        <strong>Важно:</strong><br>
+                        &bull; Скидка не суммируется с акциями &gt; 45%<br>
+                        &bull; Скидка полностью за счёт продавца<br>
+                        &bull; В ответах на отзывы код виден <strong>всем</strong> посетителям карточки
+                    </div>
+
+                    <div class="promo-help-section">
+                        <div class="promo-help-label">Чаты vs отзывы</div>
+                        <table class="promo-help-table">
+                            <tr><td>Чат</td><td>Приватно, видит только покупатель</td></tr>
+                            <tr><td>Ответ на отзыв</td><td>Публично, видят все</td></tr>
+                        </table>
+                    </div>
+
+                    <a href="https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes" target="_blank" class="promo-help-link-ext">
+                        &#128206; Инструкция Wildberries &rarr;
+                    </a>
+                </div>
+
                 <!-- Profile tab -->
                 <div id="settings-profile" style="display: none;">
                     <div class="settings-section-title">Профиль</div>
@@ -3995,7 +4531,7 @@ const cjmNotes = {
     dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек: 7 без ответа, 3 срочных, quality 8.2. Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
     messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
     analytics: '<strong>CJM:</strong> ROI для продавца. Quality Score = дифференциатор. Скорость = SLA compliance. График объёма = понимание нагрузки.',
-    settings: '<strong>CJM:</strong> Настроить и забыть. Авто-ответы: видно скорость (до 5 мин), статистику (34 за неделю), как отображаются в списке. Прозрачность = доверие.'
+    settings: '<strong>CJM:</strong> Настроить и забыть. Авто-ответы, промокоды (per-cabinet, help-панель), профиль. Промокоды: создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Slide-out справка объясняет механику.'
 };
 
 // Map screen names to bottom nav index (0=dashboard, 1=messages, 2=analytics, 3=settings)
@@ -4036,6 +4572,13 @@ function showScreen(name) {
 
     // Update CJM note
     document.getElementById('cjm-note').innerHTML = cjmNotes[name] || '';
+
+    // Auto-collapse sidebar on messages screen for more chat space
+    document.querySelectorAll('.sidebar').forEach(sb => {
+        if (name === 'messages') {
+            sb.classList.add('collapsed');
+        }
+    });
 }
 
 // Handle mobile chat open: clicking a chat item opens the chat panel
@@ -4053,7 +4596,12 @@ function showSettingsTab(tab) {
     // Hide all tabs
     document.getElementById('settings-connections').style.display = 'none';
     document.getElementById('settings-ai').style.display = 'none';
+    document.getElementById('settings-promo').style.display = 'none';
     document.getElementById('settings-profile').style.display = 'none';
+
+    // Close help panel if open
+    var helpPanel = document.getElementById('promoHelpPanel');
+    if (helpPanel) helpPanel.classList.remove('open');
 
     // Show target
     document.getElementById('settings-' + tab).style.display = 'block';

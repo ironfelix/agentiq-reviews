@@ -1,181 +1,181 @@
-# Wildberries Promo Codes API -- Research Report
+# Промокоды продавцов Wildberries — Исследование API
 
-> Date: 2026-02-11
-> Author: AgentIQ Research
-> Status: Research Complete
-> Relevance: Chat Center integration planning
-
----
-
-## Executive Summary
-
-Wildberries launched **seller promo codes** (promokody prodavca) in **January 2026** as a new marketing tool. Sellers can create promo codes in their seller portal, set discount percentages (3-50%), choose products, and distribute codes through any channel -- including WB Media, social media, messengers, and email.
-
-**Key finding for AgentIQ:** There is currently **no dedicated public API endpoint** for creating/managing promo codes programmatically. Promo codes are created through the seller portal UI. However, the existing Promotion API (`/api/v1/calendar/promotions/*`) provides endpoints for managing promotions and adding products, which may be extended to cover promo codes as the feature matures. The Chat API allows sending text messages to buyers, so promo codes can be **sent as text** in chat messages.
+> Дата: 2026-02-11
+> Автор: AgentIQ Research
+> Статус: Исследование завершено
+> Применение: Планирование интеграции в Chat Center
 
 ---
 
-## 1. WB Seller Promo Codes -- Feature Overview
+## Краткое резюме
 
-### 1.1 Launch Details
+Wildberries запустил **промокоды продавцов** в **январе 2026** как новый маркетинговый инструмент. Продавцы создают промокоды в личном кабинете, устанавливают скидку (3-50%), выбирают товары и распространяют коды через любые каналы — WB Медиа, соцсети, мессенджеры, email.
 
-- **Launch date:** January 27, 2026 (test group of Russian sellers)
-- **Status:** Rolling out to all Russian sellers
-- **Cost to seller:** Free tool (no platform commission for promo code feature itself)
-- **Discount is fully funded by the seller** (not subsidized by WB)
+**Ключевой вывод для AgentIQ:** На данный момент **нет публичного API** для создания/управления промокодами программно. Промокоды создаются только через ЛК продавца. Однако существующий Promotion API (`/api/v1/calendar/promotions/*`) содержит эндпоинты для управления акциями и добавления товаров, и, вероятно, будет расширен для промокодов по мере развития функции. Chat API позволяет отправлять текстовые сообщения покупателям, поэтому промокоды можно **отправлять текстом** в чате.
 
-Sources:
-- [Retail.ru -- WB promo codes announcement](https://www.retail.ru/news/wildberries-pozvolit-selleram-sozdavat-promokody-dlya-pokupateley-27-yanvarya-2026-273815/)
-- [Forbes.ru -- WB promo codes](https://www.forbes.ru/novosti-kompaniy/554273-na-wildberries-poavilis-promokody-ot-prodavcov)
-- [ixbt.com -- WB promo codes](https://www.ixbt.com/news/2026/01/27/v-wildberries-pojavilis-promokody-ot-prodavcov.html)
+---
 
-### 1.2 How Promo Codes Work
+## 1. Промокоды продавцов WB — Обзор функции
 
-**Creation flow (seller portal only):**
+### 1.1 Детали запуска
 
-1. Go to seller portal: **Tovary i ceny -> Kalendar' akcij** (Products and Prices -> Promotions Calendar)
-2. Open the **"Po promokodам"** (By Promo Codes) tab
-3. Click **"Sozdat' akciyu"** (Create Promotion)
-4. Configure parameters:
-   - **Promotion name** (internal only, buyers don't see it)
-   - **Discount percentage**: 3% to 50%
-   - **Duration**: 1 to 31 days
-   - **Start date**: minimum tomorrow, maximum 3 months ahead
-   - **Products**: entire assortment or specific SKUs
-5. System **auto-generates** the promo code, or seller sets a custom code
-6. Launch the promotion
+- **Дата запуска:** 27 января 2026 (тестовая группа российских продавцов)
+- **Статус:** Раскатка на всех российских продавцов
+- **Стоимость для продавца:** Бесплатный инструмент (без комиссии платформы за саму функцию)
+- **Скидка полностью за счёт продавца** (WB не субсидирует)
 
-**Buyer application flow:**
-1. Buyer adds product to cart on WB
-2. Enters promo code in the special field
-3. Gets the discounted price
+Источники:
+- [Retail.ru — анонс промокодов WB](https://www.retail.ru/news/wildberries-pozvolit-selleram-sozdavat-promokody-dlya-pokupateley-27-yanvarya-2026-273815/)
+- [Forbes.ru — промокоды WB](https://www.forbes.ru/novosti-kompaniy/554273-na-wildberries-poavilis-promokody-ot-prodavcov)
+- [ixbt.com — промокоды WB](https://www.ixbt.com/news/2026/01/27/v-wildberries-pojavilis-promokody-ot-prodavcov.html)
 
-### 1.3 Key Limitations
+### 1.2 Как работают промокоды
 
-| Parameter | Limit |
-|-----------|-------|
-| Max active promo campaigns simultaneously | **10** per seller |
-| Promo code reusability | **Unlimited uses** until promotion ends |
-| Discount range | **3% to 50%** |
-| Duration | **1 to 31 days** |
-| Start date range | Tomorrow to +3 months |
-| Products | All or selected SKUs |
-| Code format | Auto-generated or custom |
+**Создание (только в ЛК продавца):**
 
-### 1.4 Discount Stacking Rules
+1. Перейти в ЛК: **Товары и цены → Календарь акций**
+2. Открыть вкладку **«По промокодам»**
+3. Нажать **«Создать акцию»**
+4. Настроить параметры:
+   - **Название акции** (внутреннее, покупатель не видит)
+   - **Процент скидки**: от 3% до 50%
+   - **Длительность**: от 1 до 31 дня
+   - **Дата начала**: минимум завтра, максимум через 3 месяца
+   - **Товары**: весь ассортимент или конкретные артикулы
+5. Система **автогенерирует** промокод, или продавец задаёт свой
+6. Запустить акцию
 
-Discounts are applied **sequentially** to the original price:
+**Применение покупателем:**
+1. Покупатель добавляет товар в корзину на WB
+2. Вводит промокод в специальное поле
+3. Получает цену со скидкой
+
+### 1.3 Ключевые ограничения
+
+| Параметр | Лимит |
+|----------|-------|
+| Макс. одновременных промо-акций | **10** на продавца |
+| Многоразовость промокода | **Без ограничений** до окончания акции |
+| Диапазон скидки | **от 3% до 50%** |
+| Длительность | **от 1 до 31 дня** |
+| Диапазон даты начала | Завтра — +3 месяца |
+| Товары | Все или выбранные артикулы |
+| Формат кода | Автогенерация или свой |
+
+### 1.4 Правила суммирования скидок
+
+Скидки применяются **последовательно** к исходной цене:
 
 ```
-Original Price
-  -> Seller's base discount
-    -> Seller's own promotion discount
-      -> Promo code discount
+Исходная цена
+  → Базовая скидка продавца
+    → Скидка по акции продавца
+      → Скидка по промокоду
 ```
 
-**Critical rules:**
-- Promo code discount **does NOT stack** with discounts above 45% (before personal discounts)
-- Only **one promo code** can be applied per product unit at a time
-- If buyer has both a promo code and a loyalty discount, the system applies **whichever gives the buyer the bigger discount** (not both)
-- Promo code discount is **entirely at the seller's expense** (WB does not subsidize it)
+**Критичные правила:**
+- Скидка по промокоду **НЕ суммируется** со скидками выше 45% (до персональных скидок)
+- Только **один промокод** на единицу товара одновременно
+- Если у покупателя и промокод, и скидка лояльности — система применяет **ту, что выгоднее покупателю** (не обе)
+- Скидка по промокоду **полностью за счёт продавца** (WB не субсидирует)
 
-### 1.5 Distribution Channels
+### 1.5 Каналы распространения
 
-Sellers can distribute promo codes through:
-- **WB Media** (internal advertising tools on Wildberries)
-- **Social media** (VK, Telegram, etc.)
-- **Messengers** (WhatsApp, Telegram)
-- **Email newsletters**
-- **Any external channel** -- seller has full freedom
+Продавцы могут распространять промокоды через:
+- **WB Медиа** (внутренние рекламные инструменты Wildberries)
+- **Соцсети** (VK, Telegram и др.)
+- **Мессенджеры** (WhatsApp, Telegram)
+- **Email-рассылки**
+- **Любой внешний канал** — полная свобода продавца
 
-**Important for AgentIQ:** There is no prohibition on sharing promo codes in WB buyer chats. The code is just text that can be sent in any message.
+**Важно для AgentIQ:** Нет запрета на отправку промокодов в чатах WB с покупателями. Код — просто текст, который можно отправить в любом сообщении.
 
-Source: [WB Partners -- Seller Promo Codes](https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes)
+Источник: [WB Partners — Промокоды продавцов](https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes)
 
 ---
 
-## 2. WB API for Promotions -- Technical Details
+## 2. WB API для акций — Технические детали
 
-### 2.1 API Documentation Links
+### 2.1 Ссылки на документацию
 
-| Resource | URL |
-|----------|-----|
-| **Promotions Overview** | https://dev.wildberries.ru/en/openapi/promotion |
-| **Promotions Swagger** | https://dev.wildberries.ru/en/swagger/promotion |
-| **Promotions OpenAPI YAML** | https://openapi.wildberries.ru/promotion/swagger/api/ru/ |
-| **Promotion API (old portal)** | https://openapi.wildberries.ru/promotion/api/en/ |
+| Ресурс | URL |
+|--------|-----|
+| **Обзор Promotions API** | https://dev.wildberries.ru/en/openapi/promotion |
+| **Swagger Promotions** | https://dev.wildberries.ru/en/swagger/promotion |
+| **OpenAPI YAML** | https://openapi.wildberries.ru/promotion/swagger/api/ru/ |
+| **Promotion API (старый портал)** | https://openapi.wildberries.ru/promotion/api/en/ |
 | **Release Notes** | https://dev.wildberries.ru/en/release-notes |
 
-### 2.2 Authentication
+### 2.2 Аутентификация
 
 ```http
 Authorization: Bearer <PROMOTION_TOKEN>
 ```
 
-- Token category: **"Marketing i prodvizhenie"** (Marketing and Promotion)
-- Token validity: **180 days** after creation
-- Token is created in seller portal: Settings -> API keys -> Promotion category
-- One-time display -- must be saved immediately
+- Категория токена: **«Маркетинг и продвижение»**
+- Срок действия: **180 дней** после создания
+- Создаётся в ЛК: Настройки → API-ключи → категория Promotion
+- Показывается однократно — нужно сразу сохранить
 
-### 2.3 Known Promotion Calendar Endpoints
+### 2.3 Известные эндпоинты календаря акций
 
-These are the confirmed public endpoints for managing promotions (calendar-based):
+Подтверждённые публичные эндпоинты для управления акциями (на основе календаря):
 
 #### GET /api/v1/calendar/promotions
-**Description:** Get a list of available promotions in the calendar.
+**Описание:** Получить список доступных акций в календаре.
 
 #### GET /api/v1/calendar/promotions/nomenclatures
-**Description:** Get a list of products eligible for participating in a specific promotion.
+**Описание:** Получить список товаров, подходящих для участия в конкретной акции.
 
 #### POST /api/v1/calendar/promotions/upload
-**Description:** Add products to a promotion. When setting discounts via the promo calendar, uploads are processed asynchronously, and the discount activates at promo start.
+**Описание:** Добавить товары в акцию. При установке скидок через календарь акций загрузки обрабатываются асинхронно, скидка активируется при старте акции.
 
-#### Upload Status Tracking
-- **Unprocessed upload state** method -- check if upload is still processing (status = 1)
-- **Unprocessed upload details** method -- get details of pending uploads
+#### Отслеживание статуса загрузки
+- Метод **статуса необработанной загрузки** — проверка, обрабатывается ли ещё (status = 1)
+- Метод **деталей необработанной загрузки** — получение подробностей ожидающих загрузок
 
-### 2.4 Promo Code-Specific API -- Status: NOT YET PUBLIC
+### 2.4 API для промокодов — Статус: ПОКА НЕТ
 
-As of February 2026, there are **no publicly documented API endpoints** specifically for:
-- Creating promo code promotions programmatically
-- Listing active promo codes
-- Activating/deactivating promo codes
-- Getting promo code usage statistics
+На февраль 2026 **нет публично документированных эндпоинтов** для:
+- Программного создания промо-акций с промокодами
+- Получения списка активных промокодов
+- Активации/деактивации промокодов
+- Получения статистики использования промокодов
 
-**Evidence:**
-- The feature launched January 27, 2026, only 2 weeks ago
-- Still in test group rollout phase
-- The Promotion API Swagger documentation does not yet list promo-code-specific endpoints
-- WB API release notes mention "promo code discount info added to realization reports" but no creation endpoints
+**Обоснование:**
+- Функция запущена 27 января 2026, всего 2 недели назад
+- Всё ещё в фазе раскатки на тестовую группу
+- Swagger-документация Promotion API не содержит эндпоинтов для промокодов
+- В release notes WB упоминается «информация о скидке по промокоду добавлена в отчёты о реализации», но нет эндпоинтов создания
 
-**Prediction:** WB will likely add promo code management endpoints to the Promotion API within 2-6 months, following their pattern of:
-1. Launch UI feature
-2. Collect feedback
-3. Open API access
+**Прогноз:** WB, вероятно, добавит эндпоинты управления промокодами в Promotion API в течение 2-6 месяцев, следуя своему паттерну:
+1. Запуск UI-функции
+2. Сбор обратной связи
+3. Открытие API-доступа
 
-### 2.5 Realization Reports -- Promo Code Data
+### 2.5 Отчёты о реализации — Данные о промокодах
 
-The realization reports API **does** include promo code discount information:
-- `promoCodeDiscount` field added to report details
-- Shows promo code discount amounts applied to sold items
-- Allows tracking ROI of promo code campaigns
+API отчётов о реализации **уже содержит** информацию о скидках по промокодам:
+- Поле `promoCodeDiscount` добавлено в детали отчёта
+- Показывает суммы скидок по промокодам на проданные товары
+- Позволяет отслеживать ROI промо-кампаний
 
 ---
 
-## 3. WB Chat API -- Sending Promo Codes to Buyers
+## 3. WB Chat API — Отправка промокодов покупателям
 
-### 3.1 Chat API Overview
+### 3.1 Обзор Chat API
 
-Based on our existing research (see `WB_CHAT_API_RESEARCH.md`):
+На основе нашего существующего исследования (см. `WB_CHAT_API_RESEARCH.md`):
 
-| Parameter | Value |
-|-----------|-------|
+| Параметр | Значение |
+|----------|----------|
 | Base URL | `https://buyer-chat-api.wildberries.ru` |
-| Auth | `Authorization: Bearer <CHAT_TOKEN>` |
-| Token category | "Chat s pokupatelyami" (Buyers Chat) |
-| Response time limit | 10 days |
+| Аутентификация | `Authorization: Bearer <CHAT_TOKEN>` |
+| Категория токена | «Чат с покупателями» |
+| Лимит времени ответа | 10 дней |
 
-### 3.2 Sending Messages Endpoint
+### 3.2 Эндпоинт отправки сообщений
 
 ```http
 POST /api/v1/seller/chats/{chatID}/messages
@@ -183,200 +183,200 @@ Authorization: Bearer <TOKEN>
 Content-Type: application/json
 
 {
-  "message": "Spasibo za pokupku! Vot vash promo code SALE15 na skidku 15% na sleduyuschiy zakaz!"
+  "message": "Спасибо за покупку! Вот ваш промокод SALE15 на скидку 15% на следующий заказ!"
 }
 ```
 
-**Key points:**
-- Messages are **plain text** -- no special promo code attachment mechanism
-- Promo codes are sent as **text within the message body**
-- No special API for "attaching" a promo code to a chat message
-- The buyer must manually copy and apply the code at checkout
-- **There is no deep link** that auto-applies a promo code to buyer's cart
+**Ключевые моменты:**
+- Сообщения — **простой текст**, нет специального механизма прикрепления промокода
+- Промокоды отправляются как **текст в теле сообщения**
+- Нет специального API для «прикрепления» промокода к сообщению в чате
+- Покупатель должен вручную скопировать и применить код при оформлении заказа
+- **Нет deep link**, который автоматически применит промокод к корзине покупателя
 
-### 3.3 Chat + Promo Code Integration -- Current Possibilities
+### 3.3 Интеграция Чат + Промокоды — Текущие возможности
 
-| Capability | Status |
-|------------|--------|
-| Send promo code as text in chat | YES -- works now |
-| Auto-attach promo code to chat message | NO -- not supported |
-| Generate unique per-buyer promo codes via API | NO -- not supported yet |
-| Track if buyer used the promo code from chat | NO -- no attribution |
-| Deep link to product with promo code applied | NO -- not supported |
+| Возможность | Статус |
+|-------------|--------|
+| Отправить промокод текстом в чате | ДА — работает сейчас |
+| Автоприкрепление промокода к сообщению | НЕТ — не поддерживается |
+| Генерация уникальных промокодов на покупателя через API | НЕТ — пока не поддерживается |
+| Отслеживание, использовал ли покупатель промокод из чата | НЕТ — нет атрибуции |
+| Deep link на товар с применённым промокодом | НЕТ — не поддерживается |
 
-### 3.4 Workaround for AgentIQ
+### 3.4 Обходное решение для AgentIQ
 
-Since promo codes are **reusable** and **not buyer-specific**, the integration approach is:
+Поскольку промокоды **многоразовые** и **не привязаны к покупателю**, подход интеграции:
 
-1. Seller creates promo code campaigns in WB seller portal (1-10 active at a time)
-2. AgentIQ stores the active promo codes in its database (code + discount % + products + expiry)
-3. AI suggests including the promo code in chat responses when appropriate
-4. Operator sends the message with the promo code text
-5. Buyer copies the code and applies it at checkout
+1. Продавец создаёт промо-кампании в ЛК WB (1-10 активных одновременно)
+2. AgentIQ хранит активные промокоды в своей БД (код + % скидки + товары + срок действия)
+3. AI предлагает включить промокод в ответ в чате, когда это уместно
+4. Оператор отправляет сообщение с текстом промокода
+5. Покупатель копирует код и применяет при оформлении заказа
 
-**Limitation:** No way to create unique per-buyer codes. All promo codes are **shared/public** and reusable by anyone.
-
----
-
-## 4. Competitor Landscape -- Promo Code Automation on Marketplaces
-
-### 4.1 Ozon (for comparison)
-
-Ozon has a more mature promo code system called **"Kupony"** (Coupons):
-- Created in seller portal: Ceny i akcii -> Kupony -> Sozdat' akciyu
-- Coupon mechanics: "Kupon na skidku po promokodu"
-- Discount in **percentage or fixed rubles**
-- Duration: up to **6 months** (vs WB's 31 days max)
-- **Sellers CAN send promo codes to buyers in Ozon chats** -- buyers receive messages both on site and in app
-- Ozon has **chat API with premium subscription** for sending messages
-
-Source: [Ozon Seller -- How to create coupons](https://seller.ozon.ru/media/boost/kak-sozdat-svoj-promokod-na-ozon/)
-
-### 4.2 Existing Automation Services
-
-| Service | What it does | Promo code support |
-|---------|-------------|-------------------|
-| **IntellectDialog** | Unifies WB/Ozon/YM chats in amoCRM, AI auto-responses | No specific promo code automation |
-| **Marpla** | AI auto-responses to WB reviews via Telegram bot | No promo code features |
-| **Otveto** | AI auto-responses to WB reviews | No promo code features |
-| **MPSTATS** | Analytics, repricing, auto-replies to reviews | Price management, no promo code creation |
-| **Moneyplace** | Analytics, SEO, AI descriptions, auto-replies | No promo code automation |
-| **WBot (official WB)** | Analytics chatbot for sellers (Dzhем subscription) | Analytics only, no promo code management |
-| **Repricing tools** | Auto price management (MPSTATS, MPManager) | Price/discount management, not promo codes |
-
-**Key finding:** As of February 2026, **no existing service** automates promo code creation or distribution on Wildberries. This is a greenfield opportunity.
-
-### 4.3 CRM Integrations
-
-- **IntellectDialog + amoCRM/Kommo:** Aggregates all marketplace chats into CRM, AI-assisted responses, but no promo code integration
-- **Chat2Desk:** Chat center automation with WB integration, but focused on message routing, not promo codes
+**Ограничение:** Нет возможности создавать уникальные коды на покупателя. Все промокоды **общие/публичные** и многоразовые.
 
 ---
 
-## 5. Integration Architecture for AgentIQ Chat Center
+## 4. Конкурентный ландшафт — Автоматизация промокодов на маркетплейсах
 
-### 5.1 Use Cases
+### 4.1 Ozon (для сравнения)
 
-#### UC1: Satisfied Customer -- Loyalty Promo
+У Ozon более зрелая система промокодов — **«Купоны»**:
+- Создаются в ЛК: Цены и акции → Купоны → Создать акцию
+- Механика: «Купон на скидку по промокоду»
+- Скидка в **процентах или фиксированная в рублях**
+- Длительность: до **6 месяцев** (против 31 дня у WB)
+- **Продавцы МОГУТ отправлять промокоды покупателям в чатах Ozon** — покупатели получают сообщения и на сайте, и в приложении
+- У Ozon есть **Chat API с премиум-подпиской** для отправки сообщений
+
+Источник: [Ozon Seller — Как создать купоны](https://seller.ozon.ru/media/boost/kak-sozdat-svoj-promokod-na-ozon/)
+
+### 4.2 Существующие сервисы автоматизации
+
+| Сервис | Что делает | Поддержка промокодов |
+|--------|-----------|---------------------|
+| **IntellectDialog** | Объединяет чаты WB/Ozon/YM в amoCRM, AI-автоответы | Нет автоматизации промокодов |
+| **Marpla** | AI-автоответы на отзывы WB через Telegram-бот | Нет функций промокодов |
+| **Otveto** | AI-автоответы на отзывы WB | Нет функций промокодов |
+| **MPSTATS** | Аналитика, репрайсинг, автоответы на отзывы | Управление ценами, не промокоды |
+| **Moneyplace** | Аналитика, SEO, AI-описания, автоответы | Нет автоматизации промокодов |
+| **WBot (офиц. WB)** | Аналитический чатбот для продавцов (подписка Джем) | Только аналитика, не управление промокодами |
+| **Инструменты репрайсинга** | Автоуправление ценами (MPSTATS, MPManager) | Управление ценами/скидками, не промокоды |
+
+**Ключевой вывод:** На февраль 2026 **ни один существующий сервис** не автоматизирует создание или распространение промокодов на Wildberries. Это свободная ниша.
+
+### 4.3 CRM-интеграции
+
+- **IntellectDialog + amoCRM/Kommo:** Агрегация всех чатов маркетплейсов в CRM, AI-ответы, но без интеграции промокодов
+- **Chat2Desk:** Автоматизация чат-центра с интеграцией WB, но фокус на маршрутизации сообщений, не на промокодах
+
+---
+
+## 5. Архитектура интеграции для AgentIQ Chat Center
+
+### 5.1 Сценарии использования
+
+#### UC1: Довольный покупатель — Промо на лояльность
 ```
-Trigger: AI detects positive feedback / thank-you message in chat
-Action: Suggest operator includes promo code in response
-Message: "Spasibo za otzyv! Vot vash personal'nyy promokod THANKS10
-         na skidku 10% na lyuboy nash tovar. Dejstvuet do [date]!"
-Goal: Increase repeat purchases, build loyalty
+Триггер: AI определяет позитивный отзыв / благодарность в чате
+Действие: Предложить оператору включить промокод в ответ
+Сообщение: "Спасибо за отзыв! Вот ваш персональный промокод THANKS10
+           на скидку 10% на любой наш товар. Действует до [дата]!"
+Цель: Увеличение повторных покупок, укрепление лояльности
 ```
 
-#### UC2: Dissatisfied Customer -- Retention Promo
+#### UC2: Недовольный покупатель — Промо на удержание
 ```
-Trigger: AI detects complaint / negative sentiment (quality_complaint, defect)
-Action: Suggest operator offers promo code as goodwill gesture
-Message: "Nam ochen' zhal', chto vy stolknulis' s etim!
-         V kachestve izvineniya -- promokod SORRY15 na skidku 15%
-         na vash sleduyuschiy zakaz. Dejstvuet 14 dney."
-Goal: Retain customer, prevent negative review, turn negative into positive
-```
-
-#### UC3: Pre-Purchase Question -- Conversion Promo
-```
-Trigger: AI detects pre-purchase intent (sizing_fit, availability, compatibility)
-Action: Suggest promo code to incentivize purchase decision
-Message: "Etot razmer vam otlichno podojdyot!
-         A vot promokod FIRST5 na skidku 5% dlya bystogo resheniya!"
-Goal: Convert inquiry into purchase, reduce cart abandonment
+Триггер: AI определяет жалобу / негативный сентимент (quality_complaint, defect)
+Действие: Предложить оператору промокод как жест доброй воли
+Сообщение: "Нам очень жаль, что вы столкнулись с этим!
+           В качестве извинения — промокод SORRY15 на скидку 15%
+           на ваш следующий заказ. Действует 14 дней."
+Цель: Удержание покупателя, предотвращение негативного отзыва, превращение негатива в позитив
 ```
 
-### 5.2 Technical Architecture
+#### UC3: Предпокупочный вопрос — Промо на конверсию
+```
+Триггер: AI определяет предпокупочный интент (sizing_fit, availability, compatibility)
+Действие: Предложить промокод для стимулирования покупки
+Сообщение: "Этот размер вам отлично подойдёт!
+           А вот промокод FIRST5 на скидку 5% для быстрого решения!"
+Цель: Конвертация запроса в покупку, снижение отказов от корзины
+```
+
+### 5.2 Техническая архитектура
 
 ```
 +------------------+     +-------------------+     +------------------+
-|  WB Seller       |     |  AgentIQ          |     |  WB Chat API     |
-|  Portal (manual) |     |  Chat Center      |     |  (automated)     |
+|  ЛК продавца WB  |     |  AgentIQ          |     |  WB Chat API     |
+|  (вручную)       |     |  Chat Center      |     |  (автоматизация) |
 +--------+---------+     +--------+----------+     +--------+---------+
          |                        |                          |
-         |  1. Create promo      |                          |
-         |  code campaigns       |                          |
-         |  (3-50%, 1-31 days)   |                          |
+         |  1. Создать промо-    |                          |
+         |  кампании             |                          |
+         |  (3-50%, 1-31 день)   |                          |
          |                       |                          |
-         +--------> 2. Store active promo codes             |
-         |          in AgentIQ DB                           |
-         |          (code, %, products, expiry)             |
+         +--------> 2. Сохранить активные промокоды         |
+         |          в БД AgentIQ                            |
+         |          (код, %, товары, срок)                  |
          |                       |                          |
-         |               3. AI analyzes chat                |
-         |               (sentiment, intent)                |
+         |               3. AI анализирует чат              |
+         |               (сентимент, интент)                |
          |                       |                          |
-         |               4. AI suggests promo               |
-         |               code in response draft             |
+         |               4. AI предлагает промокод          |
+         |               в черновике ответа                 |
          |                       |                          |
-         |               5. Operator approves               |
-         |               (or auto-sends)                    |
+         |               5. Оператор подтверждает           |
+         |               (или автоотправка)                 |
          |                       |                          |
-         |                       +---> 6. POST message      |
-         |                       |     with promo code text |
+         |                       +---> 6. POST сообщение    |
+         |                       |     с текстом промокода  |
          |                       |          +               |
          |                       |          |               |
-         |                       |  7. Track sent promos    |
-         |                       |  (internal analytics)    |
+         |                       |  7. Трекинг отправок     |
+         |                       |  (внутренняя аналитика)  |
          +                       +                          +
 ```
 
-### 5.3 Database Schema (AgentIQ)
+### 5.3 Схема БД (AgentIQ)
 
 ```sql
--- New table for managing seller promo codes
+-- Новая таблица для управления промокодами продавца
 CREATE TABLE promo_codes (
     id SERIAL PRIMARY KEY,
     seller_id INTEGER REFERENCES sellers(id),
     code VARCHAR(50) NOT NULL,
-    discount_percent DECIMAL(5,2) NOT NULL, -- 3.00 to 50.00
+    discount_percent DECIMAL(5,2) NOT NULL, -- 3.00 до 50.00
     description TEXT,
-    -- Targeting
+    -- Таргетинг
     applies_to VARCHAR(20) DEFAULT 'all', -- 'all' | 'selected'
-    product_nms INTEGER[],  -- array of nmIds if applies_to='selected'
-    -- Lifecycle
+    product_nms INTEGER[],  -- массив nmId если applies_to='selected'
+    -- Жизненный цикл
     starts_at TIMESTAMP NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     is_active BOOLEAN DEFAULT true,
-    -- Metadata
+    -- Метаданные
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    -- Usage context rules
-    use_for_positive BOOLEAN DEFAULT true,   -- UC1: loyalty
-    use_for_negative BOOLEAN DEFAULT true,   -- UC2: retention
-    use_for_pre_purchase BOOLEAN DEFAULT true -- UC3: conversion
+    -- Правила контекста использования
+    use_for_positive BOOLEAN DEFAULT true,   -- UC1: лояльность
+    use_for_negative BOOLEAN DEFAULT true,   -- UC2: удержание
+    use_for_pre_purchase BOOLEAN DEFAULT true -- UC3: конверсия
 );
 
--- Track promo codes sent in chats
+-- Трекинг отправленных промокодов в чатах
 CREATE TABLE promo_code_sends (
     id SERIAL PRIMARY KEY,
     promo_code_id INTEGER REFERENCES promo_codes(id),
     chat_id VARCHAR(100) REFERENCES chats(wb_chat_id),
     message_id VARCHAR(100),
     sent_at TIMESTAMP DEFAULT NOW(),
-    -- Context
-    trigger_intent VARCHAR(50),  -- e.g., 'positive_feedback', 'quality_complaint'
+    -- Контекст
+    trigger_intent VARCHAR(50),  -- напр. 'positive_feedback', 'quality_complaint'
     trigger_sentiment VARCHAR(20), -- 'positive', 'negative', 'neutral'
     auto_suggested BOOLEAN DEFAULT true,
     operator_approved BOOLEAN DEFAULT true
 );
 
--- Index for analytics
+-- Индексы для аналитики
 CREATE INDEX idx_promo_sends_code ON promo_code_sends(promo_code_id);
 CREATE INDEX idx_promo_sends_chat ON promo_code_sends(chat_id);
 CREATE INDEX idx_promo_sends_date ON promo_code_sends(sent_at);
 ```
 
-### 5.4 AI Analyzer Integration
+### 5.4 Интеграция с AI Analyzer
 
-Extend `ai_analyzer.py` to include promo code suggestions:
+Расширение `ai_analyzer.py` для предложения промокодов:
 
 ```python
-# In analyze_chat() function, add promo code suggestion logic
+# В функции analyze_chat(), добавить логику предложения промокодов
 
 def suggest_promo_code(intent: str, sentiment: str, seller_id: int) -> dict | None:
     """
-    Suggest appropriate promo code based on chat context.
+    Предложить подходящий промокод на основе контекста чата.
 
-    Returns:
+    Возвращает:
         {
             "code": "THANKS10",
             "discount_percent": 10,
@@ -384,20 +384,20 @@ def suggest_promo_code(intent: str, sentiment: str, seller_id: int) -> dict | No
             "reason": "positive_feedback_loyalty"
         }
     """
-    # Priority mapping
+    # Маппинг приоритетов
     promo_rules = {
-        # UC2: Retention -- highest priority
+        # UC2: Удержание — наивысший приоритет
         ("defect_not_working", "negative"): {"use_for_negative": True, "min_discount": 10},
         ("wrong_item", "negative"): {"use_for_negative": True, "min_discount": 10},
         ("quality_complaint", "negative"): {"use_for_negative": True, "min_discount": 10},
         ("return_refund", "negative"): {"use_for_negative": True, "min_discount": 15},
 
-        # UC3: Conversion -- medium priority
+        # UC3: Конверсия — средний приоритет
         ("pre_purchase", "neutral"): {"use_for_pre_purchase": True, "min_discount": 5},
         ("sizing_fit", "neutral"): {"use_for_pre_purchase": True, "min_discount": 5},
         ("availability", "neutral"): {"use_for_pre_purchase": True, "min_discount": 5},
 
-        # UC1: Loyalty -- standard
+        # UC1: Лояльность — стандартный
         ("positive_feedback", "positive"): {"use_for_positive": True, "min_discount": 5},
     }
 
@@ -405,153 +405,153 @@ def suggest_promo_code(intent: str, sentiment: str, seller_id: int) -> dict | No
     if not rule:
         return None
 
-    # Find matching active promo code for this seller
-    # ... query promo_codes table ...
+    # Найти подходящий активный промокод для этого продавца
+    # ... запрос к таблице promo_codes ...
     return promo_suggestion
 ```
 
-### 5.5 API Endpoint for AgentIQ
+### 5.5 API-эндпоинты для AgentIQ
 
 ```python
-# New endpoints in AgentIQ backend
+# Новые эндпоинты в бэкенде AgentIQ
 
-# CRUD for promo codes
-POST   /api/promo-codes          -- Create/register promo code
-GET    /api/promo-codes          -- List seller's active promo codes
-PATCH  /api/promo-codes/{id}     -- Update promo code settings
-DELETE /api/promo-codes/{id}     -- Deactivate promo code
+# CRUD для промокодов
+POST   /api/promo-codes          # Создать/зарегистрировать промокод
+GET    /api/promo-codes          # Список активных промокодов продавца
+PATCH  /api/promo-codes/{id}     # Обновить настройки промокода
+DELETE /api/promo-codes/{id}     # Деактивировать промокод
 
-# AI suggestion
-GET    /api/chats/{id}/promo-suggestion  -- Get AI-suggested promo code for chat
+# AI-предложение
+GET    /api/chats/{id}/promo-suggestion  # Получить AI-предложение промокода для чата
 
-# Analytics
-GET    /api/promo-codes/analytics        -- Usage stats, conversion tracking
+# Аналитика
+GET    /api/promo-codes/analytics        # Статистика использования, отслеживание конверсий
 ```
 
-### 5.6 Frontend Integration (Chat Center)
+### 5.6 Интеграция во фронтенд (Chat Center)
 
-In the AI suggestion panel (`.ai-suggestion` inside `.chat-window`):
+В панели AI-предложения (`.ai-suggestion` внутри `.chat-window`):
 
 ```
 +--------------------------------------------------+
-|  AI Suggestion                                    |
+|  AI-предложение                                   |
 |                                                   |
-|  Recommended response:                            |
-|  "Spasibo za otzyv! Vot vash promokod..."        |
+|  Рекомендуемый ответ:                             |
+|  "Спасибо за отзыв! Вот ваш промокод..."         |
 |                                                   |
-|  [THANKS10] 10% discount  Expires: Feb 28        |
+|  [THANKS10] скидка 10%  Действует до: 28 фев     |
 |                                                   |
-|  [Use this promo]  [Edit]  [Skip]                |
+|  [Использовать промокод]  [Редактировать]  [Пропустить] |
 +--------------------------------------------------+
 ```
 
 ---
 
-## 6. Risks and Limitations
+## 6. Риски и ограничения
 
-### 6.1 Current Blockers
+### 6.1 Текущие блокеры
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| **No API for creating promo codes** | Must create codes manually in WB portal | Store pre-created codes in AgentIQ DB, manual sync |
-| **Promo codes are NOT per-buyer** | Same code works for everyone, no exclusivity | Use time-limited codes, rotate frequently |
-| **Max 10 active promotions** | Limited pool of codes to distribute | Strategic use: 3 for retention, 3 for loyalty, 3 for conversion, 1 reserve |
-| **No attribution tracking** | Can't know if buyer used code from chat vs. other channel | Track sends internally, correlate with realization reports |
-| **31-day max duration** | Codes expire, need renewal | Auto-remind seller to create new codes |
-| **Feature still in testing** | May change rules/limits | Monitor WB announcements |
+| Риск | Влияние | Митигация |
+|------|---------|-----------|
+| **Нет API для создания промокодов** | Коды нужно создавать вручную в ЛК WB | Хранить заранее созданные коды в БД AgentIQ, ручная синхронизация |
+| **Промокоды НЕ персональные** | Один код работает для всех, нет эксклюзивности | Использовать коды с коротким сроком действия, часто ротировать |
+| **Макс. 10 активных акций** | Ограниченный пул кодов для распространения | Стратегическое использование: 3 на удержание, 3 на лояльность, 3 на конверсию, 1 резерв |
+| **Нет трекинга атрибуции** | Нельзя узнать, использовал ли покупатель код из чата или из другого канала | Внутренний трекинг отправок, сопоставление с отчётами реализации |
+| **Макс. 31 день действия** | Коды истекают, нужно обновлять | Автонапоминание продавцу о создании новых кодов |
+| **Функция ещё тестируется** | Могут измениться правила/лимиты | Мониторить анонсы WB |
 
-### 6.2 API Cost Considerations
+### 6.2 Стоимость API
 
-WB transitioned to **Pay-as-you-go API pricing** in January 2026:
-- Cloud services pay per API operation
-- This affects third-party integrations like AgentIQ
-- Pricing details TBD for specific endpoints
+WB перешёл на модель **оплаты за использование API** в январе 2026:
+- Облачные сервисы платят за каждую API-операцию
+- Это влияет на сторонние интеграции вроде AgentIQ
+- Детали ценообразования уточняются для конкретных эндпоинтов
 
-Source: [Avoshop -- Paid API access](https://avoshop.ru/blog/wildberries/platnyy_dostup_k_api_wildberries_dlya_oblachnykh_servisov_s_2026_goda/)
+Источник: [Avoshop — Платный доступ к API](https://avoshop.ru/blog/wildberries/platnyy_dostup_k_api_wildberries_dlya_oblachnykh_servisov_s_2026_goda/)
 
-### 6.3 Compliance Risks
+### 6.3 Комплаенс-риски
 
-- Promo code discount **does not stack** with discounts > 45% -- seller must verify product pricing
-- Seller bears full discount cost -- must calculate margin impact
-- AgentIQ should include a **margin calculator** to prevent sellers from offering unprofitable discounts
-
----
-
-## 7. Roadmap Recommendation
-
-### Phase 1 (Now -- February 2026): Manual Integration
-- Add promo code storage in AgentIQ DB (manual entry by seller)
-- AI suggests promo code text in chat responses
-- Operator copies promo code into message
-- Internal tracking of promo code sends
-
-### Phase 2 (March-April 2026): Semi-Automated
-- AI auto-inserts promo code into draft response
-- One-click send with promo code
-- Dashboard: promo codes sent per day, by intent type
-- Alerts when promo code is about to expire
-
-### Phase 3 (When WB API adds promo code endpoints): Full Automation
-- Auto-create promo code campaigns via WB API
-- Dynamic promo code assignment based on chat context
-- Full attribution: track code creation -> distribution -> usage -> realization
-- ROI dashboard: revenue from promo code campaigns
-
-### Phase 4 (Future): Smart Promo Optimization
-- AI learns which discount % converts best for each intent
-- A/B testing: 5% vs. 10% vs. 15% for retention
-- Predictive: auto-adjust discount based on customer value (order history)
-- Cross-sell: suggest promo on complementary products
+- Скидка по промокоду **не суммируется** со скидками > 45% — продавец должен проверять ценообразование товара
+- Продавец несёт полную стоимость скидки — нужно рассчитывать влияние на маржу
+- AgentIQ должен включать **калькулятор маржи** для предотвращения убыточных скидок
 
 ---
 
-## 8. Comparison with Ozon
+## 7. Рекомендуемый роадмап
 
-| Feature | Wildberries (Jan 2026) | Ozon |
-|---------|----------------------|------|
-| Promo code creation | Seller portal only | Seller portal |
-| API for promo codes | Not yet | Limited (premium) |
-| Discount type | % only | % or fixed RUB |
-| Max duration | 31 days | 6 months |
-| Active campaigns limit | 10 | Higher |
-| Send in chat | Text message only | Native integration |
-| Per-buyer codes | No | No |
-| Attribution tracking | Realization reports only | Better tracking |
+### Фаза 1 (Сейчас — февраль 2026): Ручная интеграция
+- Добавить хранение промокодов в БД AgentIQ (ручной ввод продавцом)
+- AI предлагает текст с промокодом в ответах в чате
+- Оператор копирует промокод в сообщение
+- Внутренний трекинг отправок промокодов
 
----
+### Фаза 2 (Март-апрель 2026): Полуавтоматическая
+- AI автоматически вставляет промокод в черновик ответа
+- Отправка одним кликом с промокодом
+- Дашборд: отправки промокодов по дням, по типу интента
+- Алерты при истечении срока промокода
 
-## 9. Key Takeaways for AgentIQ Product
+### Фаза 3 (Когда WB добавит API промокодов): Полная автоматизация
+- Автоматическое создание промо-кампаний через WB API
+- Динамическое назначение промокодов на основе контекста чата
+- Полная атрибуция: создание кода → распространение → использование → реализация
+- ROI-дашборд: выручка от промо-кампаний
 
-1. **First-mover advantage:** No competitor automates promo code distribution in WB chats. AgentIQ can be first.
-
-2. **Manual sync is fine for MVP:** Sellers create 5-10 promo codes in WB portal, input them into AgentIQ. AI handles distribution logic.
-
-3. **High value for retention use case:** Dissatisfied customer + promo code in chat = chance to prevent negative review. This directly ties to WB's 3-day window for saving negative reviews.
-
-4. **Chat API is sufficient:** We can send promo codes as plain text in chat messages using the existing Chat API. No new API integration needed.
-
-5. **ROI story for sellers:** Promo code costs seller 5-15% discount, but saves a negative review that could cost much more in lost sales (negative review impact >> 15% discount on one order).
-
-6. **Watch WB API updates:** Monitor https://dev.wildberries.ru/en/release-notes for promo code API endpoints. They will come -- WB has a pattern of UI-first, then API.
+### Фаза 4 (Будущее): Умная оптимизация промокодов
+- AI учится, какой % скидки лучше конвертирует для каждого интента
+- A/B-тестирование: 5% vs. 10% vs. 15% для удержания
+- Предиктивная модель: автоподбор скидки на основе ценности покупателя (история заказов)
+- Кросс-сейл: предложение промокода на сопутствующие товары
 
 ---
 
-## Sources
+## 8. Сравнение с Ozon
 
-- [WB Partners -- Seller Promo Codes (official instructions)](https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes)
-- [Forbes.ru -- WB promo codes launch](https://www.forbes.ru/novosti-kompaniy/554273-na-wildberries-poavilis-promokody-ot-prodavcov)
-- [Retail.ru -- WB promo codes for sellers](https://www.retail.ru/news/wildberries-pozvolit-selleram-sozdavat-promokody-dlya-pokupateley-27-yanvarya-2026-273815/)
-- [logistics.ru -- WB promo codes economics](https://logistics.ru/internet-torgovlya-i-fulfilment/promokody-ot-prodavcov-na-wildberries-kak-novyy-instrument-menyaet)
-- [Sellermate.io -- WB 2026 updates](https://sellermate.io/blog/tpost/mxepvd4801-wildberries-2026-promokodi-prodavtsov-no)
-- [ixbt.com -- WB promo codes](https://www.ixbt.com/news/2026/01/27/v-wildberries-pojavilis-promokody-ot-prodavcov.html)
-- [WB API Documentation (Promotions)](https://dev.wildberries.ru/en/openapi/promotion)
+| Функция | Wildberries (янв. 2026) | Ozon |
+|---------|------------------------|------|
+| Создание промокодов | Только ЛК продавца | ЛК продавца |
+| API для промокодов | Пока нет | Ограниченно (премиум) |
+| Тип скидки | Только % | % или фикс. руб. |
+| Макс. длительность | 31 день | 6 месяцев |
+| Лимит активных кампаний | 10 | Больше |
+| Отправка в чате | Только текстом | Нативная интеграция |
+| Персональные коды | Нет | Нет |
+| Трекинг атрибуции | Только отчёты реализации | Лучший трекинг |
+
+---
+
+## 9. Ключевые выводы для продукта AgentIQ
+
+1. **Преимущество первопроходца:** Ни один конкурент не автоматизирует распространение промокодов в чатах WB. AgentIQ может быть первым.
+
+2. **Ручная синхронизация — норм для MVP:** Продавец создаёт 5-10 промокодов в ЛК WB, вносит их в AgentIQ. AI берёт на себя логику распространения.
+
+3. **Высокая ценность для удержания:** Недовольный покупатель + промокод в чате = шанс предотвратить негативный отзыв. Это напрямую связано с 3-дневным окном WB для спасения негативных отзывов.
+
+4. **Chat API достаточен:** Мы можем отправлять промокоды как простой текст в сообщениях чата через существующий Chat API. Новая интеграция API не нужна.
+
+5. **ROI-история для продавцов:** Промокод стоит продавцу 5-15% скидки, но спасает негативный отзыв, который мог бы стоить гораздо больше потерянных продаж (влияние негативного отзыва >> 15% скидки на один заказ).
+
+6. **Следить за обновлениями WB API:** Мониторить https://dev.wildberries.ru/en/release-notes на предмет эндпоинтов промокодов. Они появятся — у WB паттерн: сначала UI, потом API.
+
+---
+
+## Источники
+
+- [WB Partners — Промокоды продавцов (офиц. инструкция)](https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes)
+- [Forbes.ru — запуск промокодов WB](https://www.forbes.ru/novosti-kompaniy/554273-na-wildberries-poavilis-promokody-ot-prodavcov)
+- [Retail.ru — промокоды WB для продавцов](https://www.retail.ru/news/wildberries-pozvolit-selleram-sozdavat-promokody-dlya-pokupateley-27-yanvarya-2026-273815/)
+- [logistics.ru — экономика промокодов WB](https://logistics.ru/internet-torgovlya-i-fulfilment/promokody-ot-prodavcov-na-wildberries-kak-novyy-instrument-menyaet)
+- [Sellermate.io — обновления WB 2026](https://sellermate.io/blog/tpost/mxepvd4801-wildberries-2026-promokodi-prodavtsov-no)
+- [ixbt.com — промокоды WB](https://www.ixbt.com/news/2026/01/27/v-wildberries-pojavilis-promokody-ot-prodavcov.html)
+- [WB API документация (Promotions)](https://dev.wildberries.ru/en/openapi/promotion)
 - [WB API Swagger (Promotions)](https://dev.wildberries.ru/en/swagger/promotion)
 - [WB API Swagger (Communications/Chat)](https://dev.wildberries.ru/en/swagger/communications)
 - [WB API Release Notes](https://dev.wildberries.ru/en/release-notes)
-- [WB API (old portal)](https://openapi.wildberries.ru/promotion/api/en/)
-- [Ozon -- How to create coupons](https://seller.ozon.ru/media/boost/kak-sozdat-svoj-promokod-na-ozon/)
-- [IntellectDialog -- Marketplace automation](https://intellectdialog.com/tpost/wildberries-ozon-yandex-market-amocrm-automation)
-- [Wildbox -- Discount/promo code instructions](https://wildbox.ru/blog/instructions-for-installing-discounts/)
-- [Avoshop -- Paid API access 2026](https://avoshop.ru/blog/wildberries/platnyy_dostup_k_api_wildberries_dlya_oblachnykh_servisov_s_2026_goda/)
-- [Dakword/WBSeller -- GitHub library](https://github.com/Dakword/WBSeller)
-- [Moneyplace -- Set discounts and promo codes](https://moneyplace.io/wildberries/stat-wb/kak-ustanovit-skidki-i-promokody-na-t/)
+- [WB API (старый портал)](https://openapi.wildberries.ru/promotion/api/en/)
+- [Ozon — Как создать купоны](https://seller.ozon.ru/media/boost/kak-sozdat-svoj-promokod-na-ozon/)
+- [IntellectDialog — автоматизация маркетплейсов](https://intellectdialog.com/tpost/wildberries-ozon-yandex-market-amocrm-automation)
+- [Wildbox — инструкция по скидкам/промокодам](https://wildbox.ru/blog/instructions-for-installing-discounts/)
+- [Avoshop — платный доступ к API 2026](https://avoshop.ru/blog/wildberries/platnyy_dostup_k_api_wildberries_dlya_oblachnykh_servisov_s_2026_goda/)
+- [Dakword/WBSeller — GitHub-библиотека](https://github.com/Dakword/WBSeller)
+- [Moneyplace — скидки и промокоды](https://moneyplace.io/wildberries/stat-wb/kak-ustanovit-skidki-i-promokody-na-t/)
