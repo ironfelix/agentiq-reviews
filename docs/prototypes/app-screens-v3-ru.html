@@ -3245,12 +3245,12 @@ html, body {
                         <div class="metric-card">
                             <div class="metric-label">Упущенная выручка (30 дн)</div>
                             <div class="metric-value urgent">42 000 ₽</div>
-                            <div class="metric-change negative">Оценка модели, надежность 0.62</div>
+                            <div class="metric-change negative">Оценка по данным за последние 30 дней</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Потенциал возврата (30 дн)</div>
                             <div class="metric-value good">28 000 ₽</div>
-                            <div class="metric-change positive">Если довести скорость до 90%</div>
+                            <div class="metric-change positive">Если довести долю ответов вовремя по срочным до 90%</div>
                         </div>
                     </div>
 
@@ -3411,12 +3411,12 @@ html, body {
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Упущенная выручка (30 дн)</div>
                         <div class="metric-value urgent">42 000 ₽</div>
-                        <div class="metric-change negative">Оценка модели, надежность 0.62</div>
+                        <div class="metric-change negative">Оценка по данным за последние 30 дней</div>
                     </div>
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Потенциал возврата (30 дн)</div>
                         <div class="metric-value good">28 000 ₽</div>
-                        <div class="metric-change positive">Если довести скорость до 90%</div>
+                        <div class="metric-change positive">Если довести долю ответов вовремя по срочным до 90%</div>
                     </div>
                 </div>
 
@@ -3912,75 +3912,6 @@ html, body {
                             <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Спасённые рейтинги</div>
                             <div style="font-size: 24px; font-weight: 700; color: var(--color-accent);">7</div>
                             <div style="font-size: 11px; color: var(--color-text-tertiary);">негативных отзывов &rarr; решены в чате</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Revenue attribution by communication channels -->
-                <div class="chart-card" style="margin-bottom: 24px;">
-                    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
-                        <div class="chart-title">Вклад каналов в выручку (30 дней)</div>
-                        <div style="font-size: 11px; color: var(--color-text-tertiary);">Оценка модели · Надежность: 0.62 · Покрытие товаров: 78%</div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 14px;">
-                        <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Вопросы (pre-purchase)</div>
-                            <div style="font-size: 22px; font-weight: 700; color: var(--color-success);">+16 800 ₽</div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">Ответ ≤ 1ч: 82% · +1.9 п.п. к cart rate</div>
-                        </div>
-                        <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Чаты (pre/post-purchase)</div>
-                            <div style="font-size: 22px; font-weight: 700; color: var(--color-accent);">+9 400 ₽</div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">Ответ вовремя по срочным: 78% · меньше отмен на 0.7 п.п.</div>
-                        </div>
-                        <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
-                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Отзывы и ответы</div>
-                            <div style="font-size: 22px; font-weight: 700; color: var(--color-warning);">+6 100 ₽</div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">Доля 1-2★: 14% · +0.1 к рейтингу</div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
-                        <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md);">
-                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Оценка вклада каналов</div>
-                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                                <thead>
-                                    <tr style="border-bottom: 1px solid var(--color-border-medium); color: var(--color-text-secondary);">
-                                        <th style="text-align: left; padding: 6px 0;">Канал</th>
-                                        <th style="text-align: right; padding: 6px 0;">Рост конверсии</th>
-                                        <th style="text-align: right; padding: 6px 0;">Влияние, ₽</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr style="border-bottom: 1px solid var(--color-border-light);">
-                                        <td style="padding: 8px 0;">Вопросы</td>
-                                        <td style="text-align: right; padding: 8px 0; color: var(--color-success);">+1.9 п.п.</td>
-                                        <td style="text-align: right; padding: 8px 0; font-weight: 600;">16 800</td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid var(--color-border-light);">
-                                        <td style="padding: 8px 0;">Чаты</td>
-                                        <td style="text-align: right; padding: 8px 0; color: var(--color-accent);">+1.1 п.п.</td>
-                                        <td style="text-align: right; padding: 8px 0; font-weight: 600;">9 400</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;">Отзывы</td>
-                                        <td style="text-align: right; padding: 8px 0; color: var(--color-warning);">+0.7 п.п.</td>
-                                        <td style="text-align: right; padding: 8px 0; font-weight: 600;">6 100</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md);">
-                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Как считается оценка в деньгах</div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.55;">
-                                1) Смотрим, как обычно продаются товары в похожих условиях (цена, остатки, сезон).<br>
-                                2) Сравниваем с периодом, где команда лучше обрабатывает вопросы, чаты и отзывы.<br>
-                                3) Считаем разницу в заказах и выкупах.<br>
-                                4) Переводим эту разницу в рубли за выбранный период.<br>
-                                5) Показываем оценку только когда данных достаточно.
-                            </div>
-                            <div style="margin-top: 10px; font-size: 11px; color: var(--color-text-tertiary);">
-                                Эффект каналов проявляется с разной задержкой: вопросы и чаты быстрее, отзывы — медленнее.
-                            </div>
                         </div>
                     </div>
                 </div>
