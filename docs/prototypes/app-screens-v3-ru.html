@@ -1200,12 +1200,27 @@ body {
     margin-bottom: 32px;
 }
 
+.analytics-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .analytics-title {
     font-size: 22px;
     font-weight: 600;
 }
 
 .analytics-period {
+    display: flex;
+    gap: 4px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    padding: 3px;
+}
+
+.analytics-mode {
     display: flex;
     gap: 4px;
     background: var(--color-bg-primary);
@@ -1226,6 +1241,14 @@ body {
     font-weight: 500;
 }
 .period-btn.active { background: var(--color-text-primary); color: white; }
+
+.analytics-page.mode-ops .context-block {
+    display: none !important;
+}
+
+.analytics-page.mode-ops .volume-row {
+    grid-template-columns: 1fr;
+}
 
 /* Quality score card */
 .quality-card {
@@ -2775,6 +2798,13 @@ body {
         margin-bottom: 20px;
     }
 
+    .analytics-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
     .analytics-title {
         font-size: 20px;
     }
@@ -2784,6 +2814,17 @@ body {
         -webkit-overflow-scrolling: touch;
         width: 100%;
         scrollbar-width: none;
+    }
+
+    .analytics-mode {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .analytics-mode::-webkit-scrollbar {
+        display: none;
     }
 
     .analytics-period::-webkit-scrollbar {
@@ -3809,13 +3850,19 @@ html, body {
         </nav>
 
         <div class="app-content">
-            <div class="analytics-page">
+            <div class="analytics-page mode-ops" id="analyticsPage">
                 <div class="analytics-header">
                     <div class="analytics-title">Аналитика</div>
-                    <div class="analytics-period">
-                        <button class="period-btn">7 дней</button>
-                        <button class="period-btn active">30 дней</button>
-                        <button class="period-btn">90 дней</button>
+                    <div class="analytics-controls">
+                        <div class="analytics-period">
+                            <button class="period-btn">7 дней</button>
+                            <button class="period-btn active">30 дней</button>
+                            <button class="period-btn">90 дней</button>
+                        </div>
+                        <div class="analytics-mode" id="analyticsModeSwitch">
+                            <button class="period-btn active" data-mode-btn="ops" onclick="setAnalyticsMode('ops', this)">Операционный</button>
+                            <button class="period-btn" data-mode-btn="full" onclick="setAnalyticsMode('full', this)">Полный</button>
+                        </div>
                     </div>
                 </div>
 
@@ -3997,7 +4044,7 @@ html, body {
                 </div>
 
                 <!-- Row 3: Rating Distribution + Conversion Funnel -->
-                <div class="analytics-grid">
+                <div class="analytics-grid context-block">
                     <!-- Rating distribution -->
                     <div class="chart-card">
                         <div class="chart-title" style="margin-bottom: 16px;">Распределение оценок</div>
@@ -4170,7 +4217,7 @@ html, body {
                 </div>
 
                 <!-- Row 4: Top complaints + Volume chart -->
-                <div class="analytics-grid">
+                <div class="analytics-grid volume-row">
                     <!-- Top complaints from cons field -->
                     <div class="chart-card">
                         <div class="chart-title" style="margin-bottom: 16px;">Топ жалоб из отзывов</div>
@@ -4209,7 +4256,7 @@ html, body {
                     </div>
 
                     <!-- Volume chart with stacked bars -->
-                    <div class="chart-card">
+                    <div class="chart-card context-block">
                         <div class="chart-header" style="margin-bottom: 12px;">
                             <div class="chart-title">Объём по каналам</div>
                         </div>
@@ -4815,6 +4862,18 @@ const bottomNavMap = {
     promo: 3,
     settings: 4
 };
+
+function setAnalyticsMode(mode, triggerBtn) {
+    const analyticsPage = document.getElementById('analyticsPage');
+    const modeSwitch = document.getElementById('analyticsModeSwitch');
+    if (!analyticsPage || !modeSwitch) return;
+
+    analyticsPage.classList.toggle('mode-ops', mode === 'ops');
+
+    modeSwitch.querySelectorAll('[data-mode-btn]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.modeBtn === mode);
+    });
+}
 
 function showScreen(name) {
     // Hide all screens
