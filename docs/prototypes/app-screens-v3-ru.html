@@ -1,0 +1,4811 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentIQ — App Screens Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN SYSTEM (from Chat Center) ===== */
+:root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafbfc;
+    --color-bg-tertiary: #f8f9fa;
+    --color-bg-hover: #f5f6f7;
+    --color-bg-active: #f0f7ff;
+
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5f6368;
+    --color-text-tertiary: #9aa0a6;
+
+    --color-border-light: #f5f6f7;
+    --color-border-medium: #e8eaed;
+    --color-border-dark: #dadce0;
+
+    --color-accent: #1a73e8;
+    --color-accent-light: #e8f0fe;
+    --color-urgent: #ea4335;
+    --color-success: #34a853;
+    --color-warning: #f9ab00;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 100px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+    --transition-fast: 0.15s ease;
+    --transition-medium: 0.25s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Thin scrollbars (Telegram-like) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.25);
+}
+
+/* ===== SCREEN NAVIGATOR (dev only) ===== */
+.screen-nav {
+    position: relative;
+    z-index: 9999;
+    display: flex;
+    gap: 4px;
+    background: #1a1a1a;
+    padding: 8px 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.screen-nav button {
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.screen-nav button:hover { background: rgba(255,255,255,0.1); color: white; }
+.screen-nav button.active { background: var(--color-accent); color: white; }
+
+/* ===== SCREEN CONTAINER ===== */
+.screen {
+    display: none;
+    height: calc(100vh - 38px);
+    width: 100%;
+}
+.screen.active {
+    display: flex;
+    animation: screenIn 0.18s ease-out;
+}
+@keyframes screenIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== DESKTOP STATUS BAR ===== */
+.desktop-status-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 36px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 14px;
+    background: rgba(255,255,255,0.96);
+    border-top: 1px solid var(--color-border-medium);
+    backdrop-filter: blur(6px);
+    z-index: 9000;
+}
+
+.status-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.status-bar-item strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.status-bar-item.right {
+    margin-left: auto;
+}
+
+.status-action-btn {
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.status-action-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* Fix: Ensure all scrollable content has bottom padding for proper scroll */
+.dashboard,
+.msg-list,
+.msg-list-body,
+.chat-messages,
+.settings-content {
+    padding-bottom: 64px !important;
+}
+
+/* ===== CJM ANNOTATION ===== */
+.cjm-note {
+    position: relative;
+    z-index: 9998;
+    background: #2a2a2a;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 16px;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.4;
+}
+.cjm-note:empty { display: none; }
+.cjm-note strong { color: var(--color-warning); }
+
+/* ========================================================
+   SCREEN 1: ONBOARDING — CONNECT MARKETPLACE
+   ======================================================== */
+.onboarding {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+    position: relative;
+}
+
+.onboarding-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 48px 40px;
+    text-align: center;
+}
+
+.onboarding-logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+.onboarding-logo span { color: var(--color-accent); }
+
+.onboarding-subtitle {
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    margin-bottom: 48px;
+}
+
+.onboarding-step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border-medium);
+    transition: all var(--transition-medium);
+}
+.step-dot.active { background: var(--color-accent); width: 24px; border-radius: 4px; }
+.step-dot.done { background: var(--color-success); }
+
+.onboarding-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.onboarding-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+}
+
+.marketplace-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.marketplace-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+.marketplace-btn:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+.marketplace-btn.selected { border-color: var(--color-accent); background: var(--color-accent-light); }
+.marketplace-btn.disabled { opacity: 0.5; cursor: default; }
+.marketplace-btn.disabled:hover { border-color: var(--color-border-medium); background: var(--color-bg-primary); }
+
+.mp-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+}
+.mp-icon.wb { background: #8b33ff; }
+.mp-icon.ozon { background: #005bff; font-size: 11px; }
+
+.mp-info { flex: 1; }
+.mp-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.mp-desc { font-size: 12px; color: var(--color-text-tertiary); }
+.mp-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+}
+
+/* API key input */
+.api-key-section {
+    display: none;
+    margin-top: 24px;
+    text-align: left;
+}
+.api-key-section.visible { display: block; }
+
+.api-key-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.api-key-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.api-key-field {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    transition: border-color var(--transition-fast);
+}
+.api-key-field:focus { outline: none; border-color: var(--color-accent); }
+.api-key-field::placeholder { color: var(--color-text-tertiary); }
+
+.api-key-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+}
+.api-key-hint a { color: var(--color-accent); text-decoration: none; }
+.api-key-hint a:hover { text-decoration: underline; }
+
+/* CTA button */
+.btn-cta {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 24px;
+}
+.btn-cta:hover { background: #1557b0; }
+.btn-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cta:active { transform: scale(0.98); }
+
+.btn-skip {
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 16px;
+    padding: 8px;
+    transition: color var(--transition-fast);
+}
+.btn-skip:hover { color: var(--color-text-secondary); }
+
+/* ========================================================
+   SCREEN 2: ONBOARDING — SYNCING
+   ======================================================== */
+.sync-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+}
+
+.sync-animation {
+    width: 64px;
+    height: 64px;
+    border: 3px solid var(--color-border-medium);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 32px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sync-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sync-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+.sync-progress {
+    width: 300px;
+    height: 4px;
+    background: var(--color-border-medium);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.sync-progress-bar {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    width: 65%;
+    transition: width 0.5s ease;
+    animation: progress 2s ease infinite;
+}
+@keyframes progress {
+    0% { width: 20%; }
+    50% { width: 75%; }
+    100% { width: 20%; }
+}
+
+.sync-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.sync-stat {
+    text-align: center;
+}
+.sync-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-accent);
+}
+.sync-stat-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+/* ========================================================
+   SCREEN 3: ONBOARDING — DONE
+   ======================================================== */
+.done-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+}
+
+.done-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(52, 168, 83, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.done-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--color-success);
+}
+
+.done-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.done-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+.done-preview {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.done-chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+}
+
+.done-chat-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--color-bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.done-chat-info { flex: 1; min-width: 0; }
+.done-chat-name { font-size: 13px; font-weight: 500; }
+.done-chat-preview {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.done-chat-meta {
+    text-align: right;
+    flex-shrink: 0;
+}
+.done-chat-time {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+.done-chat-badge {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 18px;
+    margin-top: 4px;
+}
+
+/* ========================================================
+   SCREEN 4+: APP SHELL (Sidebar + Content)
+   ======================================================== */
+.app-shell {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* ===== SIDEBAR — light theme, design system tokens ===== */
+.sidebar {
+    width: 220px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 12px 16px;
+    flex-shrink: 0;
+    position: relative;
+    transition: width var(--transition-fast);
+}
+
+.sidebar-logo {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--color-text-primary);
+    padding: 0 8px;
+    margin-bottom: 24px;
+    cursor: pointer;
+}
+.sidebar-logo span { color: var(--color-accent); }
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+}
+.sidebar-item:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+.sidebar-item.active {
+    background: var(--color-bg-active);
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+.sidebar-item svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-label {
+    flex: 1;
+}
+
+.sidebar-badge {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 8px;
+}
+
+/* Tooltip — hidden when labels are visible */
+.sidebar-item[data-tooltip]:hover::after {
+    display: none;
+}
+
+/* Sidebar collapse toggle */
+.sidebar-collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-tertiary);
+    transition: all var(--transition-fast);
+    position: absolute;
+    top: 20px;
+    right: 12px;
+}
+.sidebar-collapse-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+.sidebar-collapse-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Collapsed sidebar state */
+.sidebar.collapsed {
+    width: 56px;
+    padding: 16px 8px 12px;
+    align-items: center;
+}
+.sidebar.collapsed .sidebar-label { display: none; }
+.sidebar.collapsed .sidebar-item { padding: 10px; justify-content: center; gap: 0; }
+.sidebar.collapsed .sidebar-logo { font-size: 0; }
+.sidebar.collapsed .sidebar-logo::before { content: 'AQ'; font-size: 13px; font-weight: 700; color: var(--color-accent); }
+.sidebar.collapsed .sidebar-logo { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; padding: 0; }
+.sidebar.collapsed .sidebar-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; font-size: 9px; padding: 0 4px; }
+.sidebar.collapsed .sidebar-collapse-btn { position: static; margin: 0 auto 12px; }
+.sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+
+/* Content area */
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--color-bg-secondary);
+}
+
+/* ========================================================
+   DASHBOARD
+   ======================================================== */
+.dashboard {
+    padding: 32px;
+    padding-bottom: 48px;
+    max-width: 960px;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+}
+
+.dashboard-greeting {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.dashboard-date {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+
+/* Setup checklist */
+.setup-checklist {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.setup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.setup-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.setup-progress-text {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.setup-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.setup-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.setup-step:hover { border-color: var(--color-border-medium); background: var(--color-bg-tertiary); }
+.setup-step.done { opacity: 0.5; }
+
+.setup-check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-border-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+.setup-step.done .setup-check {
+    background: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.setup-check svg { width: 12px; height: 12px; color: white; display: none; }
+.setup-step.done .setup-check svg { display: block; }
+
+.setup-step-info { flex: 1; }
+.setup-step-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.setup-step-desc { font-size: 12px; color: var(--color-text-tertiary); }
+
+.setup-step-time {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-tertiary);
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+/* Metric cards */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.metric-card:hover { border-color: var(--color-border-dark); box-shadow: var(--shadow-sm); }
+
+.metric-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.metric-value.urgent { color: var(--color-urgent); }
+.metric-value.good { color: var(--color-success); }
+.metric-value.warning { color: var(--color-warning); }
+
+.metric-change {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.metric-change.positive { color: var(--color-success); }
+.metric-change.negative { color: var(--color-urgent); }
+
+/* Urgent chats section */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.section-link {
+    font-size: 13px;
+    color: var(--color-accent);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+.section-link:hover { color: #1557b0; }
+
+.urgent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.urgent-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.urgent-item:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+
+.urgent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-urgent);
+    flex-shrink: 0;
+}
+.urgent-dot.warning { background: var(--color-warning); }
+
+.urgent-info { flex: 1; min-width: 0; }
+.urgent-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.urgent-preview {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.urgent-meta { text-align: right; flex-shrink: 0; }
+.urgent-time { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.urgent-sla {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--radius-pill);
+}
+.urgent-sla.overdue { background: rgba(234,67,53,0.1); color: var(--color-urgent); }
+.urgent-sla.soon { background: rgba(249,171,0,0.1); color: var(--color-warning); }
+
+/* ========================================================
+   MESSAGES (Chat Center placeholder)
+   ======================================================== */
+.messages-placeholder {
+    display: flex;
+    height: 100%;
+}
+
+.msg-list-panel {
+    width: 340px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-list-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+
+.msg-list-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.msg-search {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+.msg-search:focus { outline: none; border-color: var(--color-border-medium); background: var(--color-bg-primary); }
+.msg-search::placeholder { color: var(--color-text-tertiary); }
+
+.msg-filters {
+    display: flex;
+    gap: 4px;
+}
+
+.msg-filter-pill {
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+.msg-filter-pill:hover { background: var(--color-bg-tertiary); }
+.msg-filter-pill.active { background: var(--color-text-primary); color: white; }
+
+.msg-list-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.msg-queue-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 4px 6px;
+}
+
+.msg-chat-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: 2px;
+}
+.msg-chat-item:hover { background: var(--color-bg-tertiary); }
+.msg-chat-item.active { background: var(--color-bg-active); }
+
+.msg-chat-icon {
+    width: 18px;
+    height: 18px;
+    background: #8b33ff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.msg-chat-content { flex: 1; min-width: 0; }
+.msg-chat-header { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.msg-chat-name { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-chat-time { font-size: 10px; color: var(--color-text-tertiary); }
+.msg-chat-meta { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-chat-preview { font-size: 12px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.msg-status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+.msg-status-dot.red { background: var(--color-urgent); }
+.msg-status-dot.yellow { background: var(--color-warning); }
+.msg-status-dot.green { background: var(--color-success); }
+
+.msg-unread-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--color-accent);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Chat window */
+.msg-chat-panel {
+    flex: 1;
+    background: #e8f2f8;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-chat-header-bar {
+    padding: 16px 24px;
+    background: white;
+    border-bottom: 1px solid var(--color-border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.msg-chat-header-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.msg-chat-header-meta { font-size: 13px; color: var(--color-text-secondary); }
+
+.msg-chat-messages {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.msg-bubble {
+    max-width: 480px;
+}
+.msg-bubble.customer { align-self: flex-start; }
+.msg-bubble.seller { align-self: flex-end; }
+
+.msg-bubble-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.msg-bubble-author { font-size: 13px; font-weight: 500; }
+.msg-bubble-time { font-size: 12px; color: var(--color-text-tertiary); }
+
+.msg-bubble-content {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.msg-bubble.seller .msg-bubble-content { background: #dcedff; }
+
+.msg-ai-suggestion {
+    background: var(--color-bg-hover);
+    border-left: 3px solid var(--color-text-primary);
+    padding: 14px 16px;
+    margin: 0 24px 16px 24px;
+    border-radius: var(--radius-md);
+}
+
+.msg-ai-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.msg-ai-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+}
+
+.msg-ai-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.msg-ai-use {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+}
+.msg-ai-use:hover { color: #1557b0; }
+
+.msg-input-bar {
+    padding: 16px 24px;
+    background: white;
+    border-top: 1px solid var(--color-border-medium);
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.msg-input-field {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--color-bg-hover);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    min-height: 44px;
+    color: var(--color-text-primary);
+}
+.msg-input-field:focus { outline: none; border-color: var(--color-text-primary); background: white; }
+
+.msg-send-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--color-text-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Context panel */
+.msg-context-panel {
+    width: 300px;
+    background: white;
+    border-left: 1px solid var(--color-border-medium);
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.msg-context-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+
+.msg-context-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.msg-context-product { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.msg-context-article { font-size: 12px; color: var(--color-text-secondary); }
+
+.msg-context-item { margin-bottom: 12px; }
+.msg-context-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.msg-context-value { font-size: 13px; }
+
+.msg-insight-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--color-bg-hover);
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+.msg-insight-badge.negative { background: #fce8e6; color: #c5221f; }
+
+/* ========================================================
+   ANALYTICS
+   ======================================================== */
+.analytics-page {
+    padding: 32px;
+    padding-bottom: 64px;
+    max-width: 960px;
+}
+
+.analytics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.analytics-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.analytics-period {
+    display: flex;
+    gap: 4px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    padding: 3px;
+}
+
+.period-btn {
+    padding: 6px 14px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+}
+.period-btn.active { background: var(--color-text-primary); color: white; }
+
+/* Quality score card */
+.quality-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 48px;
+    align-items: center;
+}
+
+.quality-gauge {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.gauge-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 8px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.gauge-circle::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    border: 8px solid transparent;
+    border-top-color: var(--color-success);
+    border-right-color: var(--color-success);
+    border-bottom-color: var(--color-success);
+    transform: rotate(-30deg);
+}
+
+.gauge-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.gauge-label {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+.gauge-verdict {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-success);
+    margin-top: 12px;
+}
+
+.quality-breakdown { flex: 1; }
+
+.quality-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.quality-bar-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.quality-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.quality-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+.quality-bar-fill.good { background: var(--color-success); }
+.quality-bar-fill.acceptable { background: #4285f4; }
+.quality-bar-fill.risky { background: var(--color-warning); }
+.quality-bar-fill.harmful { background: var(--color-urgent); }
+
+.quality-bar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Speed metrics */
+.speed-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.speed-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.speed-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.speed-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.speed-target {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+.speed-target span { font-weight: 500; }
+.speed-target.met { color: var(--color-success); }
+.speed-target.missed { color: var(--color-urgent); }
+
+/* Chart placeholder */
+.chart-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.chart-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chart-area {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding-top: 20px;
+}
+
+.chart-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-bar {
+    width: 100%;
+    max-width: 32px;
+    border-radius: 4px 4px 0 0;
+    transition: all var(--transition-medium);
+}
+.chart-bar:hover { opacity: 0.8; }
+
+.chart-bar-label {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+
+/* KPI strip */
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.kpi-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kpi-unit {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+
+.kpi-trend {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+.kpi-trend.up { color: var(--color-success); }
+.kpi-trend.down { color: var(--color-urgent); }
+.kpi-trend.neutral { color: var(--color-text-tertiary); }
+
+/* Analytics two-column grid */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* Rating distribution */
+.rating-dist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-stars {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 18px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.rating-star-icon {
+    color: #fbbc04;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.rating-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: #fbbc04;
+}
+
+.rating-count {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Conversion funnel */
+.funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.funnel-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.funnel-bar-wrap {
+    flex: 1;
+}
+
+.funnel-bar-track {
+    height: 24px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.funnel-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent);
+    transition: width 0.5s ease;
+}
+
+.funnel-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.funnel-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: 56px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.funnel-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 92px;
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    gap: 4px;
+}
+
+.funnel-arrow svg {
+    width: 10px;
+    height: 10px;
+}
+
+.funnel-conversion {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+/* Response time distribution */
+.time-dist {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 60px;
+    margin-top: 12px;
+}
+
+.time-dist-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    position: relative;
+}
+
+.time-dist-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.time-dist-label {
+    font-size: 9px;
+    color: var(--color-text-tertiary);
+}
+
+/* SLA compliance bar */
+.sla-bar-wrap {
+    margin-top: 16px;
+}
+
+.sla-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.sla-bar-track {
+    height: 6px;
+    background: var(--color-bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.sla-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+/* Top complaints */
+.complaint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.complaint-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.complaint-rank {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    width: 20px;
+    flex-shrink: 0;
+}
+
+.complaint-text {
+    font-size: 13px;
+    color: var(--color-text-primary);
+    flex: 1;
+}
+
+.complaint-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+/* Volume stacked chart */
+.volume-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.stacked-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.stacked-bar {
+    width: 100%;
+    max-width: 28px;
+    border-radius: 0;
+}
+
+.stacked-bar:first-child {
+    border-radius: 3px 3px 0 0;
+}
+
+.stacked-bar:last-of-type {
+    border-radius: 0 0 0 0;
+}
+
+/* ========================================================
+   SETTINGS
+   ======================================================== */
+.settings-page {
+    display: flex;
+    height: 100%;
+}
+
+.settings-nav {
+    width: 220px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    padding: 24px 12px;
+}
+
+.settings-nav-title {
+    font-size: 17px;
+    font-weight: 600;
+    padding: 0 8px;
+    margin-bottom: 20px;
+}
+
+.settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    width: 100%;
+    background: none;
+    border: none;
+    font-family: inherit;
+    text-align: left;
+}
+.settings-nav-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+.settings-nav-item.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 500; }
+
+.settings-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.settings-content {
+    flex: 1;
+    padding: 32px;
+    padding-bottom: 64px;
+    overflow-y: auto;
+}
+
+.settings-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.settings-section-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Connection cards */
+.connection-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.connection-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+}
+.connection-icon.wb { background: #8b33ff; }
+.connection-icon.ozon { background: #005bff; font-size: 12px; }
+
+.connection-info { flex: 1; }
+.connection-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.connection-status { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.connection-status.connected { color: var(--color-success); }
+.connection-status.disconnected { color: var(--color-text-tertiary); }
+.connection-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.connection-status.connected .connection-status-dot { background: var(--color-success); }
+.connection-status.disconnected .connection-status-dot { background: var(--color-border-dark); }
+
+.connection-action {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border-medium);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+.connection-action:hover { border-color: var(--color-border-dark); background: var(--color-bg-tertiary); }
+.connection-action.primary { background: var(--color-accent); color: white; border-color: var(--color-accent); }
+.connection-action.primary:hover { background: #1557b0; }
+
+/* Promo Codes Settings */
+.promo-cabinet-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+}
+.promo-cabinet-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    background: #8b33ff;
+    flex-shrink: 0;
+}
+.promo-cabinet-info { flex: 1; }
+.promo-cabinet-name { font-size: 13px; font-weight: 600; }
+.promo-cabinet-mp { font-size: 11px; color: var(--color-text-tertiary); }
+.promo-cabinet-arrow {
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+}
+
+.promo-desc-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.promo-desc-row .settings-section-desc { margin-bottom: 0; }
+.promo-help-link {
+    color: var(--color-accent);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+}
+.promo-help-link:hover { text-decoration: underline; }
+
+.promo-count {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.promo-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 12px;
+}
+.promo-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.promo-code-name {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 1px;
+}
+.promo-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+}
+.promo-badge.active { background: rgba(52,168,83,0.1); color: var(--color-success); }
+.promo-badge.expired { background: var(--color-bg-tertiary); color: var(--color-text-tertiary); }
+
+.promo-meta {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+}
+
+.promo-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.promo-channel {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-text-secondary);
+    background: var(--color-bg-primary);
+}
+.promo-channel:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    cursor: pointer;
+}
+.promo-channel.on {
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+.promo-card:hover {
+    border-color: var(--color-border-dark);
+    box-shadow: var(--shadow-sm);
+}
+.promo-card.expanded {
+    border-color: var(--color-accent);
+}
+
+.promo-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border-light);
+}
+.promo-sends {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+.promo-actions {
+    display: flex;
+    gap: 12px;
+}
+.promo-action-btn {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    background: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+.promo-action-btn:hover { color: var(--color-text-primary); }
+.promo-action-btn.danger:hover { color: var(--color-urgent); }
+
+.promo-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px;
+    background: none;
+    border: 2px dashed var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: 32px;
+}
+.promo-add-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+
+.promo-divider {
+    height: 1px;
+    background: var(--color-border-medium);
+    margin: 32px 0 24px;
+}
+
+/* Promo help slide-out panel */
+.promo-help-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 360px;
+    height: 100vh;
+    background: var(--color-bg-primary);
+    border-left: 1px solid var(--color-border-medium);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 24px;
+    animation: slideInRight 0.2s ease;
+}
+.promo-help-panel.open { display: block; }
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+.promo-help-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-tertiary);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+.promo-help-close:hover { background: var(--color-bg-hover); }
+.promo-help-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-right: 32px;
+}
+.promo-help-section {
+    margin-bottom: 20px;
+}
+.promo-help-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.promo-help-text {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+.promo-help-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+.promo-help-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.promo-help-table td:first-child {
+    color: var(--color-text-tertiary);
+    width: 50%;
+}
+.promo-help-warning {
+    background: #fff8e1;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+.promo-help-link-ext {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-accent);
+    font-size: 13px;
+    text-decoration: none;
+    padding: 10px 0;
+    border-top: 1px solid var(--color-border-light);
+}
+.promo-help-link-ext:hover { text-decoration: underline; }
+
+/* AI Settings */
+.ai-setting-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.ai-setting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ai-setting-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Toggle switch */
+.toggle {
+    width: 42px;
+    height: 24px;
+    background: var(--color-border-dark);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.toggle.on { background: var(--color-accent); }
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: left var(--transition-fast);
+}
+.toggle.on::after { left: 20px; }
+
+.ai-setting-desc {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+}
+
+/* Tone selector */
+.tone-options {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tone-option {
+    flex: 1;
+    padding: 10px;
+    background: var(--color-bg-secondary);
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+.tone-option:hover { border-color: var(--color-border-dark); }
+.tone-option.active { border-color: var(--color-accent); background: var(--color-accent-light); }
+
+.tone-emoji { font-size: 20px; margin-bottom: 4px; }
+.tone-name { font-size: 12px; font-weight: 500; }
+
+/* Profile */
+.profile-form {
+    max-width: 400px;
+}
+
+.form-field {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+}
+.form-input:focus { outline: none; border-color: var(--color-accent); }
+
+.form-save {
+    padding: 10px 24px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+}
+.form-save:hover { background: #1557b0; }
+
+/* ========================================================
+   DEMO BANNER (top bar when viewing demo data)
+   ======================================================== */
+.demo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #fffbeb;
+    border-bottom: 1px solid var(--color-border-medium);
+    font-size: 13px;
+    color: #92400e;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.demo-banner-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.demo-banner-dot {
+    width: 6px;
+    height: 6px;
+    background: #f59e0b;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.demo-banner-btn {
+    padding: 0;
+    background: none;
+    color: var(--color-accent);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+.demo-banner-btn:hover { color: #1557b0; text-decoration: underline; }
+
+@media (max-width: 768px) {
+    .demo-banner {
+        font-size: 12px;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    .demo-banner-btn {
+        font-size: 12px;
+    }
+}
+
+/* ========================================================
+   BOTTOM NAVIGATION BAR (mobile only)
+   ======================================================== */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--color-bg-primary);
+    border-top: 1px solid var(--color-border-medium);
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    transition: color var(--transition-fast);
+    position: relative;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.bottom-nav-item span {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.bottom-nav-item.active {
+    color: var(--color-accent);
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile back button for Messages chat (hidden on desktop) */
+.msg-chat-back-btn {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    flex-shrink: 0;
+    margin-left: -12px;
+    margin-right: 4px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.msg-chat-back-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ========================================================
+   MOBILE STYLES (max-width: 768px)
+   ======================================================== */
+@media (max-width: 768px) {
+
+    /* --- General --- */
+    body {
+        overflow: auto;
+        height: auto;
+    }
+
+    /* Screen nav (dev): horizontal scroll on mobile */
+    .screen-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding: 6px 8px;
+    }
+
+    .screen-nav button {
+        padding: 4px 8px;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+
+    .desktop-status-bar {
+        display: none !important;
+    }
+
+    /* CJM note on mobile */
+    .cjm-note {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    /* Screens should fill remaining space */
+    .screen {
+        height: auto;
+        min-height: calc(100vh - 34px);
+    }
+
+    /* --- Screen 1: Onboarding --- */
+    .onboarding-card {
+        padding: 24px 16px;
+        max-width: 100%;
+    }
+
+    .onboarding-logo {
+        font-size: 22px;
+    }
+
+    .onboarding-subtitle {
+        font-size: 12px;
+        margin-bottom: 32px;
+    }
+
+    .onboarding-title {
+        font-size: 20px;
+    }
+
+    .onboarding-desc {
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+
+    .onboarding-desc br {
+        display: none;
+    }
+
+    .marketplace-btn {
+        padding: 14px 16px;
+    }
+
+    .mp-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .mp-name {
+        font-size: 14px;
+    }
+
+    .api-key-field {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .btn-cta {
+        font-size: 14px;
+        padding: 14px 20px;
+    }
+
+    /* --- Screen 2: Syncing --- */
+    .sync-screen {
+        padding: 24px 16px;
+    }
+
+    .sync-progress {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .sync-title {
+        font-size: 18px;
+    }
+
+    /* --- Screen 3: Done --- */
+    .done-screen {
+        padding: 24px 16px;
+    }
+
+    .done-preview {
+        max-width: 100%;
+    }
+
+    .done-title {
+        font-size: 20px;
+    }
+
+    .done-chat-item {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .done-chat-name {
+        font-size: 12px;
+    }
+
+    .done-chat-preview {
+        font-size: 11px;
+    }
+
+    /* --- App Shell: hide sidebar, show bottom nav --- */
+    .app-shell {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    .bottom-nav {
+        display: flex;
+    }
+
+    .app-content {
+        padding-bottom: 72px; /* space for bottom nav */
+    }
+
+    /* --- Screen 4: Dashboard --- */
+    .dashboard {
+        padding: 16px;
+    }
+
+    .dashboard-greeting {
+        font-size: 20px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 20px;
+    }
+
+    .setup-checklist {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .setup-step {
+        padding: 10px 12px;
+    }
+
+    .setup-step-time {
+        display: none;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .metric-card {
+        padding: 14px;
+    }
+
+    .metric-value {
+        font-size: 24px;
+    }
+
+    .metric-label {
+        font-size: 11px;
+    }
+
+    .urgent-item {
+        padding: 10px 12px;
+    }
+
+    .urgent-name {
+        font-size: 12px;
+    }
+
+    .urgent-preview {
+        font-size: 11px;
+    }
+
+    .urgent-time {
+        font-size: 10px;
+    }
+
+    /* --- Screen 5: Messages --- */
+    .messages-placeholder {
+        flex-direction: column;
+        height: calc(100vh - 56px); /* minus bottom nav */
+        position: relative;
+    }
+
+    /* By default, show list panel fullscreen */
+    .msg-list-panel {
+        width: 100%;
+        height: 100%;
+        flex-shrink: 0;
+    }
+
+    .msg-chat-panel {
+        display: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+    }
+
+    .msg-context-panel {
+        display: none !important;
+    }
+
+    /* When a chat is selected (mobile-chat-open class on screen) */
+    #screen-messages.mobile-chat-open .msg-list-panel {
+        display: none;
+    }
+
+    #screen-messages.mobile-chat-open .msg-chat-panel {
+        display: flex;
+    }
+
+    /* Show back button on mobile */
+    .msg-chat-back-btn {
+        display: flex;
+    }
+
+    /* Chat list adjustments */
+    .msg-list-header {
+        padding: 12px 16px;
+    }
+
+    .msg-list-title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .msg-search {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .msg-filters {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .msg-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .msg-filter-pill {
+        flex-shrink: 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 8px 14px;
+    }
+
+    .msg-list-body {
+        padding: 8px;
+    }
+
+    .msg-chat-item {
+        padding: 10px 8px;
+    }
+
+    /* Chat window adjustments on mobile */
+    .msg-chat-header-bar {
+        padding: 8px 12px;
+    }
+
+    .msg-chat-header-info h3 {
+        font-size: 15px;
+    }
+
+    .msg-chat-header-meta {
+        font-size: 12px;
+    }
+
+    .msg-chat-messages {
+        padding: 12px;
+        gap: 14px;
+    }
+
+    .msg-bubble {
+        max-width: 90%;
+    }
+
+    .msg-bubble-content {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .msg-ai-suggestion {
+        margin: 0 12px 12px 12px;
+        padding: 12px 14px;
+    }
+
+    .msg-input-bar {
+        padding: 8px 12px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .msg-input-field {
+        font-size: 16px; /* prevent iOS zoom */
+        min-height: 44px;
+    }
+
+    /* Make chat items touch-friendly */
+    .msg-chat-item {
+        min-height: 44px;
+    }
+
+    /* --- Screen 6: Analytics --- */
+    .analytics-page {
+        padding: 16px;
+        padding-bottom: 80px;
+    }
+
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-title {
+        font-size: 20px;
+    }
+
+    .analytics-period {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        scrollbar-width: none;
+    }
+
+    .analytics-period::-webkit-scrollbar {
+        display: none;
+    }
+
+    .period-btn {
+        min-height: 44px;
+        padding: 8px 14px;
+        flex-shrink: 0;
+    }
+
+    .kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .kpi-card {
+        padding: 14px;
+    }
+
+    .kpi-value {
+        font-size: 22px;
+    }
+
+    .kpi-unit {
+        font-size: 11px;
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .quality-card {
+        flex-direction: column;
+        gap: 24px;
+        padding: 20px;
+        margin-bottom: 0;
+    }
+
+    .gauge-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .gauge-value {
+        font-size: 26px;
+    }
+
+    .gauge-label {
+        font-size: 10px;
+    }
+
+    .quality-breakdown {
+        width: 100%;
+    }
+
+    .speed-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .speed-card {
+        padding: 14px;
+    }
+
+    .speed-value {
+        font-size: 18px !important;
+    }
+
+    .chart-card {
+        padding: 16px;
+    }
+
+    .chart-area {
+        height: 140px;
+    }
+
+    .funnel-label {
+        width: 64px;
+        font-size: 11px;
+    }
+
+    .funnel-value {
+        width: 48px;
+        font-size: 11px;
+    }
+
+    .funnel-arrow {
+        padding-left: 76px;
+    }
+
+    /* Revenue impact grid mobile */
+    .chart-card [style*="grid-template-columns: repeat(3"] {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    /* --- Screen 7: Settings --- */
+    .settings-page {
+        flex-direction: column;
+        padding-bottom: 72px; /* space for bottom nav */
+    }
+
+    .settings-nav {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border-medium);
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .settings-nav-title {
+        display: none;
+    }
+
+    .settings-nav-item {
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 16px;
+        font-size: 10px;
+        text-align: center;
+        flex-shrink: 0;
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .settings-nav-item svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .settings-content {
+        padding: 16px;
+    }
+
+    .settings-section-title {
+        font-size: 16px;
+    }
+
+    .connection-card {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .connection-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .connection-action {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .tone-options {
+        flex-direction: column;
+    }
+
+    .tone-option {
+        padding: 12px;
+        min-height: 44px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+    }
+
+    .tone-emoji {
+        margin-bottom: 0;
+    }
+
+    .ai-setting-card {
+        padding: 16px;
+    }
+
+    .toggle {
+        min-width: 44px;
+        min-height: 28px;
+    }
+
+    .profile-form {
+        max-width: 100%;
+    }
+
+    .form-input {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .form-save {
+        width: 100%;
+        min-height: 44px;
+    }
+}
+
+/* ========================================================
+   SMALL MOBILE (max-width: 400px)
+   ======================================================== */
+@media (max-width: 400px) {
+
+    .onboarding-card {
+        padding: 20px 12px;
+    }
+
+    .metrics-grid {
+        gap: 8px;
+    }
+
+    .metric-card {
+        padding: 12px;
+    }
+
+    .metric-value {
+        font-size: 22px;
+    }
+
+    .connection-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .connection-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .bottom-nav-item span {
+        font-size: 9px;
+    }
+
+    .bottom-nav-item {
+        padding: 6px 8px;
+    }
+}
+
+/* ========================================================
+   TABLET STYLES (769px - 1024px)
+   ======================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    /* Sidebar — force collapse on tablet */
+    .sidebar { width: 56px; padding: 16px 8px 12px; align-items: center; }
+    .sidebar-label { display: none; }
+    .sidebar-item { padding: 10px; justify-content: center; gap: 0; position: relative; }
+    .sidebar-logo { font-size: 0 !important; width: 32px !important; height: 32px !important; display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 20px !important; padding: 0 !important; }
+    .sidebar-logo::before { content: 'AQ'; font-size: 13px; font-weight: 700; color: var(--color-accent); }
+    .sidebar-collapse-btn { display: none !important; }
+    .sidebar-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; font-size: 9px; padding: 0 4px; }
+
+    /* Bottom nav stays hidden on tablet */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* Dashboard: 2 columns for metrics */
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard {
+        padding: 24px;
+    }
+
+    /* Messages: hide context panel on tablet */
+    .msg-context-panel {
+        display: none;
+    }
+
+    .msg-list-panel {
+        width: 280px;
+    }
+
+    /* Analytics */
+    .analytics-page {
+        padding: 24px;
+    }
+
+    .kpi-strip {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quality-card {
+        gap: 32px;
+        padding: 24px;
+    }
+
+    .speed-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Settings: nav stays as left sidebar but narrower */
+    .settings-nav {
+        width: 180px;
+        padding: 20px 8px;
+    }
+
+    .settings-content {
+        padding: 24px;
+    }
+
+    .desktop-status-bar {
+        display: none !important;
+    }
+}
+
+/* ========================================================
+   NO HORIZONTAL OVERFLOW (all sizes)
+   ======================================================== */
+html, body {
+    overflow-x: hidden;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN NAVIGATOR ===== -->
+<div class="screen-nav">
+    <button onclick="showScreen('onboarding')" id="nav-onboarding">1. Подключение</button>
+    <button onclick="showScreen('syncing')" id="nav-syncing">2. Загрузка</button>
+    <button onclick="showScreen('dashboard-empty')" id="nav-dashboard-empty">3. Пустой кабинет</button>
+    <button onclick="showScreen('dashboard')" id="nav-dashboard">4. Главная</button>
+    <button onclick="showScreen('messages')" id="nav-messages">5. Сообщения</button>
+    <button onclick="showScreen('analytics')" id="nav-analytics">6. Аналитика</button>
+    <button onclick="showScreen('promo')" id="nav-promo">7. Промокоды</button>
+    <button onclick="showScreen('settings')" id="nav-settings">8. Настройки</button>
+</div>
+
+<!-- CJM annotation -->
+<div class="cjm-note" id="cjm-note"></div>
+
+<!-- ========================================================
+     SCREEN 1: ONBOARDING — CONNECT MARKETPLACE
+     ======================================================== -->
+<div class="screen onboarding" id="screen-onboarding">
+    <div class="onboarding-card">
+        <div class="onboarding-logo">AGENT<span>IQ</span></div>
+        <div class="onboarding-subtitle">AI-платформа для маркетплейсов</div>
+
+        <div class="onboarding-step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <div class="onboarding-title">Подключите маркетплейс</div>
+        <div class="onboarding-desc">
+            Все сообщения покупателей в одном месте.<br>Видно что срочно, ничего не теряется.
+        </div>
+
+        <div class="marketplace-buttons">
+            <div class="marketplace-btn selected" onclick="document.querySelector('.api-key-section').classList.add('visible')">
+                <div class="mp-icon wb">W</div>
+                <div class="mp-info">
+                    <div class="mp-name">Wildberries</div>
+                    <div class="mp-desc">Чаты, отзывы, вопросы</div>
+                </div>
+            </div>
+            <div class="marketplace-btn disabled">
+                <div class="mp-icon ozon">Ozon</div>
+                <div class="mp-info">
+                    <div class="mp-name">Ozon</div>
+                    <div class="mp-desc">Чаты, отзывы, вопросы</div>
+                </div>
+                <div class="mp-badge">Скоро</div>
+            </div>
+        </div>
+
+        <div class="api-key-section visible">
+            <div class="api-key-label">API-ключ Wildberries</div>
+            <div class="api-key-input-row">
+                <input type="text" class="api-key-field" placeholder="Вставьте ключ из ЛК продавца" value="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            <div class="api-key-hint">
+                Создайте ключ в <a href="#">Настройки &rarr; Доступ к API</a> с правами на чаты
+            </div>
+        </div>
+
+        <button class="btn-cta" onclick="showScreen('syncing')">Подключить и загрузить чаты</button>
+        <button class="btn-skip" onclick="showScreen('dashboard-empty')">Пропустить, посмотрю сначала</button>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 2: SYNCING
+     ======================================================== -->
+<div class="screen sync-screen" id="screen-syncing">
+    <div class="sync-animation"></div>
+    <div class="sync-title">Подключаемся к Wildberries</div>
+    <div class="sync-desc">Проверяем API-ключ и загружаем первые чаты</div>
+    <div class="sync-progress">
+        <div class="sync-progress-bar"></div>
+    </div>
+    <div class="sync-stats">
+        <div class="sync-stat">
+            <div class="sync-stat-value" style="font-size: 16px; color: var(--color-text-secondary);">Загрузка 50 из ~200 чатов</div>
+            <div class="sync-stat-label">остальные загрузятся в фоне</div>
+        </div>
+    </div>
+    <button class="btn-cta" style="max-width: 300px; margin-top: 24px;" onclick="showScreen('messages')">
+        Перейти к сообщениям
+    </button>
+    <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 8px;">Или подождите полной загрузки</div>
+</div>
+
+<!-- ========================================================
+     SCREEN 3: DASHBOARD — DEMO MODE (skipped onboarding)
+     ======================================================== -->
+<div class="screen" id="screen-dashboard-empty">
+    <div class="app-shell" style="flex-direction: column;">
+        <!-- Demo banner -->
+        <div class="demo-banner">
+            <div class="demo-banner-text">
+                <div class="demo-banner-dot"></div>
+                Демо-данные. Подключите Wildberries, чтобы увидеть свои чаты
+            </div>
+            <button class="demo-banner-btn" onclick="showScreen('onboarding')">Подключить</button>
+        </div>
+        <div style="display: flex; flex: 1; overflow: hidden;">
+            <nav class="sidebar">
+                <div class="sidebar-logo">AGENT<span>IQ</span></div>
+                <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                </button>
+                <div class="sidebar-nav">
+                    <button class="sidebar-item active" onclick="showScreen('dashboard-empty')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span class="sidebar-label">Главная</span>
+                    </button>
+                    <button class="sidebar-item" onclick="showScreen('messages')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="sidebar-label">Сообщения</span>
+                        <div class="sidebar-badge">3</div>
+                    </button>
+                    <button class="sidebar-item" onclick="showScreen('analytics')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        <span class="sidebar-label">Аналитика</span>
+                    </button>
+                </div>
+                <div class="sidebar-bottom">
+                    <button class="sidebar-item" onclick="showScreen('settings')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <span class="sidebar-label">Настройки</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="app-content">
+                <div class="dashboard">
+                    <div class="dashboard-header">
+                        <div class="dashboard-greeting">Добро пожаловать в AgentIQ</div>
+                        <div class="dashboard-date">Вторник, 11 февраля 2026</div>
+                    </div>
+
+                    <!-- Metrics (demo) -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Упущенная выручка (30 дн)</div>
+                            <div class="metric-value urgent">42 000 ₽</div>
+                            <div class="metric-change negative">+8% к прошлому периоду</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Потенциал возврата (30 дн)</div>
+                            <div class="metric-value good">28 000 ₽</div>
+                            <div class="metric-change positive">При внедрении авто-сценариев</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Прогноз рейтинга (14 дн)</div>
+                            <div class="metric-value warning">4.4 / 5</div>
+                            <div class="metric-change positive">+0.1 при закрытии срочных</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Прогноз роста выручки</div>
+                            <div class="metric-value good">+6.8%</div>
+                            <div class="metric-change positive">Горизонт: 30 дней</div>
+                        </div>
+                    </div>
+
+                    <!-- Urgent chats (demo) -->
+                    <div class="section-header">
+                        <div class="section-title">Требуют внимания</div>
+                    </div>
+                    <div class="urgent-list">
+                        <div class="urgent-item">
+                            <div class="urgent-dot"></div>
+                            <div class="urgent-info">
+                                <div class="urgent-name">Мария Козлова</div>
+                                <div class="urgent-preview">Товар пришёл с браком, кнопка не работает</div>
+                            </div>
+                            <div class="urgent-meta">
+                                <div class="urgent-time">12 мин назад</div>
+                                <div class="urgent-sla overdue">SLA 23м</div>
+                            </div>
+                        </div>
+                        <div class="urgent-item">
+                            <div class="urgent-dot"></div>
+                            <div class="urgent-info">
+                                <div class="urgent-name">Алексей Петров</div>
+                                <div class="urgent-preview">Прислали не тот размер, как оформить возврат?</div>
+                            </div>
+                            <div class="urgent-meta">
+                                <div class="urgent-time">28 мин назад</div>
+                                <div class="urgent-sla overdue">SLA 2м</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" onclick="showScreen('dashboard-empty')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 4: DASHBOARD
+     ======================================================== -->
+<div class="screen" id="screen-dashboard">
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item active" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-greeting">Привет, Иван</div>
+                    <div class="dashboard-date">Вторник, 11 февраля 2026</div>
+                </div>
+
+                <!-- Setup checklist (shown until all steps done) -->
+                <div class="setup-checklist">
+                    <div class="setup-header">
+                        <div class="setup-title">Настройте AgentIQ</div>
+                        <div class="setup-progress-text">1 из 3</div>
+                    </div>
+                    <div class="setup-steps">
+                        <div class="setup-step done">
+                            <div class="setup-check">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Подключить Wildberries</div>
+                                <div class="setup-step-desc">API-ключ добавлен, 24 чата загружены</div>
+                            </div>
+                        </div>
+                        <div class="setup-step" onclick="showScreen('settings')">
+                            <div class="setup-check"></div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Настроить AI-ассистента</div>
+                                <div class="setup-step-desc">Выберите тон ответов и правила авто-ответов</div>
+                            </div>
+                            <div class="setup-step-time">2 мин</div>
+                        </div>
+                        <div class="setup-step">
+                            <div class="setup-check"></div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Ответьте на первый чат</div>
+                                <div class="setup-step-desc">Используйте AI-подсказку или напишите свой ответ</div>
+                            </div>
+                            <div class="setup-step-time">1 мин</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Упущенная выручка (30 дн)</div>
+                        <div class="metric-value urgent">42 000 ₽</div>
+                        <div class="metric-change negative">+8% к прошлому периоду</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Потенциал возврата (30 дн)</div>
+                        <div class="metric-value good">28 000 ₽</div>
+                        <div class="metric-change positive">При внедрении авто-сценариев</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Прогноз рейтинга (14 дн)</div>
+                        <div class="metric-value warning">4.4 / 5</div>
+                        <div class="metric-change positive">+0.1 при закрытии срочных</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Прогноз роста выручки</div>
+                        <div class="metric-value good">+6.8%</div>
+                        <div class="metric-change positive">Горизонт: 30 дней</div>
+                    </div>
+                </div>
+
+                <!-- Urgent chats -->
+                <div class="section-header">
+                    <div class="section-title">Требуют внимания</div>
+                    <div class="section-link" onclick="showScreen('messages')">Все сообщения &rarr;</div>
+                </div>
+                <div class="urgent-list">
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Мария Козлова</div>
+                            <div class="urgent-preview">Товар пришёл с браком, кнопка не работает, требую замену</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">12 мин назад</div>
+                            <div class="urgent-sla overdue">SLA 23м</div>
+                        </div>
+                    </div>
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Алексей Петров</div>
+                            <div class="urgent-preview">Прислали не тот размер, как оформить возврат?</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">28 мин назад</div>
+                            <div class="urgent-sla overdue">SLA 2м</div>
+                        </div>
+                    </div>
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot warning"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Екатерина Новикова</div>
+                            <div class="urgent-preview">Подскажите, какой размер выбрать при росте 170?</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">1ч назад</div>
+                            <div class="urgent-sla soon">SLA 48м</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 5: MESSAGES (Chat Center)
+     ======================================================== -->
+<div class="screen" id="screen-messages">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item active" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="messages-placeholder">
+            <!-- Chat list -->
+            <div class="msg-list-panel">
+                <div class="msg-list-header">
+                    <div class="msg-list-title">Сообщения</div>
+                    <input type="text" class="msg-search" placeholder="Поиск чатов...">
+                    <div class="msg-filters">
+                        <button class="msg-filter-pill active">Все</button>
+                        <button class="msg-filter-pill">Срочно</button>
+                        <button class="msg-filter-pill">Без ответа</button>
+                        <button class="msg-filter-pill">Обработаны</button>
+                    </div>
+                </div>
+                <div class="msg-list-body">
+                    <div class="msg-queue-label"><span class="msg-status-dot red"></span> В работе</div>
+                    <div class="msg-chat-item active">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Мария Козлова</div>
+                                <div class="msg-unread-badge">1</div>
+                                <div class="msg-chat-time">12:47</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot red"></span>Чат &middot; Термокружка с датчиком</div>
+                            <div class="msg-chat-preview">Товар пришёл с браком, кнопка не работает</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Алексей Петров</div>
+                                <div class="msg-unread-badge">2</div>
+                                <div class="msg-chat-time">12:19</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot red"></span>Чат &middot; Кроссовки Nike Air</div>
+                            <div class="msg-chat-preview">Прислали не тот размер, нужен возврат</div>
+                        </div>
+                    </div>
+
+                    <div class="msg-queue-label" style="margin-top: 16px;"><span class="msg-status-dot yellow"></span> Ожидают ответа</div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Екатерина Новикова</div>
+                                <div class="msg-unread-badge">1</div>
+                                <div class="msg-chat-time">11:48</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot yellow"></span>Чат &middot; Платье летнее</div>
+                            <div class="msg-chat-preview">Подскажите размер при росте 170?</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Дмитрий Соколов</div>
+                                <div class="msg-chat-time">10:32</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot yellow"></span>Чат &middot; Рюкзак городской</div>
+                            <div class="msg-chat-preview">Есть ли этот рюкзак в чёрном цвете?</div>
+                        </div>
+                    </div>
+
+                    <div class="msg-queue-label" style="margin-top: 16px;"><span class="msg-status-dot green"></span> Все сообщения</div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Анна Смирнова</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot green"></span>Чат &middot; Наушники BT-500</div>
+                            <div class="msg-chat-preview">Спасибо за оперативный ответ!</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item" style="opacity: 0.7;">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Ольга Федорова</div>
+                                <div style="font-size: 9px; padding: 2px 6px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-weight: 500;">авто</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot" style="background: var(--color-text-tertiary);"></span>Чат &middot; Косметичка дорожная</div>
+                            <div class="msg-chat-preview" style="color: var(--color-text-tertiary);">AI: Благодарим за отзыв! Рады, что вам понравилось...</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item" style="opacity: 0.7;">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Игорь Волков</div>
+                                <div style="font-size: 9px; padding: 2px 6px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-weight: 500;">авто</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot" style="background: var(--color-text-tertiary);"></span>Чат &middot; Рюкзак городской 25л</div>
+                            <div class="msg-chat-preview" style="color: var(--color-text-tertiary);">AI: Спасибо за высокую оценку! Приятного использования...</div>
+                        </div>
+                    </div>
+
+                    <!-- Sync banner (Apple Mail style) — bottom of list -->
+                    <div class="sync-banner" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: var(--color-text-tertiary); border-top: 1px solid var(--color-border-light);">
+                        <div style="width: 12px; height: 12px; border: 1.5px solid var(--color-border-medium); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;"></div>
+                        <span>Загрузка... 50 из ~200 чатов</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat window -->
+            <div class="msg-chat-panel">
+                <div class="msg-chat-header-bar">
+                    <button class="msg-chat-back-btn" onclick="document.getElementById('screen-messages').classList.remove('mobile-chat-open')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <div class="msg-chat-header-info">
+                        <h3>Мария Козлова</h3>
+                        <div class="msg-chat-header-meta">Wildberries &middot; Арт. 123456 &middot; Термокружка с датчиком температуры</div>
+                    </div>
+                </div>
+
+                <div class="msg-chat-messages">
+                    <div class="msg-bubble customer">
+                        <div class="msg-bubble-header">
+                            <div class="msg-bubble-author">Мария Козлова</div>
+                            <div class="msg-bubble-time">12:47</div>
+                        </div>
+                        <div class="msg-bubble-content">
+                            Здравствуйте! Получила термокружку, но кнопка включения дисплея не работает. Нажимаю - ничего не происходит. Товар пришёл с браком. Что делать?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="msg-ai-suggestion">
+                    <div class="msg-ai-label">Рекомендация AI</div>
+                    <div class="msg-ai-text">
+                        Мария, добрый день! Приносим извинения за неудобства. Попробуйте, пожалуйста, зажать кнопку на 3 секунды - у данной модели долгое нажатие для активации. Если не поможет, оформите возврат через Личный кабинет WB как "товар с браком" - мы всё компенсируем.
+                    </div>
+                    <div class="msg-ai-actions">
+                        <button class="msg-ai-use">Использовать ответ</button>
+                    </div>
+                </div>
+
+                <div class="msg-input-bar">
+                    <textarea class="msg-input-field" placeholder="Написать ответ..." rows="1"></textarea>
+                    <button class="msg-send-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Context panel -->
+            <div class="msg-context-panel">
+                <div class="msg-context-section">
+                    <div class="msg-context-title">Товар</div>
+                    <div class="msg-context-product">Термокружка с датчиком температуры 450мл</div>
+                    <div class="msg-context-article">Арт. 123456</div>
+                </div>
+                <div class="msg-context-section">
+                    <div class="msg-context-title">AI Анализ</div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Интент</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge">defect_not_working</span></div>
+                    </div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Тональность</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge negative">Негативная</span></div>
+                    </div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Приоритет</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge negative">Срочный</span></div>
+                    </div>
+                </div>
+                <div class="msg-context-section">
+                    <div class="msg-context-title">Действия</div>
+                    <div class="msg-context-item">
+                        <a href="#" style="color: var(--color-accent); text-decoration: none; font-size: 13px;">Открыть чат на WB</a>
+                    </div>
+                    <div class="msg-context-item">
+                        <a href="#" style="color: var(--color-accent); text-decoration: none; font-size: 13px;">Карточка товара</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 6: ANALYTICS
+     ======================================================== -->
+<div class="screen" id="screen-analytics">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item active" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="analytics-page">
+                <div class="analytics-header">
+                    <div class="analytics-title">Аналитика</div>
+                    <div class="analytics-period">
+                        <button class="period-btn">7 дней</button>
+                        <button class="period-btn active">30 дней</button>
+                        <button class="period-btn">90 дней</button>
+                    </div>
+                </div>
+
+                <!-- KPI Strip — 4 key numbers -->
+                <div class="kpi-strip">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Отвечено</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: var(--color-success);">96%</div>
+                        </div>
+                        <div class="kpi-trend up">156 из 162</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Медиана ответа</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value">2ч 10м</div>
+                        </div>
+                        <div class="kpi-trend up">-18% vs прошлый месяц</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Средний рейтинг</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: #fbbc04;">4.3</div>
+                            <div class="kpi-unit">/ 5</div>
+                        </div>
+                        <div class="kpi-trend up">+0.2 vs прошлый месяц</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Без ответа</div>
+                        <div class="kpi-value-row">
+                            <div class="kpi-value" style="color: var(--color-urgent);">6</div>
+                            <div class="kpi-unit">отзывов</div>
+                        </div>
+                        <div class="kpi-trend neutral">+ 3 вопроса</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Индекс качества ответов + Speed -->
+                <div class="analytics-grid">
+                    <!-- Индекс качества ответов -->
+                    <div class="quality-card" style="margin-bottom: 0;">
+                        <div class="quality-gauge">
+                            <div class="gauge-circle">
+                                <div class="gauge-value">8.2</div>
+                                <div class="gauge-label">из 10</div>
+                            </div>
+                            <div class="gauge-verdict">Хорошо</div>
+                        </div>
+                        <div class="quality-breakdown">
+                            <div style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Качество ответов</div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Хорошие</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill good" style="width: 62%"></div></div>
+                                <div class="quality-bar-value">62%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Допустимые</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill acceptable" style="width: 24%"></div></div>
+                                <div class="quality-bar-value">24%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Рискованные</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill risky" style="width: 10%"></div></div>
+                                <div class="quality-bar-value">10%</div>
+                            </div>
+                            <div class="quality-row">
+                                <div class="quality-bar-label">Вредные</div>
+                                <div class="quality-bar-track"><div class="quality-bar-fill harmful" style="width: 4%"></div></div>
+                                <div class="quality-bar-value">4%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Speed + SLA -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Скорость ответа</div>
+                        <div class="speed-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+                            <div class="speed-card" style="margin: 0;">
+                                <div class="speed-label">Негатив (1-3)</div>
+                                <div class="speed-value" style="color: var(--color-warning); font-size: 20px;">47м</div>
+                                <div class="speed-target missed">Цель: &lt;30 мин</div>
+                            </div>
+                            <div class="speed-card" style="margin: 0;">
+                                <div class="speed-label">Вопросы</div>
+                                <div class="speed-value" style="color: var(--color-success); font-size: 20px;">38м</div>
+                                <div class="speed-target met">Цель: &lt;1 час</div>
+                            </div>
+                        </div>
+                        <!-- Response time distribution -->
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Распределение времени ответа</div>
+                        <div class="time-dist">
+                            <div class="time-dist-bar" style="height: 55%; background: var(--color-success);" title="< 1 час: 89 ответов"></div>
+                            <div class="time-dist-bar" style="height: 25%; background: var(--color-accent);" title="1-4 часа: 40 ответов"></div>
+                            <div class="time-dist-bar" style="height: 12%; background: var(--color-warning);" title="4-12 часов: 19 ответов"></div>
+                            <div class="time-dist-bar" style="height: 5%; background: var(--color-urgent);" title="12-24 часа: 6 ответов"></div>
+                            <div class="time-dist-bar" style="height: 3%; background: #9e1010;" title="> 24 часа: 2 ответа"></div>
+                        </div>
+                        <div class="time-dist-labels">
+                            <span class="time-dist-label">&lt;1ч</span>
+                            <span class="time-dist-label">1-4ч</span>
+                            <span class="time-dist-label">4-12ч</span>
+                            <span class="time-dist-label">12-24ч</span>
+                            <span class="time-dist-label">&gt;24ч</span>
+                        </div>
+                        <!-- SLA compliance -->
+                        <div class="sla-bar-wrap">
+                            <div class="sla-bar-label">
+                                <span>Соблюдение SLA (негатив &lt;1ч)</span>
+                                <span style="font-weight: 600; color: var(--color-warning);">78%</span>
+                            </div>
+                            <div class="sla-bar-track">
+                                <div class="sla-bar-fill" style="width: 78%; background: var(--color-warning);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Impact — high visibility, right after quality -->
+                <div class="chart-card" style="margin-bottom: 24px;">
+                    <div class="chart-title" style="margin-bottom: 16px;">Влияние на продажи</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Потери от плохих ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-urgent);">~42K</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">руб/мес упущенной выручки</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Экономия от быстрых ответов</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-success);">+20%</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">конверсия при ответе &lt;1ч (WB стат.)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Спасённые рейтинги</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--color-accent);">7</div>
+                            <div style="font-size: 11px; color: var(--color-text-tertiary);">негативных отзывов &rarr; решены в чате</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Rating Distribution + Conversion Funnel -->
+                <div class="analytics-grid">
+                    <!-- Rating distribution -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Распределение оценок</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px;">
+                            <span style="font-size: 32px; font-weight: 700; color: #fbbc04;">4.3</span>
+                            <span style="font-size: 12px; color: var(--color-text-tertiary);">из 5 (162 отзыва)</span>
+                        </div>
+                        <div class="rating-dist">
+                            <div class="rating-row">
+                                <div class="rating-stars">5</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 58%;"></div></div>
+                                <div class="rating-count">94</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">4</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 18%;"></div></div>
+                                <div class="rating-count">29</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">3</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 10%; background: var(--color-warning);"></div></div>
+                                <div class="rating-count">16</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">2</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 6%; background: var(--color-urgent);"></div></div>
+                                <div class="rating-count">10</div>
+                            </div>
+                            <div class="rating-row">
+                                <div class="rating-stars">1</div>
+                                <div class="rating-star-icon">&#9733;</div>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 8%; background: var(--color-urgent);"></div></div>
+                                <div class="rating-count">13</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conversion funnel from WB Analytics API -->
+                    <div class="chart-card">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <div class="chart-title">Воронка продаж</div>
+                            <!-- Product switcher -->
+                            <div class="analytics-period" style="margin: 0;">
+                                <button class="period-btn active" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('funnel-all').style.display='block';document.getElementById('funnel-products').style.display='none';">Кабинет</button>
+                                <button class="period-btn" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('funnel-all').style.display='none';document.getElementById('funnel-products').style.display='block';">По товарам</button>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 16px;">Данные из Wildberries за выбранный период</div>
+
+                        <!-- Cabinet-level funnel -->
+                        <div id="funnel-all">
+                            <div class="funnel">
+                                <div class="funnel-step">
+                                    <div class="funnel-label">Просмотры</div>
+                                    <div class="funnel-bar-wrap">
+                                        <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 100%; opacity: 0.3;"></div></div>
+                                    </div>
+                                    <div class="funnel-value">12 480</div>
+                                </div>
+                                <div class="funnel-arrow">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    <span class="funnel-conversion">18.3% в корзину</span>
+                                </div>
+                                <div class="funnel-step">
+                                    <div class="funnel-label">В корзину</div>
+                                    <div class="funnel-bar-wrap">
+                                        <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 46%; opacity: 0.5;"></div></div>
+                                    </div>
+                                    <div class="funnel-value">2 284</div>
+                                </div>
+                                <div class="funnel-arrow">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    <span class="funnel-conversion">42.1% в заказ</span>
+                                </div>
+                                <div class="funnel-step">
+                                    <div class="funnel-label">Заказы</div>
+                                    <div class="funnel-bar-wrap">
+                                        <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 19.3%; opacity: 0.75;"></div></div>
+                                    </div>
+                                    <div class="funnel-value">962</div>
+                                </div>
+                                <div class="funnel-arrow">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    <span class="funnel-conversion">87% выкуп</span>
+                                </div>
+                                <div class="funnel-step">
+                                    <div class="funnel-label">Выкуплено</div>
+                                    <div class="funnel-bar-wrap">
+                                        <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width: 16.8%;"></div></div>
+                                    </div>
+                                    <div class="funnel-value">837</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Per-product breakdown -->
+                        <div id="funnel-products" style="display: none;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--color-border-medium);">
+                                        <th style="text-align: left; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Товар</th>
+                                        <th style="text-align: right; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Просм.</th>
+                                        <th style="text-align: right; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Корзина</th>
+                                        <th style="text-align: right; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Заказы</th>
+                                        <th style="text-align: right; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Выкуп</th>
+                                        <th style="text-align: right; padding: 8px 6px; font-weight: 600; color: var(--color-text-secondary);">Conv.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                        <td style="padding: 10px 6px;">
+                                            <div style="font-weight: 500; color: var(--color-text-primary);">Термокружка с датчиком</div>
+                                            <div style="font-size: 10px; color: var(--color-text-tertiary);">Арт. 123456</div>
+                                        </td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">5 240</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">1 048</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">412</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">358</td>
+                                        <td style="text-align: right; padding: 10px 6px;"><span style="color: var(--color-success); font-weight: 600;">20.0%</span></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                        <td style="padding: 10px 6px;">
+                                            <div style="font-weight: 500; color: var(--color-text-primary);">Кроссовки Nike Air</div>
+                                            <div style="font-size: 10px; color: var(--color-text-tertiary);">Арт. 234567</div>
+                                        </td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">3 820</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">688</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">302</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">265</td>
+                                        <td style="text-align: right; padding: 10px 6px;"><span style="color: var(--color-success); font-weight: 600;">18.0%</span></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                        <td style="padding: 10px 6px;">
+                                            <div style="font-weight: 500; color: var(--color-text-primary);">Наушники BT-500</div>
+                                            <div style="font-size: 10px; color: var(--color-text-tertiary);">Арт. 345678</div>
+                                        </td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">2 180</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">370</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">165</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">148</td>
+                                        <td style="text-align: right; padding: 10px 6px;"><span style="color: var(--color-warning); font-weight: 600;">17.0%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 6px;">
+                                            <div style="font-weight: 500; color: var(--color-text-primary);">Рюкзак городской 25л</div>
+                                            <div style="font-size: 10px; color: var(--color-text-tertiary);">Арт. 456789</div>
+                                        </td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">1 240</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">178</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">83</td>
+                                        <td style="text-align: right; padding: 10px 6px; color: var(--color-text-secondary);">66</td>
+                                        <td style="text-align: right; padding: 10px 6px;"><span style="color: var(--color-urgent); font-weight: 600;">14.3%</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Top complaints + Volume chart -->
+                <div class="analytics-grid">
+                    <!-- Top complaints from cons field -->
+                    <div class="chart-card">
+                        <div class="chart-title" style="margin-bottom: 16px;">Топ жалоб из отзывов</div>
+                        <div class="complaint-list">
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">1</div>
+                                <div class="complaint-text">Быстро разряжается</div>
+                                <div class="complaint-count" style="color: var(--color-urgent);">18</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">2</div>
+                                <div class="complaint-text">Не совпадает размер</div>
+                                <div class="complaint-count" style="color: var(--color-urgent);">12</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">3</div>
+                                <div class="complaint-text">Дешёвые материалы</div>
+                                <div class="complaint-count" style="color: var(--color-warning);">9</div>
+                            </div>
+                            <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
+                                <div class="complaint-rank">4</div>
+                                <div class="complaint-text">Долгая доставка</div>
+                                <div class="complaint-count">7</div>
+                            </div>
+                            <div class="complaint-item">
+                                <div class="complaint-rank">5</div>
+                                <div class="complaint-text">Отличается от фото</div>
+                                <div class="complaint-count">5</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 12px;">Извлечено из поля «Недостатки» в отзывах WB</div>
+                    </div>
+
+                    <!-- Volume chart with stacked bars -->
+                    <div class="chart-card">
+                        <div class="chart-header" style="margin-bottom: 12px;">
+                            <div class="chart-title">Объём по каналам</div>
+                        </div>
+                        <div class="volume-legend">
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-accent);"></div>Отзывы</div>
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-success);"></div>Вопросы</div>
+                            <div class="legend-item"><div class="legend-dot" style="background: var(--color-warning);"></div>Чаты</div>
+                        </div>
+                        <div class="chart-area" style="height: 140px;">
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 30px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 8px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Пн</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 45px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 18px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 10px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Вт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 55px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 15px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Ср</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 38px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 10px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 6px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Чт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 62px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 20px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 14px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Пт</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 80px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 22px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 18px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Сб</div>
+                            </div>
+                            <div class="chart-bar-group">
+                                <div class="chart-bar" style="height: 68px; background: var(--color-accent); border-radius: 3px 3px 0 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 16px; background: var(--color-success); border-radius: 0; margin-bottom: 0;"></div>
+                                <div class="chart-bar" style="height: 12px; background: var(--color-warning); border-radius: 0;"></div>
+                                <div class="chart-bar-label">Вс</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 7: PROMO CODES
+     ======================================================== -->
+<div class="screen" id="screen-promo">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="settings-content" style="padding: 32px; max-width: 700px;">
+                <div class="settings-section-title">Промокоды</div>
+
+                <!-- Cabinet selector -->
+                <div class="promo-cabinet-selector">
+                    <div class="promo-cabinet-icon">W</div>
+                    <div class="promo-cabinet-info">
+                        <div class="promo-cabinet-name">CRM Group</div>
+                        <div class="promo-cabinet-mp">Wildberries</div>
+                    </div>
+                    <div class="promo-cabinet-arrow">&#9662;</div>
+                </div>
+
+                <!-- Description -->
+                <div class="settings-section-desc">Промокоды создаются в ЛК Wildberries. Здесь вы указываете их для AI &mdash; он будет предлагать промокод в ответах, когда это уместно.</div>
+
+                <!-- Active promo codes + help link on same line -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div class="promo-count" style="margin-bottom: 0;">Активные промокоды (2 из 10)</div>
+                    <button class="promo-help-link" onclick="document.getElementById('promoHelpPanel').classList.add('open')">Как это работает?</button>
+                </div>
+
+                <!-- Promo card 1 -->
+                <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                    <div class="promo-card-header">
+                        <div class="promo-code-name">THANKS10</div>
+                        <div class="promo-badge active">Активен</div>
+                    </div>
+                    <div class="promo-meta">Скидка 10% &middot; до 28 февраля &middot; Все товары</div>
+                    <div class="promo-channels">
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                    </div>
+                    <div class="promo-card-footer">
+                        <div class="promo-sends">Отправлено: 23 раза</div>
+                        <div class="promo-actions">
+                            <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                            <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод THANKS10?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo card 2 -->
+                <div class="promo-card" onclick="this.classList.toggle('expanded')" style="cursor: pointer;">
+                    <div class="promo-card-header">
+                        <div class="promo-code-name">SORRY15</div>
+                        <div class="promo-badge active">Активен</div>
+                    </div>
+                    <div class="promo-meta">Скидка 15% &middot; до 15 марта &middot; Все товары</div>
+                    <div class="promo-channels">
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: негатив</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Чаты: вопросы</span>
+                        <span class="promo-channel" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: позитив</span>
+                        <span class="promo-channel on" onclick="event.stopPropagation();this.classList.toggle('on')">Отзывы: негатив</span>
+                    </div>
+                    <div class="promo-card-footer">
+                        <div class="promo-sends">Отправлено: 8 раз</div>
+                        <div class="promo-actions">
+                            <button class="promo-action-btn" onclick="event.stopPropagation();document.getElementById('promoAddForm').style.display='block';document.getElementById('promoAddBtn').style.display='none';document.getElementById('promoAddForm').scrollIntoView({behavior:'smooth',block:'center'})">Редактировать</button>
+                            <button class="promo-action-btn danger" onclick="event.stopPropagation();if(confirm('Удалить промокод SORRY15?'))this.closest('.promo-card').style.display='none'">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add button + inline form -->
+                <button class="promo-add-btn" id="promoAddBtn" onclick="document.getElementById('promoAddForm').style.display='block';this.style.display='none'">+ Добавить промокод</button>
+
+                <!-- Inline add form (hidden by default) -->
+                <div id="promoAddForm" class="promo-card" style="display: none; cursor: default; border-color: var(--color-accent); border-width: 2px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Новый промокод</div>
+                    <div class="profile-form" style="max-width: 100%;">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Код</label>
+                                <input type="text" class="form-input" placeholder="WELCOME20" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">
+                                <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">Скопируйте из ЛК WB</div>
+                            </div>
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Скидка</label>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <input type="number" class="form-input" placeholder="10" min="3" max="50" style="width: 80px;">
+                                    <span style="font-size: 14px; color: var(--color-text-secondary);">%</span>
+                                </div>
+                            </div>
+                            <div class="form-field" style="margin: 0;">
+                                <label class="form-label">Действует до</label>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label class="form-label">Товары</label>
+                            <div style="display: flex; gap: 16px; font-size: 13px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="promo-products" checked> Все товары
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="promo-products"> Выбранные артикулы
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label class="form-label">Где предлагать</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); overflow: hidden;">
+                                <div style="padding: 10px 12px; background: var(--color-bg-tertiary); font-size: 11px; font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">Чаты (приватно)</div>
+                                <div style="padding: 10px 12px; background: #fff8e1; font-size: 11px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Отзывы (публично!)</div>
+                                <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Позитивные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox" checked> Негативные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox" checked> Вопросы по товару</label>
+                                </div>
+                                <div style="padding: 8px 12px; border-top: 1px solid var(--color-border-light);">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 6px;"><input type="checkbox"> Позитивные</label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;"><input type="checkbox"> Негативные</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="form-save" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Сохранить</button>
+                            <button class="form-save" style="background: none; color: var(--color-text-secondary); border: 1px solid var(--color-border-medium);" onclick="document.getElementById('promoAddForm').style.display='none';document.getElementById('promoAddBtn').style.display='flex';">Отмена</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="promo-divider"></div>
+
+                <!-- Automation settings -->
+                <div class="promo-count">Настройки автоподстановки</div>
+
+                <div class="ai-setting-card">
+                    <div class="ai-setting-header">
+                        <div class="ai-setting-title">AI предлагает промокод в ответах</div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="ai-setting-desc">
+                        AI добавит промокод в черновик ответа, когда это уместно. Вы увидите его перед отправкой и сможете убрать.
+                    </div>
+                </div>
+
+                <div class="ai-setting-card">
+                    <div class="ai-setting-header">
+                        <div class="ai-setting-title">Предупреждать об отзывах</div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="ai-setting-desc">
+                        Показывать напоминание, что промокод в ответе на отзыв виден всем посетителям карточки товара.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help slide-out panel -->
+            <div class="promo-help-panel" id="promoHelpPanel">
+                <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="promo-help-title">Как работают промокоды</div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Создание</div>
+                    <div class="promo-help-text">
+                        Промокоды создаются в ЛК Wildberries:<br>
+                        <strong>Товары и цены &rarr; Календарь акций &rarr; По промокодам</strong>
+                    </div>
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Параметры</div>
+                    <table class="promo-help-table">
+                        <tr><td>Скидка</td><td>3% &mdash; 50%</td></tr>
+                        <tr><td>Длительность</td><td>1 &mdash; 31 день</td></tr>
+                        <tr><td>Макс. акций</td><td>10 одновременно</td></tr>
+                        <tr><td>Код</td><td>Авто или свой</td></tr>
+                        <tr><td>Использование</td><td>Многоразовый</td></tr>
+                    </table>
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Как применяется</div>
+                    <div class="promo-help-text">
+                        Покупатель вводит код в корзине на WB. Код многоразовый &mdash; его может использовать любой покупатель.
+                    </div>
+                </div>
+
+                <div class="promo-help-warning">
+                    <strong>Важно:</strong><br>
+                    &bull; Скидка не суммируется с акциями &gt; 45%<br>
+                    &bull; Скидка полностью за счёт продавца<br>
+                    &bull; В ответах на отзывы код виден <strong>всем</strong> посетителям карточки
+                </div>
+
+                <div class="promo-help-section">
+                    <div class="promo-help-label">Чаты vs отзывы</div>
+                    <table class="promo-help-table">
+                        <tr><td>Чат</td><td>Приватно, видит только покупатель</td></tr>
+                        <tr><td>Ответ на отзыв</td><td>Публично, видят все</td></tr>
+                    </table>
+                </div>
+
+                <a href="https://seller.wildberries.ru/instructions/ru/ru/material/seller-promocodes" target="_blank" class="promo-help-link-ext">
+                    &#128206; Инструкция Wildberries &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 8: SETTINGS
+     ======================================================== -->
+<div class="screen" id="screen-settings">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+            <button class="sidebar-collapse-btn" onclick="this.closest('.sidebar').classList.toggle('collapsed')" title="Свернуть меню">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+                <button class="sidebar-item" onclick="showScreen('promo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    <span class="sidebar-label">Промокоды</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item active" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="settings-page">
+            <div class="settings-nav">
+                <div class="settings-nav-title">Настройки</div>
+                <button class="settings-nav-item active" onclick="showSettingsTab('connections')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    Подключения
+                </button>
+                <button class="settings-nav-item" onclick="showSettingsTab('ai')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    AI-ассистент
+                </button>
+                <button class="settings-nav-item" onclick="showSettingsTab('profile')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Профиль
+                </button>
+            </div>
+
+            <div class="settings-content">
+                <!-- Connections tab -->
+                <div id="settings-connections">
+                    <div class="settings-section-title">Подключения</div>
+                    <div class="settings-section-desc">Управляйте подключениями к маркетплейсам. AgentIQ синхронизирует чаты каждые 30 секунд.</div>
+
+                    <div class="connection-card">
+                        <div class="connection-icon wb">W</div>
+                        <div class="connection-info">
+                            <div class="connection-name">Wildberries</div>
+                            <div class="connection-status connected">
+                                <div class="connection-status-dot"></div>
+                                Подключено &middot; Последняя синхр. 2 мин назад
+                            </div>
+                        </div>
+                        <button class="connection-action">Настроить</button>
+                    </div>
+
+                    <div class="connection-card">
+                        <div class="connection-icon ozon">Ozon</div>
+                        <div class="connection-info">
+                            <div class="connection-name">Ozon</div>
+                            <div class="connection-status disconnected">
+                                <div class="connection-status-dot"></div>
+                                Не подключено
+                            </div>
+                        </div>
+                        <button class="connection-action primary">Подключить</button>
+                    </div>
+                </div>
+
+                <!-- AI tab -->
+                <div id="settings-ai" style="display: none;">
+                    <div class="settings-section-title">AI-ассистент</div>
+                    <div class="settings-section-desc">Настройте, как AI генерирует ответы на сообщения покупателей.</div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">Тон ответов</div>
+                        </div>
+                        <div class="ai-setting-desc">Выберите стиль общения AI с покупателями</div>
+                        <div class="tone-options">
+                            <div class="tone-option">
+                                <div class="tone-emoji">&#x1F454;</div>
+                                <div class="tone-name">Формальный</div>
+                            </div>
+                            <div class="tone-option active">
+                                <div class="tone-emoji">&#x1F60A;</div>
+                                <div class="tone-name">Дружелюбный</div>
+                            </div>
+                            <div class="tone-option">
+                                <div class="tone-emoji">&#x1F4DD;</div>
+                                <div class="tone-name">Нейтральный</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">Авто-ответы на позитив</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">
+                            Автоматически отвечать на положительные сообщения (4-5 звёзд) без вашего участия.
+                        </div>
+                        <div style="margin-top: 12px; padding: 12px; background: var(--color-bg-secondary); border-radius: var(--radius-md); font-size: 12px; line-height: 1.6;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="color: var(--color-text-secondary);">Скорость ответа</span>
+                                <span style="font-weight: 500;">до 5 минут после сообщения</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="color: var(--color-text-secondary);">За последние 7 дней</span>
+                                <span style="font-weight: 500;">отвечено авто: <span style="color: var(--color-success);">34 чата</span></span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--color-text-secondary);">В списке чатов</span>
+                                <span style="font-weight: 500;">отмечаются как <span style="padding: 1px 5px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-size: 10px;">авто</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">AI-подсказки</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">Показывать AI-рекомендацию ответа для каждого нового чата. Вы можете отредактировать или отклонить подсказку.</div>
+                    </div>
+                </div>
+
+                <!-- Profile tab -->
+                <div id="settings-profile" style="display: none;">
+                    <div class="settings-section-title">Профиль</div>
+                    <div class="settings-section-desc">Основная информация о вашем аккаунте.</div>
+
+                    <div class="profile-form">
+                        <div class="form-field">
+                            <label class="form-label">Название компании</label>
+                            <input type="text" class="form-input" value="ООО Иванов">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="ivan@example.com">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Пароль</label>
+                            <input type="password" class="form-input" value="********">
+                        </div>
+                        <button class="form-save">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- Desktop status bar -->
+<div class="desktop-status-bar" id="desktop-status-bar">
+    <div class="status-bar-item">
+        <span>Синхронизация:</span>
+        <strong>2 мин назад</strong>
+    </div>
+    <div class="status-bar-item">
+        <span>Риск выручки сегодня:</span>
+        <strong style="color: var(--color-urgent);">12 400 ₽</strong>
+    </div>
+    <div class="status-bar-item right">
+        <button class="status-action-btn" onclick="showScreen('messages')">Открыть решения (3)</button>
+    </div>
+</div>
+
+
+<script>
+// CJM notes for each screen
+const cjmNotes = {
+    onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить WB. Ценность: "все сообщения в одном месте, видно что срочно". Не AI-ответы (касдев).',
+    syncing: '<strong>CJM:</strong> Батч-загрузка как Apple Mail. Первые 50 чатов = можно работать. Остальные в фоне. Не блокируем пользователя — кнопка "перейти" сразу.',
+    'dashboard-empty': '<strong>CJM:</strong> Пользователь нажал "Пропустить" — видит полную Главную с демо-данными. Жёлтая верхняя плашка: "Демо-данные. Подключите WB чтобы увидеть свои". Понимает ценность продукта ДО подключения.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек: 7 без ответа, 3 срочных, индекс качества 8.2. Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
+    messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
+    analytics: '<strong>CJM:</strong> ROI для продавца. Индекс качества ответов = дифференциатор. Скорость = соблюдение SLA. График объёма = понимание нагрузки.',
+    promo: '<strong>CJM:</strong> Промокоды создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Per-cabinet привязка. Help-панель объясняет механику. Чаты = приватно, отзывы = публично.',
+    settings: '<strong>CJM:</strong> Настроить и забыть. Подключения, AI-тон, авто-ответы, профиль.'
+};
+
+// Map screen names to bottom nav index (0=dashboard, 1=messages, 2=analytics, 3=settings)
+const bottomNavMap = {
+    'dashboard-empty': 0,
+    dashboard: 0,
+    messages: 1,
+    analytics: 2,
+    promo: 3,
+    settings: 4
+};
+
+function showScreen(name) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+        s.classList.remove('mobile-chat-open');
+    });
+    document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+
+    // Show target
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+
+    // Update bottom nav active states (each app-shell screen has its own bottom-nav)
+    document.querySelectorAll('.bottom-nav').forEach(nav => {
+        nav.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+    });
+    // Set active on the bottom nav inside the active screen
+    const activeScreen = document.getElementById('screen-' + name);
+    const bottomNav = activeScreen ? activeScreen.querySelector('.bottom-nav') : null;
+    if (bottomNav && bottomNavMap.hasOwnProperty(name)) {
+        const items = bottomNav.querySelectorAll('.bottom-nav-item');
+        const idx = bottomNavMap[name];
+        if (items[idx]) {
+            items[idx].classList.add('active');
+        }
+    }
+
+    // Update CJM note
+    document.getElementById('cjm-note').innerHTML = cjmNotes[name] || '';
+
+    // Desktop status bar appears only in app workspace screens
+    const statusBar = document.getElementById('desktop-status-bar');
+    if (statusBar) {
+        const appScreens = ['dashboard-empty', 'dashboard', 'messages', 'analytics', 'promo', 'settings'];
+        const isDesktop = window.innerWidth > 1024;
+        statusBar.style.display = (isDesktop && appScreens.includes(name)) ? 'flex' : 'none';
+    }
+
+    // Auto-collapse sidebar on messages screen for more chat space
+    document.querySelectorAll('.sidebar').forEach(sb => {
+        if (name === 'messages') {
+            sb.classList.add('collapsed');
+        }
+    });
+}
+
+// Handle mobile chat open: clicking a chat item opens the chat panel
+document.addEventListener('click', function(e) {
+    const chatItem = e.target.closest('.msg-chat-item');
+    if (chatItem && window.innerWidth <= 768) {
+        const messagesScreen = document.getElementById('screen-messages');
+        if (messagesScreen) {
+            messagesScreen.classList.add('mobile-chat-open');
+        }
+    }
+});
+
+function showSettingsTab(tab) {
+    // Hide all tabs
+    document.getElementById('settings-connections').style.display = 'none';
+    document.getElementById('settings-ai').style.display = 'none';
+    document.getElementById('settings-profile').style.display = 'none';
+
+    // Close help panel if open
+    var helpPanel = document.getElementById('promoHelpPanel');
+    if (helpPanel) helpPanel.classList.remove('open');
+
+    // Show target
+    document.getElementById('settings-' + tab).style.display = 'block';
+
+    // Update nav
+    document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
+    event.target.closest('.settings-nav-item').classList.add('active');
+}
+
+// Start with onboarding
+showScreen('onboarding');
+</script>
+
+</body>
+</html>
