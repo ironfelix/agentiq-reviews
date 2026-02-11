@@ -116,59 +116,6 @@ body {
     to { opacity: 1; }
 }
 
-/* ===== DESKTOP STATUS BAR ===== */
-.desktop-status-bar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 36px;
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 0 14px;
-    background: rgba(255,255,255,0.96);
-    border-top: 1px solid var(--color-border-medium);
-    backdrop-filter: blur(6px);
-    z-index: 9000;
-}
-
-.status-bar-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-}
-
-.status-bar-item strong {
-    color: var(--color-text-primary);
-    font-weight: 600;
-}
-
-.status-bar-item.right {
-    margin-left: auto;
-}
-
-.status-action-btn {
-    padding: 6px 10px;
-    border: 1px solid var(--color-border-dark);
-    border-radius: var(--radius-md);
-    background: var(--color-bg-primary);
-    color: var(--color-text-primary);
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.status-action-btn:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-}
-
 /* Fix: Ensure all scrollable content has bottom padding for proper scroll */
 .dashboard,
 .msg-list,
@@ -2538,9 +2485,6 @@ body {
         flex-shrink: 0;
     }
 
-    .desktop-status-bar {
-        display: none !important;
-    }
     .promo-help-panel.left {
         width: 100%;
         max-width: 100%;
@@ -3206,9 +3150,6 @@ body {
         padding: 24px;
     }
 
-    .desktop-status-bar {
-        display: none !important;
-    }
 }
 
 /* ========================================================
@@ -4907,22 +4848,6 @@ html, body {
     </div>
 </div>
 
-<!-- Desktop status bar -->
-<div class="desktop-status-bar" id="desktop-status-bar">
-    <div class="status-bar-item">
-        <span>Синхронизация:</span>
-        <strong>2 мин назад</strong>
-    </div>
-    <div class="status-bar-item">
-        <span>Оценка выручки:</span>
-        <strong style="color: var(--color-text-primary);">Пилотная модель (beta)</strong>
-    </div>
-    <div class="status-bar-item right">
-        <button class="status-action-btn" onclick="showScreen('messages')">Открыть решения (3)</button>
-    </div>
-</div>
-
-
 <script>
 // CJM notes for each screen
 const cjmNotes = {
@@ -4981,14 +4906,6 @@ function showScreen(name) {
     if (dashboardContextPanel) dashboardContextPanel.classList.remove('open');
     const promoHelpPanel = document.getElementById('promoHelpPanel');
     if (promoHelpPanel) promoHelpPanel.classList.remove('open');
-
-    // Desktop status bar appears only in app workspace screens
-    const statusBar = document.getElementById('desktop-status-bar');
-    if (statusBar) {
-        const appScreens = ['dashboard-empty', 'dashboard', 'messages', 'analytics', 'promo', 'settings'];
-        const isDesktop = window.innerWidth > 1024;
-        statusBar.style.display = (isDesktop && appScreens.includes(name)) ? 'flex' : 'none';
-    }
 
     // Auto-collapse sidebar on messages screen for more chat space
     document.querySelectorAll('.sidebar').forEach(sb => {
