@@ -116,6 +116,15 @@ body {
     to { opacity: 1; }
 }
 
+/* Fix: Ensure all scrollable content has bottom padding for proper scroll */
+.dashboard,
+.msg-list,
+.msg-list-body,
+.chat-messages,
+.settings-content {
+    padding-bottom: 64px !important;
+}
+
 /* ===== CJM ANNOTATION ===== */
 .cjm-note {
     position: relative;
