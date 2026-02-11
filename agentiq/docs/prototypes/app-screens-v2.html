@@ -2344,9 +2344,9 @@ html, body {
 
 <!-- ===== SCREEN NAVIGATOR ===== -->
 <div class="screen-nav">
-    <button onclick="showScreen('onboarding')" id="nav-onboarding">1. Онбординг</button>
-    <button onclick="showScreen('syncing')" id="nav-syncing">2. Синхр.</button>
-    <button onclick="showScreen('done')" id="nav-done">3. Готово</button>
+    <button onclick="showScreen('onboarding')" id="nav-onboarding">1. Подключение</button>
+    <button onclick="showScreen('syncing')" id="nav-syncing">2. Загрузка</button>
+    <button onclick="showScreen('dashboard-empty')" id="nav-dashboard-empty">3. Пустой кабинет</button>
     <button onclick="showScreen('dashboard')" id="nav-dashboard">4. Главная</button>
     <button onclick="showScreen('messages')" id="nav-messages">5. Сообщения</button>
     <button onclick="showScreen('analytics')" id="nav-analytics">6. Аналитика</button>
@@ -2761,6 +2761,30 @@ html, body {
                             <div class="msg-chat-preview">Спасибо за оперативный ответ!</div>
                         </div>
                     </div>
+                    <div class="msg-chat-item" style="opacity: 0.7;">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Ольга Федорова</div>
+                                <div style="font-size: 9px; padding: 2px 6px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-weight: 500;">авто</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot" style="background: var(--color-text-tertiary);"></span>Чат &middot; Косметичка дорожная</div>
+                            <div class="msg-chat-preview" style="color: var(--color-text-tertiary);">AI: Благодарим за отзыв! Рады, что вам понравилось...</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item" style="opacity: 0.7;">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Игорь Волков</div>
+                                <div style="font-size: 9px; padding: 2px 6px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-weight: 500;">авто</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot" style="background: var(--color-text-tertiary);"></span>Чат &middot; Рюкзак городской 25л</div>
+                            <div class="msg-chat-preview" style="color: var(--color-text-tertiary);">AI: Спасибо за высокую оценку! Приятного использования...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -3101,7 +3125,23 @@ html, body {
                             <div class="ai-setting-title">Авто-ответы на позитив</div>
                             <div class="toggle on" onclick="this.classList.toggle('on')"></div>
                         </div>
-                        <div class="ai-setting-desc">Автоматически отвечать на положительные отзывы (4-5 звёзд) без вашего участия. Экономит ~2 часа в день.</div>
+                        <div class="ai-setting-desc">
+                            Автоматически отвечать на положительные сообщения (4-5 звёзд) без вашего участия.
+                        </div>
+                        <div style="margin-top: 12px; padding: 12px; background: var(--color-bg-secondary); border-radius: var(--radius-md); font-size: 12px; line-height: 1.6;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="color: var(--color-text-secondary);">Скорость ответа</span>
+                                <span style="font-weight: 500;">до 5 минут после сообщения</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <span style="color: var(--color-text-secondary);">За последние 7 дней</span>
+                                <span style="font-weight: 500;">отвечено авто: <span style="color: var(--color-success);">34 чата</span></span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--color-text-secondary);">В списке чатов</span>
+                                <span style="font-weight: 500;">отмечаются как <span style="padding: 1px 5px; background: rgba(52,168,83,0.1); color: var(--color-success); border-radius: var(--radius-pill); font-size: 10px;">авто</span></span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="ai-setting-card">
@@ -3164,17 +3204,18 @@ html, body {
 <script>
 // CJM notes for each screen
 const cjmNotes = {
-    onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить маркетплейс. Нет лишних вопросов (мы знаем цель пользователя). "Пропустить" для нетерпеливых.',
-    syncing: '<strong>CJM:</strong> Пользователь ждёт. Показываем прогресс + цифры (чаты, сообщения, срочные) чтобы было видно - что-то происходит. 30-60 сек.',
-    done: '<strong>CJM:</strong> Мгновенная ценность: "Найдено 24 чата, 3 срочных". Превью первых чатов - пользователь видит свои данные. Один CTA: перейти к работе.',
-    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек видно: 7 без ответа, 3 срочных, quality 8.2. Чеклист настройки пока не всё сделано. Каждая карточка - клик к деталям.',
-    messages: '<strong>CJM:</strong> 80% времени здесь. Это существующий Chat Center + sidebar навигация. AI-подсказка + контекст товара + очереди по приоритету.',
-    analytics: '<strong>CJM:</strong> ROI для продавца. Quality Score = главный дифференциатор от конкурентов. Скорость ответа показывает SLA compliance. График объёма = понимание нагрузки.',
-    settings: '<strong>CJM:</strong> Настроить один раз, забыть. 3 раздела: подключения (API ключи), AI (тон + авто-ответы), профиль. Минимум настроек = минимум когнитивной нагрузки.'
+    onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить WB. Ценность: "все сообщения в одном месте, видно что срочно". Не AI-ответы (касдев).',
+    syncing: '<strong>CJM:</strong> Батч-загрузка как Apple Mail. Первые 50 чатов = можно работать. Остальные в фоне. Не блокируем пользователя — кнопка "перейти" сразу.',
+    'dashboard-empty': '<strong>CJM:</strong> Пользователь нажал "Пропустить". Пустой кабинет с одним CTA: подключить WB. Не потерян — видит структуру приложения (sidebar), понимает куда попал.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек: 7 без ответа, 3 срочных, quality 8.2. Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
+    messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
+    analytics: '<strong>CJM:</strong> ROI для продавца. Quality Score = дифференциатор. Скорость = SLA compliance. График объёма = понимание нагрузки.',
+    settings: '<strong>CJM:</strong> Настроить и забыть. Авто-ответы: видно скорость (до 5 мин), статистику (34 за неделю), как отображаются в списке. Прозрачность = доверие.'
 };
 
 // Map screen names to bottom nav index (0=dashboard, 1=messages, 2=analytics, 3=settings)
 const bottomNavMap = {
+    'dashboard-empty': 0,
     dashboard: 0,
     messages: 1,
     analytics: 2,
