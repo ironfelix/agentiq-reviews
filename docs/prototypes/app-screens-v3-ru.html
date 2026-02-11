@@ -3224,7 +3224,7 @@ html, body {
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <div class="promo-count" style="margin-bottom: 0;">Контекст KPI</div>
+                        <div class="promo-count" style="margin-bottom: 0;">Как читать показатели</div>
                         <div class="kpi-context-actions">
                             <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Что влияет на выручку?</button>
                         </div>
@@ -3238,19 +3238,19 @@ html, body {
                             <div class="metric-change negative">3 срочных в работе</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-label">SLA по срочным сегодня</div>
+                            <div class="metric-label">Ответ вовремя по срочным</div>
                             <div class="metric-value warning">78%</div>
                             <div class="metric-change negative">Цель: ≥ 90%</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Упущенная выручка (30 дн)</div>
                             <div class="metric-value urgent">42 000 ₽</div>
-                            <div class="metric-change negative">Оценка модели, доверие 0.62</div>
+                            <div class="metric-change negative">Оценка модели, надежность 0.62</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Потенциал возврата (30 дн)</div>
                             <div class="metric-value good">28 000 ₽</div>
-                            <div class="metric-change positive">Если довести SLA до 90%</div>
+                            <div class="metric-change positive">Если довести скорость до 90%</div>
                         </div>
                     </div>
 
@@ -3267,7 +3267,7 @@ html, body {
                             </div>
                             <div class="urgent-meta">
                                 <div class="urgent-time">12 мин назад</div>
-                                <div class="urgent-sla overdue">SLA 23м</div>
+                                <div class="urgent-sla overdue">Просрочка 23м</div>
                             </div>
                         </div>
                         <div class="urgent-item">
@@ -3278,7 +3278,7 @@ html, body {
                             </div>
                             <div class="urgent-meta">
                                 <div class="urgent-time">28 мин назад</div>
-                                <div class="urgent-sla overdue">SLA 2м</div>
+                                <div class="urgent-sla overdue">Просрочка 2м</div>
                             </div>
                         </div>
                     </div>
@@ -3390,7 +3390,7 @@ html, body {
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <div class="promo-count" style="margin-bottom: 0;">Контекст KPI</div>
+                    <div class="promo-count" style="margin-bottom: 0;">Как читать показатели</div>
                     <div class="kpi-context-actions">
                         <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Что влияет на выручку?</button>
                     </div>
@@ -3404,19 +3404,19 @@ html, body {
                         <div class="metric-change negative">3 срочных в работе</div>
                     </div>
                     <div class="metric-card" onclick="showScreen('messages')">
-                        <div class="metric-label">SLA по срочным сегодня</div>
+                        <div class="metric-label">Ответ вовремя по срочным</div>
                         <div class="metric-value warning">78%</div>
                         <div class="metric-change negative">Цель: ≥ 90%</div>
                     </div>
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Упущенная выручка (30 дн)</div>
                         <div class="metric-value urgent">42 000 ₽</div>
-                        <div class="metric-change negative">Оценка модели, доверие 0.62</div>
+                        <div class="metric-change negative">Оценка модели, надежность 0.62</div>
                     </div>
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Потенциал возврата (30 дн)</div>
                         <div class="metric-value good">28 000 ₽</div>
-                        <div class="metric-change positive">Если довести SLA до 90%</div>
+                        <div class="metric-change positive">Если довести скорость до 90%</div>
                     </div>
                 </div>
 
@@ -3434,7 +3434,7 @@ html, body {
                         </div>
                         <div class="urgent-meta">
                             <div class="urgent-time">12 мин назад</div>
-                            <div class="urgent-sla overdue">SLA 23м</div>
+                            <div class="urgent-sla overdue">Просрочка 23м</div>
                         </div>
                     </div>
                     <div class="urgent-item" onclick="showScreen('messages')">
@@ -3445,7 +3445,7 @@ html, body {
                         </div>
                         <div class="urgent-meta">
                             <div class="urgent-time">28 мин назад</div>
-                            <div class="urgent-sla overdue">SLA 2м</div>
+                            <div class="urgent-sla overdue">Просрочка 2м</div>
                         </div>
                     </div>
                     <div class="urgent-item" onclick="showScreen('messages')">
@@ -3456,7 +3456,7 @@ html, body {
                         </div>
                         <div class="urgent-meta">
                             <div class="urgent-time">1ч назад</div>
-                            <div class="urgent-sla soon">SLA 48м</div>
+                            <div class="urgent-sla soon">До просрочки 48м</div>
                         </div>
                     </div>
                 </div>
@@ -3884,7 +3884,7 @@ html, body {
                         <!-- SLA compliance -->
                         <div class="sla-bar-wrap">
                             <div class="sla-bar-label">
-                                <span>Соблюдение SLA (негатив &lt;1ч)</span>
+                                <span>Ответ вовремя (негатив &lt;1ч)</span>
                                 <span style="font-weight: 600; color: var(--color-warning);">78%</span>
                             </div>
                             <div class="sla-bar-track">
@@ -3920,7 +3920,7 @@ html, body {
                 <div class="chart-card" style="margin-bottom: 24px;">
                     <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
                         <div class="chart-title">Вклад каналов в выручку (30 дней)</div>
-                        <div style="font-size: 11px; color: var(--color-text-tertiary);">Модель uplift v1 · Доверие: 0.62 · Покрытие SKU: 78%</div>
+                        <div style="font-size: 11px; color: var(--color-text-tertiary);">Оценка модели · Надежность: 0.62 · Покрытие товаров: 78%</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 14px;">
                         <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
@@ -3931,7 +3931,7 @@ html, body {
                         <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
                             <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Чаты (pre/post-purchase)</div>
                             <div style="font-size: 22px; font-weight: 700; color: var(--color-accent);">+9 400 ₽</div>
-                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">SLA срочных: 78% · -0.7 п.п. отмен</div>
+                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">Ответ вовремя по срочным: 78% · меньше отмен на 0.7 п.п.</div>
                         </div>
                         <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-bg-secondary);">
                             <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Отзывы и ответы</div>
@@ -3941,12 +3941,12 @@ html, body {
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
                         <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md);">
-                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">ML-атрибуция по каналам</div>
+                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Оценка вклада каналов</div>
                             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                                 <thead>
                                     <tr style="border-bottom: 1px solid var(--color-border-medium); color: var(--color-text-secondary);">
                                         <th style="text-align: left; padding: 6px 0;">Канал</th>
-                                        <th style="text-align: right; padding: 6px 0;">Uplift CR</th>
+                                        <th style="text-align: right; padding: 6px 0;">Рост конверсии</th>
                                         <th style="text-align: right; padding: 6px 0;">Влияние, ₽</th>
                                     </tr>
                                 </thead>
@@ -3970,16 +3970,16 @@ html, body {
                             </table>
                         </div>
                         <div style="padding: 12px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md);">
-                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Как считаем деньги</div>
+                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Как считается оценка в деньгах</div>
                             <div style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.55;">
-                                1) Строим baseline без коммуникаций: цена, остатки, сезонность, реклама.<br>
-                                2) Добавляем фичи каналов: скорость ответов, долю без ответа, качество ответов.<br>
-                                3) Считаем uplift: <code>&Delta;CR = CR_with_comm - CR_baseline</code>.<br>
-                                4) Конвертируем в выручку: <code>&Delta;Выручка = &Delta;CR × Просмотры × AOV × %Выкупа</code>.<br>
-                                5) Показываем только при покрытии &gt;60% SKU и доверии &gt;0.5.
+                                1) Смотрим, как обычно продаются товары в похожих условиях (цена, остатки, сезон).<br>
+                                2) Сравниваем с периодом, где команда лучше обрабатывает вопросы, чаты и отзывы.<br>
+                                3) Считаем разницу в заказах и выкупах.<br>
+                                4) Переводим эту разницу в рубли за выбранный период.<br>
+                                5) Показываем оценку только когда данных достаточно.
                             </div>
                             <div style="margin-top: 10px; font-size: 11px; color: var(--color-text-tertiary);">
-                                Метод: panel uplift (SKU×день). Лаги: вопросы 0-2д, чаты 0-1д, отзывы 3-14д.
+                                Эффект каналов проявляется с разной задержкой: вопросы и чаты быстрее, отзывы — медленнее.
                             </div>
                         </div>
                     </div>
@@ -4733,7 +4733,7 @@ html, body {
     <div class="promo-help-section">
         <div class="promo-help-label">Логика блока</div>
         <div class="promo-help-text">
-            На главной слева — управляемые KPI команды, справа — денежный эффект. Сначала работаем с левыми метриками, затем смотрим, как меняется правая часть.
+            На главной слева — показатели, которыми управляет команда, справа — денежный эффект. Сначала работаем с левой частью, затем смотрим, как меняется правая.
         </div>
     </div>
 
@@ -4750,14 +4750,14 @@ html, body {
         <div class="promo-help-label">Приоритет действий</div>
         <div class="promo-help-text">
             1) Закрыть «Без ответа».<br>
-            2) Довести SLA по срочным до цели.<br>
+            2) Довести скорость по срочным до цели.<br>
             3) Проверить, как изменились «Упущенная выручка» и «Потенциал возврата».
         </div>
     </div>
 
     <div class="promo-help-warning">
         Важно:<br>
-        • Сначала действия команды в левых KPI, потом оценка эффекта в денежных метриках справа.<br>
+        • Сначала действия команды в левых показателях, потом оценка эффекта в денежных метриках справа.<br>
         • Денежные показатели — оценка модели, а не бухгалтерский факт.
     </div>
 
@@ -4772,9 +4772,9 @@ const cjmNotes = {
     onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить WB. Ценность: "все сообщения в одном месте, видно что срочно". Не AI-ответы (касдев).',
     syncing: '<strong>CJM:</strong> Батч-загрузка как Apple Mail. Первые 50 чатов = можно работать. Остальные в фоне. Не блокируем пользователя — кнопка "перейти" сразу.',
     'dashboard-empty': '<strong>CJM:</strong> Пользователь нажал "Пропустить" — видит полную Главную с демо-данными. Жёлтая верхняя плашка: "Демо-данные. Подключите WB чтобы увидеть свои". Понимает ценность продукта ДО подключения.',
-    dashboard: '<strong>CJM:</strong> Точка входа каждый день. Слева — что делать сейчас (без ответа + SLA), справа — денежный эффект (потери + потенциал). Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. Слева — что делать сейчас (без ответа + скорость), справа — денежный эффект (потери + потенциал). Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
     messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
-    analytics: '<strong>CJM:</strong> ROI для продавца. Индекс качества ответов = дифференциатор. Скорость = соблюдение SLA. График объёма = понимание нагрузки.',
+    analytics: '<strong>CJM:</strong> Экран про влияние коммуникаций на продажи. Видно качество ответов, скорость работы и как это связано с выручкой.',
     promo: '<strong>CJM:</strong> Промокоды создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Per-cabinet привязка. Help-панель объясняет механику. Чаты = приватно, отзывы = публично.',
     settings: '<strong>CJM:</strong> Настроить и забыть. Подключения, AI-тон, авто-ответы, профиль.'
 };
