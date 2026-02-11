@@ -3273,25 +3273,28 @@ html, body {
                     <!-- Metrics (demo) -->
                     <div class="metrics-grid">
                         <div class="metric-card">
+                            <div class="metric-label">Без ответа сейчас</div>
+                            <div class="metric-value urgent">7</div>
+                            <div class="metric-change negative">3 срочных в работе</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">SLA по срочным сегодня</div>
+                            <div class="metric-value warning">78%</div>
+                            <div class="metric-change negative">Цель: ≥ 90%</div>
+                        </div>
+                        <div class="metric-card">
                             <div class="metric-label">Упущенная выручка (30 дн)</div>
                             <div class="metric-value urgent">42 000 ₽</div>
-                            <div class="metric-change negative">+8% к прошлому периоду</div>
+                            <div class="metric-change negative">Оценка модели, доверие 0.62</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Потенциал возврата (30 дн)</div>
                             <div class="metric-value good">28 000 ₽</div>
-                            <div class="metric-change positive">При внедрении авто-сценариев</div>
+                            <div class="metric-change positive">Если довести SLA до 90%</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Прогноз рейтинга (14 дн)</div>
-                            <div class="metric-value warning">4.4 / 5</div>
-                            <div class="metric-change positive">+0.1 при закрытии срочных</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Прогноз роста выручки</div>
-                            <div class="metric-value good">+6.8%</div>
-                            <div class="metric-change positive">Горизонт: 30 дней</div>
-                        </div>
+                    </div>
+                    <div style="margin-top: -8px; margin-bottom: 20px; font-size: 11px; color: var(--color-text-tertiary);">
+                        Что делать: сначала закрыть чаты без ответа и срочные SLA. Деньги справа пересчитываются от этих действий.
                     </div>
 
                     <!-- Urgent chats (demo) -->
@@ -3431,26 +3434,29 @@ html, body {
 
                 <!-- Metrics -->
                 <div class="metrics-grid">
+                    <div class="metric-card" onclick="showScreen('messages')">
+                        <div class="metric-label">Без ответа сейчас</div>
+                        <div class="metric-value urgent">7</div>
+                        <div class="metric-change negative">3 срочных в работе</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('messages')">
+                        <div class="metric-label">SLA по срочным сегодня</div>
+                        <div class="metric-value warning">78%</div>
+                        <div class="metric-change negative">Цель: ≥ 90%</div>
+                    </div>
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Упущенная выручка (30 дн)</div>
                         <div class="metric-value urgent">42 000 ₽</div>
-                        <div class="metric-change negative">+8% к прошлому периоду</div>
+                        <div class="metric-change negative">Оценка модели, доверие 0.62</div>
                     </div>
                     <div class="metric-card" onclick="showScreen('analytics')">
                         <div class="metric-label">Потенциал возврата (30 дн)</div>
                         <div class="metric-value good">28 000 ₽</div>
-                        <div class="metric-change positive">При внедрении авто-сценариев</div>
+                        <div class="metric-change positive">Если довести SLA до 90%</div>
                     </div>
-                    <div class="metric-card" onclick="showScreen('analytics')">
-                        <div class="metric-label">Прогноз рейтинга (14 дн)</div>
-                        <div class="metric-value warning">4.4 / 5</div>
-                        <div class="metric-change positive">+0.1 при закрытии срочных</div>
-                    </div>
-                    <div class="metric-card" onclick="showScreen('analytics')">
-                        <div class="metric-label">Прогноз роста выручки</div>
-                        <div class="metric-value good">+6.8%</div>
-                        <div class="metric-change positive">Горизонт: 30 дней</div>
-                    </div>
+                </div>
+                <div style="margin-top: -8px; margin-bottom: 20px; font-size: 11px; color: var(--color-text-tertiary);">
+                    Слева — управляемые KPI команды, справа — денежный эффект. Клик по KPI откроет нужный рабочий экран.
                 </div>
 
                 <!-- Urgent chats -->
@@ -4780,7 +4786,7 @@ const cjmNotes = {
     onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить WB. Ценность: "все сообщения в одном месте, видно что срочно". Не AI-ответы (касдев).',
     syncing: '<strong>CJM:</strong> Батч-загрузка как Apple Mail. Первые 50 чатов = можно работать. Остальные в фоне. Не блокируем пользователя — кнопка "перейти" сразу.',
     'dashboard-empty': '<strong>CJM:</strong> Пользователь нажал "Пропустить" — видит полную Главную с демо-данными. Жёлтая верхняя плашка: "Демо-данные. Подключите WB чтобы увидеть свои". Понимает ценность продукта ДО подключения.',
-    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек: 7 без ответа, 3 срочных, индекс качества 8.2. Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. Слева — что делать сейчас (без ответа + SLA), справа — денежный эффект (потери + потенциал). Чеклист настройки пока не всё сделано. Каждая карточка → клик к деталям.',
     messages: '<strong>CJM:</strong> 80% времени здесь. Баннер синхронизации "50 из ~200" (Apple Mail). Авто-ответы с badge "авто" + пониженная opacity. Фильтр "Обработаны" покажет их.',
     analytics: '<strong>CJM:</strong> ROI для продавца. Индекс качества ответов = дифференциатор. Скорость = соблюдение SLA. График объёма = понимание нагрузки.',
     promo: '<strong>CJM:</strong> Промокоды создаются в ЛК WB, вносятся сюда, AI подставляет в ответы. Per-cabinet привязка. Help-панель объясняет механику. Чаты = приватно, отзывы = публично.',
