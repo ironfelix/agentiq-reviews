@@ -1,0 +1,3232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentIQ — App Screens Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN SYSTEM (from Chat Center) ===== */
+:root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafbfc;
+    --color-bg-tertiary: #f8f9fa;
+    --color-bg-hover: #f5f6f7;
+    --color-bg-active: #f0f7ff;
+
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5f6368;
+    --color-text-tertiary: #9aa0a6;
+
+    --color-border-light: #f5f6f7;
+    --color-border-medium: #e8eaed;
+    --color-border-dark: #dadce0;
+
+    --color-accent: #1a73e8;
+    --color-accent-light: #e8f0fe;
+    --color-urgent: #ea4335;
+    --color-success: #34a853;
+    --color-warning: #f9ab00;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 100px;
+
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+    --transition-fast: 0.15s ease;
+    --transition-medium: 0.25s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ===== SCREEN NAVIGATOR (dev only) ===== */
+.screen-nav {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 9999;
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.85);
+    padding: 6px 8px;
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(12px);
+}
+
+.screen-nav button {
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.screen-nav button:hover { background: rgba(255,255,255,0.1); color: white; }
+.screen-nav button.active { background: var(--color-accent); color: white; }
+
+/* ===== SCREEN CONTAINER ===== */
+.screen {
+    display: none;
+    height: 100vh;
+    width: 100%;
+}
+.screen.active { display: flex; }
+
+/* ===== CJM ANNOTATION ===== */
+.cjm-note {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9998;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    backdrop-filter: blur(12px);
+    max-width: 600px;
+    text-align: center;
+    line-height: 1.4;
+}
+.cjm-note strong { color: var(--color-warning); }
+
+/* ========================================================
+   SCREEN 1: ONBOARDING — CONNECT MARKETPLACE
+   ======================================================== */
+.onboarding {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+    position: relative;
+}
+
+.onboarding-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 48px 40px;
+    text-align: center;
+}
+
+.onboarding-logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+.onboarding-logo span { color: var(--color-accent); }
+
+.onboarding-subtitle {
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    margin-bottom: 48px;
+}
+
+.onboarding-step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border-medium);
+    transition: all var(--transition-medium);
+}
+.step-dot.active { background: var(--color-accent); width: 24px; border-radius: 4px; }
+.step-dot.done { background: var(--color-success); }
+
+.onboarding-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.onboarding-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+}
+
+.marketplace-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.marketplace-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+.marketplace-btn:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+.marketplace-btn.selected { border-color: var(--color-accent); background: var(--color-accent-light); }
+.marketplace-btn.disabled { opacity: 0.5; cursor: default; }
+.marketplace-btn.disabled:hover { border-color: var(--color-border-medium); background: var(--color-bg-primary); }
+
+.mp-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+}
+.mp-icon.wb { background: #8b33ff; }
+.mp-icon.ozon { background: #005bff; font-size: 11px; }
+
+.mp-info { flex: 1; }
+.mp-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.mp-desc { font-size: 12px; color: var(--color-text-tertiary); }
+.mp-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+}
+
+/* API key input */
+.api-key-section {
+    display: none;
+    margin-top: 24px;
+    text-align: left;
+}
+.api-key-section.visible { display: block; }
+
+.api-key-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.api-key-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.api-key-field {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    transition: border-color var(--transition-fast);
+}
+.api-key-field:focus { outline: none; border-color: var(--color-accent); }
+.api-key-field::placeholder { color: var(--color-text-tertiary); }
+
+.api-key-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+}
+.api-key-hint a { color: var(--color-accent); text-decoration: none; }
+.api-key-hint a:hover { text-decoration: underline; }
+
+/* CTA button */
+.btn-cta {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 24px;
+}
+.btn-cta:hover { background: #1557b0; }
+.btn-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cta:active { transform: scale(0.98); }
+
+.btn-skip {
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 16px;
+    padding: 8px;
+    transition: color var(--transition-fast);
+}
+.btn-skip:hover { color: var(--color-text-secondary); }
+
+/* ========================================================
+   SCREEN 2: ONBOARDING — SYNCING
+   ======================================================== */
+.sync-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+}
+
+.sync-animation {
+    width: 64px;
+    height: 64px;
+    border: 3px solid var(--color-border-medium);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 32px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sync-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sync-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+.sync-progress {
+    width: 300px;
+    height: 4px;
+    background: var(--color-border-medium);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.sync-progress-bar {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    width: 65%;
+    transition: width 0.5s ease;
+    animation: progress 2s ease infinite;
+}
+@keyframes progress {
+    0% { width: 20%; }
+    50% { width: 75%; }
+    100% { width: 20%; }
+}
+
+.sync-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.sync-stat {
+    text-align: center;
+}
+.sync-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-accent);
+}
+.sync-stat-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+/* ========================================================
+   SCREEN 3: ONBOARDING — DONE
+   ======================================================== */
+.done-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-primary);
+}
+
+.done-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(52, 168, 83, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.done-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--color-success);
+}
+
+.done-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.done-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+.done-preview {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.done-chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+}
+
+.done-chat-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--color-bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.done-chat-info { flex: 1; min-width: 0; }
+.done-chat-name { font-size: 13px; font-weight: 500; }
+.done-chat-preview {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.done-chat-meta {
+    text-align: right;
+    flex-shrink: 0;
+}
+.done-chat-time {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+.done-chat-badge {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 18px;
+    margin-top: 4px;
+}
+
+/* ========================================================
+   SCREEN 4+: APP SHELL (Sidebar + Content)
+   ======================================================== */
+.app-shell {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 56px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    flex-shrink: 0;
+}
+
+.sidebar-logo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 24px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+.sidebar-logo span { color: var(--color-accent); }
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.sidebar-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--color-text-tertiary);
+    position: relative;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+}
+.sidebar-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+.sidebar-item.active { background: var(--color-accent-light); color: var(--color-accent); }
+
+.sidebar-item svg {
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-bg-primary);
+}
+
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.sidebar-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.sidebar-avatar:hover { opacity: 0.85; }
+
+/* Tooltip */
+.sidebar-item[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 52px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+}
+
+/* Content area */
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--color-bg-secondary);
+}
+
+/* ========================================================
+   DASHBOARD
+   ======================================================== */
+.dashboard {
+    padding: 32px;
+    max-width: 960px;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+}
+
+.dashboard-greeting {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.dashboard-date {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+
+/* Setup checklist */
+.setup-checklist {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.setup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.setup-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.setup-progress-text {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.setup-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.setup-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.setup-step:hover { border-color: var(--color-border-medium); background: var(--color-bg-tertiary); }
+.setup-step.done { opacity: 0.5; }
+
+.setup-check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-border-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+.setup-step.done .setup-check {
+    background: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.setup-check svg { width: 12px; height: 12px; color: white; display: none; }
+.setup-step.done .setup-check svg { display: block; }
+
+.setup-step-info { flex: 1; }
+.setup-step-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.setup-step-desc { font-size: 12px; color: var(--color-text-tertiary); }
+
+.setup-step-time {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-tertiary);
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+/* Metric cards */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.metric-card:hover { border-color: var(--color-border-dark); box-shadow: var(--shadow-sm); }
+
+.metric-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.metric-value.urgent { color: var(--color-urgent); }
+.metric-value.good { color: var(--color-success); }
+.metric-value.warning { color: var(--color-warning); }
+
+.metric-change {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.metric-change.positive { color: var(--color-success); }
+.metric-change.negative { color: var(--color-urgent); }
+
+/* Urgent chats section */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.section-link {
+    font-size: 13px;
+    color: var(--color-accent);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+.section-link:hover { color: #1557b0; }
+
+.urgent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.urgent-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.urgent-item:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
+
+.urgent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-urgent);
+    flex-shrink: 0;
+}
+.urgent-dot.warning { background: var(--color-warning); }
+
+.urgent-info { flex: 1; min-width: 0; }
+.urgent-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.urgent-preview {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.urgent-meta { text-align: right; flex-shrink: 0; }
+.urgent-time { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.urgent-sla {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--radius-pill);
+}
+.urgent-sla.overdue { background: rgba(234,67,53,0.1); color: var(--color-urgent); }
+.urgent-sla.soon { background: rgba(249,171,0,0.1); color: var(--color-warning); }
+
+/* ========================================================
+   MESSAGES (Chat Center placeholder)
+   ======================================================== */
+.messages-placeholder {
+    display: flex;
+    height: 100%;
+}
+
+.msg-list-panel {
+    width: 340px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-list-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+
+.msg-list-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.msg-search {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+.msg-search:focus { outline: none; border-color: var(--color-border-medium); background: var(--color-bg-primary); }
+.msg-search::placeholder { color: var(--color-text-tertiary); }
+
+.msg-filters {
+    display: flex;
+    gap: 4px;
+}
+
+.msg-filter-pill {
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+.msg-filter-pill:hover { background: var(--color-bg-tertiary); }
+.msg-filter-pill.active { background: var(--color-text-primary); color: white; }
+
+.msg-list-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.msg-queue-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 4px 6px;
+}
+
+.msg-chat-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: 2px;
+}
+.msg-chat-item:hover { background: var(--color-bg-tertiary); }
+.msg-chat-item.active { background: var(--color-bg-active); }
+
+.msg-chat-icon {
+    width: 18px;
+    height: 18px;
+    background: #8b33ff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.msg-chat-content { flex: 1; min-width: 0; }
+.msg-chat-header { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.msg-chat-name { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-chat-time { font-size: 10px; color: var(--color-text-tertiary); }
+.msg-chat-meta { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-chat-preview { font-size: 12px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.msg-status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+.msg-status-dot.red { background: var(--color-urgent); }
+.msg-status-dot.yellow { background: var(--color-warning); }
+.msg-status-dot.green { background: var(--color-success); }
+
+.msg-unread-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--color-accent);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Chat window */
+.msg-chat-panel {
+    flex: 1;
+    background: #e8f2f8;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-chat-header-bar {
+    padding: 16px 24px;
+    background: white;
+    border-bottom: 1px solid var(--color-border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.msg-chat-header-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.msg-chat-header-meta { font-size: 13px; color: var(--color-text-secondary); }
+
+.msg-chat-messages {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.msg-bubble {
+    max-width: 480px;
+}
+.msg-bubble.customer { align-self: flex-start; }
+.msg-bubble.seller { align-self: flex-end; }
+
+.msg-bubble-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.msg-bubble-author { font-size: 13px; font-weight: 500; }
+.msg-bubble-time { font-size: 12px; color: var(--color-text-tertiary); }
+
+.msg-bubble-content {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.msg-bubble.seller .msg-bubble-content { background: #dcedff; }
+
+.msg-ai-suggestion {
+    background: var(--color-bg-hover);
+    border-left: 3px solid var(--color-text-primary);
+    padding: 14px 16px;
+    margin: 0 24px 16px 24px;
+    border-radius: var(--radius-md);
+}
+
+.msg-ai-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.msg-ai-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+}
+
+.msg-ai-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.msg-ai-use {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+}
+.msg-ai-use:hover { color: #1557b0; }
+
+.msg-input-bar {
+    padding: 16px 24px;
+    background: white;
+    border-top: 1px solid var(--color-border-medium);
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.msg-input-field {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--color-bg-hover);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    min-height: 44px;
+    color: var(--color-text-primary);
+}
+.msg-input-field:focus { outline: none; border-color: var(--color-text-primary); background: white; }
+
+.msg-send-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--color-text-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Context panel */
+.msg-context-panel {
+    width: 300px;
+    background: white;
+    border-left: 1px solid var(--color-border-medium);
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.msg-context-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+
+.msg-context-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.msg-context-product { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.msg-context-article { font-size: 12px; color: var(--color-text-secondary); }
+
+.msg-context-item { margin-bottom: 12px; }
+.msg-context-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.msg-context-value { font-size: 13px; }
+
+.msg-insight-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--color-bg-hover);
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+.msg-insight-badge.negative { background: #fce8e6; color: #c5221f; }
+
+/* ========================================================
+   ANALYTICS
+   ======================================================== */
+.analytics-page {
+    padding: 32px;
+    max-width: 960px;
+}
+
+.analytics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.analytics-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.analytics-period {
+    display: flex;
+    gap: 4px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    padding: 3px;
+}
+
+.period-btn {
+    padding: 6px 14px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+}
+.period-btn.active { background: var(--color-text-primary); color: white; }
+
+/* Quality score card */
+.quality-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 48px;
+    align-items: center;
+}
+
+.quality-gauge {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.gauge-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 8px solid var(--color-border-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.gauge-circle::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    border: 8px solid transparent;
+    border-top-color: var(--color-success);
+    border-right-color: var(--color-success);
+    border-bottom-color: var(--color-success);
+    transform: rotate(-30deg);
+}
+
+.gauge-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.gauge-label {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+.gauge-verdict {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-success);
+    margin-top: 12px;
+}
+
+.quality-breakdown { flex: 1; }
+
+.quality-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.quality-bar-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.quality-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.quality-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+.quality-bar-fill.good { background: var(--color-success); }
+.quality-bar-fill.acceptable { background: #4285f4; }
+.quality-bar-fill.risky { background: var(--color-warning); }
+.quality-bar-fill.harmful { background: var(--color-urgent); }
+
+.quality-bar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Speed metrics */
+.speed-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.speed-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.speed-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.speed-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.speed-target {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+}
+.speed-target span { font-weight: 500; }
+.speed-target.met { color: var(--color-success); }
+.speed-target.missed { color: var(--color-urgent); }
+
+/* Chart placeholder */
+.chart-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.chart-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chart-area {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding-top: 20px;
+}
+
+.chart-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-bar {
+    width: 100%;
+    max-width: 32px;
+    border-radius: 4px 4px 0 0;
+    transition: all var(--transition-medium);
+}
+.chart-bar:hover { opacity: 0.8; }
+
+.chart-bar-label {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+}
+
+/* ========================================================
+   SETTINGS
+   ======================================================== */
+.settings-page {
+    display: flex;
+    height: 100%;
+}
+
+.settings-nav {
+    width: 220px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    padding: 24px 12px;
+}
+
+.settings-nav-title {
+    font-size: 17px;
+    font-weight: 600;
+    padding: 0 8px;
+    margin-bottom: 20px;
+}
+
+.settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    width: 100%;
+    background: none;
+    border: none;
+    font-family: inherit;
+    text-align: left;
+}
+.settings-nav-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+.settings-nav-item.active { background: var(--color-accent-light); color: var(--color-accent); font-weight: 500; }
+
+.settings-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.settings-content {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+}
+
+.settings-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.settings-section-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Connection cards */
+.connection-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.connection-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+}
+.connection-icon.wb { background: #8b33ff; }
+.connection-icon.ozon { background: #005bff; font-size: 12px; }
+
+.connection-info { flex: 1; }
+.connection-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.connection-status { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.connection-status.connected { color: var(--color-success); }
+.connection-status.disconnected { color: var(--color-text-tertiary); }
+.connection-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.connection-status.connected .connection-status-dot { background: var(--color-success); }
+.connection-status.disconnected .connection-status-dot { background: var(--color-border-dark); }
+
+.connection-action {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border-medium);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+.connection-action:hover { border-color: var(--color-border-dark); background: var(--color-bg-tertiary); }
+.connection-action.primary { background: var(--color-accent); color: white; border-color: var(--color-accent); }
+.connection-action.primary:hover { background: #1557b0; }
+
+/* AI Settings */
+.ai-setting-card {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.ai-setting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ai-setting-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Toggle switch */
+.toggle {
+    width: 42px;
+    height: 24px;
+    background: var(--color-border-dark);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+.toggle.on { background: var(--color-accent); }
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: left var(--transition-fast);
+}
+.toggle.on::after { left: 20px; }
+
+.ai-setting-desc {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+}
+
+/* Tone selector */
+.tone-options {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tone-option {
+    flex: 1;
+    padding: 10px;
+    background: var(--color-bg-secondary);
+    border: 1.5px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+.tone-option:hover { border-color: var(--color-border-dark); }
+.tone-option.active { border-color: var(--color-accent); background: var(--color-accent-light); }
+
+.tone-emoji { font-size: 20px; margin-bottom: 4px; }
+.tone-name { font-size: 12px; font-weight: 500; }
+
+/* Profile */
+.profile-form {
+    max-width: 400px;
+}
+
+.form-field {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+}
+.form-input:focus { outline: none; border-color: var(--color-accent); }
+
+.form-save {
+    padding: 10px 24px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+}
+.form-save:hover { background: #1557b0; }
+
+/* ========================================================
+   BOTTOM NAVIGATION BAR (mobile only)
+   ======================================================== */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--color-bg-primary);
+    border-top: 1px solid var(--color-border-medium);
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    transition: color var(--transition-fast);
+    position: relative;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.bottom-nav-item span {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.bottom-nav-item.active {
+    color: var(--color-accent);
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile back button for Messages chat (hidden on desktop) */
+.msg-chat-back-btn {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    flex-shrink: 0;
+    margin-left: -12px;
+    margin-right: 4px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.msg-chat-back-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ========================================================
+   MOBILE STYLES (max-width: 768px)
+   ======================================================== */
+@media (max-width: 768px) {
+
+    /* --- General --- */
+    body {
+        overflow: auto;
+        height: auto;
+    }
+
+    /* Screen nav (dev): horizontal scroll */
+    .screen-nav {
+        top: auto;
+        bottom: auto;
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        padding: 4px 6px;
+    }
+
+    .screen-nav button {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    /* CJM note on mobile */
+    .cjm-note {
+        bottom: 64px;
+        left: 8px;
+        right: 8px;
+        transform: none;
+        font-size: 11px;
+        padding: 6px 12px;
+        max-width: none;
+    }
+
+    /* Screens should be scrollable */
+    .screen {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    /* --- Screen 1: Onboarding --- */
+    .onboarding-card {
+        padding: 24px 16px;
+        max-width: 100%;
+    }
+
+    .onboarding-logo {
+        font-size: 22px;
+    }
+
+    .onboarding-subtitle {
+        font-size: 12px;
+        margin-bottom: 32px;
+    }
+
+    .onboarding-title {
+        font-size: 20px;
+    }
+
+    .onboarding-desc {
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+
+    .onboarding-desc br {
+        display: none;
+    }
+
+    .marketplace-btn {
+        padding: 14px 16px;
+    }
+
+    .mp-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .mp-name {
+        font-size: 14px;
+    }
+
+    .api-key-field {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .btn-cta {
+        font-size: 14px;
+        padding: 14px 20px;
+    }
+
+    /* --- Screen 2: Syncing --- */
+    .sync-screen {
+        padding: 24px 16px;
+    }
+
+    .sync-progress {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .sync-title {
+        font-size: 18px;
+    }
+
+    /* --- Screen 3: Done --- */
+    .done-screen {
+        padding: 24px 16px;
+    }
+
+    .done-preview {
+        max-width: 100%;
+    }
+
+    .done-title {
+        font-size: 20px;
+    }
+
+    .done-chat-item {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .done-chat-name {
+        font-size: 12px;
+    }
+
+    .done-chat-preview {
+        font-size: 11px;
+    }
+
+    /* --- App Shell: hide sidebar, show bottom nav --- */
+    .app-shell {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    .bottom-nav {
+        display: flex;
+    }
+
+    .app-content {
+        padding-bottom: 72px; /* space for bottom nav */
+    }
+
+    /* --- Screen 4: Dashboard --- */
+    .dashboard {
+        padding: 16px;
+    }
+
+    .dashboard-greeting {
+        font-size: 20px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 20px;
+    }
+
+    .setup-checklist {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .setup-step {
+        padding: 10px 12px;
+    }
+
+    .setup-step-time {
+        display: none;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .metric-card {
+        padding: 14px;
+    }
+
+    .metric-value {
+        font-size: 24px;
+    }
+
+    .metric-label {
+        font-size: 11px;
+    }
+
+    .urgent-item {
+        padding: 10px 12px;
+    }
+
+    .urgent-name {
+        font-size: 12px;
+    }
+
+    .urgent-preview {
+        font-size: 11px;
+    }
+
+    .urgent-time {
+        font-size: 10px;
+    }
+
+    /* --- Screen 5: Messages --- */
+    .messages-placeholder {
+        flex-direction: column;
+        height: calc(100vh - 56px); /* minus bottom nav */
+        position: relative;
+    }
+
+    /* By default, show list panel fullscreen */
+    .msg-list-panel {
+        width: 100%;
+        height: 100%;
+        flex-shrink: 0;
+    }
+
+    .msg-chat-panel {
+        display: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+    }
+
+    .msg-context-panel {
+        display: none !important;
+    }
+
+    /* When a chat is selected (mobile-chat-open class on screen) */
+    #screen-messages.mobile-chat-open .msg-list-panel {
+        display: none;
+    }
+
+    #screen-messages.mobile-chat-open .msg-chat-panel {
+        display: flex;
+    }
+
+    /* Show back button on mobile */
+    .msg-chat-back-btn {
+        display: flex;
+    }
+
+    /* Chat list adjustments */
+    .msg-list-header {
+        padding: 12px 16px;
+    }
+
+    .msg-list-title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .msg-search {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .msg-filters {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .msg-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .msg-filter-pill {
+        flex-shrink: 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 8px 14px;
+    }
+
+    .msg-list-body {
+        padding: 8px;
+    }
+
+    .msg-chat-item {
+        padding: 10px 8px;
+    }
+
+    /* Chat window adjustments on mobile */
+    .msg-chat-header-bar {
+        padding: 8px 12px;
+    }
+
+    .msg-chat-header-info h3 {
+        font-size: 15px;
+    }
+
+    .msg-chat-header-meta {
+        font-size: 12px;
+    }
+
+    .msg-chat-messages {
+        padding: 12px;
+        gap: 14px;
+    }
+
+    .msg-bubble {
+        max-width: 90%;
+    }
+
+    .msg-bubble-content {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .msg-ai-suggestion {
+        margin: 0 12px 12px 12px;
+        padding: 12px 14px;
+    }
+
+    .msg-input-bar {
+        padding: 8px 12px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .msg-input-field {
+        font-size: 16px; /* prevent iOS zoom */
+        min-height: 44px;
+    }
+
+    /* Make chat items touch-friendly */
+    .msg-chat-item {
+        min-height: 44px;
+    }
+
+    /* --- Screen 6: Analytics --- */
+    .analytics-page {
+        padding: 16px;
+    }
+
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-title {
+        font-size: 20px;
+    }
+
+    .analytics-period {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        scrollbar-width: none;
+    }
+
+    .analytics-period::-webkit-scrollbar {
+        display: none;
+    }
+
+    .period-btn {
+        min-height: 44px;
+        padding: 8px 14px;
+        flex-shrink: 0;
+    }
+
+    .quality-card {
+        flex-direction: column;
+        gap: 24px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .gauge-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .gauge-value {
+        font-size: 26px;
+    }
+
+    .gauge-label {
+        font-size: 10px;
+    }
+
+    .quality-breakdown {
+        width: 100%;
+    }
+
+    .speed-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .speed-card {
+        padding: 16px;
+    }
+
+    .speed-value {
+        font-size: 22px;
+    }
+
+    .chart-card {
+        padding: 16px;
+    }
+
+    .chart-area {
+        height: 140px;
+    }
+
+    /* --- Screen 7: Settings --- */
+    .settings-page {
+        flex-direction: column;
+        padding-bottom: 72px; /* space for bottom nav */
+    }
+
+    .settings-nav {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border-medium);
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .settings-nav-title {
+        display: none;
+    }
+
+    .settings-nav-item {
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 16px;
+        font-size: 10px;
+        text-align: center;
+        flex-shrink: 0;
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .settings-nav-item svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .settings-content {
+        padding: 16px;
+    }
+
+    .settings-section-title {
+        font-size: 16px;
+    }
+
+    .connection-card {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .connection-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .connection-action {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .tone-options {
+        flex-direction: column;
+    }
+
+    .tone-option {
+        padding: 12px;
+        min-height: 44px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+    }
+
+    .tone-emoji {
+        margin-bottom: 0;
+    }
+
+    .ai-setting-card {
+        padding: 16px;
+    }
+
+    .toggle {
+        min-width: 44px;
+        min-height: 28px;
+    }
+
+    .profile-form {
+        max-width: 100%;
+    }
+
+    .form-input {
+        font-size: 16px; /* prevent iOS zoom */
+    }
+
+    .form-save {
+        width: 100%;
+        min-height: 44px;
+    }
+}
+
+/* ========================================================
+   SMALL MOBILE (max-width: 400px)
+   ======================================================== */
+@media (max-width: 400px) {
+
+    .onboarding-card {
+        padding: 20px 12px;
+    }
+
+    .metrics-grid {
+        gap: 8px;
+    }
+
+    .metric-card {
+        padding: 12px;
+    }
+
+    .metric-value {
+        font-size: 22px;
+    }
+
+    .connection-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .connection-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .bottom-nav-item span {
+        font-size: 9px;
+    }
+
+    .bottom-nav-item {
+        padding: 6px 8px;
+    }
+}
+
+/* ========================================================
+   TABLET STYLES (769px - 1024px)
+   ======================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    /* Sidebar stays visible but slightly narrower */
+    .sidebar {
+        width: 48px;
+    }
+
+    .sidebar-item {
+        width: 36px;
+        height: 36px;
+    }
+
+    .sidebar-item svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sidebar-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+
+    .sidebar-logo {
+        font-size: 10px;
+    }
+
+    /* Bottom nav stays hidden on tablet */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* Dashboard: 2 columns for metrics */
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard {
+        padding: 24px;
+    }
+
+    /* Messages: hide context panel on tablet */
+    .msg-context-panel {
+        display: none;
+    }
+
+    .msg-list-panel {
+        width: 280px;
+    }
+
+    /* Analytics */
+    .analytics-page {
+        padding: 24px;
+    }
+
+    .quality-card {
+        gap: 32px;
+        padding: 24px;
+    }
+
+    .speed-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Settings: nav stays as left sidebar but narrower */
+    .settings-nav {
+        width: 180px;
+        padding: 20px 8px;
+    }
+
+    .settings-content {
+        padding: 24px;
+    }
+}
+
+/* ========================================================
+   NO HORIZONTAL OVERFLOW (all sizes)
+   ======================================================== */
+html, body {
+    overflow-x: hidden;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN NAVIGATOR ===== -->
+<div class="screen-nav">
+    <button onclick="showScreen('onboarding')" id="nav-onboarding">1. Онбординг</button>
+    <button onclick="showScreen('syncing')" id="nav-syncing">2. Синхр.</button>
+    <button onclick="showScreen('done')" id="nav-done">3. Готово</button>
+    <button onclick="showScreen('dashboard')" id="nav-dashboard">4. Главная</button>
+    <button onclick="showScreen('messages')" id="nav-messages">5. Сообщения</button>
+    <button onclick="showScreen('analytics')" id="nav-analytics">6. Аналитика</button>
+    <button onclick="showScreen('settings')" id="nav-settings">7. Настройки</button>
+</div>
+
+<!-- CJM annotation -->
+<div class="cjm-note" id="cjm-note"></div>
+
+<!-- ========================================================
+     SCREEN 1: ONBOARDING — CONNECT MARKETPLACE
+     ======================================================== -->
+<div class="screen onboarding" id="screen-onboarding">
+    <div class="onboarding-card">
+        <div class="onboarding-logo">AGENT<span>IQ</span></div>
+        <div class="onboarding-subtitle">AI-платформа для маркетплейсов</div>
+
+        <div class="onboarding-step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <div class="onboarding-title">Подключите маркетплейс</div>
+        <div class="onboarding-desc">
+            AgentIQ загрузит ваши чаты и начнёт генерировать<br>AI-ответы на сообщения покупателей
+        </div>
+
+        <div class="marketplace-buttons">
+            <div class="marketplace-btn selected" onclick="document.querySelector('.api-key-section').classList.add('visible')">
+                <div class="mp-icon wb">W</div>
+                <div class="mp-info">
+                    <div class="mp-name">Wildberries</div>
+                    <div class="mp-desc">Чаты, отзывы, вопросы</div>
+                </div>
+            </div>
+            <div class="marketplace-btn disabled">
+                <div class="mp-icon ozon">Ozon</div>
+                <div class="mp-info">
+                    <div class="mp-name">Ozon</div>
+                    <div class="mp-desc">Чаты, отзывы, вопросы</div>
+                </div>
+                <div class="mp-badge">Скоро</div>
+            </div>
+        </div>
+
+        <div class="api-key-section visible">
+            <div class="api-key-label">API-ключ Wildberries</div>
+            <div class="api-key-input-row">
+                <input type="text" class="api-key-field" placeholder="Вставьте ключ из ЛК продавца" value="eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            <div class="api-key-hint">
+                Создайте ключ в <a href="#">Настройки &rarr; Доступ к API</a> с правами на чаты
+            </div>
+        </div>
+
+        <button class="btn-cta" onclick="showScreen('syncing')">Подключить и загрузить чаты</button>
+        <button class="btn-skip" onclick="showScreen('dashboard')">Пропустить, настрою позже</button>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 2: SYNCING
+     ======================================================== -->
+<div class="screen sync-screen" id="screen-syncing">
+    <div class="sync-animation"></div>
+    <div class="sync-title">Загружаем чаты с Wildberries</div>
+    <div class="sync-desc">Обычно занимает 30-60 секунд</div>
+    <div class="sync-progress">
+        <div class="sync-progress-bar"></div>
+    </div>
+    <div class="sync-stats">
+        <div class="sync-stat">
+            <div class="sync-stat-value">24</div>
+            <div class="sync-stat-label">чата найдено</div>
+        </div>
+        <div class="sync-stat">
+            <div class="sync-stat-value">156</div>
+            <div class="sync-stat-label">сообщений</div>
+        </div>
+        <div class="sync-stat">
+            <div class="sync-stat-value">3</div>
+            <div class="sync-stat-label">срочных</div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 3: ONBOARDING DONE
+     ======================================================== -->
+<div class="screen done-screen" id="screen-done">
+    <div class="done-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+    </div>
+    <div class="done-title">Готово! Найдено 24 чата</div>
+    <div class="done-desc">3 чата требуют срочного ответа</div>
+
+    <div class="done-preview">
+        <div class="done-chat-item">
+            <div class="done-chat-avatar" style="background: rgba(234,67,53,0.1); color: #ea4335;">!</div>
+            <div class="done-chat-info">
+                <div class="done-chat-name">Мария Козлова</div>
+                <div class="done-chat-preview">Товар пришёл с браком, кнопка не работает...</div>
+            </div>
+            <div class="done-chat-meta">
+                <div class="done-chat-time">12 мин</div>
+                <div class="done-chat-badge">1</div>
+            </div>
+        </div>
+        <div class="done-chat-item">
+            <div class="done-chat-avatar" style="background: rgba(234,67,53,0.1); color: #ea4335;">!</div>
+            <div class="done-chat-info">
+                <div class="done-chat-name">Алексей Петров</div>
+                <div class="done-chat-preview">Прислали не тот размер, нужен возврат</div>
+            </div>
+            <div class="done-chat-meta">
+                <div class="done-chat-time">28 мин</div>
+                <div class="done-chat-badge">2</div>
+            </div>
+        </div>
+        <div class="done-chat-item">
+            <div class="done-chat-avatar" style="background: rgba(249,171,0,0.1); color: #f9ab00;">?</div>
+            <div class="done-chat-info">
+                <div class="done-chat-name">Екатерина Новикова</div>
+                <div class="done-chat-preview">Подскажите, какой размер выбрать при росте 170?</div>
+            </div>
+            <div class="done-chat-meta">
+                <div class="done-chat-time">1ч</div>
+                <div class="done-chat-badge">1</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-cta" style="max-width: 400px;" onclick="showScreen('messages')">Перейти к сообщениям</button>
+</div>
+
+<!-- ========================================================
+     SCREEN 4: DASHBOARD
+     ======================================================== -->
+<div class="screen" id="screen-dashboard">
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-nav">
+                <button class="sidebar-item active" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="sidebar-avatar">ИИ</div>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-greeting">Привет, Иван</div>
+                    <div class="dashboard-date">Вторник, 11 февраля 2026</div>
+                </div>
+
+                <!-- Setup checklist (shown until all steps done) -->
+                <div class="setup-checklist">
+                    <div class="setup-header">
+                        <div class="setup-title">Настройте AgentIQ</div>
+                        <div class="setup-progress-text">1 из 3</div>
+                    </div>
+                    <div class="setup-steps">
+                        <div class="setup-step done">
+                            <div class="setup-check">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Подключить Wildberries</div>
+                                <div class="setup-step-desc">API-ключ добавлен, 24 чата загружены</div>
+                            </div>
+                        </div>
+                        <div class="setup-step" onclick="showScreen('settings')">
+                            <div class="setup-check"></div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Настроить AI-ассистента</div>
+                                <div class="setup-step-desc">Выберите тон ответов и правила авто-ответов</div>
+                            </div>
+                            <div class="setup-step-time">2 мин</div>
+                        </div>
+                        <div class="setup-step">
+                            <div class="setup-check"></div>
+                            <div class="setup-step-info">
+                                <div class="setup-step-name">Ответьте на первый чат</div>
+                                <div class="setup-step-desc">Используйте AI-подсказку или напишите свой ответ</div>
+                            </div>
+                            <div class="setup-step-time">1 мин</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card" onclick="showScreen('messages')">
+                        <div class="metric-label">Без ответа</div>
+                        <div class="metric-value urgent">7</div>
+                        <div class="metric-change negative">+3 за сегодня</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('messages')">
+                        <div class="metric-label">Срочных (SLA)</div>
+                        <div class="metric-value urgent">3</div>
+                        <div class="metric-change negative">2 просрочены</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Ср. время ответа</div>
+                        <div class="metric-value warning">47м</div>
+                        <div class="metric-change negative">Цель: &lt;30м</div>
+                    </div>
+                    <div class="metric-card" onclick="showScreen('analytics')">
+                        <div class="metric-label">Quality Score</div>
+                        <div class="metric-value good">8.2</div>
+                        <div class="metric-change positive">+0.4 за неделю</div>
+                    </div>
+                </div>
+
+                <!-- Urgent chats -->
+                <div class="section-header">
+                    <div class="section-title">Требуют внимания</div>
+                    <div class="section-link" onclick="showScreen('messages')">Все сообщения &rarr;</div>
+                </div>
+                <div class="urgent-list">
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Мария Козлова</div>
+                            <div class="urgent-preview">Товар пришёл с браком, кнопка не работает, требую замену</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">12 мин назад</div>
+                            <div class="urgent-sla overdue">SLA 23м</div>
+                        </div>
+                    </div>
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Алексей Петров</div>
+                            <div class="urgent-preview">Прислали не тот размер, как оформить возврат?</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">28 мин назад</div>
+                            <div class="urgent-sla overdue">SLA 2м</div>
+                        </div>
+                    </div>
+                    <div class="urgent-item" onclick="showScreen('messages')">
+                        <div class="urgent-dot warning"></div>
+                        <div class="urgent-info">
+                            <div class="urgent-name">Екатерина Новикова</div>
+                            <div class="urgent-preview">Подскажите, какой размер выбрать при росте 170?</div>
+                        </div>
+                        <div class="urgent-meta">
+                            <div class="urgent-time">1ч назад</div>
+                            <div class="urgent-sla soon">SLA 48м</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 5: MESSAGES (Chat Center)
+     ======================================================== -->
+<div class="screen" id="screen-messages">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <button class="sidebar-item active" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="sidebar-avatar">ИИ</div>
+            </div>
+        </nav>
+
+        <div class="messages-placeholder">
+            <!-- Chat list -->
+            <div class="msg-list-panel">
+                <div class="msg-list-header">
+                    <div class="msg-list-title">Сообщения</div>
+                    <input type="text" class="msg-search" placeholder="Поиск чатов...">
+                    <div class="msg-filters">
+                        <button class="msg-filter-pill active">Все</button>
+                        <button class="msg-filter-pill">Срочно</button>
+                        <button class="msg-filter-pill">Без ответа</button>
+                        <button class="msg-filter-pill">Обработаны</button>
+                    </div>
+                </div>
+                <div class="msg-list-body">
+                    <div class="msg-queue-label"><span class="msg-status-dot red"></span> В работе</div>
+                    <div class="msg-chat-item active">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Мария Козлова</div>
+                                <div class="msg-unread-badge">1</div>
+                                <div class="msg-chat-time">12:47</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot red"></span>Чат &middot; Термокружка с датчиком</div>
+                            <div class="msg-chat-preview">Товар пришёл с браком, кнопка не работает</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Алексей Петров</div>
+                                <div class="msg-unread-badge">2</div>
+                                <div class="msg-chat-time">12:19</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot red"></span>Чат &middot; Кроссовки Nike Air</div>
+                            <div class="msg-chat-preview">Прислали не тот размер, нужен возврат</div>
+                        </div>
+                    </div>
+
+                    <div class="msg-queue-label" style="margin-top: 16px;"><span class="msg-status-dot yellow"></span> Ожидают ответа</div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Екатерина Новикова</div>
+                                <div class="msg-unread-badge">1</div>
+                                <div class="msg-chat-time">11:48</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot yellow"></span>Чат &middot; Платье летнее</div>
+                            <div class="msg-chat-preview">Подскажите размер при росте 170?</div>
+                        </div>
+                    </div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Дмитрий Соколов</div>
+                                <div class="msg-chat-time">10:32</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot yellow"></span>Чат &middot; Рюкзак городской</div>
+                            <div class="msg-chat-preview">Есть ли этот рюкзак в чёрном цвете?</div>
+                        </div>
+                    </div>
+
+                    <div class="msg-queue-label" style="margin-top: 16px;"><span class="msg-status-dot green"></span> Все сообщения</div>
+                    <div class="msg-chat-item">
+                        <div class="msg-chat-icon">W</div>
+                        <div class="msg-chat-content">
+                            <div class="msg-chat-header">
+                                <div class="msg-chat-name">Анна Смирнова</div>
+                                <div class="msg-chat-time">Вчера</div>
+                            </div>
+                            <div class="msg-chat-meta"><span class="msg-status-dot green"></span>Чат &middot; Наушники BT-500</div>
+                            <div class="msg-chat-preview">Спасибо за оперативный ответ!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat window -->
+            <div class="msg-chat-panel">
+                <div class="msg-chat-header-bar">
+                    <button class="msg-chat-back-btn" onclick="document.getElementById('screen-messages').classList.remove('mobile-chat-open')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <div class="msg-chat-header-info">
+                        <h3>Мария Козлова</h3>
+                        <div class="msg-chat-header-meta">Wildberries &middot; Арт. 123456 &middot; Термокружка с датчиком температуры</div>
+                    </div>
+                </div>
+
+                <div class="msg-chat-messages">
+                    <div class="msg-bubble customer">
+                        <div class="msg-bubble-header">
+                            <div class="msg-bubble-author">Мария Козлова</div>
+                            <div class="msg-bubble-time">12:47</div>
+                        </div>
+                        <div class="msg-bubble-content">
+                            Здравствуйте! Получила термокружку, но кнопка включения дисплея не работает. Нажимаю - ничего не происходит. Товар пришёл с браком. Что делать?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="msg-ai-suggestion">
+                    <div class="msg-ai-label">AI-подсказка</div>
+                    <div class="msg-ai-text">
+                        Мария, добрый день! Приносим извинения за неудобства. Попробуйте, пожалуйста, зажать кнопку на 3 секунды - у данной модели долгое нажатие для активации. Если не поможет, оформите возврат через Личный кабинет WB как "товар с браком" - мы всё компенсируем.
+                    </div>
+                    <div class="msg-ai-actions">
+                        <button class="msg-ai-use">Использовать ответ</button>
+                    </div>
+                </div>
+
+                <div class="msg-input-bar">
+                    <textarea class="msg-input-field" placeholder="Написать ответ..." rows="1"></textarea>
+                    <button class="msg-send-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Context panel -->
+            <div class="msg-context-panel">
+                <div class="msg-context-section">
+                    <div class="msg-context-title">Товар</div>
+                    <div class="msg-context-product">Термокружка с датчиком температуры 450мл</div>
+                    <div class="msg-context-article">Арт. 123456</div>
+                </div>
+                <div class="msg-context-section">
+                    <div class="msg-context-title">AI Анализ</div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Интент</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge">defect_not_working</span></div>
+                    </div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Тональность</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge negative">Негативная</span></div>
+                    </div>
+                    <div class="msg-context-item">
+                        <div class="msg-context-label">Приоритет</div>
+                        <div class="msg-context-value"><span class="msg-insight-badge negative">Срочный</span></div>
+                    </div>
+                </div>
+                <div class="msg-context-section">
+                    <div class="msg-context-title">Действия</div>
+                    <div class="msg-context-item">
+                        <a href="#" style="color: var(--color-accent); text-decoration: none; font-size: 13px;">Открыть чат на WB</a>
+                    </div>
+                    <div class="msg-context-item">
+                        <a href="#" style="color: var(--color-accent); text-decoration: none; font-size: 13px;">Карточка товара</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 6: ANALYTICS
+     ======================================================== -->
+<div class="screen" id="screen-analytics">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item active" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="sidebar-avatar">ИИ</div>
+            </div>
+        </nav>
+
+        <div class="app-content">
+            <div class="analytics-page">
+                <div class="analytics-header">
+                    <div class="analytics-title">Аналитика</div>
+                    <div class="analytics-period">
+                        <button class="period-btn">7 дней</button>
+                        <button class="period-btn active">30 дней</button>
+                        <button class="period-btn">90 дней</button>
+                    </div>
+                </div>
+
+                <!-- Quality Score -->
+                <div class="quality-card">
+                    <div class="quality-gauge">
+                        <div class="gauge-circle">
+                            <div class="gauge-value">8.2</div>
+                            <div class="gauge-label">из 10</div>
+                        </div>
+                        <div class="gauge-verdict">Хорошо</div>
+                    </div>
+                    <div class="quality-breakdown">
+                        <div style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">Качество ответов</div>
+                        <div class="quality-row">
+                            <div class="quality-bar-label">Хорошие</div>
+                            <div class="quality-bar-track"><div class="quality-bar-fill good" style="width: 62%"></div></div>
+                            <div class="quality-bar-value">62%</div>
+                        </div>
+                        <div class="quality-row">
+                            <div class="quality-bar-label">Допустимые</div>
+                            <div class="quality-bar-track"><div class="quality-bar-fill acceptable" style="width: 24%"></div></div>
+                            <div class="quality-bar-value">24%</div>
+                        </div>
+                        <div class="quality-row">
+                            <div class="quality-bar-label">Рискованные</div>
+                            <div class="quality-bar-track"><div class="quality-bar-fill risky" style="width: 10%"></div></div>
+                            <div class="quality-bar-value">10%</div>
+                        </div>
+                        <div class="quality-row">
+                            <div class="quality-bar-label">Вредные</div>
+                            <div class="quality-bar-track"><div class="quality-bar-fill harmful" style="width: 4%"></div></div>
+                            <div class="quality-bar-value">4%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Speed metrics -->
+                <div class="speed-grid">
+                    <div class="speed-card">
+                        <div class="speed-label">Медиана ответа (негатив)</div>
+                        <div class="speed-value" style="color: var(--color-warning);">47м</div>
+                        <div class="speed-target missed">Цель: <span>&lt;30 мин</span></div>
+                    </div>
+                    <div class="speed-card">
+                        <div class="speed-label">Медиана ответа (все)</div>
+                        <div class="speed-value" style="color: var(--color-success);">2ч 10м</div>
+                        <div class="speed-target met">Цель: <span>&lt;4 часа</span></div>
+                    </div>
+                    <div class="speed-card">
+                        <div class="speed-label">Отвечено за период</div>
+                        <div class="speed-value">156</div>
+                        <div class="speed-target">Из 162 чатов <span>(96%)</span></div>
+                    </div>
+                </div>
+
+                <!-- Volume chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Объём сообщений</div>
+                    </div>
+                    <div class="chart-area">
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 40px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Пн</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 65px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Вт</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 80px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Ср</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 55px; background: var(--color-accent-light);"></div><div class="chart-bar-label">Чт</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 90px; background: var(--color-accent);"></div><div class="chart-bar-label">Пт</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 120px; background: var(--color-accent);"></div><div class="chart-bar-label">Сб</div></div>
+                        <div class="chart-bar-group"><div class="chart-bar" style="height: 100px; background: var(--color-accent);"></div><div class="chart-bar-label">Вс</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ========================================================
+     SCREEN 7: SETTINGS
+     ======================================================== -->
+<div class="screen" id="screen-settings">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-nav">
+                <button class="sidebar-item" data-tooltip="Главная" onclick="showScreen('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <button class="sidebar-item" data-tooltip="Сообщения" onclick="showScreen('messages')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <div class="sidebar-badge">3</div>
+                </button>
+                <button class="sidebar-item" data-tooltip="Аналитика" onclick="showScreen('analytics')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item active" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="sidebar-avatar">ИИ</div>
+            </div>
+        </nav>
+
+        <div class="settings-page">
+            <div class="settings-nav">
+                <div class="settings-nav-title">Настройки</div>
+                <button class="settings-nav-item active" onclick="showSettingsTab('connections')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    Подключения
+                </button>
+                <button class="settings-nav-item" onclick="showSettingsTab('ai')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    AI-ассистент
+                </button>
+                <button class="settings-nav-item" onclick="showSettingsTab('profile')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Профиль
+                </button>
+            </div>
+
+            <div class="settings-content">
+                <!-- Connections tab -->
+                <div id="settings-connections">
+                    <div class="settings-section-title">Подключения</div>
+                    <div class="settings-section-desc">Управляйте подключениями к маркетплейсам. AgentIQ синхронизирует чаты каждые 30 секунд.</div>
+
+                    <div class="connection-card">
+                        <div class="connection-icon wb">W</div>
+                        <div class="connection-info">
+                            <div class="connection-name">Wildberries</div>
+                            <div class="connection-status connected">
+                                <div class="connection-status-dot"></div>
+                                Подключено &middot; Последняя синхр. 2 мин назад
+                            </div>
+                        </div>
+                        <button class="connection-action">Настроить</button>
+                    </div>
+
+                    <div class="connection-card">
+                        <div class="connection-icon ozon">Ozon</div>
+                        <div class="connection-info">
+                            <div class="connection-name">Ozon</div>
+                            <div class="connection-status disconnected">
+                                <div class="connection-status-dot"></div>
+                                Не подключено
+                            </div>
+                        </div>
+                        <button class="connection-action primary">Подключить</button>
+                    </div>
+                </div>
+
+                <!-- AI tab -->
+                <div id="settings-ai" style="display: none;">
+                    <div class="settings-section-title">AI-ассистент</div>
+                    <div class="settings-section-desc">Настройте, как AI генерирует ответы на сообщения покупателей.</div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">Тон ответов</div>
+                        </div>
+                        <div class="ai-setting-desc">Выберите стиль общения AI с покупателями</div>
+                        <div class="tone-options">
+                            <div class="tone-option">
+                                <div class="tone-emoji">&#x1F454;</div>
+                                <div class="tone-name">Формальный</div>
+                            </div>
+                            <div class="tone-option active">
+                                <div class="tone-emoji">&#x1F60A;</div>
+                                <div class="tone-name">Дружелюбный</div>
+                            </div>
+                            <div class="tone-option">
+                                <div class="tone-emoji">&#x1F4DD;</div>
+                                <div class="tone-name">Нейтральный</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">Авто-ответы на позитив</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">Автоматически отвечать на положительные отзывы (4-5 звёзд) без вашего участия. Экономит ~2 часа в день.</div>
+                    </div>
+
+                    <div class="ai-setting-card">
+                        <div class="ai-setting-header">
+                            <div class="ai-setting-title">AI-подсказки</div>
+                            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                        </div>
+                        <div class="ai-setting-desc">Показывать AI-рекомендацию ответа для каждого нового чата. Вы можете отредактировать или отклонить подсказку.</div>
+                    </div>
+                </div>
+
+                <!-- Profile tab -->
+                <div id="settings-profile" style="display: none;">
+                    <div class="settings-section-title">Профиль</div>
+                    <div class="settings-section-desc">Основная информация о вашем аккаунте.</div>
+
+                    <div class="profile-form">
+                        <div class="form-field">
+                            <label class="form-label">Название компании</label>
+                            <input type="text" class="form-input" value="ООО Иванов">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="ivan@example.com">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Пароль</label>
+                            <input type="password" class="form-input" value="********">
+                        </div>
+                        <button class="form-save">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item" onclick="showScreen('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+                <div class="bottom-nav-badge">3</div>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item active" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+
+<script>
+// CJM notes for each screen
+const cjmNotes = {
+    onboarding: '<strong>CJM:</strong> Первый вход после регистрации. Одна задача: подключить маркетплейс. Нет лишних вопросов (мы знаем цель пользователя). "Пропустить" для нетерпеливых.',
+    syncing: '<strong>CJM:</strong> Пользователь ждёт. Показываем прогресс + цифры (чаты, сообщения, срочные) чтобы было видно - что-то происходит. 30-60 сек.',
+    done: '<strong>CJM:</strong> Мгновенная ценность: "Найдено 24 чата, 3 срочных". Превью первых чатов - пользователь видит свои данные. Один CTA: перейти к работе.',
+    dashboard: '<strong>CJM:</strong> Точка входа каждый день. За 3 сек видно: 7 без ответа, 3 срочных, quality 8.2. Чеклист настройки пока не всё сделано. Каждая карточка - клик к деталям.',
+    messages: '<strong>CJM:</strong> 80% времени здесь. Это существующий Chat Center + sidebar навигация. AI-подсказка + контекст товара + очереди по приоритету.',
+    analytics: '<strong>CJM:</strong> ROI для продавца. Quality Score = главный дифференциатор от конкурентов. Скорость ответа показывает SLA compliance. График объёма = понимание нагрузки.',
+    settings: '<strong>CJM:</strong> Настроить один раз, забыть. 3 раздела: подключения (API ключи), AI (тон + авто-ответы), профиль. Минимум настроек = минимум когнитивной нагрузки.'
+};
+
+// Map screen names to bottom nav index (0=dashboard, 1=messages, 2=analytics, 3=settings)
+const bottomNavMap = {
+    dashboard: 0,
+    messages: 1,
+    analytics: 2,
+    settings: 3
+};
+
+function showScreen(name) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+        s.classList.remove('mobile-chat-open');
+    });
+    document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+
+    // Show target
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+
+    // Update bottom nav active states (each app-shell screen has its own bottom-nav)
+    document.querySelectorAll('.bottom-nav').forEach(nav => {
+        nav.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+    });
+    // Set active on the bottom nav inside the active screen
+    const activeScreen = document.getElementById('screen-' + name);
+    const bottomNav = activeScreen ? activeScreen.querySelector('.bottom-nav') : null;
+    if (bottomNav && bottomNavMap.hasOwnProperty(name)) {
+        const items = bottomNav.querySelectorAll('.bottom-nav-item');
+        const idx = bottomNavMap[name];
+        if (items[idx]) {
+            items[idx].classList.add('active');
+        }
+    }
+
+    // Update CJM note
+    document.getElementById('cjm-note').innerHTML = cjmNotes[name] || '';
+}
+
+// Handle mobile chat open: clicking a chat item opens the chat panel
+document.addEventListener('click', function(e) {
+    const chatItem = e.target.closest('.msg-chat-item');
+    if (chatItem && window.innerWidth <= 768) {
+        const messagesScreen = document.getElementById('screen-messages');
+        if (messagesScreen) {
+            messagesScreen.classList.add('mobile-chat-open');
+        }
+    }
+});
+
+function showSettingsTab(tab) {
+    // Hide all tabs
+    document.getElementById('settings-connections').style.display = 'none';
+    document.getElementById('settings-ai').style.display = 'none';
+    document.getElementById('settings-profile').style.display = 'none';
+
+    // Show target
+    document.getElementById('settings-' + tab).style.display = 'block';
+
+    // Update nav
+    document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
+    event.target.closest('.settings-nav-item').classList.add('active');
+}
+
+// Start with onboarding
+showScreen('onboarding');
+</script>
+
+</body>
+</html>
