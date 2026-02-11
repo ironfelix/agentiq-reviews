@@ -2125,6 +2125,33 @@ body {
     flex-shrink: 0;
 }
 
+/* UX clarity block: answers "what it gives" + "what next" */
+.ux-why-next {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: 6px;
+}
+
+.ux-why-next.compact {
+    margin-top: -2px;
+    margin-bottom: 12px;
+}
+
+.ux-why-next-line {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+}
+
+.ux-why-next-label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
 /* AI Settings */
 .ai-setting-card {
     background: var(--color-bg-primary);
@@ -3224,10 +3251,14 @@ html, body {
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                        <div class="promo-count" style="margin-bottom: 0;">Что влияет на выручку?</div>
+                        <div class="promo-count" style="margin-bottom: 0;">ПОКАЗАТЕЛИ</div>
                         <div class="kpi-context-actions">
                             <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Что влияет на выручку?</button>
                         </div>
+                    </div>
+                    <div class="ux-why-next">
+                        <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Показывает, где горит сейчас и сколько это стоит бизнесу.</div>
+                        <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Подключить WB и перейти в сообщения, чтобы закрыть срочные.</div>
                     </div>
 
                     <!-- Metrics (demo) -->
@@ -3390,10 +3421,14 @@ html, body {
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <div class="promo-count" style="margin-bottom: 0;">Что влияет на выручку?</div>
+                    <div class="promo-count" style="margin-bottom: 0;">ПОКАЗАТЕЛИ</div>
                     <div class="kpi-context-actions">
                         <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Что влияет на выручку?</button>
                     </div>
+                </div>
+                <div class="ux-why-next">
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> За 10 секунд видно приоритет работы и ожидаемый денежный эффект.</div>
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Сначала закрыть "Без ответа", затем дотянуть скорость по срочным до цели.</div>
                 </div>
 
                 <!-- Metrics -->
@@ -3424,6 +3459,10 @@ html, body {
                 <div class="section-header">
                     <div class="section-title">Требуют внимания</div>
                     <div class="section-link" onclick="showScreen('messages')">Все сообщения &rarr;</div>
+                </div>
+                <div class="ux-why-next compact">
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Список диалогов, которые сильнее всего влияют на рейтинг и отмены.</div>
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Открыть каждый срочный диалог и дать ответ до просрочки.</div>
                 </div>
                 <div class="urgent-list">
                     <div class="urgent-item" onclick="showScreen('messages')">
@@ -3813,11 +3852,19 @@ html, body {
                         <div class="kpi-trend neutral">+ 3 вопроса</div>
                     </div>
                 </div>
+                <div class="ux-why-next">
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Быстрый health-check качества, скорости и рейтинга за период.</div>
+                    <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Если "Без ответа" больше нуля, сначала разгрузить входящий поток в сообщениях.</div>
+                </div>
 
                 <!-- Row 2: Индекс качества ответов + Speed -->
                 <div class="analytics-grid">
                     <!-- Индекс качества ответов -->
                     <div class="quality-card" style="margin-bottom: 0;">
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Показывает долю ответов, которые повышают или снижают доверие.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Снизить "Рискованные" и "Вредные": обновить шаблоны и tone-of-voice.</div>
+                        </div>
                         <div class="quality-gauge">
                             <div class="gauge-circle">
                                 <div class="gauge-value">8.2</div>
@@ -3853,6 +3900,10 @@ html, body {
                     <!-- Speed + SLA -->
                     <div class="chart-card">
                         <div class="chart-title" style="margin-bottom: 16px;">Скорость ответа</div>
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Видно, где команда не успевает в целевой SLA.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Приоритизировать негативы 1-3★ и довести ответ по ним до &lt;30 мин.</div>
+                        </div>
                         <div class="speed-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
                             <div class="speed-card" style="margin: 0;">
                                 <div class="speed-label">Негатив (1-3)</div>
@@ -3897,6 +3948,10 @@ html, body {
                 <!-- Revenue Impact — high visibility, right after quality -->
                 <div class="chart-card" style="margin-bottom: 24px;">
                     <div class="chart-title" style="margin-bottom: 16px;">Влияние на продажи</div>
+                    <div class="ux-why-next compact">
+                        <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Денежную оценку эффекта от качества и скорости коммуникаций.</div>
+                        <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Выбрать метрику с наибольшими потерями и поставить цель на 7 дней.</div>
+                    </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
                         <div>
                             <div style="font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 6px;">Потери от плохих ответов</div>
@@ -3946,6 +4001,10 @@ html, body {
                     <!-- Rating distribution -->
                     <div class="chart-card">
                         <div class="chart-title" style="margin-bottom: 16px;">Распределение оценок</div>
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Видно, какая доля 1-3★ тянет рейтинг карточек вниз.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Разобрать 1-3★ вместе с "Топ жалобами" и закрыть главные причины.</div>
+                        </div>
                         <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px;">
                             <span style="font-size: 32px; font-weight: 700; color: #fbbc04;">4.3</span>
                             <span style="font-size: 12px; color: var(--color-text-tertiary);">из 5 (162 отзыва)</span>
@@ -3993,6 +4052,10 @@ html, body {
                                 <button class="period-btn active" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('funnel-all').style.display='block';document.getElementById('funnel-products').style.display='none';">Кабинет</button>
                                 <button class="period-btn" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('funnel-all').style.display='none';document.getElementById('funnel-products').style.display='block';">По товарам</button>
                             </div>
+                        </div>
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Показывает этап, где теряется больше всего покупателей.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Переключиться на "По товарам" и найти SKU с самой слабой конверсией.</div>
                         </div>
                         <div style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 16px;">Данные из Wildberries за выбранный период</div>
 
@@ -4111,6 +4174,10 @@ html, body {
                     <!-- Top complaints from cons field -->
                     <div class="chart-card">
                         <div class="chart-title" style="margin-bottom: 16px;">Топ жалоб из отзывов</div>
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Частые причины негатива, которые бьют по выкупу и рейтингу.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Взять жалобы №1-2 в работу: карточка товара, контент, шаблоны ответов.</div>
+                        </div>
                         <div class="complaint-list">
                             <div class="complaint-item" style="border-bottom: 1px solid var(--color-border-light);">
                                 <div class="complaint-rank">1</div>
@@ -4145,6 +4212,10 @@ html, body {
                     <div class="chart-card">
                         <div class="chart-header" style="margin-bottom: 12px;">
                             <div class="chart-title">Объём по каналам</div>
+                        </div>
+                        <div class="ux-why-next compact">
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что это дает:</span> Нагрузку команды по отзывам, вопросам и чатам по дням.</div>
+                            <div class="ux-why-next-line"><span class="ux-why-next-label">Что делать дальше:</span> Планировать смены и автоответы на дни с пиковым объемом.</div>
                         </div>
                         <div class="volume-legend">
                             <div class="legend-item"><div class="legend-dot" style="background: var(--color-accent);"></div>Отзывы</div>
