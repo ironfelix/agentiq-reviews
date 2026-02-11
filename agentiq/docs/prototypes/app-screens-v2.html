@@ -2371,7 +2371,7 @@ html, body {
 
         <div class="onboarding-title">Подключите маркетплейс</div>
         <div class="onboarding-desc">
-            AgentIQ загрузит ваши чаты и начнёт генерировать<br>AI-ответы на сообщения покупателей
+            Все сообщения покупателей в одном месте.<br>Видно что срочно, ничего не теряется.
         </div>
 
         <div class="marketplace-buttons">
@@ -2403,7 +2403,7 @@ html, body {
         </div>
 
         <button class="btn-cta" onclick="showScreen('syncing')">Подключить и загрузить чаты</button>
-        <button class="btn-skip" onclick="showScreen('dashboard')">Пропустить, настрою позже</button>
+        <button class="btn-skip" onclick="showScreen('dashboard-empty')">Пропустить, посмотрю сначала</button>
     </div>
 </div>
 
@@ -2412,76 +2412,82 @@ html, body {
      ======================================================== -->
 <div class="screen sync-screen" id="screen-syncing">
     <div class="sync-animation"></div>
-    <div class="sync-title">Загружаем чаты с Wildberries</div>
-    <div class="sync-desc">Обычно занимает 30-60 секунд</div>
+    <div class="sync-title">Подключаемся к Wildberries</div>
+    <div class="sync-desc">Проверяем API-ключ и загружаем первые чаты</div>
     <div class="sync-progress">
         <div class="sync-progress-bar"></div>
     </div>
     <div class="sync-stats">
         <div class="sync-stat">
-            <div class="sync-stat-value">24</div>
-            <div class="sync-stat-label">чата найдено</div>
-        </div>
-        <div class="sync-stat">
-            <div class="sync-stat-value">156</div>
-            <div class="sync-stat-label">сообщений</div>
-        </div>
-        <div class="sync-stat">
-            <div class="sync-stat-value">3</div>
-            <div class="sync-stat-label">срочных</div>
+            <div class="sync-stat-value" style="font-size: 16px; color: var(--color-text-secondary);">Загрузка 50 из ~200 чатов</div>
+            <div class="sync-stat-label">остальные загрузятся в фоне</div>
         </div>
     </div>
+    <button class="btn-cta" style="max-width: 300px; margin-top: 24px;" onclick="showScreen('messages')">
+        Перейти к сообщениям
+    </button>
+    <div style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 8px;">Или подождите полной загрузки</div>
 </div>
 
 <!-- ========================================================
-     SCREEN 3: ONBOARDING DONE
+     SCREEN 3: DASHBOARD — EMPTY (skipped onboarding)
      ======================================================== -->
-<div class="screen done-screen" id="screen-done">
-    <div class="done-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-        </svg>
-    </div>
-    <div class="done-title">Готово! Найдено 24 чата</div>
-    <div class="done-desc">3 чата требуют срочного ответа</div>
+<div class="screen" id="screen-dashboard-empty">
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="sidebar-logo">A<span>IQ</span></div>
+            <div class="sidebar-nav">
+                <button class="sidebar-item active" data-tooltip="Главная" onclick="showScreen('dashboard-empty')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <button class="sidebar-item" data-tooltip="Сообщения">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </button>
+                <button class="sidebar-item" data-tooltip="Аналитика">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="sidebar-item" data-tooltip="Настройки" onclick="showScreen('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <div class="sidebar-avatar">ИИ</div>
+            </div>
+        </nav>
 
-    <div class="done-preview">
-        <div class="done-chat-item">
-            <div class="done-chat-avatar" style="background: rgba(234,67,53,0.1); color: #ea4335;">!</div>
-            <div class="done-chat-info">
-                <div class="done-chat-name">Мария Козлова</div>
-                <div class="done-chat-preview">Товар пришёл с браком, кнопка не работает...</div>
-            </div>
-            <div class="done-chat-meta">
-                <div class="done-chat-time">12 мин</div>
-                <div class="done-chat-badge">1</div>
-            </div>
-        </div>
-        <div class="done-chat-item">
-            <div class="done-chat-avatar" style="background: rgba(234,67,53,0.1); color: #ea4335;">!</div>
-            <div class="done-chat-info">
-                <div class="done-chat-name">Алексей Петров</div>
-                <div class="done-chat-preview">Прислали не тот размер, нужен возврат</div>
-            </div>
-            <div class="done-chat-meta">
-                <div class="done-chat-time">28 мин</div>
-                <div class="done-chat-badge">2</div>
+        <div class="app-content">
+            <div class="dashboard" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 64px); text-align: center;">
+                <div style="width: 64px; height: 64px; background: var(--color-accent-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </div>
+                <div style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">Подключите маркетплейс</div>
+                <div style="font-size: 14px; color: var(--color-text-secondary); max-width: 320px; line-height: 1.5; margin-bottom: 24px;">
+                    Чтобы увидеть чаты покупателей, подключите API-ключ Wildberries
+                </div>
+                <button class="btn-cta" style="max-width: 280px;" onclick="showScreen('onboarding')">Подключить Wildberries</button>
             </div>
         </div>
-        <div class="done-chat-item">
-            <div class="done-chat-avatar" style="background: rgba(249,171,0,0.1); color: #f9ab00;">?</div>
-            <div class="done-chat-info">
-                <div class="done-chat-name">Екатерина Новикова</div>
-                <div class="done-chat-preview">Подскажите, какой размер выбрать при росте 170?</div>
-            </div>
-            <div class="done-chat-meta">
-                <div class="done-chat-time">1ч</div>
-                <div class="done-chat-badge">1</div>
-            </div>
-        </div>
-    </div>
 
-    <button class="btn-cta" style="max-width: 400px;" onclick="showScreen('messages')">Перейти к сообщениям</button>
+        <!-- Bottom Navigation (mobile only) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" onclick="showScreen('dashboard-empty')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Главная</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('messages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </button>
+            <button class="bottom-nav-item" onclick="showScreen('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </button>
+        </nav>
+    </div>
 </div>
 
 <!-- ========================================================
@@ -2685,6 +2691,13 @@ html, body {
                     </div>
                 </div>
                 <div class="msg-list-body">
+                    <!-- Sync banner (Apple Mail style) -->
+                    <div class="sync-banner" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--color-accent-light); border-radius: var(--radius-md); margin-bottom: 12px; font-size: 12px; color: var(--color-accent);">
+                        <div style="width: 14px; height: 14px; border: 2px solid var(--color-border-medium); border-top-color: var(--color-accent); border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0;"></div>
+                        <span>Загрузка... 50 из ~200 чатов</span>
+                        <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 11px;">в фоне</span>
+                    </div>
+
                     <div class="msg-queue-label"><span class="msg-status-dot red"></span> В работе</div>
                     <div class="msg-chat-item active">
                         <div class="msg-chat-icon">W</div>
