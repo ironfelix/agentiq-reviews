@@ -2125,18 +2125,6 @@ body {
     flex-shrink: 0;
 }
 
-.dashboard-context-card {
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-md);
-    padding: 10px 12px;
-    margin-bottom: 8px;
-}
-
-.dashboard-context-card strong {
-    color: var(--color-text-primary);
-}
-
 /* AI Settings */
 .ai-setting-card {
     background: var(--color-bg-primary);
@@ -3404,7 +3392,7 @@ html, body {
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                     <div class="promo-count" style="margin-bottom: 0;">Контекст KPI</div>
                     <div class="kpi-context-actions">
-                        <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Как это работает?</button>
+                        <button class="promo-help-link" onclick="document.getElementById('dashboardContextPanel').classList.add('open')">Что влияет на выручку?</button>
                     </div>
                 </div>
 
@@ -4740,31 +4728,22 @@ html, body {
 <!-- Dashboard context panel -->
 <div class="promo-help-panel" id="dashboardContextPanel">
     <button class="promo-help-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
-    <div class="promo-help-title">Как KPI на главной связаны с выручкой</div>
+    <div class="promo-help-title">Что влияет на выручку</div>
 
     <div class="promo-help-section">
         <div class="promo-help-label">Логика блока</div>
         <div class="promo-help-text">
-            На главной слева показаны управляемые KPI команды, справа — денежный эффект. Сначала работаем с левыми метриками, затем смотрим, как меняется правая часть.
+            На главной слева — управляемые KPI команды, справа — денежный эффект. Сначала работаем с левыми метриками, затем смотрим, как меняется правая часть.
         </div>
     </div>
 
     <div class="promo-help-section">
-        <div class="promo-help-label">Вопросы покупателей</div>
-        <div class="dashboard-context-card"><strong>Что делать:</strong> отвечать быстро и конкретно (размер, наличие, совместимость).</div>
-        <div class="dashboard-context-card"><strong>Что меняется:</strong> меньше сомнений до покупки, выше переход в корзину и заказ.</div>
-    </div>
-
-    <div class="promo-help-section">
-        <div class="promo-help-label">Чаты</div>
-        <div class="dashboard-context-card"><strong>Что делать:</strong> первыми закрывать срочные проблемы и не оставлять диалоги без ответа.</div>
-        <div class="dashboard-context-card"><strong>Что меняется:</strong> меньше отмен и возвратов, выше выкуп и лояльность.</div>
-    </div>
-
-    <div class="promo-help-section">
-        <div class="promo-help-label">Отзывы и ответы</div>
-        <div class="dashboard-context-card"><strong>Что делать:</strong> отвечать на негатив спокойно, по делу и без шаблонной «отписки».</div>
-        <div class="dashboard-context-card"><strong>Что меняется:</strong> стабильнее рейтинг карточки, выше доверие новых покупателей.</div>
+        <div class="promo-help-label">Каналы влияния</div>
+        <table class="promo-help-table">
+            <tr><td>Вопросы</td><td>Быстрый и конкретный ответ снимает сомнения до покупки.</td></tr>
+            <tr><td>Чаты</td><td>Приоритет срочных + ноль диалогов без ответа снижает отмены и возвраты.</td></tr>
+            <tr><td>Отзывы</td><td>Корректный ответ на негатив стабилизирует рейтинг и доверие к карточке.</td></tr>
+        </table>
     </div>
 
     <div class="promo-help-section">
@@ -4775,6 +4754,16 @@ html, body {
             3) Проверить, как изменились «Упущенная выручка» и «Потенциал возврата».
         </div>
     </div>
+
+    <div class="promo-help-warning">
+        Важно:<br>
+        • Сначала действия команды в левых KPI, потом оценка эффекта в денежных метриках справа.<br>
+        • Денежные показатели — оценка модели, а не бухгалтерский факт.
+    </div>
+
+    <a href="#" onclick="showScreen('analytics'); this.parentElement.classList.remove('open'); return false;" class="promo-help-link-ext">
+        Смотреть детали в Аналитике &rarr;
+    </a>
 </div>
 
 <script>
