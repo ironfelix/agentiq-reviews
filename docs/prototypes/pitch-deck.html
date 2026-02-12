@@ -1,0 +1,1704 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentIQ — Pitch Deck (HTML)</title>
+    <meta
+      name="description"
+      content="AgentIQ — unified communications workspace для селлеров маркетплейсов: отзывы, вопросы и чаты в одной очереди + AI-драфты, SLA и контроль качества."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ===== RESET ===== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
+
+      /* ===== DESIGN SYSTEM (aligned with AgentIQ landing / chat-center palette) ===== */
+      :root {
+        --color-bg-primary: #ffffff;
+        --color-bg-secondary: #fafbfc;
+        --color-bg-tertiary: #f8f9fa;
+        --color-bg-hover: #f5f6f7;
+        --color-bg-active: #f0f7ff;
+
+        --color-text-primary: #1a1a1a;
+        --color-text-secondary: #5f6368;
+        --color-text-tertiary: #9aa0a6;
+
+        --color-border-light: #f5f6f7;
+        --color-border-medium: #e8eaed;
+        --color-border-dark: #dadce0;
+
+        --color-accent: #1a73e8;
+        --color-accent-2: #0f56b3;
+        --color-accent-bg: rgba(26, 115, 232, 0.06);
+        --color-accent-bg-strong: rgba(26, 115, 232, 0.12);
+
+        --color-urgent: #ea4335;
+        --color-success: #34a853;
+        --color-warning: #f9ab00;
+
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-7: 32px;
+        --space-8: 40px;
+        --space-9: 56px;
+
+        --font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+        --radius-sm: 5px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --radius-xl: 16px;
+        --radius-2xl: 20px;
+        --radius-full: 9999px;
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+        --transition-fast: 0.12s ease;
+        --transition-medium: 0.2s ease;
+        --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+        --container-max: 1160px;
+        --nav-height: 64px;
+        --toc-width: 320px;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+
+      body {
+        font-family: var(--font-family);
+        color: var(--color-text-primary);
+        background: var(--color-bg-primary);
+        line-height: 1.55;
+        font-size: 14px;
+        overflow-x: hidden;
+      }
+
+      /* ===== BACKGROUND ===== */
+      .gradient-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .gradient-bg::before {
+        content: "";
+        position: absolute;
+        top: -18%;
+        right: -12%;
+        width: 720px;
+        height: 720px;
+        background: radial-gradient(circle, rgba(26, 115, 232, 0.06) 0%, transparent 70%);
+      }
+      .gradient-bg::after {
+        content: "";
+        position: absolute;
+        bottom: 10%;
+        left: -16%;
+        width: 560px;
+        height: 560px;
+        background: radial-gradient(circle, rgba(26, 115, 232, 0.045) 0%, transparent 70%);
+      }
+
+      /* ===== NAV ===== */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--nav-height);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid transparent;
+        transition: background var(--transition-medium), border-color var(--transition-medium);
+      }
+      .navbar.scrolled {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(18px) saturate(180%);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        border-color: var(--color-border-medium);
+      }
+      .nav-inner {
+        width: 100%;
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding: 0 var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-5);
+      }
+      .brand {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-2);
+        text-decoration: none;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        font-size: 16px;
+      }
+      .brand .mark {
+        color: var(--color-accent);
+      }
+      .brand .sub {
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        letter-spacing: 0.2px;
+        font-size: 12px;
+        display: none;
+      }
+      @media (min-width: 880px) {
+        .brand .sub {
+          display: inline;
+        }
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: var(--radius-full);
+        border: 1px solid var(--color-border-medium);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+        transition: transform var(--transition-fast), background var(--transition-medium),
+          box-shadow var(--transition-medium), border-color var(--transition-medium);
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow-sm);
+      }
+      .btn:active {
+        transform: translateY(0px);
+      }
+      .btn.primary {
+        border-color: transparent;
+        background: var(--color-text-primary);
+        color: var(--color-bg-primary);
+      }
+      .btn.primary:hover {
+        box-shadow: 0 10px 30px rgba(26, 115, 232, 0.18);
+      }
+      .btn .kbd {
+        font-weight: 700;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        padding: 3px 7px;
+      }
+      .btn:not(.primary) .kbd {
+        color: var(--color-text-secondary);
+        background: rgba(0, 0, 0, 0.04);
+      }
+
+      /* ===== LAYOUT ===== */
+      .page {
+        position: relative;
+        z-index: 1;
+        padding-top: var(--nav-height);
+      }
+      .container {
+        max-width: var(--container-max);
+        margin: 0 auto;
+        padding: 0 var(--space-6);
+      }
+      .deck {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-7);
+        padding: var(--space-7) 0 var(--space-9);
+      }
+      @media (min-width: 1040px) {
+        .deck {
+          grid-template-columns: var(--toc-width) 1fr;
+          gap: var(--space-8);
+          align-items: start;
+        }
+      }
+      @media (min-width: 1040px) {
+        #btnToc {
+          display: none;
+        }
+      }
+
+      /* ===== TOC ===== */
+      .toc {
+        position: sticky;
+        top: calc(var(--nav-height) + var(--space-6));
+        align-self: start;
+        display: none;
+      }
+      @media (min-width: 1040px) {
+        .toc {
+          display: block;
+        }
+      }
+      .toc-card {
+        border: 1px solid var(--color-border-medium);
+        background: rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(18px) saturate(180%);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-sm);
+        padding: var(--space-5);
+      }
+      .toc-title {
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+      }
+      .toc-list {
+        margin-top: var(--space-4);
+        display: grid;
+        gap: 4px;
+      }
+      .toc-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: 8px 10px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--color-text-secondary);
+        border: 1px solid transparent;
+        transition: background var(--transition-fast), border-color var(--transition-fast),
+          color var(--transition-fast);
+      }
+      .toc-link:hover {
+        background: var(--color-bg-hover);
+        color: var(--color-text-primary);
+      }
+      .toc-link.active {
+        background: var(--color-accent-bg-strong);
+        border-color: rgba(26, 115, 232, 0.22);
+        color: var(--color-accent-2);
+      }
+      .toc-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 12px;
+        color: var(--color-text-primary);
+        background: rgba(0, 0, 0, 0.04);
+      }
+      .toc-link.active .toc-num {
+        background: rgba(26, 115, 232, 0.14);
+        color: var(--color-accent-2);
+      }
+
+      /* ===== SECTIONS ===== */
+      .content {
+        display: grid;
+        gap: var(--space-8);
+      }
+      .deck-section {
+        scroll-margin-top: calc(var(--nav-height) + 18px);
+        border: 1px solid var(--color-border-medium);
+        background: rgba(255, 255, 255, 0.86);
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+      .section-inner {
+        padding: clamp(18px, 2.5vw, 30px);
+      }
+      .section-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        margin-bottom: var(--space-5);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--color-text-secondary);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.2px;
+      }
+      .chip.accent {
+        background: rgba(26, 115, 232, 0.12);
+        color: var(--color-accent-2);
+      }
+      .chip.todo {
+        background: rgba(249, 171, 0, 0.14);
+        color: #7a4d00;
+      }
+      .title {
+        font-size: clamp(22px, 2.4vw, 34px);
+        letter-spacing: -0.6px;
+        line-height: 1.1;
+        margin: 0;
+      }
+      .subtitle {
+        margin: var(--space-3) 0 0;
+        color: var(--color-text-secondary);
+        font-size: 14px;
+        max-width: 80ch;
+      }
+      .split {
+        display: grid;
+        gap: var(--space-6);
+        margin-top: var(--space-6);
+      }
+      @media (min-width: 900px) {
+        .split {
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: var(--space-7);
+          align-items: start;
+        }
+      }
+      .grid-3 {
+        margin-top: var(--space-6);
+        display: grid;
+        gap: var(--space-4);
+      }
+      @media (min-width: 900px) {
+        .grid-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .card {
+        border: 1px solid var(--color-border-medium);
+        background: var(--color-bg-primary);
+        border-radius: var(--radius-xl);
+        padding: var(--space-5);
+      }
+      .card h3 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: -0.2px;
+      }
+      .card p {
+        margin: var(--space-3) 0 0;
+        color: var(--color-text-secondary);
+      }
+      .list {
+        margin: var(--space-4) 0 0;
+        padding-left: 18px;
+        color: var(--color-text-secondary);
+      }
+      .list li {
+        margin: 8px 0;
+      }
+      .kpis {
+        display: grid;
+        gap: var(--space-4);
+        margin-top: var(--space-6);
+      }
+      @media (min-width: 760px) {
+        .kpis {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .kpi {
+        border: 1px solid var(--color-border-medium);
+        background: linear-gradient(180deg, rgba(26, 115, 232, 0.06), rgba(255, 255, 255, 0.86));
+        border-radius: var(--radius-xl);
+        padding: var(--space-5);
+      }
+      .kpi .big {
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+      }
+      .kpi .label {
+        margin-top: 6px;
+        color: var(--color-text-secondary);
+        font-weight: 600;
+      }
+      .kpi .note {
+        margin-top: 10px;
+        color: var(--color-text-tertiary);
+        font-size: 12px;
+      }
+      .muted {
+        color: var(--color-text-tertiary);
+      }
+      .accent {
+        color: var(--color-accent-2);
+        font-weight: 700;
+      }
+
+      .media {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 1px solid var(--color-border-medium);
+        background: var(--color-bg-secondary);
+        box-shadow: var(--shadow-sm);
+      }
+      .media img {
+        width: 100%;
+        height: auto;
+      }
+      .media-grid {
+        margin-top: var(--space-6);
+        display: grid;
+        gap: var(--space-5);
+      }
+      @media (min-width: 980px) {
+        .media-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .caption {
+        padding: 10px 12px;
+        border-top: 1px solid var(--color-border-medium);
+        color: var(--color-text-tertiary);
+        font-size: 12px;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: var(--space-5);
+        overflow: hidden;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-medium);
+      }
+      .table th,
+      .table td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--color-border-medium);
+        vertical-align: top;
+      }
+      .table th {
+        background: var(--color-bg-tertiary);
+        color: var(--color-text-secondary);
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .callout {
+        margin-top: var(--space-6);
+        border: 1px solid rgba(26, 115, 232, 0.25);
+        background: rgba(26, 115, 232, 0.08);
+        border-radius: var(--radius-xl);
+        padding: var(--space-5);
+        color: #0a3f86;
+      }
+      .callout strong {
+        color: #08356f;
+      }
+
+      /* ===== COVER ===== */
+      .cover {
+        position: relative;
+      }
+      .cover::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 25% 10%, rgba(26, 115, 232, 0.12), transparent 45%),
+          radial-gradient(circle at 90% 60%, rgba(26, 115, 232, 0.09), transparent 45%);
+        pointer-events: none;
+      }
+      .cover .section-inner {
+        position: relative;
+        padding: clamp(24px, 3.4vw, 42px);
+      }
+      .cover h1 {
+        margin: 0;
+        font-size: clamp(34px, 4.3vw, 54px);
+        line-height: 1.02;
+        letter-spacing: -1.4px;
+      }
+      .cover h1 .mark {
+        color: var(--color-accent);
+      }
+      .cover .tagline {
+        margin-top: var(--space-4);
+        font-size: 15px;
+        color: var(--color-text-secondary);
+        max-width: 90ch;
+      }
+      .cover .meta {
+        margin-top: var(--space-6);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+
+      /* ===== PRESENT MODE ===== */
+      body.present {
+        background: #f7f8fb;
+      }
+      body.present .toc {
+        display: none !important;
+      }
+      body.present .navbar {
+        background: rgba(255, 255, 255, 0.92);
+        border-color: var(--color-border-medium);
+      }
+      body.present .deck-section {
+        min-height: calc(100vh - var(--nav-height) - 22px);
+        display: grid;
+        align-items: center;
+      }
+
+      /* ===== TOC DRAWER (mobile/tablet) ===== */
+      .toc-drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: none;
+      }
+      .toc-drawer.open {
+        display: block;
+      }
+      .toc-drawer .backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.32);
+        backdrop-filter: blur(6px);
+      }
+      .toc-drawer .panel {
+        position: absolute;
+        top: calc(var(--nav-height) + 10px);
+        right: 10px;
+        left: 10px;
+        max-height: calc(100vh - var(--nav-height) - 20px);
+        overflow: auto;
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--color-border-medium);
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: var(--shadow-md);
+      }
+      @media (min-width: 640px) {
+        .toc-drawer .panel {
+          left: auto;
+          width: min(520px, calc(100vw - 20px));
+        }
+      }
+      .toc-drawer .panel-inner {
+        padding: var(--space-5);
+      }
+      .toc-drawer .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+      }
+      .toc-drawer .close {
+        border-radius: var(--radius-full);
+        padding: 10px 12px;
+        border: 1px solid var(--color-border-medium);
+        background: rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      /* ===== FOOTER / HELP ===== */
+      .help {
+        margin-top: var(--space-6);
+        color: var(--color-text-tertiary);
+        font-size: 12px;
+      }
+      .help code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--color-text-secondary);
+      }
+
+      /* ===== PRINT ===== */
+      @media print {
+        .gradient-bg,
+        .navbar,
+        .toc {
+          display: none !important;
+        }
+        body {
+          background: #fff !important;
+        }
+        .page {
+          padding-top: 0 !important;
+        }
+        .deck {
+          padding: 0 !important;
+          display: block !important;
+        }
+        .deck-section {
+          box-shadow: none !important;
+          border: 1px solid #ddd !important;
+          break-after: page;
+        }
+        .deck-section:last-child {
+          break-after: auto;
+        }
+        a {
+          text-decoration: none !important;
+        }
+        .caption {
+          color: #555 !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="gradient-bg" aria-hidden="true"></div>
+
+    <header class="navbar" id="navbar">
+      <div class="nav-inner">
+        <a class="brand" href="#cover" aria-label="AgentIQ Pitch Deck">
+          AGENT<span class="mark">&lt;IQ&gt;</span>
+          <span class="sub">Pitch Deck, HTML</span>
+        </a>
+
+        <div class="nav-actions">
+          <button class="btn" id="btnToc" type="button" title="Открыть содержание">
+            Contents
+          </button>
+          <button class="btn" id="btnPresent" type="button" title="Переключить режим презентации (P)">
+            Present <span class="kbd">P</span>
+          </button>
+          <button class="btn primary" id="btnPrint" type="button" title="Печать в PDF">
+            PDF / Print
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="container">
+        <div class="deck">
+          <aside class="toc" aria-label="Содержание">
+            <div class="toc-card">
+              <div class="toc-title">Содержание</div>
+              <nav class="toc-list" id="tocList"></nav>
+              <div class="help">
+                Навигация: <code>J</code>/<code>K</code> или <code>↓</code>/<code>↑</code> в Present.
+              </div>
+            </div>
+          </aside>
+
+          <div class="content" id="content">
+            <!-- 1 -->
+            <section class="deck-section cover" id="cover" data-nav="Обложка">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip accent">Unified Communications</span>
+                  <span class="chip">v0.1 • 2026-02-12</span>
+                </div>
+                <h1>
+                  Agent<span class="mark">IQ</span>:
+                  <br />
+                  Intercom для маркетплейсов
+                </h1>
+                <p class="tagline">
+                  Единое рабочее пространство для обработки <span class="accent">отзывов</span>,
+                  <span class="accent">вопросов</span> и <span class="accent">чатов</span> с покупателями на Wildberries
+                  (дальше: Ozon и другие). AI-драфты, SLA-приоритизация, контроль качества и операционная готовность к
+                  пилоту.
+                </p>
+
+                <div class="meta">
+                  <span class="chip">Сайт: agentiq.ru/app</span>
+                  <span class="chip">Модель: подписка + аудит-лидмагнит</span>
+                  <span class="chip todo">TBD: сумма/раунд</span>
+                </div>
+
+                <div class="callout">
+                  <strong>Коротко:</strong> мы не строим “ещё один генератор ответов”.
+                  Мы строим <strong>unified inbox + контроль результата</strong>: скорость по SLA, качество ответов,
+                  алерты, readiness и guardrails.
+                </div>
+              </div>
+            </section>
+
+            <!-- 2 -->
+            <section class="deck-section" id="one-liner" data-nav="Одна фраза">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">01</span>
+                  <span class="chip accent">В чём идея</span>
+                </div>
+                <h2 class="title">AgentIQ превращает хаос коммуникаций в управляемую очередь</h2>
+                <p class="subtitle">
+                  На WB сообщения живут в разных разделах, “важное” смешано с шумом, качество ответа не измеряется. Мы
+                  объединяем каналы в одну сущность, даём AI-драфт, ставим дедлайны (SLA), показываем качество и даём
+                  менеджеру контроль.
+                </p>
+
+                <div class="kpis">
+                  <div class="kpi">
+                    <div class="big">1 очередь</div>
+                    <div class="label">Отзывы + вопросы + чаты</div>
+                    <div class="note">Одна модель данных: interaction.</div>
+                  </div>
+                  <div class="kpi">
+                    <div class="big">SLA</div>
+                    <div class="label">Срочное видно сразу</div>
+                    <div class="note">Due-time, overdue, ops-alerts.</div>
+                  </div>
+                  <div class="kpi">
+                    <div class="big">Качество</div>
+                    <div class="label">Accept / edit / manual</div>
+                    <div class="note">Метрики “draft → reply” по дням.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 3 -->
+            <section class="deck-section" id="problem" data-nav="Проблема">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">02</span>
+                  <span class="chip accent">Pain</span>
+                </div>
+                <h2 class="title">Почему селлер теряет деньги на коммуникациях</h2>
+                <div class="split">
+                  <div>
+                    <div class="card">
+                      <h3>Фрагментация</h3>
+                      <p>Чаты, отзывы и вопросы отдельно. Нельзя увидеть общую картину и управлять очередью.</p>
+                      <ul class="list">
+                        <li>Нет единого backlog и ответственного.</li>
+                        <li>Сложно выстроить процесс (оператор → менеджер).</li>
+                      </ul>
+                    </div>
+
+                    <div class="card" style="margin-top: var(--space-4)">
+                      <h3>Скорость критична, но не управляется</h3>
+                      <p>Окно “покупатель максимально вовлечён” короткое: там решается отмена/возврат/негатив.</p>
+                      <ul class="list">
+                        <li>SLA по вопросам и срочным кейсам не виден.</li>
+                        <li>Нет алертов “overdue” и “due soon”.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="card">
+                      <h3>Качество ответа влияет на конверсию и рейтинг</h3>
+                      <p>
+                        Многие ответы вредят: обвинения, игнор, “копипаст”. Это снижает доверие и ухудшает перформанс
+                        карточки.
+                      </p>
+                      <ul class="list">
+                        <li>Нет понятной оценки качества и причин.</li>
+                        <li>Нет системы обучения команды на реальных кейсах.</li>
+                      </ul>
+                    </div>
+
+                    <div class="callout">
+                      <strong>Инвесторский угол:</strong> это не “автоматизация ради автоматизации”. Это
+                      <strong>контроль метрик процесса</strong>, которые можно привязать к бизнес-результату (через
+                      пилоты/эксперименты).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 4 -->
+            <section class="deck-section" id="solution" data-nav="Решение">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">03</span>
+                  <span class="chip accent">Solution</span>
+                </div>
+                <h2 class="title">Unified inbox + AI + операционный контроль</h2>
+                <p class="subtitle">
+                  AgentIQ делает коммуникации “похожими на Intercom”: очередь, контекст, драфты, таймлайны, guardrails и
+                  качество. Начинаем с Wildberries (WB-first), затем масштабируем на Ozon.
+                </p>
+
+                <div class="grid-3">
+                  <div class="card">
+                    <h3>Оператор</h3>
+                    <p>Одна очередь, чёткие приоритеты, быстрые драфты, удобный timeline похожих кейсов.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Менеджер</h3>
+                    <p>Качество ответов, алерты по SLA, readiness “GO/NO-GO” перед пилотом, контроль регрессий.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Бизнес</h3>
+                    <p>Быстрее ответили, лучше ответили, меньше негатива, больше доверия, меньше “утечек” выручки.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 5 -->
+            <section class="deck-section" id="product" data-nav="Продукт">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">04</span>
+                  <span class="chip accent">Product</span>
+                </div>
+                <h2 class="title">Как выглядит рабочее место</h2>
+                <p class="subtitle">
+                  Сейчас продукт включает Chat Center (unified interactions) и Reviews (AI-анализ отзывов). На уровне UI
+                  это один workspace: сообщения и аналитика.
+                </p>
+
+                <div class="media-grid">
+                  <div class="media">
+                    <img src="screenshots/chat-center.png" alt="AgentIQ Chat Center screenshot" />
+                    <div class="caption">Chat Center: unified inbox + AI-драфт + контекст справа.</div>
+                  </div>
+                  <div class="media">
+                    <img src="screenshots/quality-score.png" alt="Quality dashboard screenshot" />
+                    <div class="caption">Аналитика: качество (accept/edit/manual), ops-alerts, readiness.</div>
+                  </div>
+                  <div class="media">
+                    <img src="screenshots/review-analysis.png" alt="Review analysis screenshot" />
+                    <div class="caption">Reviews: анализ проблем и качества ответов с рекомендациями.</div>
+                  </div>
+                </div>
+
+                <div class="help">
+                  Источник скринов: <code>docs/prototypes/screenshots/</code>. Если нужно обновить картинки под ваш
+                  билд, замените PNG-файлы с теми же именами.
+                </div>
+              </div>
+            </section>
+
+            <!-- 6 -->
+            <section class="deck-section" id="tech" data-nav="Как работает">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">05</span>
+                  <span class="chip accent">How it works</span>
+                </div>
+                <h2 class="title">Основа: единая сущность interaction + guardrails</h2>
+                <div class="split">
+                  <div>
+                    <div class="card">
+                      <h3>Ingestion</h3>
+                      <p>Reviews + Questions + Chats собираются в unified слой (interaction) и синхронизируются фоном.</p>
+                      <ul class="list">
+                        <li>Стабильность: sync-status, retry и surfacing ошибок в UI.</li>
+                        <li>Покрытие: обязательные каналы review/question, chat как recommended на старте пилота.</li>
+                      </ul>
+                    </div>
+                    <div class="card" style="margin-top: var(--space-4)">
+                      <h3>AI Draft + Quality Metrics</h3>
+                      <p>Драфт генерируется под канал и контекст, дальше измеряем принятие/редактуру/ручной ответ.</p>
+                      <ul class="list">
+                        <li>Метрики по дням + алерты регрессии качества week-over-week.</li>
+                        <li>Runtime switching LLM (provider/model) без деплоя.</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="card">
+                      <h3>Linking + Timeline</h3>
+                      <p>Делаем кросс-канальный thread timeline (customer/order/product) с объяснениями и confidence.</p>
+                      <ul class="list">
+                        <li><span class="accent">Deterministic</span>: auto-allowed при confidence ≥ 85%.</li>
+                        <li><span class="accent">Probabilistic</span>: всегда assist-only (никаких auto-actions).</li>
+                      </ul>
+                    </div>
+                    <div class="callout">
+                      <strong>Почему это важно:</strong> в B2B-операциях доверие строится не на “магии”, а на
+                      <strong>предсказуемости</strong>: прозрачные правила, измерение качества, безопасные режимы пилота.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 7 -->
+            <section class="deck-section" id="differentiation" data-nav="Дифференциация">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">06</span>
+                  <span class="chip accent">Moat</span>
+                </div>
+                <h2 class="title">Почему это не “ещё один автоответчик”</h2>
+                <table class="table" aria-label="Сравнение">
+                  <thead>
+                    <tr>
+                      <th>Критерий</th>
+                      <th>Типичные сервисы</th>
+                      <th>AgentIQ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Фокус</td>
+                      <td>Генерация ответов + шаблоны</td>
+                      <td>Unified workspace + контроль процесса</td>
+                    </tr>
+                    <tr>
+                      <td>Контекст</td>
+                      <td>Обычно нет (или минимальный)</td>
+                      <td>Контекст товара + тренды + связанный thread timeline</td>
+                    </tr>
+                    <tr>
+                      <td>SLA</td>
+                      <td>Иногда “непрочитано”</td>
+                      <td>Due/overdue, ops-alerts, приоритеты, readiness</td>
+                    </tr>
+                    <tr>
+                      <td>Качество</td>
+                      <td>Не измеряется</td>
+                      <td>Accept/edit/manual, история по дням, регрессии</td>
+                    </tr>
+                    <tr>
+                      <td>Безопасность пилота</td>
+                      <td>Нет явных режимов</td>
+                      <td>Safe-run QA matrix, go/no-go по формальным checks</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- 8 -->
+            <section class="deck-section" id="business-model" data-nav="Монетизация">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">07</span>
+                  <span class="chip accent">Business model</span>
+                </div>
+                <h2 class="title">Подписка, которая окупается через SLA и качество</h2>
+                <div class="split">
+                  <div>
+                    <div class="card">
+                      <h3>Лид-магнит</h3>
+                      <p>Бесплатный коммуникационный аудит по выбранным товарам, чтобы показать “вот где вы теряете”.</p>
+                      <ul class="list">
+                        <li>Выводы + план действий + примеры плохих ответов.</li>
+                        <li>Дальше upsell в мониторинг и workspace.</li>
+                      </ul>
+                    </div>
+                    <div class="card" style="margin-top: var(--space-4)">
+                      <h3>Подписка</h3>
+                      <p>
+                        Базово: от <span class="accent">4 990 ₽/мес</span> (ориентир из текущего лендинга), дальше
+                        сегментация по объёму и числу операторов.
+                      </p>
+                      <ul class="list">
+                        <li class="muted">TBD: финальные тарифы и лимиты после пилота.</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="card">
+                      <h3>Что продаём “в деньгах”</h3>
+                      <p>Скорость ответа и качество ответов как рычаг на выручку.</p>
+                      <ul class="list">
+                        <li>Снижаем долю overdue по срочным обращениям.</li>
+                        <li>Снижаем manual-rate через AI + обучение команды.</li>
+                        <li>Доказуемость: пилоты/квазиэксперименты (DiD) на товар×день.</li>
+                      </ul>
+                    </div>
+                    <div class="callout">
+                      <strong>Важно для инвестора:</strong> монетизация держится на <strong>retention</strong>. Поэтому
+                      “quality + ops” в продукте с самого начала, а не “потом добавим аналитику”.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 9 -->
+            <section class="deck-section" id="gtm" data-nav="Go-to-market">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">08</span>
+                  <span class="chip accent">GTM</span>
+                </div>
+                <h2 class="title">Как привлекаем первых клиентов</h2>
+                <p class="subtitle">
+                  На старте целимся в селлеров WB среднего+ сегмента (у кого есть поток обращений и боль по SLA).
+                  Дистрибуция: сообщества, партнёрства, cold outreach с персонализированным аудитом.
+                </p>
+
+                <div class="grid-3">
+                  <div class="card">
+                    <h3>Telegram / VK</h3>
+                    <p>Оффер “бесплатный аудит ответов” + кейсы “до/после”.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Cold outreach</h3>
+                    <p>Выбираем селлеров с явными проблемами и отправляем мини-отчёт как “первую ценность”.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Партнёрства</h3>
+                    <p>Интеграции/кросс-промо с сервисами аналитики WB и агентствами.</p>
+                  </div>
+                </div>
+
+                <div class="callout">
+                  <strong>Контроль канала:</strong> считаем CAC на уровне “аудит → демо → пилот → платёж”, а не просто
+                  “клики/лиды”.
+                </div>
+              </div>
+            </section>
+
+            <!-- 10 -->
+            <section class="deck-section" id="status" data-nav="Статус">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">09</span>
+                  <span class="chip accent">Status</span>
+                </div>
+                <h2 class="title">Стадия: MVP+ и подготовка пилота</h2>
+                <p class="subtitle">
+                  Продукт уже работает локально/в контуре, есть формальные критерии готовности и QA-матрица. Дальше
+                  задача: конвертировать это в пилоты и первые платежи.
+                </p>
+
+                <div class="split">
+                  <div>
+                    <div class="card">
+                      <h3>Что уже сделано</h3>
+                      <ul class="list">
+                        <li>Unified interactions: review + question + chat.</li>
+                        <li>AI-draft endpoint и кэш последнего драфта.</li>
+                        <li>Quality dashboard: accept/edit/manual + history.</li>
+                        <li>Ops-alerts: SLA overdue/due soon + регрессии качества.</li>
+                        <li>Go/No-Go readiness endpoint с blocker-checks.</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="card">
+                      <h3>Даты демо (план)</h3>
+                      <ul class="list">
+                        <li><span class="accent">February 13, 2026</span>: Product Demo #1 (unified inbox + ops).</li>
+                        <li><span class="accent">February 17, 2026</span>: Product Demo #2 (pilot candidate).</li>
+                        <li><span class="accent">February 19, 2026</span>: Pilot Demo / Go-NoGo (live E2E).</li>
+                      </ul>
+                      <p class="muted" style="margin-top: var(--space-3)">
+                        Источник: <code>docs/product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</code>
+                      </p>
+                    </div>
+                    <div class="callout">
+                      <strong>Сильная сторона:</strong> пилотируемся “как продукт”, не “как скрипт”. Safe-run, метрики,
+                      чек-лист отката.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 11 -->
+            <section class="deck-section" id="roadmap" data-nav="Roadmap">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">10</span>
+                  <span class="chip accent">Roadmap</span>
+                </div>
+                <h2 class="title">План развития: от пилота к scale</h2>
+                <table class="table" aria-label="Roadmap">
+                  <thead>
+                    <tr>
+                      <th>Фаза</th>
+                      <th>Цель</th>
+                      <th>Артефакт</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Phase 0</strong> (сейчас)</td>
+                      <td>Стабильная синхронизация + safety пилота</td>
+                      <td>QA matrix, readiness, ops-alerts</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Phase 1</strong> (после пилота)</td>
+                      <td>Командная работа + снижение manual-rate</td>
+                      <td>Роли/распределение, шаблоны, обучение</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Phase 2</strong></td>
+                      <td>Multi-marketplace</td>
+                      <td>Ozon + унификация коннекторов</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Phase 3</strong></td>
+                      <td>Управляемые эксперименты ROI</td>
+                      <td>До/после, квазиэксперименты, причинность</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- 12 -->
+            <section class="deck-section" id="market" data-nav="Рынок">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">11</span>
+                  <span class="chip accent">Market</span>
+                </div>
+                <h2 class="title">Большой рынок, но важно выбрать beachhead</h2>
+                <p class="subtitle">
+                  Платёжеспособность и pain сильно зависят от категории и оборота. На старте фокус на сегменте, где
+                  количество обращений уже делает “ручной процесс” дорогим.
+                </p>
+                <div class="kpis">
+                  <div class="kpi">
+                    <div class="big">WB-first</div>
+                    <div class="label">Самый плотный поток обращений</div>
+                    <div class="note">Где SLA и качество заметно влияют на продажи.</div>
+                  </div>
+                  <div class="kpi">
+                    <div class="big todo">TBD: TAM</div>
+                    <div class="label">Платёжеспособные селлеры</div>
+                    <div class="note">Нужно подтвердить размер сегмента (RAT #3).</div>
+                  </div>
+                  <div class="kpi">
+                    <div class="big">Расширение</div>
+                    <div class="label">Ozon / YM / другие</div>
+                    <div class="note">Увеличение TAM после подтверждения WTP.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 13 -->
+            <section class="deck-section" id="competition" data-nav="Конкуренты">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">12</span>
+                  <span class="chip accent">Competition</span>
+                </div>
+                <h2 class="title">Рынок перегрет “AI-ответчиками”, а не workspace</h2>
+                <p class="subtitle">
+                  Конкуренты сильны в шаблонах и “сгенерировать ответ”. Наш угол: workflow + качество + контроль
+                  менеджера.
+                </p>
+                <div class="grid-3">
+                  <div class="card">
+                    <h3>Tier 1: платформы</h3>
+                    <p>Otveto, Otvechumba, Spix.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Tier 2: AI-first</h3>
+                    <p>AIResponses, MP Manager, Astra Helper.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Наш дифф</h3>
+                    <p>Unified queue, контекст, SLA, quality, readiness, guardrails.</p>
+                  </div>
+                </div>
+                <div class="help">
+                  Детальнее: <code>docs/research/CJM_AND_COMPETITORS.md</code>
+                </div>
+              </div>
+            </section>
+
+            <!-- 14 -->
+            <section class="deck-section" id="team" data-nav="Команда">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">13</span>
+                  <span class="chip accent">Team</span>
+                </div>
+                <h2 class="title">Команда</h2>
+                <div class="split">
+                  <div class="card">
+                    <h3 class="muted">TBD: добавить факты, а не “про качества”</h3>
+                    <ul class="list">
+                      <li><span class="accent">Founder</span>: кто вы, какие результаты, почему именно эта проблема.</li>
+                      <li><span class="accent">Tech</span>: опыт в data/LLM/проде/интеграциях.</li>
+                      <li><span class="accent">GTM</span>: доступ к селлерам/партнёрам/комьюнити.</li>
+                    </ul>
+                  </div>
+                  <div class="callout">
+                    <strong>Подсказка для питча:</strong> инвестору важны 3 вещи: <strong>почему вы</strong>,
+                    <strong>почему сейчас</strong>, <strong>как вы дойдёте до PMF</strong>. В этом блоке дайте факты и
+                    скорость исполнения.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 15 -->
+            <section class="deck-section" id="fundraising" data-nav="Раунд и ask">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">14</span>
+                  <span class="chip accent">Fundraising</span>
+                </div>
+                <h2 class="title">Что мы поднимаем и на что тратим</h2>
+                <p class="subtitle">
+                  Этот блок намеренно сделан как “структура”, чтобы вы быстро подставили реальные цифры.
+                </p>
+
+                <div class="grid-3">
+                  <div class="card">
+                    <h3>Раунд</h3>
+                    <p><span class="chip todo">TBD</span> Pre-seed / Seed</p>
+                    <ul class="list">
+                      <li>Инструмент: SAFE/convertible или equity.</li>
+                      <li>Target: <span class="muted">TBD сумма</span>.</li>
+                    </ul>
+                  </div>
+                  <div class="card">
+                    <h3>Runway</h3>
+                    <p><span class="chip todo">TBD</span> месяцев</p>
+                    <ul class="list">
+                      <li>С учётом cloud/LLM/дев/продаж.</li>
+                      <li>План найма: <span class="muted">TBD</span>.</li>
+                    </ul>
+                  </div>
+                  <div class="card">
+                    <h3>Milestones</h3>
+                    <p>За раунд закрываем:</p>
+                    <ul class="list">
+                      <li>Pilot → первые платящие.</li>
+                      <li>Retention на workflow.</li>
+                      <li>Scale канал привлечения.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="callout">
+                  <strong>Как “правильно” формулировать ask:</strong> сумма = сколько нужно, чтобы снять ключевые риски
+                  (WTP, канал, retention) и прийти к следующему раунду с метриками, а не “просто пожить”.
+                </div>
+              </div>
+            </section>
+
+            <!-- 16 -->
+            <section class="deck-section" id="process" data-nav="Как привлекаем инвестиции">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">15</span>
+                  <span class="chip accent">Process</span>
+                </div>
+                <h2 class="title">Процесс fundraising: pipeline и артефакты</h2>
+                <div class="split">
+                  <div>
+                    <div class="card">
+                      <h3>Материалы</h3>
+                      <ul class="list">
+                        <li>Teaser (1 страница): “что / зачем / traction / ask”.</li>
+                        <li>Этот deck (HTML): narrative + продукт + план.</li>
+                        <li>Data room: метрики, пилоты, юнит-экономика, IP, юридическое.</li>
+                        <li>Фин. модель: unit economics, LTV/CAC гипотезы, бюджеты.</li>
+                      </ul>
+                    </div>
+                    <div class="card" style="margin-top: var(--space-4)">
+                      <h3>Воронка</h3>
+                      <ul class="list">
+                        <li>Список инвесторов (ангелы/фонды) + warm intros.</li>
+                        <li>1st call: проблема/угол/план пилота.</li>
+                        <li>2nd call: продукт, метрики, риски и how-to-test.</li>
+                        <li>Term sheet → DD → closing.</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="card">
+                      <h3>Как держать темп</h3>
+                      <ul class="list">
+                        <li>Делать “batch”: 15–25 интро в 2 недели, не растягивать на месяцы.</li>
+                        <li>Weekly update: пилоты/метрики/прогресс roadmap.</li>
+                        <li>Единый “source of truth”: Notion/Doc с ответами на FAQs.</li>
+                      </ul>
+                    </div>
+                    <div class="callout">
+                      <strong>Правило:</strong> инвестор покупает <strong>скорость обучения</strong>. Покажите, как вы
+                      проверяете RAT-риски и как быстро закрываете неопределённость.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 17 -->
+            <section class="deck-section" id="rounds" data-nav="Раунды 101 (приложение)">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">A1</span>
+                  <span class="chip accent">Appendix</span>
+                </div>
+                <h2 class="title">Правила раундов: что обычно ожидают</h2>
+                <p class="subtitle">
+                  Это “шпаргалка”, чтобы deck соответствовал ожиданиям инвесторов. Конкретные цифры зависят от рынка и
+                  географии.
+                </p>
+
+                <table class="table" aria-label="Раунды">
+                  <thead>
+                    <tr>
+                      <th>Раунд</th>
+                      <th>Зачем</th>
+                      <th>Что доказываем</th>
+                      <th>Типичные инвесторы</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Pre-seed</strong></td>
+                      <td>Найти PMF-направление</td>
+                      <td>WTP, первые пилоты, понятная гипотеза LTV/CAC</td>
+                      <td>Ангелы, микро-фонды</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Seed</strong></td>
+                      <td>Сделать repeatable growth</td>
+                      <td>Retention, стаб. продажи, первые “каналы”</td>
+                      <td>Seed-фонды</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Series A</strong></td>
+                      <td>Масштабировать</td>
+                      <td>Сильные метрики, предсказуемая экономика</td>
+                      <td>Growth/VC</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="grid-3">
+                  <div class="card">
+                    <h3>SAFE / Convertible</h3>
+                    <p>Быстрее закрыть раунд, меньше юр. трения, конверсия в equity на след. раунде.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Equity</h3>
+                    <p>Чёткие доли сразу. Обычно больше юр. работы, но понятнее cap table.</p>
+                  </div>
+                  <div class="card">
+                    <h3>Ключевой принцип</h3>
+                    <p>Раунд покупает <span class="accent">снятие рисков</span> до следующего раунда.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 18 -->
+            <section class="deck-section" id="what-to-include" data-nav="Что должно быть в deck (чек-лист)">
+              <div class="section-inner">
+                <div class="section-topline">
+                  <span class="chip">A2</span>
+                  <span class="chip accent">Checklist</span>
+                </div>
+                <h2 class="title">Что инвестор ожидает увидеть (и где это в этом HTML)</h2>
+                <table class="table" aria-label="Checklist deck">
+                  <thead>
+                    <tr>
+                      <th>Слайд</th>
+                      <th>Смысл</th>
+                      <th>Где здесь</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1. One-liner</td>
+                      <td>Что вы делаете в 1 фразу</td>
+                      <td><a href="#one-liner">Одна фраза</a></td>
+                    </tr>
+                    <tr>
+                      <td>2. Problem</td>
+                      <td>Какая боль и у кого</td>
+                      <td><a href="#problem">Проблема</a></td>
+                    </tr>
+                    <tr>
+                      <td>3. Solution</td>
+                      <td>Почему вы решаете лучше</td>
+                      <td><a href="#solution">Решение</a></td>
+                    </tr>
+                    <tr>
+                      <td>4. Product</td>
+                      <td>Доказательство “это реально”</td>
+                      <td><a href="#product">Продукт</a></td>
+                    </tr>
+                    <tr>
+                      <td>5. Market</td>
+                      <td>Почему масштабно</td>
+                      <td><a href="#market">Рынок</a></td>
+                    </tr>
+                    <tr>
+                      <td>6. Business model</td>
+                      <td>Как зарабатываете</td>
+                      <td><a href="#business-model">Монетизация</a></td>
+                    </tr>
+                    <tr>
+                      <td>7. GTM</td>
+                      <td>Как добираетесь до клиента</td>
+                      <td><a href="#gtm">Go-to-market</a></td>
+                    </tr>
+                    <tr>
+                      <td>8. Traction</td>
+                      <td>Сигналы прогресса</td>
+                      <td><a href="#status">Статус</a></td>
+                    </tr>
+                    <tr>
+                      <td>9. Team</td>
+                      <td>Почему вы</td>
+                      <td><a href="#team">Команда</a></td>
+                    </tr>
+                    <tr>
+                      <td>10. Ask</td>
+                      <td>Сколько и зачем</td>
+                      <td><a href="#fundraising">Раунд и ask</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="toc-drawer" id="tocDrawer" aria-hidden="true">
+      <div class="backdrop" id="tocBackdrop"></div>
+      <div class="panel" role="dialog" aria-modal="true" aria-label="Содержание">
+        <div class="panel-inner">
+          <div class="panel-head">
+            <div class="toc-title">Содержание</div>
+            <button class="close" id="tocClose" type="button">Закрыть</button>
+          </div>
+          <nav class="toc-list" id="tocDrawerList" style="margin-top: var(--space-4)"></nav>
+          <div class="help">Подсказка: <code>P</code> включает Present, <code>PDF / Print</code> печатает в PDF.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const navbar = document.getElementById("navbar");
+        const tocList = document.getElementById("tocList");
+        const tocDrawerList = document.getElementById("tocDrawerList");
+        const btnToc = document.getElementById("btnToc");
+        const btnPrint = document.getElementById("btnPrint");
+        const btnPresent = document.getElementById("btnPresent");
+        const tocDrawer = document.getElementById("tocDrawer");
+        const tocBackdrop = document.getElementById("tocBackdrop");
+        const tocClose = document.getElementById("tocClose");
+
+        const sections = Array.from(document.querySelectorAll(".deck-section[data-nav]"));
+        const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+        function onScroll() {
+          if (window.scrollY > 10) navbar.classList.add("scrolled");
+          else navbar.classList.remove("scrolled");
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+
+        // TOC generation (desktop + drawer)
+        const tocLinks = [];
+        const tocDrawerLinks = [];
+        function makeTocLink(sec, idx) {
+          const a = document.createElement("a");
+          a.className = "toc-link";
+          a.href = "#" + sec.id;
+          a.dataset.target = sec.id;
+
+          const num = document.createElement("span");
+          num.className = "toc-num";
+          num.textContent = String(idx + 1);
+
+          const label = document.createElement("span");
+          label.textContent = sec.getAttribute("data-nav") || sec.id;
+
+          a.appendChild(num);
+          a.appendChild(label);
+          return a;
+        }
+        sections.forEach((sec, idx) => {
+          const a = makeTocLink(sec, idx);
+          tocList.appendChild(a);
+          tocLinks.push(a);
+
+          if (tocDrawerList) {
+            const b = makeTocLink(sec, idx);
+            tocDrawerList.appendChild(b);
+            tocDrawerLinks.push(b);
+          }
+        });
+
+        function setActive(id) {
+          tocLinks.forEach((a) => a.classList.toggle("active", a.dataset.target === id));
+          tocDrawerLinks.forEach((a) => a.classList.toggle("active", a.dataset.target === id));
+        }
+
+        // Scroll spy
+        const io = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((e) => e.isIntersecting)
+              .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0))[0];
+            if (!visible) return;
+            setActive(visible.target.id);
+          },
+          { root: null, threshold: [0.2, 0.35, 0.5, 0.65] }
+        );
+        sections.forEach((s) => io.observe(s));
+
+        // Print
+        btnPrint.addEventListener("click", () => window.print());
+
+        // Drawer (mobile/tablet)
+        function setDrawer(open) {
+          if (!tocDrawer) return;
+          tocDrawer.classList.toggle("open", !!open);
+          tocDrawer.setAttribute("aria-hidden", open ? "false" : "true");
+        }
+        if (btnToc) btnToc.addEventListener("click", () => setDrawer(true));
+        if (tocBackdrop) tocBackdrop.addEventListener("click", () => setDrawer(false));
+        if (tocClose) tocClose.addEventListener("click", () => setDrawer(false));
+        tocDrawerLinks.forEach((a) => a.addEventListener("click", () => setDrawer(false)));
+
+        // Present mode
+        function setPresent(on) {
+          document.body.classList.toggle("present", !!on);
+          const url = new URL(window.location.href);
+          if (on) url.searchParams.set("present", "1");
+          else url.searchParams.delete("present");
+          window.history.replaceState({}, "", url.toString());
+        }
+
+        btnPresent.addEventListener("click", () => setPresent(!document.body.classList.contains("present")));
+
+        // Query param
+        try {
+          const url = new URL(window.location.href);
+          if (url.searchParams.get("present") === "1") setPresent(true);
+        } catch (_) {}
+
+        function currentSectionIndex() {
+          const y = window.scrollY + 80;
+          let bestIdx = 0;
+          let bestDist = Infinity;
+          sections.forEach((s, i) => {
+            const dist = Math.abs((s.offsetTop || 0) - y);
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestIdx = i;
+            }
+          });
+          return bestIdx;
+        }
+
+        function go(delta) {
+          const idx = currentSectionIndex();
+          const next = clamp(idx + delta, 0, sections.length - 1);
+          const target = sections[next];
+          if (!target) return;
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        window.addEventListener("keydown", (e) => {
+          const tag = (e.target && e.target.tagName) || "";
+          if (tag === "INPUT" || tag === "TEXTAREA" || e.isComposing) return;
+
+          const k = e.key.toLowerCase();
+          if (e.key === "Escape") {
+            setDrawer(false);
+          }
+          if (k === "p") {
+            setPresent(!document.body.classList.contains("present"));
+            return;
+          }
+          if (!document.body.classList.contains("present")) return;
+
+          if (k === "j" || e.key === "ArrowDown" || e.key === "PageDown") {
+            e.preventDefault();
+            go(+1);
+          }
+          if (k === "k" || e.key === "ArrowUp" || e.key === "PageUp") {
+            e.preventDefault();
+            go(-1);
+          }
+          if (e.key === "Home") {
+            e.preventDefault();
+            sections[0].scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          if (e.key === "End") {
+            e.preventDefault();
+            sections[sections.length - 1].scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+
+        // If the page opens mid-section (hash), try to highlight right away.
+        if (window.location.hash) {
+          const id = window.location.hash.slice(1);
+          if (id) setActive(id);
+        } else {
+          setActive(sections[0] && sections[0].id);
+        }
+      })();
+    </script>
+  </body>
+</html>

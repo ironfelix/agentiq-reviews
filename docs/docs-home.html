@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentIQ — Documentation Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #fafbfc;
+      --color-card: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-secondary: #5f6368;
+      --color-text-tertiary: #9aa0a6;
+      --color-accent: #1a73e8;
+      --color-success: #34a853;
+      --color-danger: #ea4335;
+      --color-warning: #f9ab00;
+      --color-border: #e8eaed;
+      --shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+      padding: 40px 20px;
+    }
+
+    .container { max-width: 1060px; margin: 0 auto; }
+
+    h1 {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+      max-width: 92ch;
+    }
+
+    .meta {
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+      margin-bottom: 26px;
+    }
+
+    .section {
+      background: var(--color-card);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--color-accent);
+    }
+
+    p { margin-bottom: 12px; }
+
+    a { color: var(--color-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      background: var(--color-accent);
+    }
+
+    .pillRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .pill {
+      font-size: 13px;
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      color: var(--color-text-secondary);
+      background: rgba(26,115,232,0.03);
+      white-space: nowrap;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      background: rgba(26,115,232,0.06);
+      border: 1px solid rgba(26,115,232,0.18);
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .statusDot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--color-text-tertiary);
+    }
+
+    .status.implemented { border-color: rgba(52,168,83,0.35); background: rgba(52,168,83,0.06); color: #1f6c37; }
+    .status.implemented .statusDot { background: var(--color-success); }
+
+    .status.inprogress { border-color: rgba(249,171,0,0.45); background: rgba(249,171,0,0.08); color: #6c4d00; }
+    .status.inprogress .statusDot { background: var(--color-warning); }
+
+    .status.hypothesis { border-color: rgba(26,115,232,0.25); background: rgba(26,115,232,0.06); color: #1a73e8; }
+    .status.hypothesis .statusDot { background: var(--color-accent); }
+
+    .status.research { border-color: rgba(95,99,104,0.25); background: rgba(95,99,104,0.05); color: #3b3f45; }
+    .status.research .statusDot { background: #80868b; }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      background: var(--color-bg);
+      border: 2px solid var(--color-accent);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 160px;
+    }
+
+    .flow-step.data { border-color: #7a64ff; background: rgba(122,100,255,0.06); }
+    .flow-step.policy { border-color: var(--color-warning); background: rgba(249,171,0,0.08); }
+    .flow-step.ops { border-color: var(--color-success); background: rgba(52,168,83,0.06); }
+
+    .flow-arrow {
+      font-size: 22px;
+      color: var(--color-text-tertiary);
+      user-select: none;
+    }
+
+    .diagram {
+      margin: 18px 0;
+      padding: 18px;
+      background: var(--color-bg);
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+    }
+
+    .callout {
+      background: rgba(249,171,0,0.08);
+      border-left: 4px solid var(--color-warning);
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+
+    .calloutTitle {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #402f00;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .cost-table th {
+      background: var(--color-bg);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .cost-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 920px) {
+      .grid2 { grid-template-columns: 1fr; }
+    }
+
+    .cardMini {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 14px;
+      background: var(--color-bg);
+    }
+
+    .cardMiniTitle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .list { margin-left: 18px; margin-bottom: 0; }
+    .list li { margin-bottom: 6px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body { padding: 20px 12px; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 14px; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 20px; }
+
+      .flow { flex-direction: column; align-items: stretch; }
+      .flow-step { min-width: auto; width: 100%; }
+      .flow-arrow { transform: rotate(90deg); margin: 0; }
+
+      .cost-table { font-size: 13px; display: block; overflow-x: auto; }
+      .cost-table thead { display: none; }
+      .cost-table tr { display: block; margin-bottom: 16px; background: var(--color-bg); border-radius: 10px; padding: 12px; }
+      .cost-table td { display: block; padding: 6px 0; border: none; }
+      .cost-table td:first-child { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AgentIQ Documentation Portal</h1>
+    <p class="subtitle">
+      Единая “карта проекта”: модули, продукты внутри продукта, ссылки на документацию и пометки статуса
+      (<span class="mono">реализовано</span> / <span class="mono">в процессе</span> / <span class="mono">гипотеза</span>).
+    </p>
+    <div class="meta">Last updated: 2026-02-12 • Folder: <span class="mono">docs/</span></div>
+
+    <div class="section" id="legend">
+      <h2><span class="badge">1</span> Как читать статусы</h2>
+      <p>В документации ниже мы явно помечаем: что уже работает в коде, что в разработке, а что пока гипотеза/план.</p>
+      <div class="pillRow">
+        <div class="status implemented"><span class="statusDot"></span>Реализовано</div>
+        <div class="status inprogress"><span class="statusDot"></span>В процессе</div>
+        <div class="status hypothesis"><span class="statusDot"></span>Идея / гипотеза / план</div>
+        <div class="status research"><span class="statusDot"></span>Исследование / методика</div>
+      </div>
+
+      <div class="callout">
+        <div class="calloutTitle">Правило “истины”</div>
+        Если есть расхождение между документом и кодом, “истина” в:
+        <span class="mono">docs/product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</span> (execution log) и в коде
+        <span class="mono">apps/**</span>.
+      </div>
+
+      <div class="pillRow">
+        <a class="pill" href="./INDEX.md">Docs index (MD)</a>
+        <a class="pill" href="./PROJECT_MAP.md">Project map (MD)</a>
+        <a class="pill" href="./chat-center/INDEX.md">Chat Center docs</a>
+        <a class="pill" href="./reviews/README.md">Reviews docs</a>
+      </div>
+    </div>
+
+    <div class="section" id="map">
+      <h2><span class="badge">2</span> Карта продукта (1 экран, без технарщины)</h2>
+      <p>
+        AgentIQ сейчас это suite из двух контуров: основной workspace <span class="mono">agentiq.ru/app</span> (chat-center) и legacy отчеты (reviews).
+        Траектория: тянуть reviews/questions/chats в единый inbox.
+      </p>
+
+      <div class="diagram">
+        <div class="flow">
+          <div class="flow-step">Connect Marketplace</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Sync events</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Unified Inbox (Interactions)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step policy">Policy (allow/assist/deny)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Operator + AI Draft</div>
+        </div>
+        <div class="flow" style="margin-top: 10px;">
+          <div class="flow-step ops">Reply dispatcher</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Quality / SLA / Ops alerts</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Pilot readiness (GO/NO-GO)</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Workspace: Messages</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Единый список обращений: отзывы, вопросы, чаты</li>
+            <li>AI draft для ответов</li>
+            <li>Timeline: связка обращений по заказу/покупателю/товару</li>
+          </ul>
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            Док: <a href="./product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md">UNIFIED_COMM_PLAN_V3_WB_FIRST.md</a>
+          </p>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Workspace: Analytics</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Качество: accepted/edited/manual</li>
+            <li>Ops alerts: SLA overdue, regressions</li>
+            <li>Readiness gate для пилота</li>
+          </ul>
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            Док: <a href="./chat-center/SCENARIO_ENGINE.md">SCENARIO_ENGINE.md</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="modules">
+      <h2><span class="badge">3</span> Модули (код и ответственность)</h2>
+
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Модуль</th>
+            <th>Где в репо</th>
+            <th>Что делает</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Chat Center / Unified Inbox</strong></td>
+            <td><span class="mono">apps/chat-center</span></td>
+            <td>
+              Основной продукт <span class="mono">agentiq.ru/app</span>. Unified inbox на базе сущности <span class="mono">Interaction</span>.
+              Sync + draft + reply + metrics.
+            </td>
+            <td><span class="status implemented"><span class="statusDot"></span>Реализовано</span></td>
+          </tr>
+          <tr>
+            <td><strong>Reviews Reports (legacy)</strong></td>
+            <td><span class="mono">apps/reviews</span></td>
+            <td>
+              Отдельные отчеты по отзывам + коммуникации (WBCON pipeline, PDF). Используется как “второй продукт” и источник методик.
+            </td>
+            <td><span class="status implemented"><span class="statusDot"></span>Реализовано</span></td>
+          </tr>
+          <tr>
+            <td><strong>Billing module</strong></td>
+            <td><span class="mono">docs/BILLING_ARCHITECTURE.md</span></td>
+            <td>Дизайн биллинга и feature gating.</td>
+            <td><span class="status hypothesis"><span class="statusDot"></span>План</span></td>
+          </tr>
+          <tr>
+            <td><strong>2.0 Vision</strong></td>
+            <td><span class="mono">docs/architecture/AGENTIQ_2.0_ARCHITECTURE.md</span></td>
+            <td>Визионерская архитектура (направление, не текущая реальность).</td>
+            <td><span class="status hypothesis"><span class="statusDot"></span>Гипотеза</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="chatcenter">
+      <h2><span class="badge">4</span> Что внутри Chat Center (подсистемы)</h2>
+      <p>Ниже подсистемы, чтобы понимать архитектуру без чтения всего кода.</p>
+
+      <div class="grid2">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Interaction Layer (unified)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Unified сущность <span class="mono">Interaction</span> и <span class="mono">InteractionEvent</span>, единые endpoints для list/sync/draft/reply/metrics.
+          </p>
+          <ul class="list">
+            <li>API: <span class="mono">backend/app/api/interactions.py</span></li>
+            <li>Models: <span class="mono">backend/app/models/interaction*.py</span></li>
+            <li>Docs: <a href="./product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md">UNIFIED_COMM_PLAN_V3_WB_FIRST.md</a></li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Ingestion (WB reviews/questions/chats)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Фоновая синхронизация и ручные sync endpoints, нормализация в interactions.
+          </p>
+          <ul class="list">
+            <li>Service: <span class="mono">backend/app/services/interaction_ingest.py</span></li>
+            <li>Connectors: <span class="mono">wb_*_connector.py</span></li>
+            <li>Docs: <a href="./chat-center/WB_CHAT_API_RESEARCH.md">WB_CHAT_API_RESEARCH.md</a></li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Linking + Timeline</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Детерминированные и вероятностные связки, policy “auto vs assist-only”.
+          </p>
+          <ul class="list">
+            <li>Service: <span class="mono">backend/app/services/interaction_linking.py</span></li>
+            <li>UI: “timeline” в правой панели</li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>AI Drafting</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            LLM draft + fallback, runtime switch модели через БД.
+          </p>
+          <ul class="list">
+            <li>Service: <span class="mono">backend/app/services/interaction_drafts.py</span></li>
+            <li>Runtime: <span class="mono">backend/app/services/llm_runtime.py</span></li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Metrics / Ops alerts / Readiness</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            События воронки draft→reply, ops alerts, GO/NO-GO readiness.
+          </p>
+          <ul class="list">
+            <li>Service: <span class="mono">backend/app/services/interaction_metrics.py</span></li>
+            <li>Docs: <a href="./product/PILOT_QA_MATRIX_AND_GONOGO_CHECKLIST.md">PILOT_QA_MATRIX...</a></li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Scenario Engine (policy + guardrails)</span>
+            <span class="status inprogress"><span class="statusDot"></span>В процессе</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Сценарная оркестрация P0-P3 поверх unified слоя. Сейчас описано и частично реализовано как policy в слоях linking/metrics;
+            дальше нужно формализовать <span class="mono">ScenarioDefinition</span> и <span class="mono">ScenarioRun</span>.
+          </p>
+          <ul class="list">
+            <li>Docs: <a href="./chat-center/scenario-engine.html">scenario-engine.html</a></li>
+            <li>Tech doc: <a href="./chat-center/SCENARIO_ENGINE.md">SCENARIO_ENGINE.md</a></li>
+            <li>Compliance: <a href="./research/06-wb-chat-consent-and-crm-triggers-2026.md">WB chat consent</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="docs">
+      <h2><span class="badge">5</span> Навигация по документации (ссылки + статус)</h2>
+
+      <h3>Product</h3>
+      <ul class="list">
+        <li><a href="./product/PRODUCT.md">product/PRODUCT.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md">product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./product/BACKLOG_UNIFIED_COMM_V3.md">product/BACKLOG_UNIFIED_COMM_V3.md</a> <span class="status inprogress"><span class="statusDot"></span>В процессе</span></li>
+      </ul>
+
+      <h3>Chat Center</h3>
+      <ul class="list">
+        <li><a href="./chat-center/INDEX.md">chat-center/INDEX.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./chat-center/QUICKSTART.md">chat-center/QUICKSTART.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./chat-center/SCENARIO_ENGINE.md">chat-center/SCENARIO_ENGINE.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./chat-center/scenario-engine.html">chat-center/scenario-engine.html</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+      </ul>
+
+      <h3>Reviews (legacy)</h3>
+      <ul class="list">
+        <li><a href="./reviews/README.md">reviews/README.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./reviews/PROJECT_SUMMARY.md">reviews/PROJECT_SUMMARY.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./reviews/RESPONSE_GUARDRAILS.md">reviews/RESPONSE_GUARDRAILS.md</a> <span class="status research"><span class="statusDot"></span>Методика</span></li>
+      </ul>
+
+      <h3>Architecture / Ops / Research</h3>
+      <ul class="list">
+        <li><a href="./architecture/architecture.md">architecture/architecture.md</a> <span class="status hypothesis"><span class="statusDot"></span>Док-ориентир</span></li>
+        <li><a href="./architecture/AGENTIQ_2.0_ARCHITECTURE.md">architecture/AGENTIQ_2.0_ARCHITECTURE.md</a> <span class="status hypothesis"><span class="statusDot"></span>Vision</span></li>
+        <li><a href="./ops/DEPLOYMENT.md">ops/DEPLOYMENT.md</a> <span class="status inprogress"><span class="statusDot"></span>В процессе</span></li>
+        <li><a href="./research/INDEX.md">research/INDEX.md</a> <span class="status research"><span class="statusDot"></span>Исследование</span></li>
+      </ul>
+    </div>
+
+    <div class="section" id="next">
+      <h2><span class="badge">6</span> Что дальше (как поддерживать актуальность)</h2>
+      <p>
+        Чтобы документация не “протухала”, важно ввести простую дисциплину:
+      </p>
+      <ul class="list">
+        <li>В каждом крупном документе в начале: <span class="mono">Last updated</span> и <span class="mono">Status</span>.</li>
+        <li>Если это гипотеза: явно писать “это план, не реализовано”.</li>
+        <li>Если это реализовано: давать ссылки на “истинные” файлы/эндпоинты/таблицы.</li>
+        <li>Execution log держать в <span class="mono">docs/product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</span>.</li>
+      </ul>
+      <div class="pillRow">
+        <a class="pill" href="../next-actions.md">Roadmap: next-actions.md</a>
+        <a class="pill" href="./CHANGELOG.md">Chat Center changelog</a>
+        <a class="pill" href="./SLA_RULES.md">SLA rules</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

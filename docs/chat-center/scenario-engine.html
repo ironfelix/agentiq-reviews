@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentIQ Chat Center — Scenario Engine (WB-first)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #fafbfc;
+      --color-card: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-secondary: #5f6368;
+      --color-text-tertiary: #9aa0a6;
+      --color-accent: #1a73e8;
+      --color-success: #34a853;
+      --color-danger: #ea4335;
+      --color-warning: #f9ab00;
+      --color-border: #e8eaed;
+
+      --shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      margin-bottom: 24px;
+      max-width: 90ch;
+    }
+
+    .meta {
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      background: var(--color-card);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .badge.blue { background: var(--color-accent); }
+    .badge.green { background: var(--color-success); }
+    .badge.amber { background: var(--color-warning); color: #402f00; }
+    .badge.red { background: var(--color-danger); }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--color-accent);
+    }
+
+    p { margin-bottom: 12px; }
+
+    .toc {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .toc a {
+      text-decoration: none;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: rgba(26,115,232,0.03);
+    }
+    .toc a:hover { border-color: rgba(26,115,232,0.35); color: var(--color-text); }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      background: var(--color-bg);
+      border: 2px solid var(--color-accent);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .flow-step.sub {
+      font-weight: 500;
+      font-size: 13px;
+      border-width: 1px;
+      color: var(--color-text-secondary);
+    }
+
+    .flow-step.policy { border-color: var(--color-warning); background: rgba(249,171,0,0.08); }
+    .flow-step.assist { border-color: var(--color-success); background: rgba(52,168,83,0.06); }
+    .flow-step.auto { border-color: var(--color-success); background: rgba(52,168,83,0.06); }
+    .flow-step.deny { border-color: var(--color-danger); background: rgba(234,67,53,0.06); }
+    .flow-step.data { border-color: #7a64ff; background: rgba(122,100,255,0.06); }
+
+    .flow-arrow {
+      font-size: 22px;
+      color: var(--color-text-tertiary);
+      user-select: none;
+    }
+
+    .diagram {
+      margin: 18px 0;
+      padding: 18px;
+      background: var(--color-bg);
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+    }
+
+    .callout {
+      background: rgba(249,171,0,0.08);
+      border-left: 4px solid var(--color-warning);
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #402f00;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .example-box {
+      background: rgba(52,168,83,0.05);
+      border: 1px solid var(--color-success);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .danger-box {
+      background: rgba(234,67,53,0.05);
+      border: 1px solid var(--color-danger);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      background: rgba(26,115,232,0.06);
+      border: 1px solid rgba(26,115,232,0.18);
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    ul { margin-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+      margin: 22px 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--color-border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 26px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: 3px solid var(--color-card);
+    }
+
+    .timeline-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .timeline-details {
+      background: var(--color-bg);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid var(--color-border);
+    }
+
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .cost-table th {
+      background: var(--color-bg);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .cost-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .highlight {
+      background: rgba(26,115,232,0.10);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .highlight-danger {
+      background: rgba(234,67,53,0.10);
+      color: var(--color-danger);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .highlight-success {
+      background: rgba(52,168,83,0.10);
+      color: var(--color-success);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body { padding: 20px 12px; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 14px; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 20px; }
+
+      .flow { flex-direction: column; align-items: stretch; }
+      .flow-step { min-width: auto; width: 100%; }
+      .flow-arrow { transform: rotate(90deg); margin: 0; }
+
+      .timeline { padding-left: 28px; }
+      .timeline::before { left: 10px; }
+      .timeline-item::before { left: -24px; width: 12px; height: 12px; }
+
+      .cost-table { font-size: 13px; display: block; overflow-x: auto; }
+      .cost-table thead { display: none; }
+      .cost-table tr { display: block; margin-bottom: 16px; background: var(--color-bg); border-radius: 10px; padding: 12px; }
+      .cost-table td { display: block; padding: 6px 0; border: none; }
+      .cost-table td:first-child { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Scenario Engine для Chat Center (WB-first)</h1>
+    <p class="subtitle">
+      Это “человеческое” описание движка сценариев: что он делает, где принимает решение
+      <span class="mono">allow / assist / deny</span>, почему P0-P3 вообще нужны и когда можно P3 в WB-чате.
+      Сделано в стиле <span class="mono">WB_LOGISTICS_CJM.html</span>.
+    </p>
+    <div class="meta">Last updated: 2026-02-12</div>
+
+    <div class="section">
+      <h2><span class="badge blue">1</span> Быстрое понимание за 60 секунд</h2>
+      <p>
+        В AgentIQ все входящие коммуникации (чат, вопрос, отзыв) превращаются в одну сущность:
+        <span class="mono">Interaction</span>. Дальше движок решает:
+        <strong>можно ли отправлять сообщение</strong>, <strong>нужно ли человеку подтверждение</strong> и
+        <strong>какой сценарий применить</strong>.
+      </p>
+
+      <div class="diagram">
+        <div class="flow">
+          <div class="flow-step">Источники WB</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">Нормализация</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Interactions</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Link + Classify</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step policy">Policy Engine</div>
+        </div>
+
+        <div class="flow" style="margin-top: 10px;">
+          <div class="flow-step deny">DENY (не отправлять)</div>
+          <div class="flow-arrow">•</div>
+          <div class="flow-step assist">ASSIST (черновик + оператор)</div>
+          <div class="flow-arrow">•</div>
+          <div class="flow-step auto">AUTO (редко, только низкий риск)</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Ключевой инсайт</div>
+        Сначала мы принимаем решение по правилам (policy), и только потом генерируем текст/отправляем.
+        Это защищает от “умных, но опасных” автоматизаций.
+      </div>
+
+      <div class="toc">
+        <a href="#pipeline">Пошагово</a>
+        <a href="#priorities">P0-P3</a>
+        <a href="#policy">Guardrails</a>
+        <a href="#p3">Когда P3 можно</a>
+        <a href="#events">Audit events</a>
+      </div>
+    </div>
+
+    <div id="pipeline" class="section">
+      <h2><span class="badge blue">2</span> Пошагово: что происходит после входящего события</h2>
+      <p>
+        Представим типовой кейс: покупатель написал в чат или оставил отзыв/вопрос. Движок проходит одинаковые шаги.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 1: Пришло событие из WB</div>
+          <div class="timeline-desc">Chats / Questions / Reviews</div>
+          <div class="timeline-details">
+            Источник важен для ограничений: например, WB чат нельзя “создать первым”, можно только отвечать в уже существующем диалоге.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 2: Нормализуем в Interaction</div>
+          <div class="timeline-desc">Единый формат для всех каналов</div>
+          <div class="timeline-details">
+            Мы приводим всё к общему виду: канал, внешний id, текст/subject, флаг <span class="mono">needs_response</span>,
+            время <span class="mono">occurred_at</span>, и ключи корреляции (<span class="mono">order_id</span>, <span class="mono">nm_id</span> и т.д.).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 3: Upsert в БД</div>
+          <div class="timeline-desc">Идемпотентность и история</div>
+          <div class="timeline-details">
+            Одинаковое событие не должно “размножаться”. Параллельно пишем события в <span class="mono">InteractionEvent</span> для аудита.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 4: Link + Classify</div>
+          <div class="timeline-desc">Склейка каналов и вычисление приоритета</div>
+          <div class="timeline-details">
+            Связки бывают детерминированные (надежно) и вероятностные (только подсказка).
+            Классификация даёт intent/sentiment/priority и SLA, чтобы очереди работали.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 5: Policy Engine решает allow/assist/deny</div>
+          <div class="timeline-desc">Это главный “предохранитель”</div>
+          <div class="timeline-details">
+            Policy проверяет контент, контекст, caps (частоту), ограничения WB и уровень риска (P0-P3).
+            На этом шаге можно остановить сценарий, даже если “технически” отправить сообщение можно.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 6: Действие (assist или auto)</div>
+          <div class="timeline-desc">Черновик + оператор или авто-отправка</div>
+          <div class="timeline-details">
+            В режиме assist генерируем черновик (LLM/Fallback + playbook), оператор правит и отправляет.
+            Auto оставляем только для очень безопасных действий (например, routing/алерты).
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-title">Шаг 7: Audit + метрики</div>
+          <div class="timeline-desc">Объяснимость и контроль качества</div>
+          <div class="timeline-details">
+            Пишем причины решения policy, факт отправки, ошибки, ретраи, латентности.
+            Это позволяет отвечать на вопрос: “почему сообщение ушло или не ушло?”.
+          </div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <strong>Как это выглядит для оператора:</strong><br><br>
+        1) Система показывает interaction в очереди с приоритетом и дедлайном.<br>
+        2) Справа черновик ответа (и объяснение “почему такой черновик”).<br>
+        3) Если policy поставил ограничение, оператор видит причину и что можно сделать (например: убрать промо-лексики).
+      </div>
+    </div>
+
+    <div id="priorities" class="section">
+      <h2><span class="badge amber">3</span> Приоритеты P0-P3: что автоматизируем в первую очередь</h2>
+      <p>
+        Приоритеты нужны, чтобы не смешать “обязательный сервис” и “маркетинг”. В WB-чате это критично.
+      </p>
+
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Что это</th>
+            <th>Режим в WB-чате</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>P0</strong></td>
+            <td>Service, Recovery: решить обращение, снять негатив, вернуть клиента в “норму”</td>
+            <td><span class="highlight-success">allow</span> (обычно assist, иногда авто-routing)</td>
+          </tr>
+          <tr>
+            <td><strong>P1</strong></td>
+            <td>Trust &amp; CX, Education: качество сервиса, инструкции, follow-up по результату</td>
+            <td><span class="highlight-success">allow</span> (assist; auto только для шаблонных safe follow-up)</td>
+          </tr>
+          <tr>
+            <td><strong>P2</strong></td>
+            <td>Service-Mixed: рекомендация строго внутри контекста кейса (аналог, совместимость)</td>
+            <td><span class="highlight">assist-only</span> + модерация формулировок</td>
+          </tr>
+          <tr>
+            <td><strong>P3</strong></td>
+            <td>Reactivation / Promo / Loyalty: стимулирование повторных покупок и промо</td>
+            <td><span class="highlight-danger">deny по умолчанию</span> (разрешаем только в “окнах”)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="danger-box">
+        <strong>Важно:</strong> “технически можно отправить” не означает “можно по правилам и устойчиво в масштабе”.
+        P3 без окна быстро превращается в рассылку, а это риск блокировок и жалоб.
+      </div>
+    </div>
+
+    <div id="policy" class="section">
+      <h2><span class="badge green">4</span> Guardrails: что именно проверяет Policy Engine</h2>
+      <p>Policy должен быть простым для понимания, но строгим в исполнении. Минимальный набор правил:</p>
+
+      <h3>Контент</h3>
+      <ul>
+        <li>Запрет внешних ссылок (в WB-чате).</li>
+        <li>Запрет “стимулов за отзывы” (любая связка “за отзыв/оценку” и выгода).</li>
+        <li>Промо-лексика: P0/P1 может быть допустима в редких случаях, P2/P3 почти всегда уводит в модерацию/deny.</li>
+        <li>PII: не собирать/не хранить персональные данные покупателя; просить только то, что необходимо для решения кейса.</li>
+      </ul>
+
+      <h3>Контекст</h3>
+      <ul>
+        <li>Чат существует и активен.</li>
+        <li>Сообщение “по делу”: связано с обращением/кейcом.</li>
+        <li>Если связка каналов вероятностная: только assist (никаких auto-отправок).</li>
+      </ul>
+
+      <h3>Частота (caps)</h3>
+      <ul>
+        <li>Не чаще N раз на interaction за период.</li>
+        <li>Не чаще N раз на customer_id за период (если доступно).</li>
+        <li>Отдельные caps для P3.</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-title">Зачем audit trail</div>
+        Любое решение policy должно оставлять след: <span class="mono">policy_decision</span> с reason/signals.
+        Это ускоряет разработку и снижает риск “случайных” рассылок.
+      </div>
+    </div>
+
+    <div id="p3" class="section">
+      <h2><span class="badge red">5</span> P3 в WB-чате: когда можно (два узких окна)</h2>
+      <p>
+        Базово P3 запрещён. Разрешение только когда сообщение не выглядит инициативной рассылкой и объяснимо контекстом.
+      </p>
+
+      <div class="diagram">
+        <div class="flow">
+          <div class="flow-step deny">P3 по умолчанию: DENY</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step policy">проверяем окно</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step assist">если окно ок: ASSIST</div>
+        </div>
+      </div>
+
+      <h3>Окно A: customer_request (покупатель сам попросил)</h3>
+      <ul>
+        <li>Последнее сообщение от покупателя и есть явный запрос: скидка/промокод/аналог/рекомендация.</li>
+        <li>Один ответ (без цепочек).</li>
+        <li>Без внешних ссылок и без “давления” (“успей”, “только сегодня”).</li>
+        <li>Caps: 1 P3 на interaction за 30-90 дней.</li>
+      </ul>
+
+      <h3>Окно B: compensation_case (урегулирование проблемного кейса)</h3>
+      <ul>
+        <li>Активный проблемный кейс: дефект/ошибка/срыв срока/претензия.</li>
+        <li>Промокод как компенсация: reason_code = compensation, привязка к кейсу.</li>
+        <li>Запрет связки с отзывом (“за 5 звезд”).</li>
+        <li>Всегда assist-only + аудит причины.</li>
+      </ul>
+
+      <div class="example-box">
+        <strong>Пример (окно A):</strong><br><br>
+        Покупатель: “Есть промокод или скидка?”<br>
+        Продавец (assist): “По вашему запросу можем предложить промокод X. Он действует на товары нашего магазина в WB. Если хотите, подберу подходящий артикул под вашу задачу.”
+      </div>
+    </div>
+
+    <div id="events" class="section">
+      <h2><span class="badge blue">6</span> Audit events: что фиксируем, чтобы всё было управляемо</h2>
+      <p>
+        Минимальный набор событий для <span class="mono">InteractionEvent</span>. Они нужны не “для красоты”, а чтобы объяснять решения и строить метрики.
+      </p>
+      <ul>
+        <li><span class="mono">ingested</span>: source + counts</li>
+        <li><span class="mono">linked</span>: link_type, confidence, signals</li>
+        <li><span class="mono">classified</span>: intent, sentiment, priority, sla_minutes</li>
+        <li><span class="mono">policy_decision</span>: allow/assist/deny + reason + caps</li>
+        <li><span class="mono">draft_generated</span>: llm/fallback + template_id</li>
+        <li><span class="mono">queued</span>: queue/agent assignment</li>
+        <li><span class="mono">reply_sent</span>: external_message_id + latency</li>
+        <li><span class="mono">send_failed</span>: error_class + retry_at</li>
+        <li><span class="mono">scenario_scheduled</span>: scenario_id + scheduled_at</li>
+        <li><span class="mono">scenario_cancelled</span>: reason</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><span class="badge green">7</span> Связанные материалы</h2>
+      <ul>
+        <li><span class="mono">docs/chat-center/SCENARIO_ENGINE.md</span> — текстовая “техническая” версия со схемами Mermaid</li>
+        <li><span class="mono">docs/research/06-wb-chat-consent-and-crm-triggers-2026.md</span> — комплаенс и логика по P3 окнам</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
+

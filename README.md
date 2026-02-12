@@ -1,327 +1,201 @@
-# Customer Service AI Product - Sierra-like Solution
+# AgentIQ — AI анализ отзывов для WB продавцов
 
-> AI-агент для customer service команд в DTC e-commerce
-> Специализированный, доступный, быстрый в запуске
+> **Domain:** agentiq.ru
+> **MVP Status:** ✅ Working locally
+> **Focus:** Поиск скрытых проблем в отзывах + анализ качества ответов продавца
 
----
-
-## 🚀 Быстрый старт
-
-**Новичок в проекте?** Начни здесь:
-
-1. **[START_HERE.md](START_HERE.md)** ⭐⭐⭐ - полный overview проекта (читать первым!)
-2. **[QUICK_START_CHECKLIST.md](QUICK_START_CHECKLIST.md)** - пошаговый план на 30 дней
-3. **[strategy/01-go-to-market-strategy.md](strategy/01-go-to-market-strategy.md)** - стратегия выхода на рынок
+**→ [Что это простыми словами](docs/product/PRODUCT.md)**
 
 ---
 
-## 📋 Что уже сделано?
+## 🚀 Быстрый старт (локальный запуск)
 
-### ✅ Исследование рынка
-- Полный анализ Sierra (лидер рынка, $10B valuation)
-- Сравнение конкурентов (Intercom, Zendesk, Salesforce)
-- Сегментация рынка по отраслям и размеру
-- Ключевые тренды 2026 (outcome-based pricing, autonomous agents)
+```bash
+cd apps/reviews
 
-📄 См. [research/01-market-landscape-2026.md](research/01-market-landscape-2026.md)
+# 1. Установка зависимостей
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-### ✅ Go-to-Market стратегия
-- 3 варианта подхода (vertical-first, feature-first, horizontal)
-- **Рекомендация:** E-commerce DTC vertical
-- Target: DTC brands $5-50M revenue, 10-50 support agents
-- Positioning vs Sierra: специализация, скорость, цена
-- 90-дневный roadmap
+# 2. Установка Redis
+brew install redis
+brew services start redis
 
-📄 См. [strategy/01-go-to-market-strategy.md](strategy/01-go-to-market-strategy.md)
+# 3. Настройка .env
+cp .env.example .env
+# Отредактируй .env: SECRET_KEY, WBCON_EMAIL, WBCON_PASS, DEEPSEEK_API_KEY
 
-### ✅ Competitive Analysis
-- Детальное сравнение с Sierra, Intercom, Zendesk
-- Positioning map (price vs specialization)
-- Battle cards для sales
-- Competitive intelligence tracking plan
+# 4. Инициализация БД
+python3 init_db.py
 
-📄 См. [competitive-analysis/competitor-comparison.md](competitive-analysis/competitor-comparison.md)
+# 5. Запуск (2 терминала)
+# Terminal 1: FastAPI + Celery Worker
+./start.sh
 
-### ✅ Инструменты для валидации
-- Customer research interview template
-- Target company finder (Python script с scoring)
-- Outreach email templates
-- Analysis frameworks
+# Terminal 2: (опционально) ngrok для Telegram auth
+ngrok http 8000
+```
 
-📄 См. [tools/](tools/) директорию
+Открой: http://localhost:8000
 
-### ✅ Python окружение
-- Virtual environment настроен
-- Dependencies установлены (pandas, numpy, jupyter, etc)
-- Готов для анализа и прототипирования
+Подробнее: [docs/reviews/QUICKSTART.md](docs/reviews/QUICKSTART.md)
+Документация: [docs/INDEX.md](docs/INDEX.md)
 
 ---
 
 ## 📁 Структура проекта
 
 ```
-customer-service-ai-product/
-│
-├── README.md                              # Этот файл
-├── START_HERE.md                          # ⭐ Точка входа для новичков
-├── QUICK_START_CHECKLIST.md              # ✅ 30-дневный action plan
-│
-├── research/                              # Исследования
-│   └── 01-market-landscape-2026.md       # Анализ рынка и трендов
-│
-├── strategy/                              # Стратегия
-│   └── 01-go-to-market-strategy.md       # GTM стратегия (main doc)
-│
-├── competitive-analysis/                  # Конкуренты
-│   └── competitor-comparison.md           # Детальное сравнение
-│
-├── tools/                                 # Практические инструменты
-│   ├── customer_research_template.md      # Шаблон интервью
-│   └── target_company_finder.py           # Скрипт для поиска клиентов
-│
-├── market-segments/                       # (для будущего анализа)
-├── product-design/                        # (следующий этап - MVP design)
-│
-├── requirements.txt                       # Python dependencies
-└── venv/                                  # Virtual environment
+agentiq/
+├── apps/
+│   ├── reviews/                 # ⭐ Анализ отзывов (FastAPI + Celery)
+│   └── chat-center/             # ⭐ Chat Center MVP+
+├── docs/
+│   ├── INDEX.md                 # Навигация по докам
+│   ├── architecture/            # Архитектура
+│   ├── product/                 # Описание продукта
+│   ├── reviews/                 # Документация по анализу отзывов
+│   ├── chat-center/             # Документация по чатам
+│   ├── research/                # Custdev/рынок/конкуренты
+│   ├── ops/                     # Деплой/безопасность/правила
+│   └── prototypes/              # Публичные прототипы (GitHub Pages)
+├── scripts/                     # Скрипты анализа/интеграций
+├── data/                        # Дамп-данные, отчёты, логи
+├── assets/                      # Изображения/PDF
+├── infra/                       # Docker/Nginx/compose
+├── archive/                     # Архив (старые версии)
+├── next-actions.md              # Development roadmap
+└── README.md                    # Этот файл
 ```
 
 ---
 
-## 🎯 Рекомендуемый подход
+## 🎯 Что делает система
 
-### Target Segment: E-commerce DTC Brands
+### 1. Анализ проблемных вариантов товара
+- Определяет какой цвет/размер/режим проседает по рейтингу
+- Извлекает причины жалоб (тусклый, батарея, размер не тот)
+- Сравнивает варианты (красный: 4.0★ vs белый: 4.8★)
 
-**Ideal Customer Profile (ICP):**
-- Revenue: $5-50M annually
-- Support team: 10-50 agents
-- Monthly tickets: 500-5,000
-- Tech stack: Shopify/WooCommerce + Zendesk/Gorgias
-- Pain: WISMO volume, seasonal spikes, high costs
+### 2. Анализ качества ответов продавца ⭐ NEW
+- Классифицирует ответы: хорошие, нормальные, вредящие
+- Находит токсичные паттерны (обвиняет покупателя, игнорирует жалобу)
+- Генерирует рекомендации «как стоило ответить»
+- Оценивает влияние на конверсию (~2-5% потери из-за плохих ответов)
 
-**Value Proposition:**
-> "AI agent специально для e-commerce.
-> Автоматически решает 70% WISMO, returns и product questions.
-> Setup за дни, не месяцы. $500-2000/month, не $200k/year."
+### 3. Готовый план действий
+- Конкретные шаги с приоритетами (критично / важно)
+- Черновики ответов для копирования
+- Рекомендации по обновлению карточки товара
 
-**Competitive Advantage:**
-1. Vertical specialization (e-commerce expertise)
-2. Fast time-to-value (days vs months)
-3. Affordable pricing (10x cheaper than Sierra)
-4. Pre-built integrations (Shopify first-class)
+**Демо:** [data/reports/reviews/communication-loss-282955222.html](data/reports/reviews/communication-loss-282955222.html)
 
 ---
 
-## 📊 Market Opportunity
+## 🔑 Ключевые файлы
 
-### Market Size
-- **BFSI** - largest segment (2024)
-- **E-commerce** - fastest growing (26% CAGR 2025-2033)
-- **Trend:** Seat-based → Outcome-based pricing
+### Backend (Python/FastAPI)
+- **[apps/reviews/backend/main.py](apps/reviews/backend/main.py)** — API endpoints, auth, routes
+- **[apps/reviews/backend/tasks.py](apps/reviews/backend/tasks.py)** — Celery tasks для фоновой обработки
+- **[apps/reviews/backend/database.py](apps/reviews/backend/database.py)** — SQLAlchemy models (User, Task, Report)
 
-### Key Players
-1. **Sierra** - $10B valuation, enterprise leader
-2. **Intercom Fin** - 60-70% resolution rate
-3. **Zendesk AI** - 30-80% resolution (varies)
-4. **Salesforce Agentforce** - enterprise CRM integration
+### Анализ отзывов
+- **[scripts/wbcon-task-to-card-v2.py](scripts/wbcon-task-to-card-v2.py)** — Главный скрипт анализа
+  - Определение категории товара
+  - Поиск проблемных вариантов
+  - Подсчёт причин жалоб
+  - **Анализ качества ответов** (LLM-powered)
+  - Генерация рекомендаций
+- **[scripts/llm_analyzer.py](scripts/llm_analyzer.py)** — DeepSeek LLM integration
+  - Классификация причин негатива
+  - Deep analysis (root cause + strategy)
+  - **Communication quality analysis** ⭐
+  - Guardrails для ответов продавца
 
-### Our Positioning
-- **vs Sierra:** 100x cheaper, 10x faster setup, e-commerce specialized
-- **vs Intercom:** Better e-commerce flows, outcome pricing
-- **vs Zendesk:** 50-70% cost savings, simpler for SMB
+### HTML Template
+- **[apps/reviews/templates/report.html](apps/reviews/templates/report.html)** — Jinja2 template для карточки отчёта
+  - Проблемные варианты + сравнение
+  - Причины жалоб с цитатами
+  - **Секция "Коммуникация"** (качество ответов, худшие примеры, план действий)
 
----
-
-## 🔥 Next Steps - First 30 Days
-
-### Week 1-2: Customer Development
-- [ ] Build list of 50+ DTC brands
-- [ ] Find contacts (LinkedIn, Hunter.io)
-- [ ] Send outreach, book 5-7 calls
-- [ ] Conduct interviews (use template)
-
-**Goal:** Validate problem exists, price sensitivity, buying intent
-
-### Week 3: Smoke Test
-Choose one:
-- **A) Landing + Waitlist** - validate interest ($500 ads)
-- **B) Concierge MVP** - 2-3 paying customers manually
-- **C) Build in Public** - Twitter/LinkedIn audience
-
-**Goal:** Prove willingness to pay before building
-
-### Week 4: GO/NO-GO Decision
-- Analyze interview results
-- Check validation criteria
-- Decide: Build MVP or Pivot?
-
-📋 Full checklist: [QUICK_START_CHECKLIST.md](QUICK_START_CHECKLIST.md)
+### Документация
+- **[docs/product/PRODUCT.md](docs/product/PRODUCT.md)** — Описание продукта простыми словами
+- **[docs/reviews/CARD_FORMAT.md](docs/reviews/CARD_FORMAT.md)** — Формат JSON карточки
+- **[docs/reviews/QUICKSTART.md](docs/reviews/QUICKSTART.md)** — Подробная инструкция по запуску
+- **[docs/architecture/architecture.md](docs/architecture/architecture.md)** — Архитектура системы
 
 ---
 
-## 💰 Proposed Pricing
+## 🛠 Технологии
 
-### Model: Tiered Monthly + Outcome option
+**Backend:**
+- FastAPI — web framework
+- SQLAlchemy + aiosqlite — database (SQLite)
+- Celery + Redis — background tasks
+- Jinja2 — HTML templates
+- python-telegram-bot — Telegram notifications
 
-**Starter** - $500/month
-- Up to 500 tickets/month
-- Email + Chat channels
-- Shopify integration
-- 70%+ auto-resolution target
+**LLM Integration:**
+- DeepSeek API (OpenAI-compatible) — ~$0.01/100 reviews
+- Prompts with guardrails (no false promises, no AI mentions)
 
-**Growth** - $1,200/month
-- Up to 2,000 tickets/month
-- All Starter features
-- Priority support
-- Custom workflows
+**Frontend:**
+- Vanilla JS + CSS
+- Montserrat font (Google Fonts)
+- Dark theme (#0a1018 background)
 
-**Scale** - $2,000/month
-- Up to 5,000 tickets/month
-- All Growth features
-- Dedicated success manager
-- Advanced analytics
-
-**Enterprise** - Custom
-- 5,000+ tickets/month
-- Custom integrations
-- SLA guarantees
-
-**Alternative:** Outcome-based at $0.50 per successfully resolved ticket
+**Integrations:**
+- WBCON API — парсинг отзывов WB
+- WB Public Card API — описание товара
+- Telegram Login Widget — авторизация
 
 ---
 
-## 🛠 Tech Stack (Proposed for MVP)
+## 📊 Текущий статус
 
-### AI/ML
-- **Claude API** (Anthropic) - main agent engine
-- **OpenAI** - fallback/specific tasks
-- Prompt engineering + RAG for knowledge
+### ✅ Готово
+- Backend API (FastAPI) с auth bypass для локального теста
+- Celery worker для фоновой обработки
+- Интеграция с WBCON API (создание задач, polling, pagination)
+- Скрипт анализа отзывов (rule-based + LLM)
+- **LLM-анализ качества ответов продавца** ⭐
+- База данных (SQLite) с моделями User, Task, Report
+- Dashboard с таблицей задач и статусами
+- HTML template `report.html` с секцией Communication
 
-### Integrations
-- **Shopify API** - order tracking, inventory
-- **Gorgias/Zendesk API** - helpdesk integration
-- **Klaviyo** - customer data (optional)
+### 🚧 В процессе
+- ❌ Telegram авторизация (сейчас bypass для локального теста)
+- ❌ Deploy на продакшн (нужен ngrok/cloudflare для webhook)
 
-### Backend
-- **Python** (FastAPI) - API server
-- **PostgreSQL** - data storage
-- **Redis** - caching, queues
-- **Celery** - background jobs
-
-### Frontend
-- **React** + **TypeScript** - admin dashboard
-- **Tailwind CSS** - styling
-- **Framer Motion** - animations
-
-### Infrastructure
-- **Railway/Render** - hosting (MVP)
-- **AWS/GCP** - production scale
-- **Vercel** - frontend hosting
+### 📝 TODO
+- [ ] Добавить обработку ошибок и retry для WBCON API
+- [ ] Настроить Telegram Bot для авторизации
+- [ ] Deploy на VPS (ngrok/cloudflared для webhook)
+- [ ] Логирование и мониторинг (Sentry?)
+- [ ] Метрики и A/B тесты
 
 ---
 
-## 📚 Resources & Learning
+## 🐛 Известные проблемы
 
-### Market Research
-- CB Insights: Customer Service AI Market Report 2025
-- Gartner: Conversational AI in Contact Centers
-- Industry blogs: Sierra, Intercom, Zendesk
-
-### Books
-- "The Mom Test" - customer interviews
-- "Obviously Awesome" - positioning
-- "Traction" - distribution channels
-
-### Communities
-- eCommerceFuel - DTC community
-- Indie Hackers - founders community
-- r/ecommerce, r/SaaS - Reddit
-
-### Tools
-- LinkedIn Sales Navigator - find contacts
-- Hunter.io - email finding
-- Calendly - scheduling
-- Notion - CRM, notes
+1. **WBCON pagination broken** — offset returns duplicates, only 100 of 407 fetched
+2. **Telegram notifications** — async/await in sync context, fixed via `asyncio.run()`
+3. **Auth bypass** — для локального теста создаётся фейковый user (telegram_id=999999999)
+4. **python-dotenv not in system python** — pass env vars via CLI: `DEEPSEEK_API_KEY=... USE_LLM=1 python3 ...`
 
 ---
 
-## 🤝 Contributing & Collaboration
+## 📞 Контакты
 
-Это исследовательский проект. Если хочешь внести вклад:
-
-1. **Research:** Добавь insights из твоих интервью
-2. **Analysis:** Улучши competitive analysis
-3. **Tools:** Добавь полезные скрипты
-4. **Feedback:** Поделись что сработало/не сработало
+Вопросы и предложения: [GitHub Issues](https://github.com/ironfelix/agentiq-reviews/issues)
 
 ---
 
-## 📧 Questions?
+## 📚 Дополнительные материалы
 
-Застрял? Не знаешь с чего начать?
-
-1. Читай [START_HERE.md](START_HERE.md)
-2. Следуй [QUICK_START_CHECKLIST.md](QUICK_START_CHECKLIST.md)
-3. Задавай вопросы в issue tracker (если это GitHub)
-
----
-
-## 🎓 Key Learnings (будут обновляться)
-
-### From Market Research:
-- ✅ Outcome-based pricing gaining traction
-- ✅ Autonomous > Assisted agents in demand
-- ✅ Vertical specialization beats horizontal
-- ✅ Voice will be key differentiator
-
-### From Customer Interviews:
-- TBD (добавляй insights сюда)
-
-### From Experiments:
-- TBD (track что работает)
-
----
-
-## ⚠️ Important Notes
-
-**This is a research/planning phase project.**
-
-- ✅ Market validated (Sierra $10B proves market exists)
-- 🔄 Customer validated (in progress - need 20 interviews)
-- ⏳ Product not built yet (waiting for validation)
-- 💡 MVP design next step (after validation)
-
-**Don't start building product until validation complete!**
-
----
-
-## 📅 Project Timeline
-
-```
-Month 1: Research & Validation ← YOU ARE HERE
-Month 2-3: MVP Development
-Month 4: Alpha Testing (3-5 customers)
-Month 5-6: Beta & Iteration (10-20 customers)
-Month 7+: Growth & Scale
-```
-
----
-
-## 🚀 Vision
-
-**Short-term (6 months):**
-Become the go-to AI solution for 50+ DTC e-commerce brands
-
-**Mid-term (12 months):**
-Category leader: "Best AI agent for e-commerce support"
-100+ customers, proven ROI, case studies
-
-**Long-term (24+ months):**
-Expand to adjacent verticals (SaaS, hospitality, retail)
-500+ customers, Series A funding
-
----
-
-**Last Updated:** 2026-02-02
-**Status:** 🟢 Research & Validation Phase
-**Next Milestone:** Complete 20 customer interviews
+- **Описание продукта** — [docs/product/PRODUCT.md](docs/product/PRODUCT.md)
+- **CustDev интервью** — [docs/research/custdev/](docs/research/custdev/)
+- **Демо-отчёты** — [data/reports/](data/reports/)
+- **API/рынок исследование** — [docs/research/](docs/research/), [archive/research/](archive/research/)
+- **Референс дизайна** — [assets/pdf/otveto-analysis-card-WB-03-02-2026.pdf](assets/pdf/otveto-analysis-card-WB-03-02-2026.pdf)

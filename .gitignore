@@ -1,10 +1,68 @@
-venv/
+# Python
 __pycache__/
-*.pyc
-.DS_Store
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
 .env
+.env.local
+.env.*
+!.env.example
+
+# Model handoff policy docs (must be tracked)
+# (keep them versioned to avoid losing cross-model rules)
+
+# Keys
+*.pem
+
+# Security / reports (may contain sensitive production data)
+**/WB_TOKENS_TEST_REPORT.md
+
+# Local backups / conflict dumps (never commit)
+/archive/backups/
+/archive/duplicates/
+/archive/merge-conflicts/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
 *.log
-.pids
-=1.0.0
-agentiq/architecture.md
-CLAUDE.md
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Redis
+dump.rdb
+
+# Temporary files
+*.tmp
+tmp/
+temp/
