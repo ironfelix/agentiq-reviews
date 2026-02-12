@@ -23,9 +23,9 @@
 3. Mark data-source decisions explicitly (`WB API first`, fallback rules, confidence thresholds).
 
 ## Documentation Policy (MANDATORY)
-Path note: in this repo the canonical docs live under `agentiq/docs/`. Many references use shortened paths like `docs/...` assuming the working directory is `agentiq/`.
+Path note: in this repo the canonical docs live under `docs/` at the repository root.
 
-1. Project documentation lives in `docs/` (inside `agentiq/`) and is consolidated via:
+1. Project documentation lives in `docs/` and is consolidated via:
 - `docs/docs-home.html` (human portal, statuses, module map)
 - `docs/INDEX.md` (Markdown index)
 2. Keep docs fresh (avoid stale docs):
@@ -47,7 +47,7 @@ Path note: in this repo the canonical docs live under `agentiq/docs/`. Many refe
 3. Always label metric source in UI/API (`wb_api` vs `wbcon_fallback`).
 
 ## Frontend Design Contract (MANDATORY)
-1. For app UI in Chat Center, the single source of truth is `agentiq/docs/prototypes/app-screens-v3-ru.html`.
+1. For app UI in Chat Center, the single source of truth is `docs/prototypes/app-screens-v3-ru.html`.
 2. When implementing backend/service logic, do not redesign layout, hierarchy, or visual patterns.
 3. Allowed UI changes are only data wiring and state handling (loading/error/empty) that preserve the approved design.
 
