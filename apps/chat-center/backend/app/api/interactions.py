@@ -628,6 +628,7 @@ async def reply_to_interaction(
         reply_text=reply_text,
     )
 
+    now_iso = datetime.now(timezone.utc).isoformat()
     interaction.status = "responded"
     interaction.needs_response = False
     interaction.priority = "low"
@@ -636,6 +637,11 @@ async def reply_to_interaction(
             **interaction.extra_data,
             "last_reply_text": reply_text[:500],
             "last_reply_outcome": outcome,
+            # If WB doesn't reflect the answer immediately (moderation / propagation),
+            # ingestion can keep the item in responded state for a short window.
+            "last_reply_source": "agentiq",
+            "last_reply_at": now_iso,
+            "wb_sync_state": "pending",
         }
     await db.commit()
     await db.refresh(interaction)

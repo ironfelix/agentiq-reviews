@@ -98,10 +98,35 @@ def _priority_for_review(rating: Optional[int], needs_response: bool) -> str:
 PRESERVED_META_KEYS = {
     "last_ai_draft",
     "last_reply_text",
+    "last_reply_source",
+    "last_reply_at",
     "last_reply_outcome",
+    "wb_sync_state",
     "link_candidates",
     "link_updated_at",
 }
+
+
+def _reply_pending_override(*, existing: Optional[Interaction], window_minutes: int = 180) -> bool:
+    """
+    If we have a local reply recorded (e.g. we sent it via AgentIQ),
+    don't reopen the item immediately just because WB hasn't reflected it yet.
+
+    This happens in practice due to moderation/propgation delays.
+    """
+    if not existing or not isinstance(existing.extra_data, dict):
+        return False
+    meta = existing.extra_data
+    if meta.get("last_reply_source") != "agentiq":
+        return False
+    last_reply_at = _parse_iso_dt(meta.get("last_reply_at")) if isinstance(meta.get("last_reply_at"), str) else None
+    if not last_reply_at:
+        return False
+    now = datetime.now(timezone.utc)
+    if last_reply_at.tzinfo is None:
+        last_reply_at = last_reply_at.replace(tzinfo=timezone.utc)
+    age = (now - last_reply_at).total_seconds() / 60.0
+    return age >= 0 and age <= float(window_minutes)
 
 
 def _merge_extra_data(existing_meta: Optional[dict], new_meta: dict[str, Any]) -> dict[str, Any]:
@@ -265,6 +290,13 @@ async def ingest_wb_reviews_to_interactions(
                     channel_meta["last_reply_source"] = "wb_api"
                     if answer_created_at:
                         channel_meta["last_reply_at"] = answer_created_at.isoformat()
+                    channel_meta["wb_sync_state"] = "confirmed"
+                elif _reply_pending_override(existing=existing):
+                    # Keep responded in UI while WB answer is pending visibility.
+                    needs_response = False
+                    mapped_status = "responded"
+                    mapped_priority = "low"
+                    channel_meta["wb_sync_state"] = "pending"
                 payload = {
                     "customer_id": None,  # Name-only identity is intentionally not used as deterministic key
                     "order_id": str(fb.get("supplierProductID") or "") or None,
@@ -420,6 +452,12 @@ async def ingest_wb_questions_to_interactions(
                     channel_meta["last_reply_source"] = "wb_api"
                     if answer_created_at:
                         channel_meta["last_reply_at"] = answer_created_at.isoformat()
+                    channel_meta["wb_sync_state"] = "confirmed"
+                elif _reply_pending_override(existing=existing):
+                    needs_response = False
+                    mapped_status = "responded"
+                    mapped_priority = "low"
+                    channel_meta["wb_sync_state"] = "pending"
                 payload = {
                     "customer_id": None,
                     "order_id": None,
