@@ -326,8 +326,12 @@ async def ingest_wb_reviews_to_interactions(
                 # Rating-only reviews (no buyer text) don't need seller response
                 if not review_text:
                     needs_response = False
+                elif answer_text or answer_state is True:
+                    # WB API may return empty answerText even for answered reviews;
+                    # trust the isAnswered=true filter pass as primary signal.
+                    needs_response = False
                 else:
-                    needs_response = not bool(answer_text)
+                    needs_response = True
                 occurred_at = _parse_iso_dt(fb.get("createdDate"))
                 answer_created_at = _parse_iso_dt(
                     fb.get("answerCreateDate")

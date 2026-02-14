@@ -366,12 +366,15 @@ def sync_seller_interactions(self, seller_id: int, force_full_sync: bool = False
                 seller_id=seller_id, channel="review", started_at=_now_utc()
             )
             try:
+                # Full sync (no watermark): use higher limit to catch all reviews.
+                # Incremental sync: 500 per state is plenty for delta.
+                review_limit = 1500 if review_watermark is None else 500
                 reviews_result = await ingest_wb_reviews_to_interactions(
                     db=db,
                     seller_id=seller_id,
                     marketplace=seller.marketplace or "wildberries",
                     only_unanswered=False,
-                    max_items=500,
+                    max_items=review_limit,
                     page_size=100,
                     since_watermark=review_watermark,
                 )
@@ -398,12 +401,13 @@ def sync_seller_interactions(self, seller_id: int, force_full_sync: bool = False
                 seller_id=seller_id, channel="question", started_at=_now_utc()
             )
             try:
+                question_limit = 1500 if question_watermark is None else 500
                 questions_result = await ingest_wb_questions_to_interactions(
                     db=db,
                     seller_id=seller_id,
                     marketplace=seller.marketplace or "wildberries",
                     only_unanswered=False,
-                    max_items=500,
+                    max_items=question_limit,
                     page_size=100,
                     since_watermark=question_watermark,
                 )
