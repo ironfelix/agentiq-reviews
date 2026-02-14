@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FolderStrip — Responsive (1 component)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafbfc;
+    --color-bg-tertiary: #f8f9fa;
+    --color-bg-hover: #f5f6f7;
+    --color-bg-active: #f0f7ff;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5f6368;
+    --color-text-tertiary: #9aa0a6;
+    --color-border-light: #f0f1f2;
+    --color-border-medium: #e8eaed;
+    --color-accent: #1a73e8;
+    --color-accent-light: #e8f0fe;
+    --color-urgent: #ea4335;
+    --radius-sm: 5px;
+    --radius-md: 6px;
+    --radius-pill: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #e8eaed;
+    color: var(--color-text-primary);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== TOGGLE ===== */
+.toggle-bar {
+    position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: #1a1a1a;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    z-index: 100;
+}
+.toggle-btn {
+    padding: 6px 16px; border-radius: var(--radius-pill);
+    border: 1px solid rgba(255,255,255,0.2); background: transparent;
+    color: rgba(255,255,255,0.6); font-family: inherit; font-size: 12px;
+    font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.toggle-btn.active {
+    background: var(--color-accent); color: #fff;
+    border-color: var(--color-accent);
+}
+
+/* ===== APP SHELL ===== */
+.app-shell {
+    margin-top: 44px;
+    height: calc(100vh - 44px);
+    display: flex;
+    background: var(--color-bg-primary);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 220px;
+    background: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border-medium);
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+.sidebar-logo { padding: 0 16px 20px; font-size: 15px; font-weight: 700; color: var(--color-text-primary); }
+.sidebar-logo span { color: var(--color-accent); }
+.sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; font-size: 13px; color: var(--color-text-secondary);
+    cursor: pointer; transition: all 0.12s;
+}
+.sidebar-item:hover { background: var(--color-bg-hover); }
+.sidebar-item.active { background: var(--color-bg-active); color: var(--color-accent); font-weight: 500; }
+.sidebar-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ===== FOLDER STRIP — Desktop: vertical ===== */
+.folder-strip {
+    width: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    flex-shrink: 0;
+    background: var(--color-bg-primary);
+}
+.folder-spacer {
+    /* matches chat-list-header height dynamically; hardcoded in preview */
+    height: 47px;
+    flex-shrink: 0;
+}
+.folder-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+    position: relative;
+    transition: all 0.12s;
+    margin-bottom: 2px;
+    padding: 0;
+    font-family: inherit;
+}
+.folder-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+.folder-label { font-size: 9px; font-weight: 500; line-height: 1; }
+.folder-item:hover { color: var(--color-text-secondary); background: var(--color-bg-hover); }
+.folder-item.active {
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+}
+.folder-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 3px;
+    background: var(--color-accent);
+    border-radius: 0 3px 3px 0;
+}
+.folder-badge {
+    position: absolute; top: 1px; right: 1px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 9px; font-weight: 700;
+    border-radius: var(--radius-pill);
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== CHAT LIST ===== */
+.chat-list {
+    width: 286px;
+    background: var(--color-bg-primary);
+    border-right: 1px solid var(--color-border-medium);
+    border-left: 1px solid var(--color-border-light);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.chat-list-header {
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid var(--color-border-medium);
+}
+.chat-list-title {
+    font-size: 17px; font-weight: 600; margin-bottom: 10px;
+}
+.search-box {
+    width: 100%;
+    background: var(--color-bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-family: inherit; font-size: 13px;
+    color: var(--color-text-primary);
+    outline: none;
+    margin-bottom: 8px;
+}
+.filters-scroll {
+    display: flex; gap: 6px; overflow-x: auto;
+    scrollbar-width: none;
+}
+.filters-scroll::-webkit-scrollbar { display: none; }
+.filter-pill {
+    padding: 5px 10px; border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-medium);
+    background: var(--color-bg-primary);
+    font-family: inherit; font-size: 11px; font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.12s;
+}
+.filter-pill:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.filter-pill.active {
+    background: var(--color-accent); color: white;
+    border-color: var(--color-accent);
+}
+.filter-pill .count { opacity: 0.7; margin-left: 2px; }
+
+/* Queue sections */
+.chat-list-content { flex: 1; overflow-y: auto; }
+.queue-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.3px;
+    background: var(--color-bg-secondary);
+}
+.queue-count { font-weight: 700; }
+.chat-item {
+    display: flex; gap: 10px; padding: 10px 14px;
+    cursor: pointer; border-bottom: 1px solid var(--color-border-light);
+    transition: background 0.12s;
+}
+.chat-item:hover { background: var(--color-bg-hover); }
+.chat-item.active { background: var(--color-bg-active); }
+.marketplace-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #7B2D8E; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.chat-item-content { flex: 1; min-width: 0; }
+.chat-item-header { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.chat-item-name { font-size: 13px; font-weight: 500; flex: 1; }
+.chat-item-time { font-size: 10px; color: var(--color-text-tertiary); }
+.chat-item-meta { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+.chat-item-preview { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.waiting { background: #fbbc04; }
+.status-dot.waiting.risk { background: var(--color-urgent); }
+.status-dot.responded { background: #34a853; }
+.unread-badge {
+    min-width: 16px; height: 16px; padding: 0 4px;
+    background: var(--color-accent); color: white;
+    font-size: 10px; font-weight: 600; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== MOBILE MODE ===== */
+.app-shell.mobile {
+    max-width: 390px;
+}
+.app-shell.mobile .sidebar { display: none; }
+.app-shell.mobile .chat-list { width: 100%; border: none; }
+
+/* Mobile: folder strip becomes horizontal inside header */
+.app-shell.mobile .folder-strip {
+    width: auto;
+    flex-direction: row;
+    padding: 3px;
+    background: var(--color-bg-secondary);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    gap: 0;
+}
+.app-shell.mobile .folder-spacer { display: none; }
+.app-shell.mobile .folder-item {
+    flex: 1;
+    flex-direction: row;
+    width: auto;
+    height: auto;
+    padding: 8px 4px;
+    gap: 5px;
+    border-radius: 8px;
+    margin-bottom: 0;
+}
+.app-shell.mobile .folder-item svg { width: 18px; height: 18px; }
+.app-shell.mobile .folder-label { font-size: 13px; font-weight: 500; }
+.app-shell.mobile .folder-item.active::before { display: none; }
+.app-shell.mobile .folder-item.active {
+    background: var(--color-bg-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.app-shell.mobile .folder-badge {
+    top: 0px; right: 2px;
+}
+
+/* Mobile: folder strip moves inside chat-list-header */
+.app-shell.mobile .chat-list-header .folder-strip-slot { display: block; }
+.app-shell:not(.mobile) .chat-list-header .folder-strip-slot { display: none; }
+</style>
+</head>
+<body>
+
+<div class="toggle-bar">
+    <button class="toggle-btn active" onclick="setMode('desktop')">Desktop</button>
+    <button class="toggle-btn" onclick="setMode('mobile')">Mobile</button>
+</div>
+
+<div class="app-shell" id="appShell">
+
+<!-- Sidebar (desktop only) -->
+<aside class="sidebar">
+    <div class="sidebar-logo">AGENT<span>IQ</span></div>
+    <div class="sidebar-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Сообщения
+    </div>
+    <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Аналитика
+    </div>
+    <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Настройки
+    </div>
+</aside>
+
+<!-- Folder Strip (desktop: vertical beside chat-list) -->
+<nav class="folder-strip" id="folderStripDesktop">
+    <div class="folder-spacer"></div>
+    <button class="folder-item active" onclick="switchFolder(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="folder-label">Все</span>
+        <span class="folder-badge">12</span>
+    </button>
+    <button class="folder-item" onclick="switchFolder(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="folder-label">Отзывы</span>
+        <span class="folder-badge">5</span>
+    </button>
+    <button class="folder-item" onclick="switchFolder(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="folder-label">Вопросы</span>
+        <span class="folder-badge">4</span>
+    </button>
+    <button class="folder-item" onclick="switchFolder(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span class="folder-label">Чаты</span>
+        <span class="folder-badge">3</span>
+    </button>
+</nav>
+
+<!-- Chat List -->
+<section class="chat-list">
+    <div class="chat-list-header" id="chatListHeader">
+        <div class="chat-list-title">Сообщения</div>
+
+        <!-- Mobile: folder strip moves here (same component, horizontal) -->
+        <div class="folder-strip-slot" id="folderSlot"></div>
+
+        <input type="text" class="search-box" placeholder="Поиск...">
+        <div class="filters-scroll">
+            <button class="filter-pill active" onclick="switchPill(this)">Все <span class="count">48</span></button>
+            <button class="filter-pill" onclick="switchPill(this)">Срочно <span class="count">3</span></button>
+            <button class="filter-pill" onclick="switchPill(this)">Без ответа <span class="count">12</span></button>
+            <button class="filter-pill" onclick="switchPill(this)">Обработаны <span class="count">33</span></button>
+        </div>
+    </div>
+
+    <div class="chat-list-content">
+        <div>
+            <div class="queue-header"><span>В работе</span><span class="queue-count">2</span></div>
+            <div class="chat-item active">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Алексей М.</span><span class="unread-badge">1</span><span class="chat-item-time">14:32</span></div>
+                    <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Отзыв · SLA просрочен</div>
+                    <div class="chat-item-preview">Товар пришёл с дефектом, экран не работает</div>
+                </div>
+            </div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Ольга К.</span><span class="unread-badge">1</span><span class="chat-item-time">13:15</span></div>
+                    <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Вопрос · Ожидает ответа</div>
+                    <div class="chat-item-preview">Подскажите, есть ли размер 42?</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="queue-header"><span>Ожидают ответа</span><span class="queue-count">3</span></div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Дмитрий В.</span><span class="unread-badge">1</span><span class="chat-item-time">12:44</span></div>
+                    <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Ожидает ответа</div>
+                    <div class="chat-item-preview">Здравствуйте, когда будет доставка?</div>
+                </div>
+            </div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Мария С.</span><span class="chat-item-time">11:20</span></div>
+                    <div class="chat-item-meta"><span class="status-dot waiting"></span>Отзыв · Ожидает ответа</div>
+                    <div class="chat-item-preview">Качество хорошее, но упаковка была мятая</div>
+                </div>
+            </div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Иван П.</span><span class="chat-item-time">10:05</span></div>
+                    <div class="chat-item-meta"><span class="status-dot waiting"></span>Вопрос · Ожидает ответа</div>
+                    <div class="chat-item-preview">Совместим ли с iPhone 15 Pro Max?</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="queue-header"><span>Все сообщения</span><span class="queue-count">5</span></div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Елена Р.</span><span class="chat-item-time">09:30</span></div>
+                    <div class="chat-item-meta"><span class="status-dot responded"></span>Отзыв · Ответ дан</div>
+                    <div class="chat-item-preview">Отличный товар, рекомендую!</div>
+                </div>
+            </div>
+            <div class="chat-item">
+                <div class="marketplace-icon">W</div>
+                <div class="chat-item-content">
+                    <div class="chat-item-header"><span class="chat-item-name">Сергей Н.</span><span class="chat-item-time">вчера</span></div>
+                    <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Ответ дан</div>
+                    <div class="chat-item-preview">Спасибо за быстрый ответ!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+
+<script>
+const shell = document.getElementById('appShell');
+const strip = document.getElementById('folderStripDesktop');
+const slot = document.getElementById('folderSlot');
+
+function setMode(mode) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (mode === 'mobile') {
+        shell.classList.add('mobile');
+        // Move folder strip inside header slot
+        slot.appendChild(strip);
+    } else {
+        shell.classList.remove('mobile');
+        // Move folder strip back before chat-list
+        shell.insertBefore(strip, document.querySelector('.chat-list'));
+    }
+}
+
+function switchFolder(el) {
+    el.parentNode.querySelectorAll('.folder-item').forEach(f => f.classList.remove('active'));
+    el.classList.add('active');
+}
+function switchPill(el) {
+    el.parentNode.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+}
+</script>
+</body>
+</html>
