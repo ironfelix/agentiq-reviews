@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { FolderStrip } from './FolderStrip';
 import type { Chat, ChatFilters, InteractionQualityMetricsResponse } from '../types';
 
 interface ChatListProps {
@@ -7,6 +8,8 @@ interface ChatListProps {
   onSelectChat: (chat: Chat) => void;
   onFiltersChange: (filters: ChatFilters) => void;
   pipeline?: InteractionQualityMetricsResponse['pipeline'] | null;
+  activeChannel: 'all' | 'review' | 'question' | 'chat';
+  onChannelChange: (channel: 'all' | 'review' | 'question' | 'chat') => void;
   userName?: string;
   onLogout?: () => void;
   onConnectMarketplace?: (apiKey: string) => Promise<void>;
@@ -28,6 +31,8 @@ export function ChatList({
   onSelectChat,
   onFiltersChange,
   pipeline,
+  activeChannel,
+  onChannelChange,
   userName,
   onLogout,
   onConnectMarketplace,
@@ -43,7 +48,6 @@ export function ChatList({
   onOpenConnectOnboarding,
 }: ChatListProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'urgent' | 'unanswered' | 'resolved'>('all');
-  const [activeChannel, setActiveChannel] = useState<'all' | 'review' | 'question' | 'chat'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showApiKeyForm, setShowApiKeyForm] = useState(false);
@@ -164,7 +168,7 @@ export function ChatList({
   };
 
   const handleChannelChange = (channel: 'all' | 'review' | 'question' | 'chat') => {
-    setActiveChannel(channel);
+    onChannelChange(channel);
   };
 
   // Handle search
@@ -279,9 +283,6 @@ export function ChatList({
         c.chat_status === 'auto-response' ||
         c.chat_status === 'closed'
       ).length;
-  const reviewCount = pipelineByChannel.review ? pipelineByChannel.review.total : chats.filter(c => c.channel_type === 'review').length;
-  const questionCount = pipelineByChannel.question ? pipelineByChannel.question.total : chats.filter(c => c.channel_type === 'question').length;
-  const chatCount = pipelineByChannel.chat ? pipelineByChannel.chat.total : chats.filter(c => !c.channel_type || c.channel_type === 'chat').length;
   const activeChannelLabel = activeChannel === 'review'
     ? 'Отзывы'
     : activeChannel === 'question'
@@ -387,34 +388,14 @@ export function ChatList({
           </div>
         </div>
 
-        <div className="filters-container channel-filters">
-          <div className="filters-scroll">
-            <button
-              className={`filter-pill ${activeChannel === 'all' ? 'active' : ''}`}
-              onClick={() => handleChannelChange('all')}
-            >
-              Каналы: все <span className="count">{pipeline ? Number(pipeline.interactions_total || 0) : chats.length}</span>
-            </button>
-            <button
-              className={`filter-pill ${activeChannel === 'review' ? 'active' : ''}`}
-              onClick={() => handleChannelChange('review')}
-            >
-              Отзывы <span className="count">{reviewCount}</span>
-            </button>
-            <button
-              className={`filter-pill ${activeChannel === 'question' ? 'active' : ''}`}
-              onClick={() => handleChannelChange('question')}
-            >
-              Вопросы <span className="count">{questionCount}</span>
-            </button>
-            <button
-              className={`filter-pill ${activeChannel === 'chat' ? 'active' : ''}`}
-              onClick={() => handleChannelChange('chat')}
-            >
-              Чаты <span className="count">{chatCount}</span>
-            </button>
-          </div>
-        </div>
+        {/* Channel tabs (mobile only — desktop uses FolderStrip.desktop beside chat-list) */}
+        <FolderStrip
+          variant="mobile"
+          activeChannel={activeChannel}
+          onChannelChange={handleChannelChange}
+          pipeline={pipeline}
+          totalChats={chats.length}
+        />
 
         {/* Advanced Filters */}
         {showAdvancedFilters && (

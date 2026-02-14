@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ChatList } from './components/ChatList';
 import { ChatWindow } from './components/ChatWindow';
+import { FolderStrip } from './components/FolderStrip';
 import { Login } from './components/Login';
 import { MarketplaceOnboarding } from './components/MarketplaceOnboarding';
 import { authApi, chatApi, getToken, interactionsApi } from './services/api';
@@ -139,6 +140,7 @@ function interactionToChat(interaction: Interaction): Chat {
     product_article: interaction.product_article || interaction.nm_id,
     chat_status: interaction.needs_response ? 'waiting' : 'responded',
     closed_at: interaction.status === 'closed' ? interaction.updated_at : null,
+    source: interaction.source || null,
     created_at: interaction.created_at,
     updated_at: interaction.updated_at,
   };
@@ -285,7 +287,6 @@ function App() {
       return false;
     }
   });
-  const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [selectedInteractionId, setSelectedInteractionId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [filters, setFilters] = useState<ChatFilters>({});
@@ -299,6 +300,17 @@ function App() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isRetryingSync, setIsRetryingSync] = useState(false);
   const [mobileView, setMobileView] = useState<'list' | 'chat' | 'context'>('list');
+  const [activeChannel, setActiveChannelRaw] = useState<'all' | 'review' | 'question' | 'chat'>('all');
+  const [interactionCache, setInteractionCache] = useState<Record<string, Interaction[]>>({});
+  const interactionCacheRef = useRef(interactionCache);
+  interactionCacheRef.current = interactionCache;
+  const interactions = interactionCache[activeChannel] || [];
+  const handleChannelChange = useCallback((channel: 'all' | 'review' | 'question' | 'chat') => {
+    setActiveChannelRaw(channel);
+    if (!interactionCacheRef.current[channel]?.length) {
+      setIsLoadingChats(true);
+    }
+  }, []);
   const [qualityMetrics, setQualityMetrics] = useState<InteractionQualityMetricsResponse | null>(null);
   const [qualityHistory, setQualityHistory] = useState<InteractionQualityHistoryResponse | null>(null);
   const [opsAlerts, setOpsAlerts] = useState<InteractionOpsAlertsResponse | null>(null);
@@ -353,14 +365,21 @@ function App() {
   );
 
   const upsertInteraction = useCallback((interaction: Interaction) => {
-    setInteractions((prev) => {
-      const idx = prev.findIndex((item) => item.id === interaction.id);
-      if (idx >= 0) {
-        const next = [...prev];
-        next[idx] = interaction;
-        return next;
+    setInteractionCache((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) {
+        if (key === 'all' || key === interaction.channel) {
+          const list = next[key];
+          const idx = list.findIndex((item) => item.id === interaction.id);
+          if (idx >= 0) {
+            next[key] = [...list];
+            next[key][idx] = interaction;
+          } else {
+            next[key] = [interaction, ...list];
+          }
+        }
       }
-      return [interaction, ...prev];
+      return next;
     });
   }, []);
 
@@ -394,7 +413,7 @@ function App() {
     setActiveWorkspace('messages');
     setIsSidebarCollapsed(false);
     setDismissedSyncOnboarding(false);
-    setInteractions([]);
+    setInteractionCache({});
     setSelectedInteractionId(null);
     setMessages([]);
     setTimeline(null);
@@ -460,9 +479,10 @@ function App() {
   }, [user]);
 
   const fetchInteractions = useCallback(async () => {
+    const channelKey = filters.channel || 'all';
     try {
       const response = await interactionsApi.getInteractions(buildInteractionFilters(filters));
-      setInteractions(response.interactions);
+      setInteractionCache(prev => ({ ...prev, [channelKey]: response.interactions }));
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
         setSelectedInteractionId(null);
         setMessages([]);
@@ -678,13 +698,17 @@ function App() {
   }, []);
 
   const handleRegenerateAI = useCallback(async (interactionId: number) => {
-    setInteractions((prev) =>
-      prev.map((item) => {
-        if (item.id !== interactionId) return item;
-        const extra = asRecord(item.extra_data);
-        return { ...item, extra_data: { ...extra, last_ai_draft: null } };
-      })
-    );
+    setInteractionCache((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) {
+        next[key] = next[key].map((item) => {
+          if (item.id !== interactionId) return item;
+          const extra = asRecord(item.extra_data);
+          return { ...item, extra_data: { ...extra, last_ai_draft: null } };
+        });
+      }
+      return next;
+    });
 
     const draft = await interactionsApi.generateDraft(
       interactionId,
@@ -715,28 +739,32 @@ function App() {
     const text = templateText.trim();
     if (!selectedInteractionId || !text) return;
 
-    setInteractions((prev) =>
-      prev.map((item) => {
-        if (item.id !== selectedInteractionId) return item;
-        const extra = asRecord(item.extra_data);
-        const existingDraft = asRecord(extra.last_ai_draft);
-        return {
-          ...item,
-          extra_data: {
-            ...extra,
-            last_ai_draft: {
-              ...existingDraft,
-              text,
-              source: "timeline_template",
-              intent: (existingDraft.intent as string) || "thread_template",
-              sentiment: (existingDraft.sentiment as string) || "neutral",
-              sla_priority: (existingDraft.sla_priority as string) || item.priority,
-              recommendation_reason: "Template from deterministic thread",
+    setInteractionCache((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) {
+        next[key] = next[key].map((item) => {
+          if (item.id !== selectedInteractionId) return item;
+          const extra = asRecord(item.extra_data);
+          const existingDraft = asRecord(extra.last_ai_draft);
+          return {
+            ...item,
+            extra_data: {
+              ...extra,
+              last_ai_draft: {
+                ...existingDraft,
+                text,
+                source: "timeline_template",
+                intent: (existingDraft.intent as string) || "thread_template",
+                sentiment: (existingDraft.sentiment as string) || "neutral",
+                sla_priority: (existingDraft.sla_priority as string) || item.priority,
+                recommendation_reason: "Template from deterministic thread",
+              },
             },
-          },
-        };
-      })
-    );
+          };
+        });
+      }
+      return next;
+    });
   }, [selectedInteractionId]);
 
   // Fetch interactions when user changes
@@ -1245,12 +1273,21 @@ function App() {
             </div>
           ) : (
             <div className="chat-center" data-mobile-view={mobileView}>
+              <FolderStrip
+                variant="desktop"
+                activeChannel={activeChannel}
+                onChannelChange={handleChannelChange}
+                pipeline={qualityMetrics?.pipeline}
+                totalChats={chats.length}
+              />
               <ChatList
                 chats={chats}
                 selectedChatId={selectedChat?.id || null}
                 onSelectChat={handleSelectChat}
                 onFiltersChange={setFilters}
                 pipeline={qualityMetrics?.pipeline}
+                activeChannel={activeChannel}
+                onChannelChange={handleChannelChange}
                 onConnectMarketplace={handleConnectMarketplace}
                 isConnecting={isConnecting}
                 isLoadingChats={isLoadingChats}
