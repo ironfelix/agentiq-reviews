@@ -7,6 +7,9 @@ Uses DeepSeek API to:
 3. Generate response recommendation following guardrails
 
 Based on RESPONSE_GUARDRAILS.md policy.
+
+Guardrails: all banned phrases and replacements are sourced from
+``app.services.guardrails`` (single source of truth).
 """
 
 import httpx
@@ -17,6 +20,10 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 from app.config import get_settings
+from app.services.guardrails import (
+    replace_banned_phrases,
+    get_max_length,
+)
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -102,54 +109,9 @@ SLA_PRIORITIES = {
     "other": "normal",
 }
 
-# Banned phrases with replacements
-BANNED_PHRASES = {
-    # False Authority (Group A)
-    "вернём деньги": "Оформите возврат через ЛК WB",
-    "вернем деньги": "Оформите возврат через ЛК WB",
-    "гарантируем возврат": "Оформите возврат через ЛК WB",
-    "гарантируем замену": "Оформите возврат через ЛК WB",
-    "мы одобрим возврат": "Оформите возврат через ЛК WB",
-    "мы одобрим заявку": "Оформите возврат через ЛК WB",
-    "полный возврат": "возврат через ЛК WB",
-    "бесплатную замену": "возврат через ЛК WB",
-    "доставим завтра": "Со своей стороны товар отгружен",
-    "отменим ваш заказ": "Вы можете отменить заказ в ЛК WB",
-    "ускорим доставку": "Со своей стороны товар отгружен",
-
-    # Blame (forbidden)
-    "вы неправильно": "",
-    "вы не так": "",
-    "ваша вина": "",
-    "сами виноваты": "",
-
-    # Dismissive
-    "обратитесь в поддержку": "Мы со своей стороны проверим ситуацию",
-    "мы не можем повлиять": "Со своей стороны мы передали информацию",
-
-    # Legal admissions (Group C)
-    "характеристики не соответствуют": "возможен дефект конкретного экземпляра",
-    "наша ошибка": "нештатная ситуация, разбираемся",
-    "мы виноваты": "нештатная ситуация, разбираемся",
-
-    # AI/bot mentions (Group B)
-    "ИИ": "",
-    "бот": "",
-    "нейросеть": "",
-    "GPT": "",
-    "ChatGPT": "",
-    "автоматический ответ": "",
-
-    # Internal jargon
-    "пересорт": "прислали не тот товар",
-    "FBO": "склад WB",
-    "FBS": "склад продавца",
-    "SKU": "артикул",
-
-    # Formal/bureaucratic
-    "уважаемый клиент": "",
-    "уважаемый покупатель": "",
-}
+# NOTE: BANNED_PHRASES dict has been moved to guardrails.py
+# (BANNED_PHRASE_REPLACEMENTS). This module now uses
+# replace_banned_phrases() from guardrails for post-generation cleanup.
 
 # Return keywords (to suggest refund instruction)
 RETURN_TRIGGER_WORDS = [
@@ -191,7 +153,7 @@ CHAT_ANALYSIS_SYSTEM = """Ты — эксперт по клиентскому с
 7. "характеристики не соответствуют" — юридическое признание обмана
 
 ПРАВИЛА генерации recommendation:
-1. Формат: 2-3 предложения, макс 300 символов
+1. Формат: 2-3 предложения, макс 500 символов
 2. Начни с "{Имя}, здравствуйте!" если есть имя покупателя
 3. Дай КОНКРЕТНЫЙ ответ по ситуации — не общие фразы
 4. Концовка должна быть РАЗНОЙ и уместной — НЕ копипасти одну и ту же фразу
@@ -232,7 +194,8 @@ ESCALATION (needs_escalation = true):
 CHAT_ANALYSIS_USER = """Проанализируй чат и предложи ответ.
 
 Товар: {product_name}
-
+{product_context_block}
+{rating_context_block}
 История переписки (от старых к новым):
 {messages_block}
 
@@ -242,7 +205,7 @@ CHAT_ANALYSIS_USER = """Проанализируй чат и предложи о
   "sentiment": "positive" | "negative" | "neutral",
   "urgency": "low" | "normal" | "high" | "critical",
   "categories": ["complaint", "question", "order_status", ...],
-  "recommendation": "ГОТОВЫЙ ТЕКСТ ответа от лица продавца (2-3 предл., макс 300 симв.)",
+  "recommendation": "ГОТОВЫЙ ТЕКСТ ответа от лица продавца (2-3 предл., макс 500 симв.)",
   "recommendation_reason": "почему именно такой ответ (1 предл.)",
   "needs_escalation": true | false,
   "escalation_reason": "причина эскалации если needs_escalation=true"
@@ -251,7 +214,229 @@ CHAT_ANALYSIS_USER = """Проанализируй чат и предложи о
 ВАЖНО:
 - recommendation — это ГОТОВЫЙ ТЕКСТ для отправки, НЕ инструкция
 - Используй имя покупателя если есть
+- Если есть информация о товаре — используй её для КОНКРЕТНОГО ответа (состав, размеры, характеристики)
+- НЕ выдумывай характеристики, используй ТОЛЬКО те, что указаны в контексте
 - Если последнее сообщение от продавца — рекомендация не нужна, верни recommendation: null"""
+
+
+# ---------------------------------------------------------------------------
+# Channel-specific system prompts (reviews & questions)
+# ---------------------------------------------------------------------------
+
+REVIEW_DRAFT_SYSTEM = """Ты — эксперт по клиентскому сервису на маркетплейсах WB/Ozon.
+
+Задача: написать публичный ответ продавца на отзыв покупателя.
+
+ВАЖНО — ЭТО ОТЗЫВ, А НЕ ЧАТ:
+- Ответ на отзыв — публичный, его видят ВСЕ покупатели
+- Покупатель НЕ может ответить — НЕ задавай вопросов
+- Будь лаконичным, конкретным, полезным
+- Поблагодари за покупку
+
+ПРАВИЛА ПО РЕЙТИНГУ:
+- ★1-2 (негатив): Эмпатия + извинение + конкретное решение проблемы
+- ★3 (средний): Благодарность + признание недостатка + что делаем для улучшения
+- ★4-5 (позитив): Благодарность за отзыв + подчеркни что рады
+
+КРИТИЧЕСКИ ВАЖНО — ЗАПРЕЩЕНО писать:
+1. "вернём деньги", "гарантируем возврат/замену" — продавец НЕ контролирует возвраты на WB
+2. "доставим завтра", "через N дней" — продавец НЕ контролирует логистику
+3. "вы неправильно", "ваша вина" — обвинение покупателя запрещено
+4. "ИИ", "бот", "нейросеть", "GPT" — раскрытие автоматизации
+5. "обратитесь в поддержку WB" — отписка
+6. НЕ задавай вопросов покупателю — он не ответит на отзыв
+
+ПРАВИЛА генерации recommendation:
+1. Формат: 2-3 предложения, макс 500 символов
+2. Начни с приветствия и благодарности за отзыв
+3. Адресуй конкретные жалобы из текста отзыва
+4. НЕ предлагай возврат/замену ЕСЛИ покупатель сам не просил
+5. Если дефект очевиден → инструкция "Оформите возврат через ЛК WB"
+6. НЕ выдумывать характеристики товара — только из контекста
+7. Концовка должна быть РАЗНОЙ — НЕ копипасти шаблон
+8. НЕ заканчивай "Если нужна помощь — пишите!" — покупатель не ответит
+
+ПРИМЕРЫ хороших ответов на отзывы:
+- ★1 (брак): "Здравствуйте! Очень жаль, что товар оказался с дефектом. Оформите, пожалуйста, возврат через ЛК WB — мы передали информацию в отдел качества."
+- ★2 (не подошёл размер): "Здравствуйте! Спасибо за обратную связь. К сожалению, данная модель может маломерить — рекомендуем ориентироваться на размерную сетку в карточке товара."
+- ★5 (доволен): "Спасибо за отзыв! Рады, что товар оправдал ожидания. Приятных покупок!"
+- ★4 (нравится, но замечание): "Благодарим за отзыв и обратную связь! Ваше замечание учтём при улучшении товара."
+
+ESCALATION (needs_escalation = true):
+- Аллергия, здоровье, мед. реакция → STOP
+- Подозрение на контрафакт → STOP
+- Угрозы, юридические претензии → STOP"""
+
+
+REVIEW_DRAFT_USER = """Напиши ответ продавца на отзыв покупателя.
+
+Товар: {product_name}
+Рейтинг: ★{rating}/5
+
+Текст отзыва:
+{review_text}
+
+Верни JSON:
+{{
+  "intent": "один из: thanks, defect_not_working, wrong_item, refund_exchange, product_spec, other",
+  "sentiment": "positive" | "negative" | "neutral",
+  "urgency": "low" | "normal" | "high" | "critical",
+  "categories": ["complaint", "praise", "defect", ...],
+  "recommendation": "ГОТОВЫЙ ТЕКСТ ответа от лица продавца (2-3 предл., макс 500 симв.)",
+  "recommendation_reason": "почему именно такой ответ (1 предл.)",
+  "needs_escalation": true | false,
+  "escalation_reason": "причина эскалации если needs_escalation=true"
+}}
+
+ВАЖНО:
+- recommendation — это ГОТОВЫЙ ТЕКСТ для публикации, НЕ инструкция
+- Учитывай рейтинг при выборе тона и содержания
+- НЕ задавай вопросов — покупатель не ответит на отзыв"""
+
+
+QUESTION_DRAFT_SYSTEM = """Ты — эксперт по клиентскому сервису на маркетплейсах WB/Ozon.
+
+Задача: написать публичный ответ продавца на вопрос покупателя.
+
+ВАЖНО — ЭТО ВОПРОС О ТОВАРЕ:
+- Ответ публичный, его видят ВСЕ покупатели — он помогает другим
+- Отвечай на вопрос ПРЯМО и КОНКРЕТНО
+- Используй характеристики из карточки товара если есть
+- Если вопрос перед покупкой — помоги покупателю принять решение
+
+ТИПЫ ВОПРОСОВ:
+- Pre-purchase: размеры, состав, наличие, совместимость → помоги купить
+- Post-purchase: как пользоваться, проблема → решение/инструкция
+- Характеристики: конкретный факт из карточки → чёткий ответ
+
+КРИТИЧЕСКИ ВАЖНО — ЗАПРЕЩЕНО писать:
+1. "вернём деньги", "гарантируем возврат/замену" — продавец НЕ контролирует возвраты на WB
+2. "вы неправильно", "ваша вина" — обвинение покупателя запрещено
+3. "ИИ", "бот", "нейросеть", "GPT" — раскрытие автоматизации
+4. "обратитесь в поддержку WB" — отписка
+5. НЕ выдумывай характеристики — только из контекста / карточки
+
+ПРАВИЛА генерации recommendation:
+1. Формат: 1-3 предложения, макс 500 символов
+2. Начни с приветствия
+3. Ответь на вопрос КОНКРЕТНО — не общими фразами
+4. Если вопрос о размере/параметрах — дай конкретные данные
+5. Если не знаешь точный ответ — честно скажи, но предложи где найти
+6. Концовка: "Если остались вопросы — пишите!" допустима для вопросов
+7. НЕ заканчивай шаблонно каждый раз одинаково
+
+ПРИМЕРЫ хороших ответов на вопросы:
+- Размер: "Здравствуйте! Модель соответствует стандартной размерной сетке. При росте 175 и весе 70 кг рекомендуем размер M."
+- Состав: "Здравствуйте! Состав: 95% хлопок, 5% эластан. Ткань мягкая, хорошо тянется."
+- Наличие: "Здравствуйте! Да, товар есть в наличии. Поставки регулярные."
+- Использование: "Здравствуйте! Для начала работы нужно зарядить устройство 2-3 часа. Инструкция есть в карточке товара."
+
+ESCALATION (needs_escalation = true):
+- Аллергия, здоровье → STOP
+- Подозрение на контрафакт → STOP"""
+
+
+QUESTION_DRAFT_USER = """Напиши ответ продавца на вопрос покупателя.
+
+Товар: {product_name}
+
+Вопрос покупателя:
+{question_text}
+
+Верни JSON:
+{{
+  "intent": "один из: product_spec, sizing_fit, availability, compatibility, usage_howto, pre_purchase, other",
+  "sentiment": "neutral",
+  "urgency": "low" | "normal" | "high",
+  "categories": ["question", "pre_purchase", "specs", ...],
+  "recommendation": "ГОТОВЫЙ ТЕКСТ ответа от лица продавца (1-3 предл., макс 500 симв.)",
+  "recommendation_reason": "почему именно такой ответ (1 предл.)",
+  "needs_escalation": true | false,
+  "escalation_reason": "причина эскалации если needs_escalation=true"
+}}
+
+ВАЖНО:
+- recommendation — это ГОТОВЫЙ ТЕКСТ для публикации, НЕ инструкция
+- Ответь на вопрос КОНКРЕТНО"""
+
+
+# ---------------------------------------------------------------------------
+# Tone instructions (injected into system prompt based on seller settings)
+# ---------------------------------------------------------------------------
+
+TONE_INSTRUCTIONS: Dict[str, str] = {
+    "formal": "\nТОН ОТВЕТА: Используй вежливый деловой тон. Обращайся на «Вы». Без сокращений, без неформальных оборотов.",
+    "friendly": "\nТОН ОТВЕТА: Используй тёплый дружеский тон. Можно на «Вы», но с теплотой и эмпатией. Допустимы неформальные обороты.",
+    "neutral": "\nТОН ОТВЕТА: Используй нейтрально-вежливый тон. По делу, без излишней эмоциональности.",
+}
+
+
+def get_system_prompt(channel: str, tone: str = "neutral") -> str:
+    """Return the appropriate system prompt for the given channel and tone.
+
+    Args:
+        channel: One of 'review', 'question', 'chat'.
+        tone: One of 'formal', 'friendly', 'neutral'.
+
+    Returns:
+        Complete system prompt string with tone instruction appended.
+    """
+    if channel == "review":
+        base = REVIEW_DRAFT_SYSTEM
+    elif channel == "question":
+        base = QUESTION_DRAFT_SYSTEM
+    else:
+        # chat or unknown -- fall back to chat prompt
+        base = CHAT_ANALYSIS_SYSTEM
+
+    tone_instruction = TONE_INSTRUCTIONS.get(tone, TONE_INSTRUCTIONS["neutral"])
+    return base + tone_instruction
+
+
+def get_user_prompt(
+    channel: str,
+    *,
+    product_name: str = "Товар",
+    messages_block: str = "",
+    review_text: str = "",
+    rating: Optional[int] = None,
+    question_text: str = "",
+    product_context_block: str = "",
+    rating_context_block: str = "",
+) -> str:
+    """Return the appropriate user prompt for the given channel.
+
+    Args:
+        channel: One of 'review', 'question', 'chat'.
+        product_name: Product name for context.
+        messages_block: Formatted chat messages (for chat channel).
+        review_text: Review text (for review channel).
+        rating: Review rating 1-5 (for review channel).
+        question_text: Question text (for question channel).
+        product_context_block: Product card context block (for chat channel).
+        rating_context_block: Rating context block (for chat channel).
+
+    Returns:
+        Formatted user prompt string.
+    """
+    if channel == "review":
+        return REVIEW_DRAFT_USER.format(
+            product_name=product_name,
+            rating=rating if rating is not None else "?",
+            review_text=review_text or "(пустой отзыв)",
+        )
+    elif channel == "question":
+        return QUESTION_DRAFT_USER.format(
+            product_name=product_name,
+            question_text=question_text or "(пустой вопрос)",
+        )
+    else:
+        return CHAT_ANALYSIS_USER.format(
+            product_name=product_name,
+            messages_block=messages_block,
+            product_context_block=product_context_block,
+            rating_context_block=rating_context_block,
+        )
 
 
 class AIAnalyzer:
@@ -290,9 +475,14 @@ class AIAnalyzer:
         messages: List[Dict],
         product_name: Optional[str] = None,
         customer_name: Optional[str] = None,
+        product_context: Optional[str] = None,
+        rating_context: Optional[str] = None,
+        channel: str = "chat",
+        tone: str = "neutral",
+        rating: Optional[int] = None,
     ) -> Optional[Dict]:
         """
-        Analyze chat and generate response recommendation.
+        Analyze chat/review/question and generate response recommendation.
 
         Args:
             messages: List of message dicts with keys:
@@ -301,6 +491,11 @@ class AIAnalyzer:
                 - created_at: datetime
             product_name: Product name for context
             customer_name: Customer name for personalization
+            product_context: Formatted product card context (from product_context.py)
+            rating_context: Rating-aware prompt instructions (from product_context.py)
+            channel: One of 'review', 'question', 'chat' (selects prompt template)
+            tone: One of 'formal', 'friendly', 'neutral' (seller preference)
+            rating: Review rating 1-5 (for review channel)
 
         Returns:
             Analysis dict with keys:
@@ -327,11 +522,35 @@ class AIAnalyzer:
         # Check for escalation keywords first
         escalation = self._check_escalation_keywords(messages)
 
+        # Resolve the text for review/question channels
+        buyer_text = ""
+        for msg in messages:
+            if msg.get("author_type") == "buyer":
+                buyer_text = msg.get("text", "")
+                break
+
         try:
+            # Build channel-specific prompts
+            system_prompt = get_system_prompt(channel, tone)
+            user_prompt = get_user_prompt(
+                channel,
+                product_name=product_name or "Товар",
+                messages_block=messages_block,
+                review_text=buyer_text if channel == "review" else "",
+                rating=rating,
+                question_text=buyer_text if channel == "question" else "",
+                product_context_block=(
+                    f"\nИнформация о товаре:\n{product_context}\n" if product_context else ""
+                ),
+                rating_context_block=(
+                    f"\n{rating_context}\n" if rating_context else ""
+                ),
+            )
+
             # Call DeepSeek API
             response = await self._call_llm(
-                product_name=product_name or "Товар",
-                messages_block=messages_block
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
             )
 
             if not response:
@@ -344,7 +563,8 @@ class AIAnalyzer:
             if analysis.get("recommendation"):
                 analysis["recommendation"] = self._apply_guardrails(
                     analysis["recommendation"],
-                    customer_name
+                    customer_name,
+                    channel=channel,
                 )
 
             # Override escalation if detected by keywords
@@ -368,8 +588,38 @@ class AIAnalyzer:
             logger.error(f"AI analysis failed: {e}")
             return self._fallback_analysis(messages, customer_name)
 
-    async def _call_llm(self, product_name: str, messages_block: str) -> Optional[Dict]:
-        """Call DeepSeek API for chat analysis."""
+    async def _call_llm(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        # Legacy kwargs kept for backwards compatibility with external callers
+        product_name: Optional[str] = None,
+        messages_block: Optional[str] = None,
+        product_context: Optional[str] = None,
+        rating_context: Optional[str] = None,
+    ) -> Optional[Dict]:
+        """Call DeepSeek API for analysis.
+
+        Args:
+            system_prompt: Complete system prompt (channel + tone specific).
+            user_prompt: Complete user prompt (already formatted).
+        """
+        # Legacy fallback: if called with old positional args, build prompts
+        if product_name is not None and messages_block is not None:
+            product_context_block = ""
+            if product_context:
+                product_context_block = f"\nИнформация о товаре:\n{product_context}\n"
+            rating_context_block = ""
+            if rating_context:
+                rating_context_block = f"\n{rating_context}\n"
+            system_prompt = CHAT_ANALYSIS_SYSTEM
+            user_prompt = CHAT_ANALYSIS_USER.format(
+                product_name=product_name,
+                messages_block=messages_block,
+                product_context_block=product_context_block,
+                rating_context_block=rating_context_block,
+            )
+
         async with httpx.AsyncClient(timeout=30.0) as client:
             try:
                 response = await client.post(
@@ -381,11 +631,8 @@ class AIAnalyzer:
                     json={
                         "model": self.model_name,
                         "messages": [
-                            {"role": "system", "content": CHAT_ANALYSIS_SYSTEM},
-                            {"role": "user", "content": CHAT_ANALYSIS_USER.format(
-                                product_name=product_name,
-                                messages_block=messages_block
-                            )}
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt}
                         ],
                         "temperature": 0.3,
                         "max_tokens": 1000,
@@ -444,33 +691,22 @@ class AIAnalyzer:
             "escalation_reason": response.get("escalation_reason"),
         }
 
-    def _apply_guardrails(self, text: str, customer_name: Optional[str] = None) -> str:
-        """Apply guardrails to recommendation text."""
+    def _apply_guardrails(
+        self,
+        text: str,
+        customer_name: Optional[str] = None,
+        channel: str = "chat",
+    ) -> str:
+        """Apply guardrails to recommendation text.
+
+        Uses ``replace_banned_phrases()`` from the guardrails module (single
+        source of truth) and applies channel-aware truncation.
+        """
         if not text:
             return text
 
-        result = text
-
-        # Replace banned phrases
-        for phrase, replacement in BANNED_PHRASES.items():
-            if phrase.lower() in result.lower():
-                if replacement:
-                    result = re.sub(
-                        re.escape(phrase),
-                        replacement,
-                        result,
-                        flags=re.IGNORECASE
-                    )
-                else:
-                    result = re.sub(
-                        r'\s*' + re.escape(phrase) + r'\s*',
-                        ' ',
-                        result,
-                        flags=re.IGNORECASE
-                    )
-
-        # Clean up double spaces
-        result = re.sub(r'\s+', ' ', result).strip()
+        # Replace banned phrases using guardrails module (single source of truth)
+        result = replace_banned_phrases(text)
 
         # Normalize greeting: strip any existing greeting, re-add with proper first name
         # This prevents: surname greetings ("Курченко, здравствуйте!"),
@@ -495,14 +731,15 @@ class AIAnalyzer:
         else:
             result = f"Здравствуйте! {result}"
 
-        # Truncate to 300 chars
-        if len(result) > 300:
-            # Find last sentence boundary
-            cut_point = result[:297].rfind('.')
-            if cut_point > 200:
+        # Channel-aware truncation
+        max_len = get_max_length(channel)
+        if len(result) > max_len:
+            # Find last sentence boundary within limit
+            cut_point = result[:max_len - 3].rfind('.')
+            if cut_point > max_len // 2:
                 result = result[:cut_point + 1]
             else:
-                result = result[:297] + "..."
+                result = result[:max_len - 3] + "..."
 
         return result
 
@@ -644,6 +881,33 @@ class AIAnalyzer:
         }
 
 
+async def _get_seller_tone(db_session, seller_id: int) -> str:
+    """Read seller's tone preference from AI settings in DB.
+
+    Returns 'neutral' if not configured.
+    """
+    try:
+        from sqlalchemy import select
+        from app.models.runtime_setting import RuntimeSetting
+
+        key = f"ai_settings_v1:seller:{seller_id}"
+        result = await db_session.execute(
+            select(RuntimeSetting).where(RuntimeSetting.key == key)
+        )
+        record = result.scalar_one_or_none()
+        if record and record.value:
+            import json as _json
+            payload = _json.loads(record.value)
+            settings_obj = payload.get("settings", {}) if isinstance(payload, dict) else {}
+            tone = settings_obj.get("tone", "neutral")
+            if tone in ("formal", "friendly", "neutral"):
+                return tone
+    except Exception as exc:
+        logger.debug("Failed to read seller tone: %s", exc)
+
+    return "neutral"
+
+
 async def analyze_chat_for_db(chat_id: int, db_session) -> Optional[Dict]:
     """
     Analyze chat and update database.
@@ -691,6 +955,9 @@ async def analyze_chat_for_db(chat_id: int, db_session) -> Optional[Dict]:
         for m in messages
     ]
 
+    # Read seller tone preference
+    tone = await _get_seller_tone(db_session, chat.seller_id)
+
     # Analyze
     llm_runtime = await get_llm_runtime_config(db_session)
     analyzer = AIAnalyzer(
@@ -702,6 +969,8 @@ async def analyze_chat_for_db(chat_id: int, db_session) -> Optional[Dict]:
         messages=messages_data,
         product_name=chat.product_name,
         customer_name=chat.customer_name,
+        channel="chat",
+        tone=tone,
     )
 
     if analysis:

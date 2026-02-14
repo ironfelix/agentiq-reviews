@@ -6,10 +6,12 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 from collections import defaultdict
 
+from app.services.base_connector import BaseChannelConnector
+
 logger = logging.getLogger(__name__)
 
 
-class WBConnector:
+class WBConnector(BaseChannelConnector):
     """
     Асинхронный коннектор для Wildberries Chat API v1.
 
@@ -21,6 +23,8 @@ class WBConnector:
     """
 
     BASE_URL = "https://buyer-chat-api.wildberries.ru"
+    marketplace = "wildberries"
+    channel = "chat"
 
     def __init__(self, api_token: str):
         """
@@ -29,9 +33,17 @@ class WBConnector:
         Args:
             api_token: WB API token from seller dashboard
         """
-        self.api_token = api_token
+        token = (api_token or "").strip()
+        # WB Buyers Chat API expects a JWT access token (3 segments: header.payload.signature).
+        # Feedbacks/Questions APIs may accept non-JWT tokens, but chat does not.
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+        if token.count(".") != 2:
+            raise ValueError("WB chat token must be JWT (3 segments separated by '.')")
+
+        self.api_token = token
         self.headers = {
-            "Authorization": f"Bearer {api_token}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"
         }
 
@@ -379,6 +391,58 @@ class WBConnector:
             response.raise_for_status()
             return response.content
 
+    async def list_items(
+        self,
+        *,
+        skip: int = 0,
+        take: int = 100,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """List chats from WB API.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, fetch_chats() and fetch_messages_as_chats() are also available.
+
+        Note: WB Chat API doesn't use skip/take pagination, it uses cursor-based.
+        Use get_updates() for incremental sync instead.
+        """
+        result = await self.fetch_messages_as_chats(since_cursor=kwargs.get("since_cursor"))
+        return {
+            "data": {"chats": result["chats"]},
+            "total": len(result["chats"]),
+            "next_cursor": result["next_cursor"],
+        }
+
+    async def send_reply(self, *, item_id: str, text: str, **kwargs: Any) -> Dict[str, Any]:
+        """Send message to a chat.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, send_message() is also available.
+        """
+        attachments = kwargs.get("attachments")
+        result = await self.send_message(chat_id=item_id, text=text, attachments=attachments)
+        return {"success": True, **result}
+
+    async def get_updates(
+        self,
+        *,
+        since_cursor: Optional[str] = None,
+        limit: int = 50,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Get new messages/events since last cursor.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, fetch_messages() is also available.
+        """
+        cursor = int(since_cursor) if since_cursor else None
+        result = await self.fetch_messages(since_cursor=cursor, limit=limit)
+        return {
+            "items": result["messages"],
+            "next_cursor": str(result["next_cursor"]) if result["next_cursor"] else None,
+            "has_more": result["has_more"],
+        }
+
     async def get_statistics(self, since_cursor: Optional[int] = None) -> Dict:
         """
         Получить статистику по чатам и сообщениям.
@@ -439,6 +503,32 @@ async def fetch_product_name(nm_id: int) -> Optional[str]:
     Returns:
         Product name (imt_name) or None
     """
+    card = await fetch_product_card(nm_id)
+    if card:
+        return card.get("name")
+    return None
+
+
+async def fetch_product_card(nm_id: int) -> Optional[Dict]:
+    """
+    Fetch full product card from WB CDN API (no auth required).
+
+    Returns parsed card with fields: name, description, options, compositions,
+    category, subcategory. Result is cached in memory for 1 hour.
+
+    Args:
+        nm_id: WB article number (nmID from goodCard)
+
+    Returns:
+        Dict with product card data or None if unavailable
+    """
+    from app.services.product_context import get_cached_product_card, set_cached_product_card
+
+    # Check in-memory cache first
+    cached = get_cached_product_card(nm_id)
+    if cached is not None:
+        return cached if cached else None  # empty dict = negative cache
+
     basket = _get_basket_number(nm_id)
     vol = nm_id // 100000
     part = nm_id // 1000
@@ -449,11 +539,41 @@ async def fetch_product_name(nm_id: int) -> Optional[str]:
             response = await client.get(url)
             if response.status_code == 200:
                 data = response.json()
-                return data.get("imt_name", "")
+                card = _parse_product_card(data)
+                set_cached_product_card(nm_id, card)
+                return card
+            # Negative cache: remember that this nm_id has no card
+            set_cached_product_card(nm_id, {})
             return None
     except Exception as e:
-        logger.debug(f"Failed to fetch product name for nmID {nm_id}: {e}")
+        logger.debug(f"Failed to fetch product card for nmID {nm_id}: {e}")
         return None
+
+
+def _parse_product_card(data: Dict) -> Dict:
+    """Parse raw card.json into a clean product card dict."""
+    options = []
+    for opt in data.get("options", []):
+        name = (opt.get("name") or "").strip()
+        value = (opt.get("value") or "").strip()
+        if name and value:
+            options.append({"name": name, "value": value})
+
+    compositions = []
+    for comp in data.get("compositions", []):
+        name = (comp.get("name") or "").strip()
+        value = comp.get("value")
+        if name and value is not None:
+            compositions.append({"name": name, "value": value})
+
+    return {
+        "name": (data.get("imt_name") or "").strip(),
+        "description": (data.get("description") or "").strip(),
+        "category": (data.get("subj_root_name") or "").strip(),
+        "subcategory": (data.get("subj_name") or "").strip(),
+        "options": options,
+        "compositions": compositions,
+    }
 
 
 async def get_wb_connector_for_seller(seller_id: int, db_session) -> WBConnector:

@@ -19,6 +19,7 @@ from app.services.rate_limiter import get_rate_limiter
 from app.services.wb_connector import get_wb_connector_for_seller
 from app.services.wb_feedbacks_connector import get_wb_feedbacks_connector_for_seller
 from app.services.wb_questions_connector import get_wb_questions_connector_for_seller
+from app.services.connector_registry import get_connector
 
 logger = logging.getLogger(__name__)
 

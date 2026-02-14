@@ -38,10 +38,11 @@ Status: ACTIVE (triage queue)
 | 12 | IDEA | ✅ DONE — Статика для demo dashboard |
 | 13 | TODO | ✅ DONE — CJM flow проверен, всё работает |
 | 14 | UX | ✅ DONE — дубликат #9 (промокоды из меню в настройки) |
-| 15 | BUG | OPEN — фантомные отзывы (rating-only без текста) + sync не обновляет статус |
-| 16 | BUG | OPEN — ответы продавца на отзывы не загружаются (max_items budget) |
-| 17 | INFO | DOCUMENTED — правила синхронизации 300/300/500, frontend 50/page |
-| 18 | UX | OPEN — sidebar badge скрыть в активном workspace, показывать urgent |
+| 15 | BUG | ✅ FIXED — rating-only без текста: needs_response=false + answer_state trust |
+| 16 | BUG | ✅ FIXED — answered reviews: dynamic limit 1500 full / 500 incremental, per-state budget |
+| 17 | INFO | DOCUMENTED — правила синхронизации 1500/1500/500 full, 500/500/500 incremental |
+| 18 | UX | ✅ FIXED — sidebar badge: urgent count, скрыт в messages workspace |
+| 20 | RESEARCH | ✅ DONE — rating-only отзывы НЕ видны на карточке, ответ тоже не виден |
 | 19 | BUG | ✅ FIXED — при переключении каналов данные пропадают (per-channel cache) |
 
 ---
@@ -78,10 +79,12 @@ Status: ACTIVE (triage queue)
 
 14) ~~из меню убрать пункт промокоды, убрать в настройки~~ — **= дубликат #9, DONE (2026-02-15).**
 
-15) кажется отзывы и даты некорректно приходят, в карточке последний отзыв — Евгений, 11 октября 2025, а в интерфейсе — 14 февраля 2026 г. Николай — **BUG (2026-02-15):** Проверка через WB seller API: Николай 14.02.2026 — реальный отзыв в API (`id=NWc8J6hS4hFHjJmWfLvK`), но это **rating-only** (5★ без текста). WB не показывает такие отзывы на публичной карточке. Евгений (окт 2025) — отзыв на другой nmId в том же `imtId=331294168` (WB группирует по модели). Два подбага: (a) показываем rating-only отзывы без текста как обычные — нужно фильтровать или помечать; (b) sync не обновляет статус отзыва — Николай был `isAnswered=False` при первом fetch, WB позже пометил `isAnswered=True`, но re-sync не обновляет уже виденные записи.
+15) ~~кажется отзывы и даты некорректно приходят~~ **FIXED (2026-02-15):** Два подбага исправлены: (a) rating-only отзывы (без текста) теперь `needs_response=false` — не попадают в очередь; (b) WB API возвращает `answerText=null` даже для `isAnswered=true` — теперь используем `answer_state` (параметр API pass) как primary signal. Файл: `interaction_ingest.py:326-333`.
 
-16) а ответы на отзывы парсятся вообще? — **BUG (2026-02-15):** Код парсинга ответов написан и работает (`interaction_ingest.py:320-378`). Для **вопросов** — ок (316 из 330 с ответами). Для **отзывов** — ответы НЕ загружаются на проде. Причина: `max_items=300` бюджет на sync. У продавца 608 неотвеченных отзывов, sync сначала грузит unanswered (608 > 300 → бюджет исчерпан), до answered отзывов очередь не доходит. Fix: (1) увеличить `max_items` для reviews, (2) разделить бюджет для answered/unanswered, (3) починить watermarks чтобы incremental sync не перезагружал уже виденные записи.
+16) ~~а ответы на отзывы парсятся вообще?~~ **FIXED (2026-02-15):** Три исправления: (1) per-state budget — каждый `answer_state` (unanswered/answered) получает отдельный лимит вместо общего; (2) dynamic limits — full sync 1500/state, incremental 500/state (`sync.py:371,404`); (3) WB API `answerText=null` workaround (см. #15). Результат: 1213 reviews загружены (909 новых answered + 304 updated), все `status=responded`.
 
-17) а когда ключ вводим от кабинета, какие правила синхронизации? — **DOCUMENTED (2026-02-15):** Initial sync = те же лимиты что periodic, спец режима нет. Правила: **300 reviews** + **300 questions** + **500 chats** per sync cycle. WB API страницами по 100. Frontend показывает **50/page** (max 100). Периодичность: chats каждые 30 сек, reviews+questions каждые 5 мин. Watermarks (incremental sync) — код написан, но для reviews/questions watermarks не сохраняются → каждый цикл re-fetch с нуля.
+17) а когда ключ вводим от кабинета, какие правила синхронизации? — **DOCUMENTED (2026-02-15):** Full sync (first run, no watermark): **1500 reviews/state** + **1500 questions/state** + **500 chats**. Incremental (with watermark): **500/state** + **500/state** + **500 chats**. WB API страницами по 100. Frontend: **50/page** (max 100). Периодичность: chats каждые 30 сек, reviews+questions каждые 5 мин. Watermarks сохраняются в `runtime_settings` для incremental sync.
 
-18) в меню есть сообщения и бейдж 50 — не нужен в активном чат-центре, показывать в других разделах — **UX (2026-02-15):** Badge = `chats.filter(c => c.unread_count > 0).length` (динамический, не хардкод). Проблемы: (1) всегда виден, даже при count=0, (2) показывается в активном workspace. Fix: скрыть при `activeWorkspace === 'messages'`, показывать urgent count (`sla_priority === 'urgent'` + SLA overdue) вместо unread. Файлы: `App.tsx:956,1004,1626`.
+18) ~~в меню есть сообщения и бейдж 50~~ — **FIXED (2026-02-15):** Badge теперь показывает urgent count, скрыт в messages workspace и при count=0. Файлы: `App.tsx`.
+
+20) ~~ответ на отзыв без комментария (rating-only) — виден ли на карточке WB?~~ — **DONE (2026-02-15):** Исследование подтвердило: rating-only отзывы (только оценка, без текста/фото/видео) **НЕ отображаются** на публичной карточке товара. WB показывает max 1000 "непустых" отзывов. Rating-only автоматически архивируются в API (`answerState` auto-archive). Ответ продавца виден только автору в ЛК. Наша логика `needs_response=false` корректна. Источники: [WB Official](https://seller.wildberries.ru/instructions/ru/ru/material/customer-reviews), [Moneyplace](https://moneyplace.io/news/na-wildberries-vyroslo-chislo-otzyvov-bez-teksta/).

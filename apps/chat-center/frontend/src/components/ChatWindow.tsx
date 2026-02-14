@@ -1,5 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Chat, Message } from '../types';
+
+type ReplyStatus = 'idle' | 'sending' | 'sent' | 'error' | 'rejected';
+
+interface GuardrailViolation {
+  type: string;
+  severity: string;
+  message: string;
+  phrase?: string;
+  category?: string;
+}
+
+interface ReplyErrorInfo {
+  message: string;
+  violations?: GuardrailViolation[];
+  httpStatus?: number;
+}
 
 interface ChatWindowProps {
   chat: Chat | null;
@@ -11,6 +27,52 @@ interface ChatWindowProps {
   onReopenChat?: (chatId: number) => Promise<void>;
   onRegenerateAI?: (chatId: number) => Promise<void>;
   showLifecycleActions?: boolean;
+}
+
+/** Character limits by channel type */
+function getCharLimits(channelType: string | undefined): { min: number; max: number } {
+  if (channelType === 'chat') return { min: 1, max: 1000 };
+  // review and question: WB API accepts 2-5000
+  return { min: 2, max: 5000 };
+}
+
+/** Parse axios error into a user-friendly structure */
+function parseReplyError(error: unknown): ReplyErrorInfo {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosError = error as { response?: { status?: number; data?: unknown } };
+    const status = axiosError.response?.status;
+    const data = axiosError.response?.data as Record<string, unknown> | undefined;
+
+    if (status === 422 && data?.detail) {
+      const detail = data.detail as Record<string, unknown>;
+      return {
+        message: (typeof detail.summary === 'string' && detail.summary)
+          || (typeof detail.message === 'string' && detail.message)
+          || 'Текст заблокирован guardrails',
+        violations: Array.isArray(detail.violations) ? detail.violations as GuardrailViolation[] : undefined,
+        httpStatus: 422,
+      };
+    }
+
+    if (status === 502) {
+      const detail = data?.detail;
+      const msg = typeof detail === 'string' ? detail : 'Ошибка отправки через WB API';
+      return { message: msg, httpStatus: 502 };
+    }
+
+    if (status === 400) {
+      const detail = data?.detail;
+      const msg = typeof detail === 'string' ? detail : 'Некорректный запрос';
+      return { message: msg, httpStatus: 400 };
+    }
+
+    return {
+      message: `Ошибка сервера (${status || 'unknown'})`,
+      httpStatus: status,
+    };
+  }
+
+  return { message: 'Не удалось отправить ответ. Проверьте подключение.' };
 }
 
 export function ChatWindow({
@@ -26,6 +88,8 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [replyStatus, setReplyStatus] = useState<ReplyStatus>('idle');
+  const [replyError, setReplyError] = useState<ReplyErrorInfo | null>(null);
   const [showCopied, setShowCopied] = useState(false);
   const [isClosingChat, setIsClosingChat] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -34,8 +98,30 @@ export function ChatWindow({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check if chat is closed
+  // Track whether the current text originated from AI draft
+  const [usedAIDraft, setUsedAIDraft] = useState(false);
+
+  // Derive channel-aware character limits
+  const charLimits = getCharLimits(chat?.channel_type);
+  const textLength = messageText.length;
+  const isOverLimit = textLength > charLimits.max;
+  const isUnderMin = textLength > 0 && textLength < charLimits.min;
+
+  // Check if interaction was already responded
+  const isResponded = chat?.chat_status === 'responded' || chat?.chat_status === 'auto-response';
   const isChatClosed = chat?.chat_status === 'closed';
+
+  // Reset state when switching between chats
+  useEffect(() => {
+    setMessageText('');
+    setReplyStatus('idle');
+    setReplyError(null);
+    setUsedAIDraft(false);
+    setPendingFiles([]);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  }, [chat?.id]);
 
   // Handle close/reopen chat
   const handleCloseOrReopenChat = async () => {
@@ -61,12 +147,32 @@ export function ChatWindow({
   }, [messages]);
 
   // Handle send message
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if ((!messageText.trim() && pendingFiles.length === 0) || isSending) return;
 
+    // Client-side validation
+    const trimmedText = messageText.trim();
+    if (trimmedText.length < charLimits.min) {
+      setReplyError({
+        message: `Минимальная длина ответа: ${charLimits.min} символов`,
+      });
+      setReplyStatus('error');
+      return;
+    }
+    if (trimmedText.length > charLimits.max) {
+      setReplyError({
+        message: `Максимальная длина ответа: ${charLimits.max} символов`,
+      });
+      setReplyStatus('error');
+      return;
+    }
+
     setIsSending(true);
+    setReplyStatus('sending');
+    setReplyError(null);
+
     try {
-      const textBody = messageText.trim();
+      const textBody = trimmedText;
       const filesSuffix = pendingFiles.length > 0
         ? pendingFiles.map((file) => `[Файл: ${file.name}]`).join(' ')
         : '';
@@ -75,13 +181,23 @@ export function ChatWindow({
       await onSendMessage(outboundText);
       setMessageText('');
       setPendingFiles([]);
+      setReplyStatus('sent');
+      setUsedAIDraft(false);
+
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
-      alert('Ошибка отправки сообщения');
+      const errorInfo = parseReplyError(error);
+      setReplyError(errorInfo);
+      setReplyStatus(errorInfo.httpStatus === 422 ? 'rejected' : 'error');
+      // Keep text in textarea for retry
     } finally {
       setIsSending(false);
     }
-  };
+  }, [messageText, pendingFiles, isSending, charLimits, onSendMessage]);
 
   const handlePickFiles = () => {
     fileInputRef.current?.click();
@@ -103,6 +219,9 @@ export function ChatWindow({
     e.stopPropagation();
     if (chat?.ai_suggestion_text) {
       setMessageText(chat.ai_suggestion_text);
+      setUsedAIDraft(true);
+      setReplyStatus('idle');
+      setReplyError(null);
       setShowCopied(true);
       setTimeout(() => setShowCopied(false), 2000);
       // Auto-resize textarea and scroll
@@ -136,6 +255,12 @@ export function ChatWindow({
     setMessageText(e.target.value);
     e.target.style.height = 'auto';
     e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+
+    // Clear errors when user edits text
+    if (replyStatus === 'error' || replyStatus === 'rejected') {
+      setReplyStatus('idle');
+      setReplyError(null);
+    }
   };
 
   // Handle keyboard shortcuts
@@ -145,6 +270,12 @@ export function ChatWindow({
       handleSend();
     }
   };
+
+  // Dismiss success status
+  const handleDismissStatus = useCallback(() => {
+    setReplyStatus('idle');
+    setReplyError(null);
+  }, []);
 
   // Get time string (HH:MM)
   const getTimeString = (dateString: string) => {
@@ -250,6 +381,40 @@ export function ChatWindow({
     return elements;
   };
 
+  // Determine character counter color
+  const getCharCounterClass = () => {
+    if (isOverLimit) return 'reply-char-counter over-limit';
+    if (textLength > charLimits.max * 0.9) return 'reply-char-counter near-limit';
+    if (isUnderMin) return 'reply-char-counter under-min';
+    return 'reply-char-counter';
+  };
+
+  // Determine if send button should be disabled
+  const isSendDisabled =
+    isSending ||
+    (!messageText.trim() && pendingFiles.length === 0) ||
+    isOverLimit ||
+    isUnderMin;
+
+  // Determine the send button label
+  const getSendButtonContent = () => {
+    if (isSending) {
+      return (
+        <span className="reply-send-spinner" />
+      );
+    }
+    return '\u2192';
+  };
+
+  // Source label for AI draft tracking
+  const getSourceLabel = () => {
+    if (!usedAIDraft) return null;
+    if (messageText === chat.ai_suggestion_text) return 'AI-черновик (без изменений)';
+    return 'AI-черновик (отредактирован)';
+  };
+
+  const sourceLabel = getSourceLabel();
+
   return (
     <main className="chat-window">
       <div className="chat-header">
@@ -307,8 +472,8 @@ export function ChatWindow({
       </div>
 
       {/* AI Suggestion - context-aware based on chat status */}
-      {chat.chat_status === 'responded' || chat.chat_status === 'auto-response' ? (
-        /* Seller already responded — don't show recommendation to reply again */
+      {(isResponded && replyStatus !== 'sent') ? (
+        /* Seller already responded -- show the sent reply and hide input */
         <div className="ai-suggestion" style={{ opacity: 0.6, cursor: 'default' }}>
           <div className="ai-suggestion-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-success, #4ecb71)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -352,7 +517,7 @@ export function ChatWindow({
           </div>
           <div className="ai-suggestion-text">{chat.ai_suggestion_text}</div>
           <button className="ai-use-btn" onClick={handleUseAISuggestion}>
-            Использовать
+            Использовать AI-черновик
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
@@ -376,56 +541,115 @@ export function ChatWindow({
         </div>
       ) : null}
 
-      {/* Input */}
-      <div className="chat-input-container">
-        {pendingFiles.length > 0 && (
-          <div className="pending-files-row">
-            {pendingFiles.map((file, index) => (
-              <div key={`${file.name}-${index}`} className="pending-file-chip">
-                <span>{file.name}</span>
-                <button type="button" onClick={() => handleRemovePendingFile(index)}>x</button>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="chat-input-wrapper">
-          <button
-            type="button"
-            className="btn-attach"
-            onClick={handlePickFiles}
-            title="Загрузить файл"
-            disabled={isSending}
-          >
-            +
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            style={{ display: 'none' }}
-            onChange={handleFilesSelected}
-          />
-          <textarea
-            ref={textareaRef}
-            className="chat-input"
-            id="chatInput"
-            value={messageText}
-            onChange={handleTextareaChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Напишите ответ..."
-            rows={1}
-            disabled={isSending}
-            style={{ overflow: 'hidden', resize: 'none' }}
-          />
-          <button
-            className="btn-send"
-            onClick={handleSend}
-            disabled={(!messageText.trim() && pendingFiles.length === 0) || isSending}
-          >
-            {isSending ? '...' : '\u2192'}
+      {/* Reply status feedback */}
+      {replyStatus === 'sent' && (
+        <div className="reply-status-bar reply-status-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Ответ отправлен</span>
+          <button className="reply-status-dismiss" onClick={handleDismissStatus} type="button">
+            Закрыть
           </button>
         </div>
-      </div>
+      )}
+
+      {(replyStatus === 'error' || replyStatus === 'rejected') && replyError && (
+        <div className={`reply-status-bar ${replyStatus === 'rejected' ? 'reply-status-rejected' : 'reply-status-error'}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          <div className="reply-error-content">
+            <span className="reply-error-message">{replyError.message}</span>
+            {replyError.violations && replyError.violations.length > 0 && (
+              <ul className="reply-violations-list">
+                {replyError.violations.map((v, i) => (
+                  <li key={i} className="reply-violation-item">
+                    {v.message}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button className="reply-status-dismiss" onClick={handleDismissStatus} type="button">
+            Закрыть
+          </button>
+        </div>
+      )}
+
+      {/* Input area -- hidden when already responded and no active reply attempt */}
+      {!(isResponded && replyStatus !== 'error' && replyStatus !== 'rejected') && (
+        <div className="chat-input-container">
+          {pendingFiles.length > 0 && (
+            <div className="pending-files-row">
+              {pendingFiles.map((file, index) => (
+                <div key={`${file.name}-${index}`} className="pending-file-chip">
+                  <span>{file.name}</span>
+                  <button type="button" onClick={() => handleRemovePendingFile(index)}>x</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Source label when using AI draft */}
+          {sourceLabel && (
+            <div className="reply-source-label">
+              {sourceLabel}
+            </div>
+          )}
+
+          <div className="chat-input-wrapper">
+            <button
+              type="button"
+              className="btn-attach"
+              onClick={handlePickFiles}
+              title="Загрузить файл"
+              disabled={isSending}
+            >
+              +
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              style={{ display: 'none' }}
+              onChange={handleFilesSelected}
+            />
+            <textarea
+              ref={textareaRef}
+              className={`chat-input${isOverLimit ? ' input-over-limit' : ''}`}
+              id="chatInput"
+              value={messageText}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Написать ответ..."
+              rows={1}
+              disabled={isSending}
+              style={{ overflow: 'hidden', resize: 'none' }}
+            />
+            <button
+              className="btn-send"
+              onClick={handleSend}
+              disabled={isSendDisabled}
+              title="Отправить (Ctrl+Enter)"
+            >
+              {getSendButtonContent()}
+            </button>
+          </div>
+
+          {/* Character counter row */}
+          <div className="reply-input-footer">
+            {textLength > 0 && (
+              <span className={getCharCounterClass()}>
+                {textLength}/{charLimits.max}
+              </span>
+            )}
+            <span className="reply-shortcut-hint">Ctrl+Enter</span>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin {

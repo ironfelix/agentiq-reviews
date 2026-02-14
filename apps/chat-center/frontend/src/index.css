@@ -2686,3 +2686,181 @@
     50% { width: 75%; }
     100% { width: 20%; }
 }
+
+/* ===== REPLY PANEL ===== */
+
+/* Reply status bar (success / error / rejected) */
+.reply-status-bar {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 24px;
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+    border-top: 1px solid var(--color-border-medium);
+}
+
+.reply-status-bar svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.reply-status-bar span {
+    flex: 1;
+}
+
+.reply-status-success {
+    background: #eaf7ed;
+    color: #1b7f2a;
+    border-top-color: #9fd9aa;
+}
+
+.reply-status-error {
+    background: #fef0ef;
+    color: #c5221f;
+    border-top-color: #f0b2b2;
+}
+
+.reply-status-rejected {
+    background: #fff6e8;
+    color: #a35c00;
+    border-top-color: #f1cf9a;
+}
+
+.reply-status-dismiss {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: inherit;
+    opacity: 0.7;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.reply-status-dismiss:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* Reply error content */
+.reply-error-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.reply-error-message {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.reply-violations-list {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+}
+
+.reply-violation-item {
+    font-size: var(--font-size-md);
+    padding: 2px 0;
+    opacity: 0.85;
+}
+
+.reply-violation-item::before {
+    content: '\2022';
+    margin-right: 6px;
+}
+
+/* Reply input footer (character counter + shortcut hint) */
+.reply-input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 0;
+    min-height: 20px;
+}
+
+.reply-char-counter {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--transition-fast);
+}
+
+.reply-char-counter.near-limit {
+    color: #a35c00;
+}
+
+.reply-char-counter.over-limit {
+    color: var(--color-urgent);
+    font-weight: 600;
+}
+
+.reply-char-counter.under-min {
+    color: var(--color-text-tertiary);
+}
+
+.reply-shortcut-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    opacity: 0.7;
+    margin-left: auto;
+}
+
+/* Source label (AI draft tracking) */
+.reply-source-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    padding: 0 0 6px;
+    font-weight: 500;
+}
+
+/* Input over-limit red border */
+.chat-input.input-over-limit {
+    border-color: var(--color-urgent);
+}
+
+.chat-input.input-over-limit:focus {
+    border-color: var(--color-urgent);
+}
+
+/* Send button spinner */
+.reply-send-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Mobile adjustments for reply panel */
+@media (max-width: 768px) {
+    .reply-status-bar {
+        padding: 10px var(--space-4);
+        font-size: var(--font-size-md);
+    }
+
+    .reply-input-footer {
+        padding: 4px var(--space-1) 0;
+    }
+
+    .reply-char-counter {
+        font-size: var(--font-size-sm);
+    }
+
+    .reply-source-label {
+        font-size: var(--font-size-xs);
+    }
+
+    /* Ensure input font >= 16px on mobile to prevent iOS zoom */
+    .chat-input {
+        font-size: 16px;
+    }
+}

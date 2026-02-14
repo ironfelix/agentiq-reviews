@@ -33,10 +33,28 @@ from app.services.interaction_ingest import (
 )
 from app.services.rate_limiter import try_acquire_sync_lock, release_sync_lock
 from app.services.sync_metrics import SyncMetrics, sync_health_monitor
+from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 MAX_TASK_RETRIES = 3
 MAX_RETRY_BACKOFF_SECONDS = 15 * 60
+
+# Initialize Sentry for Celery if configured
+_settings = get_settings()
+if _settings.SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.celery import CeleryIntegration
+
+    sentry_sdk.init(
+        dsn=_settings.SENTRY_DSN,
+        environment=_settings.SENTRY_ENVIRONMENT,
+        traces_sample_rate=_settings.SENTRY_TRACES_SAMPLE_RATE,
+        release="1.0.0",
+        integrations=[
+            CeleryIntegration(),
+        ],
+    )
+    logger.info("Sentry initialized for Celery tasks (env: %s)", _settings.SENTRY_ENVIRONMENT)
 
 
 def _now_utc() -> datetime:

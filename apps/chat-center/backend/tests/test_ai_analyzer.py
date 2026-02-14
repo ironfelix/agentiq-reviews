@@ -22,9 +22,9 @@ from app.services.ai_analyzer import (
     extract_first_name,
     AIAnalyzer,
     SLA_PRIORITIES,
-    BANNED_PHRASES,
     ESCALATION_KEYWORDS,
 )
+from app.services.guardrails import BANNED_PHRASE_REPLACEMENTS
 
 
 # ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -175,11 +175,17 @@ class TestApplyGuardrails:
         )
         assert "ИИ" not in result
 
-    def test_truncates_long_text(self, analyzer):
-        """Text over 300 chars is truncated."""
+    def test_truncates_long_text_review(self, analyzer):
+        """Text over 500 chars is truncated for review channel."""
         long_text = "Текст. " * 100  # ~700 chars
-        result = analyzer._apply_guardrails(long_text, None)
-        assert len(result) <= 300
+        result = analyzer._apply_guardrails(long_text, None, channel="review")
+        assert len(result) <= 500
+
+    def test_truncates_long_text_chat(self, analyzer):
+        """Text over 1000 chars is truncated for chat channel."""
+        long_text = "Текст. " * 200  # ~1400 chars
+        result = analyzer._apply_guardrails(long_text, None, channel="chat")
+        assert len(result) <= 1000
 
     def test_truncates_at_sentence_boundary(self, analyzer):
         """Long text truncates at sentence boundary when possible."""
