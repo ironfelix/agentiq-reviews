@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FolderStrip — V1 vs V2</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>FolderStrip — V1 vs V2 vs V3 + Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
     --color-bg-primary: #ffffff;
@@ -14,7 +14,7 @@
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #5f6368;
     --color-text-tertiary: #9aa0a6;
-    --color-border-light: #f5f6f7;
+    --color-border-light: #f0f1f2;
     --color-border-medium: #e8eaed;
     --color-accent: #1a73e8;
     --color-accent-light: #e8f0fe;
@@ -22,7 +22,7 @@
     --color-success: #34a853;
     --radius-sm: 5px;
     --radius-md: 6px;
-    --radius-lg: 8px;
+    --radius-lg: 10px;
     --radius-pill: 14px;
     --transition-fast: 0.12s ease;
 }
@@ -38,115 +38,64 @@ body {
 
 /* ===== VERSION SWITCHER ===== */
 .version-switcher {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 46px;
+    position: fixed; top: 0; left: 0; right: 0; height: 46px;
     background: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    z-index: 100;
-    padding: 0 16px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    z-index: 100; padding: 0 12px;
+    flex-wrap: wrap;
 }
 .version-btn {
-    padding: 6px 16px;
-    border-radius: var(--radius-pill);
-    border: 1px solid rgba(255,255,255,0.2);
-    background: transparent;
-    color: rgba(255,255,255,0.6);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+    border: 1px solid rgba(255,255,255,0.2); background: transparent;
+    color: rgba(255,255,255,0.6); font-family: inherit; font-size: 12px;
+    font-weight: 500; cursor: pointer; transition: all var(--transition-fast);
+    white-space: nowrap;
 }
 .version-btn:hover { border-color: rgba(255,255,255,0.4); color: white; }
 .version-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: white; }
-.version-label {
-    color: rgba(255,255,255,0.4);
-    font-size: 12px;
-    margin-right: 8px;
+.version-sep {
+    width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px;
 }
 
 /* ===== LAYOUT ===== */
 .app-shell {
-    display: flex;
-    height: calc(100vh - 46px);
-    margin-top: 46px;
-    width: 100%;
+    display: flex; height: calc(100vh - 46px); margin-top: 46px; width: 100%;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    width: 220px;
-    background: var(--color-bg-primary);
+    width: 220px; background: var(--color-bg-primary);
     border-right: 1px solid var(--color-border-medium);
-    display: flex;
-    flex-direction: column;
-    padding: 20px 12px 16px;
-    flex-shrink: 0;
-    position: relative;
-    transition: width 0.15s ease;
+    display: flex; flex-direction: column; padding: 20px 12px 16px;
+    flex-shrink: 0; position: relative; transition: width 0.15s ease;
 }
-.sidebar-logo {
-    font-size: 16px;
-    font-weight: 700;
-    padding: 0 8px;
-    margin-bottom: 24px;
-}
+.sidebar-logo { font-size: 16px; font-weight: 700; padding: 0 8px; margin-bottom: 24px; }
 .sidebar-logo span { color: var(--color-accent); }
 .sidebar-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 8px; }
 .sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    background: transparent;
-    border: none;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    width: 100%;
-    text-align: left;
-    transition: all var(--transition-fast);
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+    border-radius: var(--radius-md); cursor: pointer; color: var(--color-text-secondary);
+    background: transparent; border: none; font-family: inherit; font-size: 13px;
+    font-weight: 500; width: 100%; text-align: left; transition: all var(--transition-fast);
 }
 .sidebar-item:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
 .sidebar-item.active { background: var(--color-bg-active); color: var(--color-accent); }
 .sidebar-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 .sidebar-item-label { flex: 1; }
 .sidebar-badge {
-    min-width: 18px; height: 18px; padding: 0 5px;
-    background: var(--color-urgent); color: white;
-    font-size: 10px; font-weight: 700; border-radius: var(--radius-pill);
+    min-width: 18px; height: 18px; padding: 0 5px; background: var(--color-urgent);
+    color: white; font-size: 10px; font-weight: 700; border-radius: var(--radius-pill);
     display: flex; align-items: center; justify-content: center;
 }
 .sidebar-collapse-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    color: var(--color-text-tertiary);
-    transition: all var(--transition-fast);
-    position: absolute;
-    top: 20px;
-    right: 12px;
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border: none; background: transparent;
+    cursor: pointer; border-radius: var(--radius-sm); color: var(--color-text-tertiary);
+    transition: all var(--transition-fast); position: absolute; top: 20px; right: 12px;
 }
 .sidebar-collapse-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
 .sidebar-collapse-btn svg { width: 16px; height: 16px; transition: transform 0.15s ease; }
-
-/* Collapsed sidebar */
 .sidebar.collapsed { width: 56px; padding: 16px 8px 12px; align-items: center; }
 .sidebar.collapsed .sidebar-item-label { display: none; }
 .sidebar.collapsed .sidebar-item { padding: 10px; justify-content: center; gap: 0; position: relative; }
@@ -156,133 +105,83 @@ body {
 .sidebar.collapsed .sidebar-collapse-btn { position: static; margin: 0 auto 12px; }
 .sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
 
-/* ===== FOLDER STRIP ===== */
+/* ===== FOLDER STRIP (desktop) ===== */
 .folder-strip {
-    width: 54px;
-    background: var(--color-bg-primary);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 0 8px;
-    gap: 2px;
-    flex-shrink: 0;
+    width: 54px; background: var(--color-bg-primary);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 0 8px; gap: 2px; flex-shrink: 0;
 }
 .folder-spacer { flex-shrink: 0; }
 .folder-item {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-    color: var(--color-text-tertiary);
-    padding: 0;
-    font-family: inherit;
+    position: relative; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; width: 44px; height: 44px;
+    border: none; background: transparent; cursor: pointer;
+    border-radius: var(--radius-md); transition: all var(--transition-fast);
+    color: var(--color-text-tertiary); padding: 0; font-family: inherit;
 }
 .folder-item:hover { background: var(--color-bg-hover); color: var(--color-text-secondary); }
 .folder-item.active { background: var(--color-accent-light); color: var(--color-accent); }
 .folder-item.active::before {
-    content: '';
-    position: absolute;
-    left: -5px;
-    top: 6px;
-    bottom: 6px;
-    width: 3px;
-    background: var(--color-accent);
-    border-radius: 0 2px 2px 0;
+    content: ''; position: absolute; left: -5px; top: 6px; bottom: 6px;
+    width: 3px; background: var(--color-accent); border-radius: 0 2px 2px 0;
 }
 .folder-icon { display: flex; align-items: center; justify-content: center; }
 .folder-icon svg { width: 20px; height: 20px; }
 .folder-label { font-size: 9px; font-weight: 500; margin-top: 1px; line-height: 1; white-space: nowrap; }
 .folder-badge {
-    position: absolute;
-    top: 2px; right: 0;
-    min-width: 16px; height: 16px; padding: 0 4px;
-    background: var(--color-urgent); color: white;
-    font-size: 9px; font-weight: 700;
-    border-radius: var(--radius-pill);
-    display: flex; align-items: center; justify-content: center;
-    line-height: 1;
+    position: absolute; top: 2px; right: 0; min-width: 16px; height: 16px;
+    padding: 0 4px; background: var(--color-urgent); color: white;
+    font-size: 9px; font-weight: 700; border-radius: var(--radius-pill);
+    display: flex; align-items: center; justify-content: center; line-height: 1;
 }
 
-/* V1: folders at top with border */
+/* V1 */
 .v1 .folder-strip { border-right: 1px solid var(--color-border-light); padding-top: 12px; }
 .v1 .folder-spacer { display: none; }
 .v1 .chat-list { border-left: none; }
-
-/* V2: folders aligned, no border, spacer visible */
+/* V2 */
 .v2 .folder-strip { border-right: none; }
 .v2 .chat-list { border-left: 1px solid var(--color-border-light); }
+/* V3 desktop = same as V2 */
+.v3 .folder-strip { border-right: none; }
+.v3 .chat-list { border-left: 1px solid var(--color-border-light); }
 
 /* ===== CHAT LIST ===== */
 .chat-list {
-    width: 286px;
-    background: var(--color-bg-primary);
+    width: 286px; background: var(--color-bg-primary);
     border-right: 1px solid var(--color-border-medium);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    overflow: hidden;
+    display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
 }
-.chat-list-header {
-    padding: 16px 16px 12px;
-    border-bottom: 1px solid var(--color-border-medium);
-}
-.chat-list-title {
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
+.chat-list-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--color-border-medium); }
+.chat-list-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
 .search-box {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--color-border-medium);
-    border-radius: var(--radius-md);
-    font-size: 13px;
-    font-family: inherit;
-    outline: none;
-    margin-bottom: 12px;
-    background: var(--color-bg-primary);
+    width: 100%; padding: 8px 12px; border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md); font-size: 13px; font-family: inherit;
+    outline: none; margin-bottom: 12px; background: var(--color-bg-primary);
     color: var(--color-text-primary);
 }
 .search-box:focus { border-color: var(--color-accent); }
 
-/* Filter pills — NO visible scrollbar, swipe only */
+/* Filter pills */
 .filters-scroll {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    margin-bottom: 8px;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    display: flex; gap: 6px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
 }
 .filters-scroll::-webkit-scrollbar { display: none; }
-
 .filter-pill {
-    padding: 5px 10px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--color-border-medium);
-    background: var(--color-bg-primary);
-    font-size: 12px;
-    font-family: inherit;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
+    padding: 5px 10px; border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-medium); background: var(--color-bg-primary);
+    font-size: 12px; font-family: inherit; font-weight: 500;
+    color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;
+    transition: all var(--transition-fast); flex-shrink: 0;
 }
 .filter-pill:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .filter-pill.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 .filter-pill .count { font-size: 10px; opacity: 0.7; margin-left: 2px; }
 
-/* Mobile channel pills (hidden on desktop) */
+/* V3 channel segmented control (Otveto-style, mobile only — hidden on desktop) */
+.channel-segments { display: none; }
+
+/* Desktop: hide mobile channel pills */
 .channel-filters-mobile { display: none; }
 
 /* ===== CHAT ITEMS ===== */
@@ -290,102 +189,153 @@ body {
 .chat-list-content::-webkit-scrollbar { width: 4px; }
 .chat-list-content::-webkit-scrollbar-track { background: transparent; }
 .chat-list-content::-webkit-scrollbar-thumb { background: var(--color-border-medium); border-radius: 2px; }
-
 .queue-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 16px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--color-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; font-size: 11px; font-weight: 600;
+    color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;
 }
-.queue-count {
-    font-size: 10px;
-    background: var(--color-bg-hover);
-    padding: 1px 6px;
-    border-radius: var(--radius-pill);
-}
+.queue-count { font-size: 10px; background: var(--color-bg-hover); padding: 1px 6px; border-radius: var(--radius-pill); }
 .chat-item {
-    display: flex;
-    gap: 10px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: background var(--transition-fast);
-    border-bottom: 1px solid var(--color-border-light);
+    display: flex; gap: 10px; padding: 10px 16px; cursor: pointer;
+    transition: background var(--transition-fast); border-bottom: 1px solid var(--color-border-light);
 }
 .chat-item:hover { background: var(--color-bg-hover); }
 .chat-item.active { background: var(--color-bg-active); }
 .marketplace-icon {
-    width: 32px; height: 32px;
-    border-radius: var(--radius-sm);
-    background: #cb11ab; color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: var(--radius-sm);
+    background: #cb11ab; color: white; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
 }
 .chat-item-content { flex: 1; min-width: 0; }
 .chat-item-header { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
 .chat-item-name { font-size: 13px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chat-item-time { font-size: 11px; color: var(--color-text-tertiary); flex-shrink: 0; }
 .unread-badge {
-    min-width: 16px; height: 16px; padding: 0 4px;
-    background: var(--color-accent); color: white;
-    font-size: 10px; font-weight: 700; border-radius: var(--radius-pill);
+    min-width: 16px; height: 16px; padding: 0 4px; background: var(--color-accent);
+    color: white; font-size: 10px; font-weight: 700; border-radius: var(--radius-pill);
     display: flex; align-items: center; justify-content: center;
 }
 .chat-item-meta { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 2px; }
-.status-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    margin-right: 4px;
-    vertical-align: middle;
-}
+.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
 .status-dot.waiting { background: #f9ab00; }
 .status-dot.risk { background: var(--color-urgent); }
 .status-dot.responded { background: var(--color-success); }
-.chat-item-preview {
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+.chat-item-preview { font-size: 12px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Right panel */
 .chat-window-placeholder {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: var(--color-text-tertiary); font-size: 14px; background: var(--color-bg-secondary);
+}
+
+/* ======================================== */
+/* ===== MOBILE VIEW (separate mode) ===== */
+/* ======================================== */
+.app-shell.mobile-preview {
+    max-width: 390px;
+    margin: 46px auto 0;
+    border-left: 1px solid var(--color-border-medium);
+    border-right: 1px solid var(--color-border-medium);
+    box-shadow: 0 0 40px rgba(0,0,0,0.08);
+}
+.app-shell.mobile-preview .sidebar { display: none; }
+.app-shell.mobile-preview .folder-strip { display: none; }
+.app-shell.mobile-preview .chat-window-placeholder { display: none; }
+.app-shell.mobile-preview .chat-list {
+    width: 100%; border: none; height: calc(100vh - 46px);
+}
+.app-shell.mobile-preview .chat-list-header { padding: 12px 16px 10px; }
+.app-shell.mobile-preview .chat-list-title { font-size: 20px; margin-bottom: 14px; }
+.app-shell.mobile-preview .chat-item { padding: 12px 16px; }
+.app-shell.mobile-preview .marketplace-icon { width: 36px; height: 36px; font-size: 14px; }
+.app-shell.mobile-preview .chat-item-name { font-size: 14px; }
+.app-shell.mobile-preview .chat-item-preview { font-size: 13px; }
+.app-shell.mobile-preview .filter-pill { padding: 6px 12px; font-size: 13px; }
+
+/* V3 mobile: show channel segments */
+.app-shell.mobile-preview.v3 .channel-segments { display: flex; }
+.app-shell.mobile-preview.v3 .channel-filters-mobile { display: none; }
+
+/* V1/V2 mobile: show channel pills */
+.app-shell.mobile-preview.v1 .channel-filters-mobile { display: block; margin-bottom: 8px; }
+.app-shell.mobile-preview.v2 .channel-filters-mobile { display: block; margin-bottom: 8px; }
+
+/* ===== V3 CHANNEL SEGMENTS (Otveto-inspired) ===== */
+.channel-segments {
+    display: none;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 3px;
+    margin-bottom: 14px;
+    gap: 0;
+}
+.channel-seg {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    padding: 10px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--color-text-tertiary);
-    font-size: 14px;
-    background: var(--color-bg-secondary);
+    transition: all 0.15s ease;
+    position: relative;
+}
+.channel-seg svg { width: 18px; height: 18px; flex-shrink: 0; }
+.channel-seg:hover { color: var(--color-text-secondary); }
+.channel-seg.active {
+    background: var(--color-bg-primary);
+    color: var(--color-accent);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.channel-seg .seg-badge {
+    position: absolute;
+    top: 2px; right: 4px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    background: var(--color-urgent); color: white;
+    font-size: 9px; font-weight: 700; border-radius: var(--radius-pill);
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+}
+.channel-seg .seg-label { white-space: nowrap; }
+
+/* V3 mobile: status filters are small chips below search */
+.app-shell.mobile-preview.v3 .status-filters-row { margin-bottom: 4px; }
+.app-shell.mobile-preview.v3 .status-filters-row .filter-pill {
+    font-size: 12px; padding: 4px 10px;
 }
 
-/* ===== MOBILE ===== */
+/* ===== REAL MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
+    .version-switcher { height: auto; padding: 6px 8px; flex-wrap: wrap; gap: 4px; }
+    .version-btn { font-size: 11px; padding: 4px 8px; }
+    .version-sep { display: none; }
+    .app-shell { margin-top: 80px; height: calc(100vh - 80px); }
+
     .sidebar { display: none; }
     .folder-strip { display: none; }
     .chat-window-placeholder { display: none; }
-    .channel-filters-mobile { display: block; margin-top: -4px; margin-bottom: 4px; }
-
-    .chat-list {
-        width: 100%;
-        border: none;
-        height: calc(100vh - 46px);
-    }
-    .chat-list-header { padding: 12px 16px; }
-    .chat-list-title { font-size: 20px; }
+    .chat-list { width: 100%; border: none; }
+    .chat-list-header { padding: 12px 16px 10px; }
+    .chat-list-title { font-size: 20px; margin-bottom: 14px; }
     .chat-item { padding: 12px 16px; }
     .marketplace-icon { width: 36px; height: 36px; font-size: 14px; }
     .chat-item-name { font-size: 14px; }
     .chat-item-preview { font-size: 13px; }
     .filter-pill { padding: 6px 12px; font-size: 13px; }
-    .version-switcher { height: 40px; }
-    .app-shell { margin-top: 40px; height: calc(100vh - 40px); }
+
+    .v3 .channel-segments { display: flex; }
+    .v3 .channel-filters-mobile { display: none; }
+    .v1 .channel-filters-mobile,
+    .v2 .channel-filters-mobile { display: block; margin-bottom: 8px; }
+
+    /* Mobile preview wrapper not needed — already mobile */
+    .app-shell.mobile-preview { max-width: none; border: none; box-shadow: none; }
 }
 
 /* Tablet */
@@ -400,23 +350,22 @@ body {
 </head>
 <body>
 
-<!-- Version switcher -->
 <div class="version-switcher">
-    <span class="version-label">Сравнение:</span>
-    <button class="version-btn active" onclick="setVersion('v1')">V1 — Папки сверху</button>
-    <button class="version-btn" onclick="setVersion('v2')">V2 — Папки у контента</button>
+    <button class="version-btn active" onclick="setVersion('v1')">V1 Папки сверху</button>
+    <button class="version-btn" onclick="setVersion('v2')">V2 Папки у контента</button>
+    <button class="version-btn" onclick="setVersion('v3')">V3 Otveto-сегменты</button>
+    <span class="version-sep"></span>
+    <button class="version-btn" onclick="setVersion('v1','mobile')">V1 Mobile</button>
+    <button class="version-btn" onclick="setVersion('v2','mobile')">V2 Mobile</button>
+    <button class="version-btn" onclick="setVersion('v3','mobile')">V3 Mobile</button>
 </div>
 
 <div class="app-shell v1" id="appShell">
 
-<!-- Sidebar -->
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">AGENT<span>IQ</span></div>
     <button class="sidebar-collapse-btn" onclick="toggleSidebar()" title="Свернуть">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="11 17 6 12 11 7"/>
-            <polyline points="18 17 13 12 18 7"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
     </button>
     <div class="sidebar-nav">
         <button class="sidebar-item active">
@@ -441,71 +390,86 @@ body {
     </div>
 </nav>
 
-<!-- Folder Strip -->
 <nav class="folder-strip" id="folderStrip">
     <div class="folder-spacer" id="folderSpacer"></div>
     <button class="folder-item active" onclick="switchFolder(this)">
-        <div class="folder-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <span class="folder-label">Все</span>
         <span class="folder-badge">12</span>
     </button>
     <button class="folder-item" onclick="switchFolder(this)">
-        <div class="folder-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <span class="folder-label">Отзывы</span>
         <span class="folder-badge">5</span>
     </button>
     <button class="folder-item" onclick="switchFolder(this)">
-        <div class="folder-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         <span class="folder-label">Вопросы</span>
         <span class="folder-badge">4</span>
     </button>
     <button class="folder-item" onclick="switchFolder(this)">
-        <div class="folder-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </div>
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
         <span class="folder-label">Чаты</span>
         <span class="folder-badge">3</span>
     </button>
 </nav>
 
-<!-- Chat List -->
 <section class="chat-list">
     <div class="chat-list-header" id="chatListHeader">
         <div class="chat-list-title">Сообщения</div>
+
+        <!-- V3: Otveto-style channel segments (visible on mobile only) -->
+        <div class="channel-segments" id="channelSegments">
+            <button class="channel-seg active" onclick="switchSeg(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="seg-label">Все</span>
+                <span class="seg-badge">12</span>
+            </button>
+            <button class="channel-seg" onclick="switchSeg(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="seg-label">Отзывы</span>
+                <span class="seg-badge">5</span>
+            </button>
+            <button class="channel-seg" onclick="switchSeg(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span class="seg-label">Вопросы</span>
+                <span class="seg-badge">4</span>
+            </button>
+            <button class="channel-seg" onclick="switchSeg(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span class="seg-label">Чаты</span>
+                <span class="seg-badge">3</span>
+            </button>
+        </div>
+
         <input type="text" class="search-box" placeholder="Поиск...">
-        <div class="filters-scroll">
+
+        <!-- Status filter pills (secondary) -->
+        <div class="filters-scroll status-filters-row">
             <button class="filter-pill active" onclick="switchPill(this)">Все <span class="count">48</span></button>
             <button class="filter-pill" onclick="switchPill(this)">Срочно <span class="count">3</span></button>
             <button class="filter-pill" onclick="switchPill(this)">Без ответа <span class="count">12</span></button>
             <button class="filter-pill" onclick="switchPill(this)">Обработаны <span class="count">33</span></button>
         </div>
-        <!-- Mobile-only channel pills -->
+
+        <!-- V1/V2 mobile: plain channel pills (same style = "двойные табы") -->
         <div class="channel-filters-mobile">
-            <div class="filters-scroll">
-                <button class="filter-pill active" onclick="switchMobileChannel(this)">Все <span class="count">48</span></button>
-                <button class="filter-pill" onclick="switchMobileChannel(this)">Отзывы <span class="count">22</span></button>
-                <button class="filter-pill" onclick="switchMobileChannel(this)">Вопросы <span class="count">15</span></button>
-                <button class="filter-pill" onclick="switchMobileChannel(this)">Чаты <span class="count">11</span></button>
+            <div class="filters-scroll" style="margin-top:8px">
+                <button class="filter-pill active" onclick="switchMobileCh(this)">Все <span class="count">48</span></button>
+                <button class="filter-pill" onclick="switchMobileCh(this)">Отзывы <span class="count">22</span></button>
+                <button class="filter-pill" onclick="switchMobileCh(this)">Вопросы <span class="count">15</span></button>
+                <button class="filter-pill" onclick="switchMobileCh(this)">Чаты <span class="count">11</span></button>
             </div>
         </div>
     </div>
+
     <div class="chat-list-content">
         <div>
             <div class="queue-header"><span>В работе</span><span class="queue-count">2</span></div>
             <div class="chat-item active">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Алексей М.</span>
-                        <span class="unread-badge">1</span>
-                        <span class="chat-item-time">14:32</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Алексей М.</span><span class="unread-badge">1</span><span class="chat-item-time">14:32</span></div>
                     <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Отзыв · SLA просрочен</div>
                     <div class="chat-item-preview">Товар пришёл с дефектом, экран не работает</div>
                 </div>
@@ -513,11 +477,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Ольга К.</span>
-                        <span class="unread-badge">1</span>
-                        <span class="chat-item-time">13:15</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Ольга К.</span><span class="unread-badge">1</span><span class="chat-item-time">13:15</span></div>
                     <div class="chat-item-meta"><span class="status-dot waiting risk"></span>Вопрос · Ожидает ответа</div>
                     <div class="chat-item-preview">Подскажите, есть ли размер 42?</div>
                 </div>
@@ -528,11 +488,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Дмитрий В.</span>
-                        <span class="unread-badge">1</span>
-                        <span class="chat-item-time">12:44</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Дмитрий В.</span><span class="unread-badge">1</span><span class="chat-item-time">12:44</span></div>
                     <div class="chat-item-meta"><span class="status-dot waiting"></span>Чат · Ожидает ответа</div>
                     <div class="chat-item-preview">Здравствуйте, когда будет доставка?</div>
                 </div>
@@ -540,10 +496,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Мария С.</span>
-                        <span class="chat-item-time">11:20</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Мария С.</span><span class="chat-item-time">11:20</span></div>
                     <div class="chat-item-meta"><span class="status-dot waiting"></span>Отзыв · Ожидает ответа</div>
                     <div class="chat-item-preview">Отличное качество, но упаковка помята</div>
                 </div>
@@ -551,10 +504,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Иван П.</span>
-                        <span class="chat-item-time">вчера</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Иван П.</span><span class="chat-item-time">вчера</span></div>
                     <div class="chat-item-meta"><span class="status-dot waiting"></span>Вопрос · Ожидает ответа</div>
                     <div class="chat-item-preview">Совместим ли с iPhone 15?</div>
                 </div>
@@ -565,10 +515,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Елена Т.</span>
-                        <span class="chat-item-time">вчера</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Елена Т.</span><span class="chat-item-time">вчера</span></div>
                     <div class="chat-item-meta"><span class="status-dot responded"></span>Отзыв · Отвечено</div>
                     <div class="chat-item-preview">Всё супер, рекомендую!</div>
                 </div>
@@ -576,10 +523,7 @@ body {
             <div class="chat-item">
                 <div class="marketplace-icon">W</div>
                 <div class="chat-item-content">
-                    <div class="chat-item-header">
-                        <span class="chat-item-name">Сергей Н.</span>
-                        <span class="chat-item-time">12.02</span>
-                    </div>
+                    <div class="chat-item-header"><span class="chat-item-name">Сергей Н.</span><span class="chat-item-time">12.02</span></div>
                     <div class="chat-item-meta"><span class="status-dot responded"></span>Чат · Отвечено</div>
                     <div class="chat-item-preview">Спасибо за быстрый ответ!</div>
                 </div>
@@ -592,35 +536,50 @@ body {
 </div>
 
 <script>
-function setVersion(v) {
+let currentVersion = 'v1';
+let currentMode = 'desktop';
+
+function setVersion(v, mode) {
+    currentVersion = v;
+    currentMode = mode || 'desktop';
     const shell = document.getElementById('appShell');
-    shell.classList.remove('v1', 'v2');
+    shell.classList.remove('v1','v2','v3','mobile-preview');
     shell.classList.add(v);
+    if (currentMode === 'mobile') shell.classList.add('mobile-preview');
+
     document.querySelectorAll('.version-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.version-btn[onclick="setVersion('${v}')"]`).classList.add('active');
+    // find the right button
+    document.querySelectorAll('.version-btn').forEach(b => {
+        const onclick = b.getAttribute('onclick');
+        if (mode === 'mobile' && onclick === `setVersion('${v}','mobile')`) b.classList.add('active');
+        if (!mode && onclick === `setVersion('${v}')`) b.classList.add('active');
+    });
     alignSpacer();
 }
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
 function switchFolder(el) {
     document.querySelectorAll('.folder-item').forEach(f => f.classList.remove('active'));
     el.classList.add('active');
 }
+function switchSeg(el) {
+    document.querySelectorAll('.channel-seg').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+}
 function switchPill(el) {
-    el.parentElement.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.closest('.filters-scroll').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
 }
-function switchMobileChannel(el) {
-    el.parentElement.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+function switchMobileCh(el) {
+    el.closest('.filters-scroll').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
 }
+
 function alignSpacer() {
     const header = document.getElementById('chatListHeader');
     const spacer = document.getElementById('folderSpacer');
-    if (header && spacer) {
-        spacer.style.height = (header.offsetHeight + 1) + 'px';
-    }
+    if (header && spacer) spacer.style.height = (header.offsetHeight + 1) + 'px';
 }
 alignSpacer();
 window.addEventListener('resize', alignSpacer);
