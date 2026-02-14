@@ -31,6 +31,8 @@ from app.services.interaction_ingest import (
     ingest_wb_questions_to_interactions,
     ingest_wb_reviews_to_interactions,
 )
+from app.services.rate_limiter import try_acquire_sync_lock, release_sync_lock
+from app.services.sync_metrics import SyncMetrics, sync_health_monitor
 
 logger = logging.getLogger(__name__)
 MAX_TASK_RETRIES = 3
@@ -143,6 +145,59 @@ async def _save_sync_cursor(
         db.add(RuntimeSetting(key=key, value=value))
 
 
+def _watermark_key(*, seller_id: int, channel: str) -> str:
+    """Build RuntimeSetting key for incremental ingestion watermark per seller+channel."""
+    return f"sync_watermark:{channel}:{seller_id}"
+
+
+async def _load_watermark(
+    db,
+    *,
+    seller_id: int,
+    channel: str,
+) -> Optional[datetime]:
+    """Load last successful ingestion watermark (occurred_at of newest synced record)."""
+    key = _watermark_key(seller_id=seller_id, channel=channel)
+    result = await db.execute(select(RuntimeSetting).where(RuntimeSetting.key == key))
+    setting = result.scalar_one_or_none()
+    if not setting or not setting.value:
+        return None
+    raw = setting.value.strip()
+    if not raw:
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        logger.warning("Invalid watermark value for %s: %s", key, raw)
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+async def _save_watermark(
+    db,
+    *,
+    seller_id: int,
+    channel: str,
+    watermark_iso: Optional[str],
+) -> None:
+    """Persist ingestion watermark after successful sync."""
+    if not watermark_iso:
+        return
+    value = str(watermark_iso).strip()
+    if not value:
+        return
+
+    key = _watermark_key(seller_id=seller_id, channel=channel)
+    result = await db.execute(select(RuntimeSetting).where(RuntimeSetting.key == key))
+    setting = result.scalar_one_or_none()
+    if setting:
+        setting.value = value
+    else:
+        db.add(RuntimeSetting(key=key, value=value))
+
+
 @celery_app.task(name="app.tasks.sync.sync_all_sellers")
 def sync_all_sellers():
     """
@@ -214,9 +269,14 @@ def sync_all_seller_interactions():
     max_retries=3,
     default_retry_delay=60,
 )
-def sync_seller_interactions(self, seller_id: int):
+def sync_seller_interactions(self, seller_id: int, force_full_sync: bool = False):
     """
     Sync unified interactions for a specific seller.
+
+    Args:
+        seller_id: Seller ID to sync.
+        force_full_sync: If True, ignore saved watermarks and pull all records
+            from the beginning. Useful for manual override / recovery.
 
     Pipeline:
     1. Pull reviews from WB feedbacks API -> interactions(channel=review)
@@ -224,6 +284,17 @@ def sync_seller_interactions(self, seller_id: int):
     3. Mirror existing chats table -> interactions(channel=chat)
     """
     logger.info(f"Syncing interactions for seller {seller_id}")
+
+    # Per-seller lock: prevent concurrent sync tasks for the same seller.
+    if not try_acquire_sync_lock(seller_id):
+        logger.info(
+            "Skipping interactions sync for seller %s: another sync is already running",
+            seller_id,
+        )
+        return
+
+    # Per-channel SyncMetrics for structured observability
+    sync_started_at = _now_utc()
 
     async def _sync():
         async with AsyncSessionLocal() as db:
@@ -267,32 +338,97 @@ def sync_seller_interactions(self, seller_id: int):
             questions_stats = {"fetched": 0, "created": 0, "updated": 0, "skipped": 0}
             chats_stats = {"fetched": 0, "created": 0, "updated": 0, "skipped": 0}
 
+            # --- Load watermarks for incremental sync ---
+            review_watermark = None
+            question_watermark = None
+            if not force_full_sync:
+                review_watermark = await _load_watermark(
+                    db, seller_id=seller_id, channel="review",
+                )
+                question_watermark = await _load_watermark(
+                    db, seller_id=seller_id, channel="question",
+                )
+                if review_watermark:
+                    logger.info(
+                        "Incremental review sync for seller=%s from watermark=%s",
+                        seller_id,
+                        review_watermark.isoformat(),
+                    )
+                if question_watermark:
+                    logger.info(
+                        "Incremental question sync for seller=%s from watermark=%s",
+                        seller_id,
+                        question_watermark.isoformat(),
+                    )
+
+            # --- Reviews channel ---
+            review_metrics = SyncMetrics(
+                seller_id=seller_id, channel="review", started_at=_now_utc()
+            )
             try:
-                reviews_stats = await ingest_wb_reviews_to_interactions(
+                reviews_result = await ingest_wb_reviews_to_interactions(
                     db=db,
                     seller_id=seller_id,
                     marketplace=seller.marketplace or "wildberries",
                     only_unanswered=False,
-                    max_items=300,
+                    max_items=500,
                     page_size=100,
+                    since_watermark=review_watermark,
                 )
+                reviews_stats = reviews_result.as_dict()
+                review_metrics.apply_ingest_stats(reviews_stats)
+                review_metrics.finish()
+                # Persist new watermark on success.
+                if reviews_result.new_watermark:
+                    await _save_watermark(
+                        db,
+                        seller_id=seller_id,
+                        channel="review",
+                        watermark_iso=reviews_result.new_watermark,
+                    )
             except Exception as exc:
                 logger.exception("Reviews ingest failed for seller=%s", seller_id)
                 channel_errors.append(f"reviews:{exc}")
+                review_metrics.finish(error=str(exc))
+            review_metrics.log()
+            sync_health_monitor.record_sync(review_metrics)
 
+            # --- Questions channel ---
+            question_metrics = SyncMetrics(
+                seller_id=seller_id, channel="question", started_at=_now_utc()
+            )
             try:
-                questions_stats = await ingest_wb_questions_to_interactions(
+                questions_result = await ingest_wb_questions_to_interactions(
                     db=db,
                     seller_id=seller_id,
                     marketplace=seller.marketplace or "wildberries",
                     only_unanswered=False,
-                    max_items=300,
+                    max_items=500,
                     page_size=100,
+                    since_watermark=question_watermark,
                 )
+                questions_stats = questions_result.as_dict()
+                question_metrics.apply_ingest_stats(questions_stats)
+                question_metrics.finish()
+                # Persist new watermark on success.
+                if questions_result.new_watermark:
+                    await _save_watermark(
+                        db,
+                        seller_id=seller_id,
+                        channel="question",
+                        watermark_iso=questions_result.new_watermark,
+                    )
             except Exception as exc:
                 logger.exception("Questions ingest failed for seller=%s", seller_id)
                 channel_errors.append(f"questions:{exc}")
+                question_metrics.finish(error=str(exc))
+            question_metrics.log()
+            sync_health_monitor.record_sync(question_metrics)
 
+            # --- Chats channel ---
+            chat_metrics = SyncMetrics(
+                seller_id=seller_id, channel="chat", started_at=_now_utc()
+            )
             try:
                 chats_stats = await ingest_chat_interactions(
                     db=db,
@@ -300,9 +436,32 @@ def sync_seller_interactions(self, seller_id: int):
                     max_items=500,
                     direct_wb_fetch=True,
                 )
+                chat_metrics.apply_ingest_stats(chats_stats)
+                chat_metrics.finish()
             except Exception as exc:
                 logger.exception("Chats ingest failed for seller=%s", seller_id)
                 channel_errors.append(f"chats:{exc}")
+                chat_metrics.finish(error=str(exc))
+            chat_metrics.log()
+            sync_health_monitor.record_sync(chat_metrics)
+
+            # --- Aggregate metrics for structured log ---
+            agg_metrics = SyncMetrics(
+                seller_id=seller_id, channel="all", started_at=sync_started_at
+            )
+            agg_metrics.apply_ingest_stats(reviews_stats)
+            agg_metrics.apply_ingest_stats(questions_stats)
+            agg_metrics.apply_ingest_stats(chats_stats)
+            # finish() first (sets duration), then override error counters
+            # to avoid double-increment from finish(error=...).
+            agg_metrics.finish()
+            agg_metrics.errors = sum(
+                m.errors for m in (review_metrics, question_metrics, chat_metrics)
+            )
+            if channel_errors:
+                agg_metrics.error_detail = "; ".join(channel_errors)[:500]
+            agg_metrics.log()
+            sync_health_monitor.record_sync(agg_metrics)
 
             seller.last_sync_at = _now_utc()
             if channel_errors:
@@ -318,11 +477,12 @@ def sync_seller_interactions(self, seller_id: int):
                 seller.sync_status = "success"
                 seller.sync_error = None
             logger.info(
-                "Interactions sync seller=%s reviews=%s questions=%s chats=%s",
+                "Interactions sync seller=%s reviews=%s questions=%s chats=%s duration=%.1fs",
                 seller_id,
                 reviews_stats,
                 questions_stats,
                 chats_stats,
+                agg_metrics.duration_seconds,
             )
             # Persist ingested interactions and final sync state.
             await db.commit()
@@ -351,6 +511,8 @@ def sync_seller_interactions(self, seller_id: int):
         if will_retry:
             raise self.retry(exc=e, countdown=countdown)
         raise
+    finally:
+        release_sync_lock(seller_id)
 
 
 @celery_app.task(
@@ -426,6 +588,20 @@ def sync_seller_chats(self, seller_id: int, marketplace: str):
                             )
                     try:
                         wb_next_cursor = await _sync_wb(db, seller, wb_cursor)
+                    except ValueError as exc:
+                        # Non-retriable: token format is not compatible with Buyers Chat API (expects JWT).
+                        seller.last_sync_at = _now_utc()
+                        seller.sync_status = "error"
+                        seller.sync_error = _format_sync_error(
+                            scope="chats_sync",
+                            message=f"wb_token_invalid: {str(exc)[:180]}",
+                            attempt=self.request.retries + 1,
+                            max_attempts=MAX_TASK_RETRIES + 1,
+                            will_retry=False,
+                        )
+                        await db.commit()
+                        logger.warning("WB token invalid for chat API seller=%s: %s", seller.id, exc)
+                        return
                     except httpx.HTTPStatusError as exc:
                         status_code = getattr(getattr(exc, "response", None), "status_code", None)
                         # Non-retriable: invalid/expired/malformed token.

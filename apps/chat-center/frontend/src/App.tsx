@@ -953,7 +953,10 @@ function App() {
     return Math.max(maxValue, point.replies_total);
   }, 0);
   const pilotNonPassChecks = (pilotReadiness?.checks || []).filter((item) => item.status !== 'pass');
-  const unreadForNav = chats.filter((chat) => chat.unread_count > 0).length;
+  const urgentForNav = chats.filter((chat) =>
+    chat.sla_priority === 'urgent' ||
+    (chat.sla_deadline_at && new Date(chat.sla_deadline_at) < new Date())
+  ).length;
   const showDemoBanner = connectionSkipped && !user.has_api_credentials;
 
   const getReadinessBadgeClass = (status: string) => {
@@ -1001,7 +1004,9 @@ function App() {
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span className="sidebar-label">Сообщения</span>
-              <div className="sidebar-badge">{unreadForNav}</div>
+              {activeWorkspace !== 'messages' && urgentForNav > 0 && (
+                <div className="sidebar-badge">{urgentForNav}</div>
+              )}
             </button>
             <button
               type="button"
@@ -1619,7 +1624,9 @@ function App() {
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <span>Сообщения</span>
-            <div className="bottom-nav-badge">{unreadForNav}</div>
+            {activeWorkspace !== 'messages' && urgentForNav > 0 && (
+              <div className="bottom-nav-badge">{urgentForNav}</div>
+            )}
           </button>
           <button
             type="button"

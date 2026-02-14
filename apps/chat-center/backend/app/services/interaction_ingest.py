@@ -2,19 +2,37 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import asyncio
+import logging
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.settings import get_seller_setting
 from app.models.chat import Chat
 from app.models.interaction import Interaction
 from app.services.interaction_linking import refresh_link_candidates_for_interactions
+from app.services.rate_limiter import get_rate_limiter
 from app.services.wb_connector import get_wb_connector_for_seller
 from app.services.wb_feedbacks_connector import get_wb_feedbacks_connector_for_seller
 from app.services.wb_questions_connector import get_wb_questions_connector_for_seller
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_REPLY_PENDING_WINDOW = 180
+
+# Small overlap buffer to handle records created in the same second as the
+# watermark. Without this, records with occurred_at == watermark could be
+# missed on the next sync cycle.
+_WATERMARK_OVERLAP_SECONDS = 2
+
+# Inter-page delay (seconds) between paginated API calls.
+# 0.5s => ~2 requests/sec = 120/min, well within WB 30-req/min limit even
+# accounting for multiple channels being ingested concurrently.
+_INTER_PAGE_DELAY: float = 0.5
 
 
 @dataclass
@@ -25,6 +43,8 @@ class IngestStats:
     created: int = 0
     updated: int = 0
     skipped: int = 0
+    stopped_at_watermark: bool = False
+    new_watermark: Optional[str] = field(default=None, repr=False)
 
     def as_dict(self) -> Dict[str, int]:
         return {
@@ -107,7 +127,7 @@ PRESERVED_META_KEYS = {
 }
 
 
-def _reply_pending_override(*, existing: Optional[Interaction], window_minutes: int = 180) -> bool:
+def _reply_pending_override(*, existing: Optional[Interaction], window_minutes: int = _DEFAULT_REPLY_PENDING_WINDOW) -> bool:
     """
     If we have a local reply recorded (e.g. we sent it via AgentIQ),
     don't reopen the item immediately just because WB hasn't reflected it yet.
@@ -159,11 +179,12 @@ def _priority_for_question_with_intent(
     needs_response: bool,
     question_text: str,
     occurred_at: Optional[datetime],
+    intent_override: Optional[str] = None,
 ) -> tuple[str, str, int]:
     if not needs_response:
         return "low", "answered", 24 * 60
 
-    intent = _question_intent(question_text)
+    intent = intent_override if intent_override else _question_intent(question_text)
     base_priority = "high"
     sla_minutes = 4 * 60
 
@@ -202,24 +223,74 @@ async def ingest_wb_reviews_to_interactions(
     nm_id: Optional[int] = None,
     max_items: int = 300,
     page_size: int = 100,
-) -> Dict[str, int]:
+    since_watermark: Optional[datetime] = None,
+    reply_pending_window_minutes: Optional[int] = None,
+) -> IngestStats:
     """
     Pull reviews from WB API and upsert into unified interactions table.
+
+    Args:
+        since_watermark: If provided, stop fetching when records older than
+            this timestamp are encountered (incremental sync).  A small overlap
+            buffer is applied so that same-second records are not lost.
+        reply_pending_window_minutes: Override for the reply-pending grace window.
+            If None, the value is loaded from seller's general settings (DB), falling
+            back to _DEFAULT_REPLY_PENDING_WINDOW (180 min).
 
     Notes:
     - Primary source only (`source=wb_api`)
     - No cross-channel identity linking here; only canonical review ingestion
+    - Returns full IngestStats (caller can use .as_dict() for backward compat)
     """
+    # Resolve reply-pending window: explicit param > seller DB setting > default.
+    if reply_pending_window_minutes is None:
+        db_value = await get_seller_setting(
+            db, seller_id, "reply_pending_window_minutes", default=None,
+        )
+        if db_value is not None:
+            try:
+                reply_pending_window_minutes = int(db_value)
+            except (TypeError, ValueError):
+                reply_pending_window_minutes = _DEFAULT_REPLY_PENDING_WINDOW
+        else:
+            reply_pending_window_minutes = _DEFAULT_REPLY_PENDING_WINDOW
+
     connector = await get_wb_feedbacks_connector_for_seller(seller_id, db)
     stats = IngestStats()
     seen_ids: set[str] = set()
     touched_ids: set[int] = set()
     answer_states = [False] if only_unanswered else [False, True]
+    max_occurred_at: Optional[datetime] = None
+
+    # Apply overlap buffer so records created in the same second are not lost.
+    effective_watermark: Optional[datetime] = None
+    if since_watermark is not None:
+        wm = _as_utc_dt(since_watermark)
+        if wm is not None:
+            effective_watermark = wm - timedelta(seconds=_WATERMARK_OVERLAP_SECONDS)
+            logger.info(
+                "Incremental review sync for seller=%s watermark=%s (effective=%s)",
+                seller_id,
+                since_watermark.isoformat(),
+                effective_watermark.isoformat(),
+            )
+
+    watermark_hit = False
 
     for answer_state in answer_states:
+        if watermark_hit:
+            break
         skip = 0
-        while stats.fetched < max_items:
-            take = min(page_size, max_items - stats.fetched)
+        page_number = 0
+        # Each answer_state gets its own budget so that unanswered reviews
+        # cannot exhaust the limit and starve answered reviews (bug #16).
+        state_fetched = 0
+        while state_fetched < max_items:
+            # Rate-limit: acquire token before each API page request.
+            await get_rate_limiter().acquire(seller_id)
+            if page_number > 0:
+                await asyncio.sleep(_INTER_PAGE_DELAY)
+            take = min(page_size, max_items - state_fetched)
             response = await connector.list_feedbacks(
                 skip=skip,
                 take=take,
@@ -227,13 +298,16 @@ async def ingest_wb_reviews_to_interactions(
                 nm_id=nm_id,
                 order="dateDesc",
             )
+            page_number += 1
 
             data = response.get("data") or {}
             feedbacks = data.get("feedbacks") or []
             if not isinstance(feedbacks, list) or not feedbacks:
                 break
 
+            state_fetched += len(feedbacks)
             stats.fetched += len(feedbacks)
+            page_hit_watermark = False
 
             for fb in feedbacks:
                 external_id = str(fb.get("id") or "").strip()
@@ -247,8 +321,13 @@ async def ingest_wb_reviews_to_interactions(
 
                 product = fb.get("productDetails") or {}
                 rating = fb.get("productValuation")
+                review_text = _build_review_text(fb)
                 answer_text = (fb.get("answerText") or "").strip()
-                needs_response = not bool(answer_text)
+                # Rating-only reviews (no buyer text) don't need seller response
+                if not review_text:
+                    needs_response = False
+                else:
+                    needs_response = not bool(answer_text)
                 occurred_at = _parse_iso_dt(fb.get("createdDate"))
                 answer_created_at = _parse_iso_dt(
                     fb.get("answerCreateDate")
@@ -256,12 +335,27 @@ async def ingest_wb_reviews_to_interactions(
                     or fb.get("answerDate")
                 )
 
+                # Track max occurred_at for new watermark.
+                if occurred_at is not None:
+                    occ_utc = _as_utc_dt(occurred_at)
+                    if occ_utc and (max_occurred_at is None or occ_utc > max_occurred_at):
+                        max_occurred_at = occ_utc
+
+                # Incremental check: if this record is older than our
+                # watermark, we have reached already-synced territory.
+                if effective_watermark is not None and occurred_at is not None:
+                    occ_utc = _as_utc_dt(occurred_at)
+                    if occ_utc and occ_utc <= effective_watermark:
+                        page_hit_watermark = True
+                        # Still process this record (overlap zone) but mark
+                        # that we should stop after this page.
+
                 subject = f"Отзыв {rating}★" if isinstance(rating, int) else "Отзыв"
                 product_name = (product.get("productName") or "").strip()
                 if product_name:
                     subject = f"{subject} · {product_name}"
 
-                mapped_text = _build_review_text(fb)
+                mapped_text = review_text  # already computed above
                 mapped_priority = _priority_for_review(rating if isinstance(rating, int) else None, needs_response)
                 mapped_status = "open" if needs_response else "responded"
 
@@ -291,7 +385,7 @@ async def ingest_wb_reviews_to_interactions(
                     if answer_created_at:
                         channel_meta["last_reply_at"] = answer_created_at.isoformat()
                     channel_meta["wb_sync_state"] = "confirmed"
-                elif _reply_pending_override(existing=existing):
+                elif _reply_pending_override(existing=existing, window_minutes=reply_pending_window_minutes):
                     # Keep responded in UI while WB answer is pending visibility.
                     needs_response = False
                     mapped_status = "responded"
@@ -332,6 +426,16 @@ async def ingest_wb_reviews_to_interactions(
                     touched_ids.add(interaction.id)
                     stats.created += 1
 
+            if page_hit_watermark:
+                watermark_hit = True
+                stats.stopped_at_watermark = True
+                logger.info(
+                    "Review sync for seller=%s hit watermark after %d fetched",
+                    seller_id,
+                    stats.fetched,
+                )
+                break
+
             if len(feedbacks) < take:
                 break
             skip += take
@@ -341,7 +445,12 @@ async def ingest_wb_reviews_to_interactions(
         seller_id=seller_id,
         interaction_ids=touched_ids,
     )
-    return stats.as_dict()
+
+    # Store new watermark in stats for the caller to persist.
+    if max_occurred_at is not None:
+        stats.new_watermark = max_occurred_at.isoformat()
+
+    return stats
 
 
 async def ingest_wb_questions_to_interactions(
@@ -353,20 +462,71 @@ async def ingest_wb_questions_to_interactions(
     nm_id: Optional[int] = None,
     max_items: int = 300,
     page_size: int = 100,
-) -> Dict[str, int]:
+    reply_pending_window_minutes: Optional[int] = None,
+    since_watermark: Optional[datetime] = None,
+) -> IngestStats:
     """
     Pull questions from WB API and upsert into unified interactions table.
+
+    Args:
+        reply_pending_window_minutes: Override for the reply-pending grace window.
+            If None, the value is loaded from seller's general settings (DB), falling
+            back to _DEFAULT_REPLY_PENDING_WINDOW (180 min).
+        since_watermark: If provided, stop fetching when records older than
+            this timestamp are encountered (incremental sync).  A small overlap
+            buffer is applied so that same-second records are not lost.
+
+    Returns full IngestStats (caller can use .as_dict() for backward compat).
     """
+    # Resolve reply-pending window: explicit param > seller DB setting > default.
+    if reply_pending_window_minutes is None:
+        db_value = await get_seller_setting(
+            db, seller_id, "reply_pending_window_minutes", default=None,
+        )
+        if db_value is not None:
+            try:
+                reply_pending_window_minutes = int(db_value)
+            except (TypeError, ValueError):
+                reply_pending_window_minutes = _DEFAULT_REPLY_PENDING_WINDOW
+        else:
+            reply_pending_window_minutes = _DEFAULT_REPLY_PENDING_WINDOW
+
     connector = await get_wb_questions_connector_for_seller(seller_id, db)
     stats = IngestStats()
     seen_ids: set[str] = set()
     touched_ids: set[int] = set()
     answer_states = [False] if only_unanswered else [False, True]
+    max_occurred_at: Optional[datetime] = None
+
+    # Apply overlap buffer so records created in the same second are not lost.
+    effective_watermark: Optional[datetime] = None
+    if since_watermark is not None:
+        wm = _as_utc_dt(since_watermark)
+        if wm is not None:
+            effective_watermark = wm - timedelta(seconds=_WATERMARK_OVERLAP_SECONDS)
+            logger.info(
+                "Incremental question sync for seller=%s watermark=%s (effective=%s)",
+                seller_id,
+                since_watermark.isoformat(),
+                effective_watermark.isoformat(),
+            )
+
+    watermark_hit = False
 
     for answer_state in answer_states:
+        if watermark_hit:
+            break
         skip = 0
-        while stats.fetched < max_items:
-            take = min(page_size, max_items - stats.fetched)
+        page_number = 0
+        # Each answer_state gets its own budget so that unanswered questions
+        # cannot exhaust the limit and starve answered questions (bug #16).
+        state_fetched = 0
+        while state_fetched < max_items:
+            # Rate-limit: acquire token before each API page request.
+            await get_rate_limiter().acquire(seller_id)
+            if page_number > 0:
+                await asyncio.sleep(_INTER_PAGE_DELAY)
+            take = min(page_size, max_items - state_fetched)
             response = await connector.list_questions(
                 skip=skip,
                 take=take,
@@ -374,13 +534,16 @@ async def ingest_wb_questions_to_interactions(
                 nm_id=nm_id,
                 order="dateDesc",
             )
+            page_number += 1
 
             data = response.get("data") or {}
             questions = data.get("questions") or []
             if not isinstance(questions, list) or not questions:
                 break
 
+            state_fetched += len(questions)
             stats.fetched += len(questions)
+            page_hit_watermark = False
 
             for q in questions:
                 external_id = str(q.get("id") or "").strip()
@@ -403,6 +566,21 @@ async def ingest_wb_questions_to_interactions(
                     answer.get("createDate") if isinstance(answer, dict) else None
                 )
 
+                # Track max occurred_at for new watermark.
+                if occurred_at is not None:
+                    occ_utc = _as_utc_dt(occurred_at)
+                    if occ_utc and (max_occurred_at is None or occ_utc > max_occurred_at):
+                        max_occurred_at = occ_utc
+
+                # Incremental check: if this record is older than our
+                # watermark, we have reached already-synced territory.
+                if effective_watermark is not None and occurred_at is not None:
+                    occ_utc = _as_utc_dt(occurred_at)
+                    if occ_utc and occ_utc <= effective_watermark:
+                        page_hit_watermark = True
+                        # Still process this record (overlap zone) but mark
+                        # that we should stop after this page.
+
                 subject = "Вопрос по товару"
                 product_name = (product.get("productName") or "").strip()
                 if product_name:
@@ -413,6 +591,27 @@ async def ingest_wb_questions_to_interactions(
                     question_text=question_text,
                     occurred_at=occurred_at,
                 )
+                intent_method = "rule_based"
+
+                # LLM fallback: if rule-based returned general_question and question
+                # needs a response, try LLM classification for better prioritization.
+                if intent == "general_question" and needs_response:
+                    try:
+                        from app.services.ai_question_analyzer import classify_question_intent
+
+                        llm_intent, llm_method = await classify_question_intent(question_text)
+                        if llm_intent != "general_question":
+                            intent_method = llm_method
+                            # Re-calculate priority with the LLM-detected intent
+                            mapped_priority, intent, sla_target_minutes = _priority_for_question_with_intent(
+                                needs_response=needs_response,
+                                question_text=question_text,
+                                occurred_at=occurred_at,
+                                intent_override=llm_intent,
+                            )
+                    except Exception:
+                        logger.debug("LLM intent fallback skipped", exc_info=True)
+
                 mapped_status = "open" if needs_response else "responded"
                 sla_due_at = None
                 if occurred_at and needs_response:
@@ -443,6 +642,7 @@ async def ingest_wb_questions_to_interactions(
                     "wb_answer_text": answer_text or None,
                     "wb_answer_created_at": answer_created_at.isoformat() if answer_created_at else None,
                     "question_intent": intent,
+                    "intent_detection_method": intent_method,
                     "priority_reason": intent,
                     "sla_target_minutes": sla_target_minutes,
                     "sla_due_at": sla_due_at,
@@ -453,7 +653,7 @@ async def ingest_wb_questions_to_interactions(
                     if answer_created_at:
                         channel_meta["last_reply_at"] = answer_created_at.isoformat()
                     channel_meta["wb_sync_state"] = "confirmed"
-                elif _reply_pending_override(existing=existing):
+                elif _reply_pending_override(existing=existing, window_minutes=reply_pending_window_minutes):
                     needs_response = False
                     mapped_status = "responded"
                     mapped_priority = "low"
@@ -493,6 +693,16 @@ async def ingest_wb_questions_to_interactions(
                     touched_ids.add(interaction.id)
                     stats.created += 1
 
+            if page_hit_watermark:
+                watermark_hit = True
+                stats.stopped_at_watermark = True
+                logger.info(
+                    "Question sync for seller=%s hit watermark after %d fetched",
+                    seller_id,
+                    stats.fetched,
+                )
+                break
+
             if len(questions) < take:
                 break
             skip += take
@@ -502,7 +712,12 @@ async def ingest_wb_questions_to_interactions(
         seller_id=seller_id,
         interaction_ids=touched_ids,
     )
-    return stats.as_dict()
+
+    # Store new watermark in stats for the caller to persist.
+    if max_occurred_at is not None:
+        stats.new_watermark = max_occurred_at.isoformat()
+
+    return stats
 
 
 async def ingest_chat_interactions(
