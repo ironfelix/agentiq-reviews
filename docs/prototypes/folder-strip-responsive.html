@@ -243,9 +243,10 @@ body {
 .app-shell.mobile .folder-strip {
     width: auto;
     flex-direction: row;
-    padding: 3px;
-    background: var(--color-bg-secondary);
-    border-radius: 10px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 1px solid var(--color-border-medium);
     margin-bottom: 10px;
     gap: 0;
 }
@@ -255,20 +256,28 @@ body {
     flex-direction: row;
     width: auto;
     height: auto;
-    padding: 8px 4px;
+    padding: 10px 4px 8px;
     gap: 5px;
-    border-radius: 8px;
+    border-radius: 0;
     margin-bottom: 0;
 }
 .app-shell.mobile .folder-item svg { width: 18px; height: 18px; }
 .app-shell.mobile .folder-label { font-size: 13px; font-weight: 500; }
-.app-shell.mobile .folder-item.active::before { display: none; }
+.app-shell.mobile .folder-item:hover { background: transparent; }
+.app-shell.mobile .folder-item.active::before {
+    display: block;
+    left: 8px; right: 8px;
+    top: auto; bottom: -1px;
+    width: auto; height: 2px;
+    border-radius: 2px 2px 0 0;
+}
 .app-shell.mobile .folder-item.active {
-    background: var(--color-bg-primary);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    background: transparent;
+    color: var(--color-accent);
+    box-shadow: none;
 }
 .app-shell.mobile .folder-badge {
-    top: 0px; right: 2px;
+    top: 2px; right: 2px;
 }
 
 /* Mobile: folder strip moves inside chat-list-header */
