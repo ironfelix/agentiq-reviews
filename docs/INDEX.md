@@ -2,7 +2,7 @@
 
 Главная навигация по проекту: что за модули есть в продукте, где их документация и где смотреть архитектуру.
 
-Last updated: 2026-02-12
+Last updated: 2026-02-15
 
 ## Start Here
 
@@ -48,6 +48,9 @@ Last updated: 2026-02-12
 - `ops/DEPLOYMENT.md`
 - `ops/SECURITY_FIXES_APPLIED.md`
 - `ops/RULES.md`
+- **`ops/RELEASE_CYCLE.md`** — релизный цикл (окружения, AI code review, CI/CD, testing strategy, monitoring)
+- **`security/SECURITY_AUDIT.md`** — полный security audit (36 findings: 6 CRITICAL, 10 HIGH, 12 MEDIUM, 8 LOW)
+- **`security/SECURITY_REVIEW_PROCESS.md`** — процесс security review при разработке и релизах (CI checks, checklists, secrets rotation, incident response)
 
 ## Design System & Prototypes
 
@@ -59,7 +62,9 @@ Last updated: 2026-02-12
 ## Research
 
 - `research/INDEX.md` — индекс исследований (рынок, UX, WB research)
-- `research/WB_LOGISTICS_CJM.html` — пример “человеческой” CJM-документации (HTML)
+- `research/WB_LOGISTICS_CJM.html` — пример "человеческой" CJM-документации (HTML)
+- **`product/CRM_PERFORMANCE_INTEGRATION_PLAN.md`** — исследование интеграции CRM-маркетинга и performance-каналов (2026, РФ рынок)
+- **`../crm-performance-plan.html`** — HTML версия CRM research для GitHub Pages
 
 ## Changelog
 

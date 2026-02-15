@@ -67,6 +67,10 @@ Status: ACTIVE (triage queue)
 | 41 | DATA | ✅ FIXED — 4 sellers синкали один WB кабинет. Оставлен seller 17 (ivan2), деактивированы 3/12/18 |
 | 42 | FEAT | ✅ DONE — Settings page включена в sidebar + mobile nav, Dashboard placeholder |
 | 43 | PERF | ✅ FIXED — Progressive loading: sessionStorage cache (30-min TTL), instant restore без спиннера, background pagination 300ms, Apple Mail sync banner |
+| 44 | UX | ✅ FIXED — Promo codes help panel: неполный контент (нет таблиц, callout, ссылки) |
+| 45 | BUG | ✅ FIXED — Mobile chat: header съезжает за app-header |
+| 46 | BUG | ✅ FIXED — Sync indicator не показывается при периодической синхронизации (30 сек) |
+| 47 | UX | ✅ FIXED — Settings navigation: reload сбрасывает активный раздел на Подключения |
 
 ---
 
@@ -157,3 +161,13 @@ Status: ACTIVE (triage queue)
 39) ~~в сниппетах в чатлисте снова пишем чат чат с покупателем, отзыв отзыв, вопрос вопрос по товару~~ **FIXED (2026-02-15):** `App.tsx:85-89` использовал fallback "Отзыв по товару"/"Вопрос по товару"/"Чат покупателя", а `ChatList.tsx:229-234` уже показывает channel label "Отзыв"/"Вопрос"/"Чат" → дубликат. Fix: fallback заменён на `Арт. {nm_id}` или null (пустая строка пропускается). Теперь: "Отзыв · Арт. 123456 · Ожидает ответа".
 
 40) ~~цвета dots сломаны~~ **FIXED (2026-02-15):** Root cause: 4849 из 4853 answered reviews не имели `last_reply_text` в extra_data (WB API `isAnswered=true`, но `answerText` пустой). Frontend derivation: `hasReply=false + needs_response=false → 'waiting'` (жёлтый) вместо `'responded'` (зелёный). Fix: добавлен fallback `if (!interaction.needs_response) return 'responded'` в `App.tsx:150`. Теперь все answered reviews/questions показывают зелёный dot.
+
+### Новые после демо 3 (2026-02-15):
+
+44) ~~Promo codes help panel: неполный контент на проде~~ **FIXED (2026-02-15):** Help panel промокодов показывал только 3 секции вместо полного контента. Добавлено: (1) СОЗДАНИЕ с путём в ЛК WB, (2) ПАРАМЕТРЫ таблица (скидка/длительность/макс.акций/код/использование), (3) КАК ПРИМЕНЯЕТСЯ, (4) жёлтый callout "Важно" со списком правил WB, (5) ЧАТЫ VS ОТЗЫВЫ таблица сравнения, (6) внешняя ссылка на инструкцию WB. Файлы: `PromoCodes.tsx` (+60 строк контент), `index.css` (+58 строк стили для таблиц/callout/ссылки). Commit: `e4bba04`.
+
+45) ~~Mobile chat: header съезжает за app-header~~ **FIXED (2026-02-15):** На mobile при открытии чата `.chat-window` имел `position:absolute; top:0`, из-за чего chat-header скрывался за app-header (56px). Fix: изменён `top: 56px` и `height: calc(100dvh - 56px - 56px)` для `.chat-center[data-mobile-view="chat"] .chat-window`. Файл: `index.css:2203-2206`. Commit: `e4bba04`.
+
+46) ~~Sync indicator не показывается при периодической синхронизации~~ **FIXED (2026-02-15):** Apple Mail-style sync banner внизу чат-листа показывался только при первой загрузке (loadingProgress.loaded < total), но не при фоновой синхронизации каждые 30 сек. Root cause: при периодической синхронизации `allLoaded=true` и `loadingProgress=null`. Fix: добавлено условие `syncStatus === 'syncing'` OR `loadingProgress` для отображения banner. Теперь показывается "Синхронизация..." при фоновой синхронизации. Файл: `ChatList.tsx:645-656`. Commit: `e4bba04`.
+
+47) ~~Settings navigation: reload сбрасывает активный раздел~~ **FIXED (2026-02-15):** При reload страницы настроек пользователь возвращался к разделу "Подключения" вместо последнего активного (например, "Промокоды"). Root cause: `tab` state хранился локально и сбрасывался в `'connections'` при mount. Fix: (1) добавлена функция `getInitialTab()` которая читает URL hash (`#settings-promo`) при mount, (2) функция `changeTab()` обновляет state + window.location.hash при переключении табов. Теперь активный раздел сохраняется в URL и восстанавливается после reload. Файл: `SettingsPage.tsx`. Commit: `e4bba04`.

@@ -393,6 +393,9 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 | Feb 15 | Claude | **Progressive loading (#39-42):** chat_status backend-canonical fix, dual-poll sync with real count, background pagination, instant folder switching, Apple Mail progress bar. **2x deploy to prod, 16/16 smoke tests.** |
 | Feb 15 | Claude | **Ops:** deploy.sh (rollback), pre-deploy-check.sh, smoke-test.sh (16 checks), CI/CD workflows (4), load testing, DB backup, SSL cert automation. |
 | Feb 15 | Claude | **Git:** 6 commits created (196 files, ~41k insertions). INBOX.md #39-42 added. Backlog updated. |
+| Feb 15 (вечер) | Claude | **UI fixes (#44-47):** Promo help panel (tables, callout, WB link), mobile chat header overlap fix, sync indicator for periodic sync (Apple Mail banner), settings hash navigation (сохранение раздела при reload). 4 файла, 145 строк. Commit `e4bba04`. |
+| Feb 15 (вечер) | Claude | **Release cycle & AI code review:** `RELEASE_CYCLE.md` (окружения, CI/CD, testing, monitoring), `ai_code_review.py` (cross-model review: Claude↔o1-preview), 3x GitHub Actions (ai-review, staging deploy, prod deploy). Roadmap: 3 фазы (Foundation → Scale → Advanced). Cost: ~$5/мес для 50 PRs. |
+| Feb 15 (вечер) | Claude | **CRM + Performance research:** `CRM_PERFORMANCE_INTEGRATION_PLAN.md` + `crm-performance-plan.html` — исследование интеграции CRM/CVM с performance-каналами (Яндекс.Директ, VK, programmatic). 3-tier оффер для агентства. 20+ источников. GitHub Pages. |
 
 ---
 
