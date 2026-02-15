@@ -23,6 +23,7 @@ interface ChatListProps {
   isRetryingSync?: boolean;
   isConnectionSkipped?: boolean;
   onOpenConnectOnboarding?: () => void;
+  loadingProgress?: { loaded: number; total: number } | null;
 }
 
 export function ChatList({
@@ -46,6 +47,7 @@ export function ChatList({
   isRetryingSync,
   isConnectionSkipped,
   onOpenConnectOnboarding,
+  loadingProgress,
 }: ChatListProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | 'urgent' | 'unanswered' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -311,6 +313,15 @@ export function ChatList({
           )}
         </div>
 
+        {/* Channel tabs (mobile only — desktop uses FolderStrip.desktop beside chat-list) */}
+        <FolderStrip
+          variant="mobile"
+          activeChannel={activeChannel}
+          onChannelChange={handleChannelChange}
+          pipeline={pipeline}
+          totalChats={chats.length}
+        />
+
         {/* Search */}
         <div className="search-wrapper">
           <input
@@ -387,15 +398,6 @@ export function ChatList({
             </button>
           </div>
         </div>
-
-        {/* Channel tabs (mobile only — desktop uses FolderStrip.desktop beside chat-list) */}
-        <FolderStrip
-          variant="mobile"
-          activeChannel={activeChannel}
-          onChannelChange={handleChannelChange}
-          pipeline={pipeline}
-          totalChats={chats.length}
-        />
 
         {/* Advanced Filters */}
         {showAdvancedFilters && (
@@ -636,6 +638,19 @@ export function ChatList({
                   <div className="queue-count">{allMessagesChats.length}</div>
                 </div>
                 {allMessagesChats.map(renderChatItem)}
+              </div>
+            )}
+
+            {/* Apple Mail–style progress indicator */}
+            {loadingProgress && loadingProgress.loaded < loadingProgress.total && (
+              <div className="load-progress-bar">
+                <div
+                  className="load-progress-fill"
+                  style={{ width: `${Math.round((loadingProgress.loaded / loadingProgress.total) * 100)}%` }}
+                />
+                <span className="load-progress-text">
+                  Загружено {loadingProgress.loaded} из {loadingProgress.total}
+                </span>
               </div>
             )}
           </>

@@ -93,10 +93,6 @@
             font-size: 14px;
         }
 
-        p {
-            text-wrap: pretty;
-        }
-
         /* ===== UTILITY ===== */
         .container {
             max-width: var(--container-max);
@@ -277,7 +273,6 @@
             letter-spacing: -1.5px;
             color: var(--color-text-primary);
             margin-bottom: var(--space-5);
-            text-wrap: balance;
             animation: fade-up 0.6s ease 0.1s forwards;
             opacity: 0;
         }
@@ -459,7 +454,6 @@
             line-height: 1.15;
             margin-bottom: var(--space-4);
             color: var(--color-text-primary);
-            text-wrap: balance;
         }
 
         .section-subtitle {
@@ -1100,7 +1094,6 @@
             margin-bottom: var(--space-2);
             color: var(--color-text-primary);
             line-height: 1.2;
-            text-wrap: balance;
         }
 
         .final-cta .section-subtitle {
@@ -1391,6 +1384,10 @@
 
         /* All mobile (≤640px) */
         @media (max-width: 640px) {
+            body.has-mobile-cta {
+                padding-bottom: 86px; /* space for the fixed mobile CTA bar */
+            }
+
             .hero {
                 min-height: auto;
                 padding: 100px 0 40px;
@@ -1580,6 +1577,52 @@
             }
         }
 
+        /* Mobile bottom CTA bar */
+        .mobile-cta-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 900;
+            padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-top: 1px solid var(--color-border-medium);
+            transform: translateY(110%);
+            transition: transform var(--transition-medium);
+        }
+
+        .mobile-cta-bar.show {
+            transform: translateY(0);
+        }
+
+        .mobile-cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+            border: none;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all var(--transition-medium);
+        }
+
+        .mobile-cta-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 641px) {
+            .mobile-cta-bar { display: none; }
+        }
+
         /* Mobile navbar CTA */
         .navbar-cta-mobile {
             display: inline-flex;
@@ -1626,9 +1669,9 @@
 <nav class="navbar" id="navbar">
     <div class="container navbar-inner">
         <a href="#" class="logo">AGENT<span>IQ</span></a>
-        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Аудит</a>
+        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Анализ</a>
         <a href="#" class="navbar-cta" onclick="openModal(event)">
-            Заказать аудит
+            Получить анализ
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
     </div>
@@ -1645,15 +1688,15 @@
                 </div>
                 <h1>Центр контроля коммуникаций <span class="highlight">Wildberries</span></h1>
                 <p class="hero-subtitle">
-                    Собираем чаты, вопросы и&nbsp;отзывы по&nbsp;вашим товарам в&nbsp;одном рабочем пространстве. Показываем точки риска и&nbsp;потери в&nbsp;продажах.
+                    Собираем чаты, вопросы и&nbsp;отзывы по&nbsp;вашим товарам в&nbsp;одном рабочем пространстве и&nbsp;показываем, где есть точки риска и&nbsp;низкая отдача.
                 </p>
                 <div class="hero-cta-group">
                     <a href="#" class="btn-primary" onclick="openModal(event)">
-                        Заказать аудит&nbsp;WB
+                        Получить анализ
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
-                    <a href="#proof" class="btn-secondary">
-                        Посмотреть пример
+                    <a href="/audit.html" class="btn-secondary">
+                        Посмотреть пример анализа
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                 </div>
@@ -1669,7 +1712,7 @@
                 </div>
                 <div class="hero-proof-item">
                     <span class="hero-proof-value">100%</span>
-                    <span class="hero-proof-label">вопросов снимают сомнения до&nbsp;покупки</span>
+                    <span class="hero-proof-label">вопросов закрывают сомнения до&nbsp;покупки</span>
                 </div>
             </div>
         </div>
@@ -1681,7 +1724,7 @@
     <div class="container">
         <div class="reveal">
             <span class="section-label">Проблема</span>
-            <h2 class="section-title">Почему селлер теряет деньги на&nbsp;коммуникациях</h2>
+            <h2 class="section-title">Почему селлеры теряют деньги на&nbsp;коммуникациях</h2>
         </div>
         <div class="pain-grid">
             <div class="pain-card reveal reveal-delay-1">
@@ -1709,28 +1752,28 @@
     <div class="container">
         <div class="reveal">
             <span class="section-label">Подход</span>
-            <h2 class="section-title">Кабинет&nbsp;WB показывает сообщения. Мы показываем, <span class="text-accent">что важно</span></h2>
+            <h2 class="section-title">Кабинет WB показывает сообщения.<br>Мы показываем, <span class="text-accent">что важно</span></h2>
         </div>
         <div class="comparison">
             <div class="comparison-card old reveal reveal-delay-1">
-                <span class="comparison-tag">Кабинет&nbsp;WB</span>
+                <span class="comparison-tag">Кабинет WB</span>
                 <h3>Просто список сообщений</h3>
                 <ul class="comparison-list">
                     <li>
                         <span class="icon">—</span>
-                        Показывает чаты и&nbsp;отзывы без приоритета
+                        Показывает чаты и отзывы без приоритета
                     </li>
                     <li>
                         <span class="icon">—</span>
-                        Нет оценки влияния на&nbsp;продажи
+                        Нет оценки влияния на продажи
                     </li>
                     <li>
                         <span class="icon">—</span>
-                        Нет связки между&nbsp;каналами
+                        Нет связки между каналами
                     </li>
                     <li>
                         <span class="icon">—</span>
-                        Невозможно отследить качество&nbsp;ответов
+                        Невозможно отследить качество ответов
                     </li>
                 </ul>
             </div>
@@ -1740,19 +1783,19 @@
                 <ul class="comparison-list">
                     <li>
                         <span class="icon">✓</span>
-                        Единый поток из&nbsp;всех каналов
+                        Единый поток из всех каналов
                     </li>
                     <li>
                         <span class="icon">✓</span>
-                        Приоритеты и&nbsp;оценка рисков
+                        Приоритеты и оценка рисков
                     </li>
                     <li>
                         <span class="icon">✓</span>
-                        Аналитика по&nbsp;проблемным&nbsp;артикулам
+                        Аналитика по проблемным артикулам
                     </li>
                     <li>
                         <span class="icon">✓</span>
-                        Контроль качества коммуникаций
+                        Контроль качества коммуникации
                     </li>
                 </ul>
             </div>
@@ -1803,15 +1846,15 @@
         <div class="money-grid">
             <div class="money-card reveal reveal-delay-1">
                 <h3>Пропущенный вопрос</h3>
-                <p>Покупатель не дождался ответа и&nbsp;ушёл к&nbsp;конкуренту. Вы этого даже не заметили.</p>
+                <p>Покупатель не дождался ответа и ушёл к конкуренту. Вы этого даже не заметили.</p>
             </div>
             <div class="money-card reveal reveal-delay-2">
                 <h3>Шаблонный ответ</h3>
-                <p>Формальная отписка не снимает сомнения. Покупатель закрывает карточку и&nbsp;не возвращается.</p>
+                <p>Формальная отписка не снимает сомнения. Покупатель закрывает карточку и не возвращается.</p>
             </div>
             <div class="money-card reveal reveal-delay-3">
                 <h3>Негатив без реакции</h3>
-                <p>Каждый отзыв без ответа тянет рейтинг карточки вниз и&nbsp;снижает позиции в&nbsp;выдаче.</p>
+                <p>Каждый отзыв без ответа тянет рейтинг карточки вниз и снижает позиции в выдаче.</p>
             </div>
         </div>
         <div class="money-bottom-text reveal">
@@ -1826,13 +1869,13 @@
         <div class="reveal">
             <span class="section-label">Предложение</span>
             <h2 class="section-title">Начните с&nbsp;простого анализа</h2>
-            <p class="section-subtitle">Сначала находим проблемы, потом берём их под&nbsp;контроль.</p>
+            <p class="section-subtitle">Сначала находим проблемы, потом берём их на&nbsp;контроль.</p>
         </div>
         <div class="offer-wrapper">
             <div class="offer-card primary reveal reveal-delay-1">
                 <span class="offer-badge">Старт</span>
-                <h3>Коммуникационный аудит&nbsp;WB</h3>
-                <p class="description">Разберём чаты, отзывы и&nbsp;вопросы по&nbsp;выбранным товарам. Покажем зоны риска, приоритеты и&nbsp;действия, которые принесут результат.</p>
+                <h3>Анализ коммуникаций по&nbsp;артикулу</h3>
+                <p class="description">Соберём чаты, отзывы и&nbsp;вопросы по&nbsp;вашему артикулу. Покажем, что срочно и&nbsp;что исправить в&nbsp;первую очередь.</p>
                 <ul class="offer-checklist">
                     <li><span class="check">✓</span> Конкретное понимание проблемных точек</li>
                     <li><span class="check">✓</span> Приоритеты для обработки сообщений</li>
@@ -1843,19 +1886,19 @@
                     <span class="amount">Бесплатно</span>
                 </div>
                 <a href="#" class="btn-offer primary" onclick="openModal(event)">
-                    Получить аудит
+                    Получить анализ
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
             </div>
             <div class="offer-card secondary reveal reveal-delay-2">
                 <span class="offer-badge">После аудита</span>
                 <h3>Центр контроля коммуникаций</h3>
-                <p class="description">Если аудит подтвердит ценность — подключаете сервис. Все каналы в&nbsp;одном месте, приоритеты расставлены, проблемы видны сразу.</p>
+                <p class="description">Если аудит подтвердит ценность — подключаете сервис. Все каналы в одном месте, приоритеты расставлены, проблемы видны сразу.</p>
                 <ul class="offer-checklist">
-                    <li><span class="check">✓</span> Все чаты, вопросы и&nbsp;отзывы в&nbsp;одном окне</li>
-                    <li><span class="check">✓</span> Автоматические приоритеты и&nbsp;алерты</li>
-                    <li><span class="check">✓</span> Аналитика по&nbsp;карточкам и&nbsp;менеджерам</li>
-                    <li><span class="check">✓</span> Помощь с&nbsp;ответами — готовые варианты под&nbsp;контекст</li>
+                    <li><span class="check">✓</span> Все чаты, вопросы и отзывы в одном окне</li>
+                    <li><span class="check">✓</span> Автоматические приоритеты и алерты</li>
+                    <li><span class="check">✓</span> Аналитика по карточкам и менеджерам</li>
+                    <li><span class="check">✓</span> Помощь с ответами — готовые варианты под контекст</li>
                 </ul>
                 <div class="offer-price">
                     <span class="amount">от 4 990 ₽</span>
@@ -1879,15 +1922,15 @@
         <div class="audience-grid">
             <div class="audience-card reveal reveal-delay-1">
                 <h3>Бренды и селлеры</h3>
-                <p>50+ сообщений в&nbsp;день, несколько карточек. Нужна система, а&nbsp;не ручная проверка каждого чата.</p>
+                <p>50+ сообщений в день, несколько карточек. Нужна система, а не ручная проверка каждого чата.</p>
             </div>
             <div class="audience-card reveal reveal-delay-2">
                 <h3>Команды с менеджерами</h3>
-                <p>Хотите видеть, как отвечают ваши менеджеры и&nbsp;аутсорсоры, без чтения каждого диалога.</p>
+                <p>Хотите видеть, как отвечают ваши менеджеры и аутсорсоры, без чтения каждого диалога.</p>
             </div>
             <div class="audience-card reveal reveal-delay-3">
                 <h3>Растущие магазины</h3>
-                <p>Вкладываетесь в&nbsp;рекламу и&nbsp;трафик, но не контролируете, что происходит после клика на&nbsp;карточку.</p>
+                <p>Вкладываетесь в рекламу и трафик, но не контролируете, что происходит после клика на карточку.</p>
             </div>
         </div>
     </div>
@@ -1909,7 +1952,7 @@
                 <div class="proof-slide-text">
                     <span class="proof-slide-num">01 / 03</span>
                     <h3>Единое окно</h3>
-                    <p>Чаты, вопросы, отзывы — один поток. Система подсказывает ответ.</p>
+                    <p>Чаты, вопросы, отзывы — один поток. ИИ подсказывает ответ.</p>
                 </div>
             </div>
             <div class="proof-slide" data-slide="1">
@@ -1919,7 +1962,7 @@
                 <div class="proof-slide-text">
                     <span class="proof-slide-num">02 / 03</span>
                     <h3>Оценка качества</h3>
-                    <p>Что вредит продажам и&nbsp;сколько это стоит в&nbsp;деньгах.</p>
+                    <p>Что вредит продажам и сколько это стоит в деньгах.</p>
                 </div>
             </div>
             <div class="proof-slide" data-slide="2">
@@ -1929,7 +1972,7 @@
                 <div class="proof-slide-text">
                     <span class="proof-slide-num">03 / 03</span>
                     <h3>Разбор ответа</h3>
-                    <p>Что не так и&nbsp;готовый текст — как стоило ответить.</p>
+                    <p>Что не так и готовый текст — как стоило ответить.</p>
                 </div>
             </div>
             <div class="proof-nav">
@@ -1959,7 +2002,7 @@
             </div>
             <div class="final-cta-buttons">
                 <a href="#" class="btn-primary" onclick="openModal(event)">
-                    Заказать аудит
+                    Получить анализ
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <a href="#offer" class="btn-secondary">Подробнее</a>
@@ -1982,41 +2025,46 @@
     </div>
 </footer>
 
+<!-- ===== MOBILE CTA BAR ===== -->
+<div class="mobile-cta-bar" id="mobileCtaBar" aria-hidden="true">
+    <a href="#" class="mobile-cta-btn" onclick="openModal(event)">Получить анализ</a>
+</div>
+
 <!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <button class="modal-close" onclick="closeModal()">&times;</button>
 
         <div id="formContent">
-            <h3>Заказать аудит&nbsp;WB</h3>
-            <p class="modal-desc">Оставьте контакты — мы свяжемся, чтобы обсудить детали и&nbsp;подготовить анализ ваших коммуникаций.</p>
+            <h3>Получить анализ по&nbsp;артикулу</h3>
+            <p class="modal-desc">Оставьте артикул и контакт — мы подготовим анализ отзывов, вопросов и чатов и пришлём рекомендации.</p>
 
             <form id="auditForm" onsubmit="submitForm(event)">
                 <div class="form-group">
-                    <label for="name">Имя</label>
-                    <input type="text" id="name" placeholder="Как вас зовут?" required>
+                    <label for="nm">Артикул WB</label>
+                    <input type="text" id="nm" placeholder="Например: 282955222" inputmode="numeric" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="email@company.ru" required>
+                    <label for="contact">Контакт</label>
+                    <input type="text" id="contact" placeholder="@telegram или +7... или email" required>
                 </div>
                 <div class="form-group">
-                    <label for="company">Компания</label>
+                    <label for="company">Магазин (опционально)</label>
                     <input type="text" id="company" placeholder="Название бренда / магазина">
                 </div>
                 <div class="form-group">
-                    <label for="wblink">Ссылка на&nbsp;кабинет&nbsp;WB или товар</label>
+                    <label for="wblink">Ссылка на товар (опционально)</label>
                     <input type="url" id="wblink" placeholder="https://www.wildberries.ru/...">
                 </div>
                 <button type="submit" class="form-submit">Отправить заявку</button>
-                <p class="form-note">Обычно отвечаем в&nbsp;течение 2&nbsp;часов</p>
+                <p class="form-note">Обычно отвечаем в течение 2 часов</p>
             </form>
         </div>
 
         <div class="form-success" id="formSuccess">
             <div class="success-icon">✓</div>
             <h4>Заявка отправлена</h4>
-            <p>Мы свяжемся с&nbsp;вами в&nbsp;ближайшее время, чтобы обсудить аудит.</p>
+            <p>Мы свяжемся с вами в ближайшее время, чтобы обсудить аудит.</p>
         </div>
     </div>
 </div>
@@ -2024,6 +2072,18 @@
 <script>
     // ===== NAVBAR SCROLL EFFECT =====
     const navbar = document.getElementById('navbar');
+    const mobileCtaBar = document.getElementById('mobileCtaBar');
+
+    function updateMobileCtaBar() {
+        if (!mobileCtaBar) return;
+        const isMobile = window.innerWidth <= 640;
+        const overlay = document.getElementById('modalOverlay');
+        const modalOpen = overlay && overlay.classList.contains('open');
+        const shouldShow = isMobile && !modalOpen && window.scrollY > 420;
+        mobileCtaBar.classList.toggle('show', shouldShow);
+        mobileCtaBar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+        document.body.classList.toggle('has-mobile-cta', shouldShow);
+    }
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
@@ -2031,7 +2091,11 @@
         } else {
             navbar.classList.remove('scrolled');
         }
+        updateMobileCtaBar();
     }, { passive: true });
+
+    window.addEventListener('resize', updateMobileCtaBar, { passive: true });
+    updateMobileCtaBar();
 
     // ===== SCROLL REVEAL =====
     const revealElements = document.querySelectorAll('.reveal');
@@ -2058,12 +2122,14 @@
         document.body.style.overflow = 'hidden';
         document.getElementById('formContent').style.display = 'block';
         document.getElementById('formSuccess').classList.remove('show');
+        updateMobileCtaBar();
     }
 
     function closeModal() {
         const overlay = document.getElementById('modalOverlay');
         overlay.classList.remove('open');
         document.body.style.overflow = '';
+        updateMobileCtaBar();
     }
 
     document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -2081,8 +2147,8 @@
         document.getElementById('formSuccess').classList.add('show');
 
         const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
+            nm: document.getElementById('nm').value,
+            contact: document.getElementById('contact').value,
             company: document.getElementById('company').value,
             wblink: document.getElementById('wblink').value,
         };
@@ -2129,6 +2195,16 @@
             }
         });
     });
+
+    // Open modal from links like "/?open=1" (used from audit example page).
+    (function autoOpenModalFromQuery() {
+        try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('open') === '1') {
+                openModal({ preventDefault: () => {} });
+            }
+        } catch (e) {}
+    })();
 </script>
 
 </body>

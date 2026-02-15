@@ -5,6 +5,7 @@ interface MarketplaceOnboardingProps {
   user: User;
   isConnecting?: boolean;
   isRetryingSync?: boolean;
+  loadedCount?: number;
   onConnectMarketplace: (apiKey: string) => Promise<void>;
   onSkip: () => void;
   onContinue: () => void;
@@ -19,6 +20,7 @@ export function MarketplaceOnboarding({
   onSkip,
   onContinue,
   onRetrySync,
+  loadedCount,
 }: MarketplaceOnboardingProps) {
   const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
@@ -51,17 +53,27 @@ export function MarketplaceOnboarding({
   };
 
   if (isSyncing) {
+    const progressPct = loadedCount && loadedCount > 0
+      ? Math.min(95, Math.round((loadedCount / Math.max(loadedCount * 1.5, 100)) * 100))
+      : undefined;
     return (
       <div className="onboarding sync-screen">
         <div className="sync-animation"></div>
         <div className="sync-title">Подключаемся к Wildberries</div>
         <div className="sync-desc">Проверяем API-ключ и загружаем чаты, отзывы и вопросы</div>
         <div className="sync-progress">
-          <div className="sync-progress-bar"></div>
+          <div
+            className="sync-progress-bar"
+            style={progressPct !== undefined ? { width: `${progressPct}%`, animation: 'none' } : undefined}
+          />
         </div>
         <div className="sync-stats">
           <div className="sync-stat">
-            <div className="sync-stat-value">Загрузка данных из Wildberries</div>
+            <div className="sync-stat-value">
+              {loadedCount && loadedCount > 0
+                ? `Загружено: ${loadedCount} сообщений`
+                : 'Загрузка данных из Wildberries'}
+            </div>
             <div className="sync-stat-label">остальные данные догрузятся в фоне</div>
           </div>
         </div>

@@ -23,6 +23,7 @@ interface ChatWindowProps {
   onSendMessage: (text: string) => Promise<void>;
   isLoadingMessages: boolean;
   onBack?: () => void;
+  onOpenContext?: () => void;
   onCloseChat?: (chatId: number) => Promise<void>;
   onReopenChat?: (chatId: number) => Promise<void>;
   onRegenerateAI?: (chatId: number) => Promise<void>;
@@ -81,6 +82,7 @@ export function ChatWindow({
   onSendMessage,
   isLoadingMessages,
   onBack,
+  onOpenContext,
   onCloseChat,
   onReopenChat,
   onRegenerateAI,
@@ -422,6 +424,21 @@ export function ChatWindow({
         <div className="chat-header-info">
           <h2>{chat.customer_name || 'Клиент'}</h2>
           <div className="chat-header-meta">{headerMeta}</div>
+        </div>
+        <div className="chat-header-actions">
+          {onOpenContext && (
+            <button
+              className="header-action-btn"
+              title="Информация"
+              onClick={onOpenContext}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </button>
+          )}
         </div>
         {showLifecycleActions && (
           <div className="chat-header-actions">

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type {
   AuthResponse,
+  AISettingsResponse,
+  AISettingsUpdateRequest,
   Chat,
   ChatFilters,
   ChatsResponse,
@@ -18,6 +20,8 @@ import type {
   LoginRequest,
   Message,
   MessagesResponse,
+  PromoSettingsResponse,
+  PromoSettingsUpdateRequest,
   RegisterRequest,
   SyncNowResponse,
   User,
@@ -110,6 +114,11 @@ export const authApi = {
     });
     return response.data;
   },
+
+  seedDemo: async (): Promise<{ created: number; message: string }> => {
+    const response = await api.post<{ created: number; message: string }>('/auth/seed-demo');
+    return response.data;
+  },
 };
 
 // Chat API
@@ -170,6 +179,7 @@ export const chatApi = {
 export const interactionsApi = {
   getInteractions: async (filters?: InteractionFilters): Promise<InteractionListResponse> => {
     const params = new URLSearchParams();
+    params.append('include_total', String(filters?.include_total ?? false));
     if (filters?.channel) params.append('channel', filters.channel);
     if (filters?.status) params.append('status', filters.status);
     if (filters?.priority) params.append('priority', filters.priority);
@@ -315,6 +325,29 @@ export const interactionsApi = {
     const response = await api.get<InteractionPilotReadinessResponse>(
       `/interactions/metrics/pilot-readiness${suffix}`
     );
+    return response.data;
+  },
+};
+
+// Settings API
+export const settingsApi = {
+  getPromoSettings: async (): Promise<PromoSettingsResponse> => {
+    const response = await api.get<PromoSettingsResponse>('/settings/promo');
+    return response.data;
+  },
+
+  updatePromoSettings: async (payload: PromoSettingsUpdateRequest): Promise<PromoSettingsResponse> => {
+    const response = await api.put<PromoSettingsResponse>('/settings/promo', payload);
+    return response.data;
+  },
+
+  getAISettings: async (): Promise<AISettingsResponse> => {
+    const response = await api.get<AISettingsResponse>('/settings/ai');
+    return response.data;
+  },
+
+  updateAISettings: async (payload: AISettingsUpdateRequest): Promise<AISettingsResponse> => {
+    const response = await api.put<AISettingsResponse>('/settings/ai', payload);
     return response.data;
   },
 };

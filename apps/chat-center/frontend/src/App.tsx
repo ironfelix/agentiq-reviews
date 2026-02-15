@@ -90,11 +90,7 @@ function interactionToChat(interaction: Interaction): Chat {
   const customerName = getStringField(extra, 'user_name')
     || getStringField(extra, 'customer_name')
     || interaction.customer_id
-    || (interaction.channel === 'review'
-      ? 'Автор отзыва'
-      : interaction.channel === 'question'
-      ? 'Автор вопроса'
-      : 'Покупатель');
+    || 'Покупатель';
 
   const analysisJson = draftText
     ? JSON.stringify({
@@ -138,7 +134,21 @@ function interactionToChat(interaction: Interaction): Chat {
     })(),
     product_name: productName,
     product_article: interaction.product_article || interaction.nm_id,
-    chat_status: interaction.needs_response ? 'waiting' : 'responded',
+    chat_status: (() => {
+      if (interaction.status === 'closed') return 'closed';
+      // For chats: use backend-canonical chat_status from extra_data
+      const backendStatus = getStringField(extra, 'chat_status');
+      if (backendStatus && ['waiting', 'responded', 'client-replied', 'auto-response', 'closed'].includes(backendStatus)) {
+        return backendStatus;
+      }
+      // For reviews/questions: derive from reply presence
+      const hasReply = Boolean(getStringField(extra, 'last_reply_text'));
+      const isAutoResponse = Boolean(extra.is_auto_response);
+      if (isAutoResponse) return 'auto-response';
+      if (hasReply && !interaction.needs_response) return 'responded';
+      if (hasReply && interaction.needs_response) return 'client-replied';
+      return 'waiting';
+    })(),
     closed_at: interaction.status === 'closed' ? interaction.updated_at : null,
     source: interaction.source || null,
     created_at: interaction.created_at,
@@ -302,13 +312,30 @@ function App() {
   const [mobileView, setMobileView] = useState<'list' | 'chat' | 'context'>('list');
   const [activeChannel, setActiveChannelRaw] = useState<'all' | 'review' | 'question' | 'chat'>('all');
   const [interactionCache, setInteractionCache] = useState<Record<string, Interaction[]>>({});
+  // Progressive loading state
+  const [syncLoadedCount, setSyncLoadedCount] = useState(0);
+  const [syncAutoTransitioned, setSyncAutoTransitioned] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState<Record<string, {
+    total: number; loadedPages: number; isLoadingMore: boolean; allLoaded: boolean;
+  }>>({});
   const interactionCacheRef = useRef(interactionCache);
   interactionCacheRef.current = interactionCache;
   const interactions = interactionCache[activeChannel] || [];
   const handleChannelChange = useCallback((channel: 'all' | 'review' | 'question' | 'chat') => {
     setActiveChannelRaw(channel);
-    if (!interactionCacheRef.current[channel]?.length) {
-      setIsLoadingChats(true);
+    const hasCachedData = (interactionCacheRef.current[channel]?.length ?? 0) > 0;
+    if (!hasCachedData && channel !== 'all') {
+      // Pre-populate from 'all' cache by filtering client-side
+      const allCache = interactionCacheRef.current['all'] || [];
+      const filtered = allCache.filter(i => i.channel === channel);
+      if (filtered.length > 0) {
+        setInteractionCache(prev => ({ ...prev, [channel]: filtered }));
+        setIsLoadingChats(false);
+      } else {
+        setIsLoadingChats(true);
+      }
+    } else {
+      setIsLoadingChats(false);
     }
   }, []);
   const [qualityMetrics, setQualityMetrics] = useState<InteractionQualityMetricsResponse | null>(null);
@@ -481,19 +508,131 @@ function App() {
   const fetchInteractions = useCallback(async () => {
     const channelKey = filters.channel || 'all';
     try {
-      const response = await interactionsApi.getInteractions(buildInteractionFilters(filters));
-      setInteractionCache(prev => ({ ...prev, [channelKey]: response.interactions }));
+      // First page with total count for pagination
+      const paginatedFilters = {
+        ...buildInteractionFilters(filters),
+        page: 1,
+        page_size: 50,
+        include_total: true,
+      };
+      const response = await interactionsApi.getInteractions(paginatedFilters);
+
+      // Update cache: replace first page (newest items)
+      const prevItems = interactionCacheRef.current[channelKey];
+      const isSame = prevItems
+        && prevItems.length >= response.interactions.length
+        && response.interactions.every((item, i) =>
+          prevItems[i]
+          && item.id === prevItems[i].id
+          && item.updated_at === prevItems[i].updated_at
+          && item.needs_response === prevItems[i].needs_response
+        );
+      if (!isSame) {
+        // Merge: keep newer first-page items, keep already-loaded older pages
+        const firstPageIds = new Set(response.interactions.map(i => i.id));
+        const olderItems = (prevItems || []).filter(i => !firstPageIds.has(i.id));
+        setInteractionCache(prev => ({
+          ...prev,
+          [channelKey]: [...response.interactions, ...olderItems],
+        }));
+        // Also split into per-channel caches for instant folder switching
+        if (channelKey === 'all') {
+          const byChannel: Record<string, Interaction[]> = {};
+          for (const item of response.interactions) {
+            if (!byChannel[item.channel]) byChannel[item.channel] = [];
+            byChannel[item.channel].push(item);
+          }
+          setInteractionCache(prev => {
+            const next: Record<string, Interaction[]> = { ...prev, [channelKey]: [...response.interactions, ...olderItems] };
+            for (const [ch, items] of Object.entries(byChannel)) {
+              if (!next[ch] || next[ch].length <= items.length) {
+                next[ch] = items;
+              }
+            }
+            return next;
+          });
+        }
+      }
+
+      // Track pagination metadata
+      const total = response.total || response.interactions.length;
+      const allLoaded = response.interactions.length < 50;
+      const currentMeta = paginationMeta[channelKey];
+      setPaginationMeta(prev => ({
+        ...prev,
+        [channelKey]: {
+          total,
+          loadedPages: 1,
+          isLoadingMore: false,
+          allLoaded: allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total),
+        },
+      }));
+
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
-        setSelectedInteractionId(null);
-        setMessages([]);
-        setTimeline(null);
+        // Selected item might be on a later page — don't deselect
+        const allCached = interactionCacheRef.current[channelKey] || [];
+        if (!allCached.some(item => item.id === selectedInteractionId)) {
+          setSelectedInteractionId(null);
+          setMessages([]);
+          setTimeline(null);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch interactions:', error);
     } finally {
       setIsLoadingChats(false);
     }
-  }, [filters, selectedInteractionId]);
+  }, [filters, selectedInteractionId, paginationMeta]);
+
+  // Background pagination: auto-load next pages
+  const fetchNextPage = useCallback(async (channelKey: string) => {
+    const meta = paginationMeta[channelKey];
+    if (!meta || meta.allLoaded || meta.isLoadingMore) return;
+
+    const nextPage = meta.loadedPages + 1;
+    setPaginationMeta(prev => ({
+      ...prev,
+      [channelKey]: { ...meta, isLoadingMore: true },
+    }));
+
+    try {
+      const pageFilters: InteractionFilters = { page: nextPage, page_size: 50 };
+      if (channelKey !== 'all') pageFilters.channel = channelKey;
+      const response = await interactionsApi.getInteractions(pageFilters);
+
+      setInteractionCache(prev => {
+        const existing = prev[channelKey] || [];
+        const existingIds = new Set(existing.map(i => i.id));
+        const newItems = response.interactions.filter(i => !existingIds.has(i.id));
+        return { ...prev, [channelKey]: [...existing, ...newItems] };
+      });
+
+      const allLoaded = response.interactions.length < 50;
+      setPaginationMeta(prev => ({
+        ...prev,
+        [channelKey]: {
+          total: meta.total,
+          loadedPages: nextPage,
+          isLoadingMore: false,
+          allLoaded,
+        },
+      }));
+    } catch {
+      setPaginationMeta(prev => ({
+        ...prev,
+        [channelKey]: { ...meta, isLoadingMore: false },
+      }));
+    }
+  }, [paginationMeta]);
+
+  // Auto-trigger background loading of remaining pages
+  useEffect(() => {
+    const channelKey = filters.channel || 'all';
+    const meta = paginationMeta[channelKey];
+    if (!meta || meta.allLoaded || meta.isLoadingMore) return;
+    const timer = setTimeout(() => fetchNextPage(channelKey), 500);
+    return () => clearTimeout(timer);
+  }, [paginationMeta, filters.channel, fetchNextPage]);
 
   const fetchQualityMetrics = useCallback(async () => {
     try {
@@ -563,8 +702,24 @@ function App() {
   const fetchMessages = useCallback(async (interactionId: number) => {
     try {
       setIsLoadingMessages(true);
+
+      // Try to show messages from cache immediately while fetching fresh data
+      const cachedInteraction = Object.values(interactionCacheRef.current)
+        .flat()
+        .find((item) => item.id === interactionId);
+
+      if (cachedInteraction) {
+        // Show cached messages immediately to reduce perceived latency
+        if (cachedInteraction.channel !== 'chat') {
+          setMessages(buildMessagesFromInteraction(cachedInteraction));
+          setIsLoadingMessages(false);
+        }
+      }
+
+      // Fetch fresh interaction data in parallel with messages
       const interaction = await interactionsApi.getInteraction(interactionId);
       upsertInteraction(interaction);
+
       if (interaction.channel === 'chat') {
         const extra = asRecord(interaction.extra_data);
         const rawChatId = extra.chat_id;
@@ -605,14 +760,44 @@ function App() {
     }
   }, []);
 
-  // Poll for sync status updates when syncing
+  // Poll for sync status updates when syncing — also fetch interactions progressively
   useEffect(() => {
     if (!user || user.sync_status !== 'syncing') return;
 
     const pollInterval = setInterval(async () => {
       try {
+        // 1. Poll user status
         const updatedUser = await authApi.getMe();
         setUser(updatedUser);
+
+        // 2. Poll interactions (first page + total) to show progress during sync
+        try {
+          const response = await interactionsApi.getInteractions({
+            page_size: 50,
+            include_total: true,
+          });
+          setSyncLoadedCount(response.total || response.interactions.length);
+          if (response.interactions.length > 0) {
+            setInteractionCache(prev => {
+              const existing = prev['all'] || [];
+              if (existing.length < response.interactions.length) {
+                return { ...prev, all: response.interactions };
+              }
+              return prev;
+            });
+          }
+          // Auto-transition to chat center at 50+ items
+          if ((response.total || response.interactions.length) >= 50 && !syncAutoTransitioned) {
+            setSyncAutoTransitioned(true);
+            setDismissedSyncOnboarding(true);
+            setActiveWorkspace('messages');
+            setIsLoadingChats(false);
+          }
+        } catch {
+          // Interactions not ready yet — that's ok during sync
+        }
+
+        // 3. When sync completes, do full refresh
         if (updatedUser.sync_status !== 'syncing') {
           clearInterval(pollInterval);
           fetchInteractions();
@@ -627,7 +812,7 @@ function App() {
     }, 3000);
 
     return () => clearInterval(pollInterval);
-  }, [user?.sync_status, fetchInteractions, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
+  }, [user?.sync_status, syncAutoTransitioned, fetchInteractions, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
 
   const handleSelectChat = useCallback(async (chat: Chat) => {
     setSelectedInteractionId(chat.id);
@@ -695,6 +880,14 @@ function App() {
 
   const handleBackToList = useCallback(() => {
     setMobileView('list');
+  }, []);
+
+  const handleOpenContext = useCallback(() => {
+    setMobileView('context');
+  }, []);
+
+  const handleBackFromContext = useCallback(() => {
+    setMobileView('chat');
   }, []);
 
   const handleRegenerateAI = useCallback(async (interactionId: number) => {
@@ -767,23 +960,31 @@ function App() {
     });
   }, [selectedInteractionId]);
 
-  // Fetch interactions when user changes
+  // Fetch interactions and essential metrics when user changes
   useEffect(() => {
     if (user) {
       fetchInteractions();
       fetchQualityMetrics();
+    }
+  }, [user]);
+
+  // Fetch analytics data only when analytics tab is active
+  const isAnalyticsActive = activeWorkspace === 'analytics';
+  useEffect(() => {
+    if (user && isAnalyticsActive) {
       fetchQualityHistory();
       fetchOpsAlerts();
       fetchPilotReadiness();
     }
-  }, [user]);
+  }, [user, isAnalyticsActive]);
 
-  // Poll unified interactions
+  // Poll unified interactions (essential — always active)
   usePolling(fetchInteractions, 10000, !!user);
-  usePolling(fetchQualityMetrics, 15000, !!user);
-  usePolling(fetchQualityHistory, 30000, !!user);
-  usePolling(fetchOpsAlerts, 30000, !!user);
-  usePolling(fetchPilotReadiness, 30000, !!user);
+  usePolling(fetchQualityMetrics, 30000, !!user);
+  // Poll analytics data only when analytics tab is active
+  usePolling(fetchQualityHistory, 60000, !!user && isAnalyticsActive);
+  usePolling(fetchOpsAlerts, 60000, !!user && isAnalyticsActive);
+  usePolling(fetchPilotReadiness, 60000, !!user && isAnalyticsActive);
 
   const formatLastMessage = (dateString: string | null) => {
     if (!dateString) return '—';
@@ -847,10 +1048,10 @@ function App() {
         user={user}
         isConnecting={isConnecting}
         isRetryingSync={isRetryingSync}
+        loadedCount={syncLoadedCount}
         onConnectMarketplace={handleConnectMarketplace}
         onRetrySync={handleRetrySync}
         onSkip={() => {
-          // When already connected, "skip" means "continue without waiting" (CJM-safe).
           setDismissedSyncOnboarding(true);
           setActiveWorkspace('messages');
         }}
@@ -1300,6 +1501,12 @@ function App() {
                 isRetryingSync={isRetryingSync}
                 isConnectionSkipped={connectionSkipped}
                 onOpenConnectOnboarding={handleResumeConnection}
+                loadingProgress={(() => {
+                  const meta = paginationMeta[activeChannel];
+                  if (!meta || meta.allLoaded) return null;
+                  const loaded = (interactionCache[activeChannel] || []).length;
+                  return { loaded, total: meta.total };
+                })()}
               />
 
               <ChatWindow
@@ -1308,12 +1515,19 @@ function App() {
                 onSendMessage={handleSendMessage}
                 isLoadingMessages={isLoadingMessages}
                 onBack={handleBackToList}
+                onOpenContext={handleOpenContext}
                 onRegenerateAI={handleRegenerateAI}
                 showLifecycleActions={false}
               />
 
               <aside className="product-context">
                 <div className="context-header">
+                  <button className="context-back-btn" onClick={handleBackFromContext}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    Назад к чату
+                  </button>
                   <div className="context-title">Контекст менеджера</div>
                   {selectedChat ? (
                     <>

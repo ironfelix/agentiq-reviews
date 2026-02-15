@@ -22,6 +22,7 @@ export interface Chat {
   product_article: string | null;
   chat_status: string | null;
   closed_at: string | null;
+  source: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -82,6 +83,54 @@ export interface SyncNowResponse {
   queued_scopes: string[];
   message: string;
 }
+
+// Settings types
+export type PromoChannels = {
+  chat_positive: boolean;
+  chat_negative: boolean;
+  chat_questions: boolean;
+  reviews_positive: boolean;
+  reviews_negative: boolean;
+};
+
+export type PromoCode = {
+  id: string;
+  code: string;
+  discount_label: string;
+  expires_label: string;
+  scope_label: string;
+  sent_count: number;
+  active: boolean;
+  channels: PromoChannels;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PromoConfig = {
+  ai_offer_enabled: boolean;
+  warn_reviews_enabled: boolean;
+};
+
+export type PromoSettingsResponse = {
+  promo_codes: PromoCode[];
+  config: PromoConfig;
+};
+
+export type PromoSettingsUpdateRequest = Partial<PromoSettingsResponse>;
+
+export type AITone = 'formal' | 'friendly' | 'neutral';
+
+export type AISettings = {
+  tone: AITone;
+  auto_replies_positive: boolean;
+  ai_suggestions: boolean;
+};
+
+export type AISettingsResponse = {
+  settings: AISettings;
+};
+
+export type AISettingsUpdateRequest = AISettingsResponse;
 
 // Message Types (matching backend MessageResponse)
 export interface Message {
@@ -310,6 +359,7 @@ export interface InteractionFilters {
   search?: string;
   page?: number;
   page_size?: number;
+  include_total?: boolean;
 }
 
 // AI Suggestion type (used by AIPanel)

@@ -55,11 +55,11 @@ const FOLDERS: { id: Channel; label: string; icon: ReactNode }[] = [
 function getBadgeCount(
   channel: Channel,
   pipeline: InteractionQualityMetricsResponse['pipeline'] | null | undefined,
-): number {
-  if (!pipeline) return 0;
-  if (channel === 'all') return pipeline.needs_response_total;
+): { needs: number; total: number } {
+  if (!pipeline) return { needs: 0, total: 0 };
+  if (channel === 'all') return { needs: pipeline.needs_response_total, total: pipeline.interactions_total };
   const item = pipeline.by_channel.find((ch) => ch.channel === channel);
-  return item ? item.needs_response_total : 0;
+  return item ? { needs: item.needs_response_total, total: item.interactions_total } : { needs: 0, total: 0 };
 }
 
 export function FolderStrip({ activeChannel, onChannelChange, pipeline, variant = 'desktop' }: FolderStripProps) {
@@ -82,8 +82,9 @@ export function FolderStrip({ activeChannel, onChannelChange, pipeline, variant 
     <nav className={`folder-strip ${variant}`}>
       {variant === 'desktop' && <div ref={spacerRef} className="folder-spacer" />}
       {FOLDERS.map((folder) => {
-        const badge = getBadgeCount(folder.id, pipeline);
+        const { needs, total } = getBadgeCount(folder.id, pipeline);
         const isActive = activeChannel === folder.id;
+        const badgeValue = needs > 0 ? needs : total;
         return (
           <button
             key={folder.id}
@@ -94,8 +95,10 @@ export function FolderStrip({ activeChannel, onChannelChange, pipeline, variant 
           >
             <div className="folder-icon">{folder.icon}</div>
             <span className="folder-label">{folder.label}</span>
-            {badge > 0 && (
-              <span className="folder-badge">{badge > 99 ? '99+' : badge}</span>
+            {badgeValue > 0 && (
+              <span className={`folder-badge${needs === 0 ? ' folder-badge-total' : ''}`}>
+                {badgeValue > 99 ? '99+' : badgeValue}
+              </span>
             )}
           </button>
         );
