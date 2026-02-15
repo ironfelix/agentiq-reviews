@@ -1,0 +1,208 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd apps/chat-center/backend
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: |
+          cd apps/chat-center/backend
+          pytest tests/ -v --tb=short
+        continue-on-error: false
+
+  deploy:
+    name: Deploy to Staging
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy backend to staging
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🚀 Deploying backend to staging..."
+
+            cd /opt/agentiq-staging
+            git pull origin main
+
+            # Activate venv and install deps
+            source venv/bin/activate
+            cd backend
+            pip install -r requirements.txt
+
+            # Run migrations (если используешь Alembic)
+            # alembic upgrade head
+
+            # Restart backend
+            sudo systemctl restart agentiq-staging
+
+            # Restart Celery
+            sudo systemctl restart agentiq-staging-celery
+
+            echo "✅ Backend deployed"
+
+      - name: Deploy frontend to staging
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🚀 Deploying frontend to staging..."
+
+            cd /opt/agentiq-staging/frontend
+
+            # Install deps and build
+            npm install
+            npm run build
+
+            # Copy to nginx directory
+            sudo rm -rf /var/www/staging/*
+            sudo cp -r dist/* /var/www/staging/
+            sudo chown -R www-data:www-data /var/www/staging
+
+            echo "✅ Frontend deployed"
+
+      - name: Wait for services to start
+        run: sleep 10
+
+      - name: Smoke test backend
+        run: |
+          echo "🧪 Running smoke tests..."
+
+          # Health check
+          HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://staging.agentiq.ru/api/health)
+
+          if [ "$HEALTH_RESPONSE" != "200" ]; then
+            echo "❌ Health check failed (HTTP $HEALTH_RESPONSE)"
+            exit 1
+          fi
+
+          echo "✅ Health check passed"
+
+      - name: Smoke test frontend
+        run: |
+          # Check if frontend loads
+          FRONTEND_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://staging.agentiq.ru/)
+
+          if [ "$FRONTEND_RESPONSE" != "200" ]; then
+            echo "❌ Frontend check failed (HTTP $FRONTEND_RESPONSE)"
+            exit 1
+          fi
+
+          echo "✅ Frontend check passed"
+
+      - name: Notify on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commit = context.payload.head_commit;
+            const message = `✅ **Staging Deploy Successful**
+
+            **Commit:** ${commit.message}
+            **Author:** ${commit.author.name}
+            **SHA:** \`${commit.id.substring(0, 7)}\`
+
+            🔗 https://staging.agentiq.ru
+
+            Ready for QA testing.`;
+
+            // Post to latest PR (if any)
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 1
+            });
+
+            if (prs.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prs.data[0].number,
+                body: message
+              });
+            }
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "❌ Deploy failed. Rolling back..."
+
+            cd /opt/agentiq-staging
+
+            # Rollback to previous commit
+            git reset --hard HEAD~1
+
+            # Restart services
+            sudo systemctl restart agentiq-staging
+            sudo systemctl restart agentiq-staging-celery
+
+            echo "✅ Rolled back to previous version"
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commit = context.payload.head_commit;
+            const message = `❌ **Staging Deploy Failed**
+
+            **Commit:** ${commit.message}
+            **SHA:** \`${commit.id.substring(0, 7)}\`
+
+            Deployment failed and has been rolled back.
+            Check [workflow logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
+
+            // Post to latest PR
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 1
+            });
+
+            if (prs.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prs.data[0].number,
+                body: message
+              });
+            }

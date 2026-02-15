@@ -1,0 +1,256 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm production deployment'
+        required: true
+        default: ''
+
+jobs:
+  validate:
+    name: Validate Deployment Request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "deploy" ]; then
+            echo "❌ Deployment not confirmed. You must type 'deploy' to proceed."
+            exit 1
+          fi
+          echo "✅ Deployment confirmed"
+
+  backup:
+    name: Backup Production Database
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create database backup
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "📦 Creating database backup..."
+
+            BACKUP_DIR="/opt/backups"
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            BACKUP_FILE="$BACKUP_DIR/agentiq_chat_$TIMESTAMP.sql"
+
+            mkdir -p $BACKUP_DIR
+
+            # Dump database
+            sudo -u postgres pg_dump agentiq_chat > $BACKUP_FILE
+
+            # Compress
+            gzip $BACKUP_FILE
+
+            echo "✅ Backup created: ${BACKUP_FILE}.gz"
+
+            # Keep only last 7 backups
+            cd $BACKUP_DIR
+            ls -t agentiq_chat_*.sql.gz | tail -n +8 | xargs -r rm
+
+            echo "✅ Old backups cleaned"
+
+  deploy:
+    name: Deploy to Production
+    needs: backup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy backend to production
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🚀 Deploying backend to production..."
+
+            cd /opt/agentiq
+            git pull origin main
+
+            # Activate venv and install deps
+            source venv/bin/activate
+            cd backend
+            pip install -r requirements.txt
+
+            # Run migrations (если используешь Alembic)
+            # alembic upgrade head
+
+            # Restart backend
+            sudo systemctl restart agentiq-chat
+
+            # Restart Celery worker and beat
+            sudo systemctl restart agentiq-celery
+            sudo systemctl restart agentiq-celery-beat
+
+            echo "✅ Backend deployed"
+
+      - name: Deploy frontend to production
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🚀 Deploying frontend to production..."
+
+            cd /opt/agentiq/frontend
+
+            # Install deps and build
+            npm install
+            npm run build
+
+            # Backup current frontend
+            if [ -d "/var/www/agentiq.backup" ]; then
+              sudo rm -rf /var/www/agentiq.backup
+            fi
+            sudo cp -r /var/www/agentiq /var/www/agentiq.backup
+
+            # Deploy new frontend
+            sudo rm -rf /var/www/agentiq/*
+            sudo cp -r dist/* /var/www/agentiq/
+            sudo chown -R www-data:www-data /var/www/agentiq
+
+            echo "✅ Frontend deployed"
+
+      - name: Wait for services to start
+        run: sleep 15
+
+      - name: Smoke test production
+        run: |
+          echo "🧪 Running production smoke tests..."
+
+          # Health check
+          HEALTH_RESPONSE=$(curl -s https://agentiq.ru/api/health)
+          HEALTH_STATUS=$(echo $HEALTH_RESPONSE | jq -r '.status' 2>/dev/null || echo "error")
+
+          if [ "$HEALTH_STATUS" != "ok" ]; then
+            echo "❌ Health check failed: $HEALTH_RESPONSE"
+            exit 1
+          fi
+
+          echo "✅ Backend health check passed"
+
+          # Frontend check
+          FRONTEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://agentiq.ru/)
+
+          if [ "$FRONTEND_CODE" != "200" ]; then
+            echo "❌ Frontend check failed (HTTP $FRONTEND_CODE)"
+            exit 1
+          fi
+
+          echo "✅ Frontend check passed"
+
+          # Critical endpoints
+          LOGIN_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://agentiq.ru/api/auth/login -X POST -H "Content-Type: application/json" -d '{}')
+
+          if [ "$LOGIN_CODE" != "422" ] && [ "$LOGIN_CODE" != "400" ]; then
+            # 422/400 expected for empty payload, anything else is bad
+            echo "❌ Login endpoint check failed (HTTP $LOGIN_CODE)"
+            exit 1
+          fi
+
+          echo "✅ Login endpoint check passed"
+          echo "✅ All smoke tests passed"
+
+      - name: Notify on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commit = await github.rest.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'main'
+            });
+
+            const message = `✅ **Production Deploy Successful**
+
+            **Commit:** ${commit.data.commit.message.split('\n')[0]}
+            **Author:** ${commit.data.commit.author.name}
+            **SHA:** \`${commit.data.sha.substring(0, 7)}\`
+            **Deployed by:** @${context.actor}
+
+            🔗 https://agentiq.ru
+
+            All smoke tests passed. Production is live.`;
+
+            // Create deployment issue comment or discussion
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Production Deploy - ${new Date().toISOString().split('T')[0]}`,
+              body: message,
+              labels: ['deployment', 'production']
+            });
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "❌ Smoke tests failed. Rolling back production..."
+
+            # Rollback backend
+            cd /opt/agentiq
+            git reset --hard HEAD~1
+            source venv/bin/activate
+            cd backend
+            pip install -r requirements.txt
+            sudo systemctl restart agentiq-chat
+            sudo systemctl restart agentiq-celery
+            sudo systemctl restart agentiq-celery-beat
+
+            # Rollback frontend
+            if [ -d "/var/www/agentiq.backup" ]; then
+              sudo rm -rf /var/www/agentiq/*
+              sudo cp -r /var/www/agentiq.backup/* /var/www/agentiq/
+              sudo chown -R www-data:www-data /var/www/agentiq
+            fi
+
+            echo "✅ Rollback completed"
+
+            # Verify rollback
+            sleep 10
+            curl -f https://agentiq.ru/api/health || echo "⚠️ Health check still failing after rollback"
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `❌ **Production Deploy Failed**
+
+            Deployment failed and has been **rolled back** to the previous version.
+
+            **Deployed by:** @${context.actor}
+            **Workflow:** [View logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+
+            **Action Required:**
+            1. Check workflow logs for error details
+            2. Fix issues on staging first
+            3. Re-run QA checklist
+            4. Try deploying again
+
+            Production is now running the previous stable version.`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Production Deploy Failed - ${new Date().toISOString().split('T')[0]}`,
+              body: message,
+              labels: ['deployment', 'production', 'failed']
+            });

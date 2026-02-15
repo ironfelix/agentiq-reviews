@@ -1,0 +1,21 @@
+# Locust generated reports
+load-test-report.html
+load-test-results*.csv
+*.log
+
+# Environment files with credentials
+.env.loadtest
+.env.local
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

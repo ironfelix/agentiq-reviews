@@ -1,0 +1,32 @@
+name: WB API Contract Check
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 03:00 UTC
+  workflow_dispatch:      # Manual trigger from GitHub UI
+
+jobs:
+  contract-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install httpx
+
+      - name: Run offline contract validation
+        run: python scripts/check_wb_contract.py --mode offline
+
+      # Online check runs only if WB_API_TOKEN secret is configured
+      - name: Run online contract validation
+        if: ${{ env.WB_API_TOKEN != '' }}
+        env:
+          WB_API_TOKEN: ${{ secrets.WB_API_TOKEN }}
+        run: python scripts/check_wb_contract.py --mode online --token "$WB_API_TOKEN"

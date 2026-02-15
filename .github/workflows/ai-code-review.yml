@@ -1,0 +1,89 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history для diff
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install anthropic openai PyGithub
+
+      - name: Get PR diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+          echo "Diff size: $(wc -l pr.diff | awk '{print $1}') lines"
+
+      - name: Detect code author
+        id: author
+        run: |
+          # Проверяем последний коммит на Co-Authored-By
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+
+          if echo "$COMMIT_MSG" | grep -q "Co-Authored-By: Claude"; then
+            AUTHOR="Claude"
+          elif echo "$COMMIT_MSG" | grep -q "Co-Authored-By: OpenAI o1"; then
+            AUTHOR="OpenAI"
+          elif echo "$COMMIT_MSG" | grep -q "Co-Authored-By: OpenAI gpt-4o"; then
+            AUTHOR="OpenAI"
+          else
+            AUTHOR="Human"
+          fi
+
+          echo "Detected code author: $AUTHOR"
+          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+
+      - name: Check if diff is too large
+        id: check-size
+        run: |
+          DIFF_LINES=$(wc -l < pr.diff)
+          if [ $DIFF_LINES -gt 2000 ]; then
+            echo "⚠️ Diff is very large ($DIFF_LINES lines). AI review may be incomplete."
+            echo "too_large=true" >> $GITHUB_OUTPUT
+          else
+            echo "too_large=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run AI Code Review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          DUAL_FLAG=""
+          if [ "${{ steps.author.outputs.author }}" = "Human" ]; then
+            DUAL_FLAG="--dual"
+          fi
+
+          python scripts/ai_code_review.py \
+            --diff pr.diff \
+            --author "${{ steps.author.outputs.author }}" \
+            --pr-number ${{ github.event.pull_request.number }} \
+            $DUAL_FLAG
+
+      - name: Warning for large diffs
+        if: steps.check-size.outputs.too_large == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Large PR Warning**: This PR has >2000 lines changed. AI review may miss some issues. Consider splitting into smaller PRs.'
+            })
