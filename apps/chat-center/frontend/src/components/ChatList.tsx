@@ -641,16 +641,11 @@ export function ChatList({
               </div>
             )}
 
-            {/* Apple Mail–style progress indicator */}
+            {/* Apple Mail–style sync banner at bottom */}
             {loadingProgress && loadingProgress.loaded < loadingProgress.total && (
-              <div className="load-progress-bar">
-                <div
-                  className="load-progress-fill"
-                  style={{ width: `${Math.round((loadingProgress.loaded / loadingProgress.total) * 100)}%` }}
-                />
-                <span className="load-progress-text">
-                  Загружено {loadingProgress.loaded} из {loadingProgress.total}
-                </span>
+              <div className="chat-list-sync-banner">
+                <div className="chat-list-sync-spinner"></div>
+                <span>Загрузка... {loadingProgress.loaded} из ~{loadingProgress.total} чатов</span>
               </div>
             )}
           </>

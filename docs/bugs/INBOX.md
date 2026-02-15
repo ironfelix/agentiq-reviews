@@ -66,6 +66,7 @@ Status: ACTIVE (triage queue)
 | 40 | BUG | ✅ FIXED — dot colors: 4849 answered reviews без last_reply_text → fallback на needs_response |
 | 41 | DATA | ✅ FIXED — 4 sellers синкали один WB кабинет. Оставлен seller 17 (ivan2), деактивированы 3/12/18 |
 | 42 | FEAT | ✅ DONE — Settings page включена в sidebar + mobile nav, Dashboard placeholder |
+| 43 | PERF | ✅ FIXED — Progressive loading: sessionStorage cache (30-min TTL), instant restore без спиннера, background pagination 300ms, Apple Mail sync banner |
 
 ---
 
