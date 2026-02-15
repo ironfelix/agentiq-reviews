@@ -6,6 +6,7 @@ python-multipart==0.0.6
 # Database
 sqlalchemy==2.0.25
 asyncpg==0.29.0
+aiosqlite==0.20.0
 alembic==1.13.1
 
 # Redis and Celery (for background tasks)
@@ -25,6 +26,10 @@ cryptography==42.0.0
 
 # Utilities
 python-dateutil==2.8.2
+
+# Observability
+prometheus-client==0.20.0
+sentry-sdk[fastapi]==2.22.0
 
 # Development
 pytest==7.4.4

@@ -1,7 +1,7 @@
 """Interaction schemas for API validation."""
 
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -25,6 +25,7 @@ class InteractionResponse(BaseModel):
     priority: str = Field(..., description="Priority level")
     needs_response: bool = Field(..., description="Whether operator response is required")
     source: str = Field(..., description="Data source (wb_api/wbcon_fallback)")
+    is_auto_response: bool = Field(False, description="Whether this was auto-responded by the system")
     occurred_at: Optional[datetime] = Field(None, description="When customer event happened")
     created_at: datetime
     updated_at: datetime
@@ -84,6 +85,10 @@ class InteractionDraftResponse(BaseModel):
     sla_priority: Optional[str] = None
     recommendation_reason: Optional[str] = None
     source: str = Field(..., description="draft source: llm/fallback/cached")
+    guardrail_warnings: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Guardrail warnings detected in the draft text",
+    )
 
 
 class InteractionQualityTotals(BaseModel):
@@ -213,6 +218,7 @@ class InteractionOpsAlertsResponse(BaseModel):
     generated_at: datetime
     question_sla: Dict[str, Any]
     quality_regression: Dict[str, Any]
+    sync_health: Optional[Dict[str, Any]] = None
     alerts: list[InteractionOpsAlert]
 
 

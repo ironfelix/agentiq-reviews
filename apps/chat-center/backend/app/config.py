@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: Optional[str] = None
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com/v1"
 
+    # LLM-based question intent classification (fallback when rule-based returns general_question)
+    ENABLE_LLM_INTENT: bool = False
+
+    # WB API Rate Limiting
+    WB_RATE_LIMIT_RPM: int = 30  # Max requests per minute per seller (WB typical limit)
+
     # App config
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
@@ -34,6 +40,11 @@ class Settings(BaseSettings):
     # Celery
     CELERY_BROKER_URL: Optional[str] = None
     CELERY_RESULT_BACKEND: Optional[str] = None
+
+    # Sentry Error Tracking (optional)
+    SENTRY_DSN: str = ""  # Empty string = disabled
+    SENTRY_ENVIRONMENT: str = "production"
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
 
     class Config:
         env_file = ".env"

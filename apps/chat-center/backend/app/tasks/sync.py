@@ -1315,6 +1315,159 @@ def analyze_chat_with_ai(self, chat_id: int):
         raise self.retry(exc=e, countdown=2 ** self.request.retries * 5)
 
 
+@celery_app.task(
+    name="app.tasks.sync.process_auto_responses",
+    bind=True,
+    max_retries=1,
+    default_retry_delay=30,
+)
+def process_auto_responses(self):
+    """
+    Periodic task: Process auto-responses for eligible interactions.
+
+    Runs every 3 minutes via Celery Beat.
+    Finds new review/question interactions with:
+    - status='open', needs_response=True, is_auto_response=False
+    - rating >= 4 (safety guard)
+    - channel in ('review', 'question')
+    For each, runs the auto-response pipeline.
+    """
+    logger.info("Looking for interactions eligible for auto-response")
+
+    async def _process():
+        from app.services.auto_response import process_auto_response
+        from app.services.sla_config import get_sla_config
+        from app.services.interaction_drafts import generate_interaction_draft
+        from app.services.ai_analyzer import AIAnalyzer
+        from app.services.llm_runtime import get_llm_runtime_config
+
+        async with AsyncSessionLocal() as db:
+            # Find sellers with auto_response_enabled
+            # We check all active sellers, then verify their config
+            result = await db.execute(
+                select(Seller).where(
+                    and_(
+                        Seller.is_active == True,
+                        Seller.api_key_encrypted != None,
+                    )
+                )
+            )
+            sellers = result.scalars().all()
+
+            if not sellers:
+                logger.debug("No active sellers with credentials for auto-response")
+                return
+
+            total_processed = 0
+            total_sent = 0
+
+            for seller in sellers:
+                try:
+                    sla_config = await get_sla_config(db, seller.id)
+                    if not sla_config.get("auto_response_enabled", False):
+                        continue
+
+                    allowed_intents = sla_config.get("auto_response_intents", [])
+                    if not allowed_intents:
+                        continue
+
+                    # Find eligible interactions for this seller
+                    from app.models.interaction import Interaction as InteractionModel
+                    interactions_result = await db.execute(
+                        select(InteractionModel).where(
+                            and_(
+                                InteractionModel.seller_id == seller.id,
+                                InteractionModel.status == "open",
+                                InteractionModel.needs_response == True,
+                                InteractionModel.is_auto_response == False,
+                                InteractionModel.rating >= 4,
+                                InteractionModel.channel.in_(["review", "question"]),
+                            )
+                        ).limit(10)  # Process max 10 per seller per cycle
+                    )
+                    interactions = interactions_result.scalars().all()
+
+                    if not interactions:
+                        continue
+
+                    logger.info(
+                        "auto_response: found %d eligible interactions for seller=%s",
+                        len(interactions), seller.id,
+                    )
+
+                    # Analyze each interaction and attempt auto-response
+                    llm_runtime = await get_llm_runtime_config(db)
+                    analyzer = AIAnalyzer(
+                        provider=llm_runtime.provider,
+                        model_name=llm_runtime.model_name,
+                        enabled=llm_runtime.enabled,
+                    )
+
+                    for interaction in interactions:
+                        total_processed += 1
+                        try:
+                            # Quick intent classification
+                            message_text = interaction.text or interaction.subject or ""
+                            messages = [
+                                {
+                                    "text": message_text,
+                                    "author_type": "buyer",
+                                    "created_at": interaction.occurred_at or datetime.now(timezone.utc),
+                                }
+                            ]
+                            customer_name = None
+                            if isinstance(interaction.extra_data, dict):
+                                customer_name = interaction.extra_data.get("user_name")
+
+                            analysis = await analyzer.analyze_chat(
+                                messages=messages,
+                                product_name=interaction.subject or "Товар",
+                                customer_name=customer_name,
+                                channel=interaction.channel or "review",
+                                rating=interaction.rating,
+                                sla_config=sla_config,
+                            )
+
+                            if not analysis:
+                                continue
+
+                            sent = await process_auto_response(
+                                db=db,
+                                interaction=interaction,
+                                ai_result=analysis,
+                                seller=seller,
+                            )
+                            if sent:
+                                total_sent += 1
+
+                        except Exception as exc:
+                            logger.warning(
+                                "auto_response: error processing interaction=%s seller=%s: %s",
+                                interaction.id, seller.id, exc,
+                            )
+                            continue
+
+                except Exception as exc:
+                    logger.warning(
+                        "auto_response: error processing seller=%s: %s",
+                        seller.id, exc,
+                    )
+                    continue
+
+            if total_processed > 0:
+                logger.info(
+                    "auto_response: processed=%d sent=%d",
+                    total_processed, total_sent,
+                )
+
+    try:
+        run_async(_process())
+    except Exception as e:
+        logger.error(f"Error in process_auto_responses: {e}")
+        if self.request.retries < 1:
+            raise self.retry(exc=e, countdown=30)
+
+
 @celery_app.task(name="app.tasks.sync.analyze_pending_chats")
 def analyze_pending_chats():
     """

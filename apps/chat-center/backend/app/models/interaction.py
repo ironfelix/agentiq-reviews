@@ -48,6 +48,9 @@ class Interaction(Base):
     needs_response = Column(Boolean, nullable=False, default=True)
     source = Column(String(50), nullable=False, default="wb_api")  # wb_api | wbcon_fallback
 
+    # Auto-response tracking
+    is_auto_response = Column(Boolean, default=False, server_default="false", nullable=False)
+
     # Event timeline
     occurred_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -72,6 +75,12 @@ class Interaction(Base):
         Index("idx_interactions_priority", "seller_id", "priority", "needs_response"),
         Index("idx_interactions_occurred", "seller_id", "occurred_at"),
         Index("idx_interactions_source", "seller_id", "source"),
+        # Performance indexes (migration 0002)
+        Index("idx_interactions_list_main", "seller_id", occurred_at.desc(), "needs_response"),
+        Index("idx_interactions_linking_nm", "seller_id", "marketplace", "nm_id"),
+        Index("idx_interactions_linking_customer", "seller_id", "marketplace", "customer_id"),
+        Index("idx_interactions_linking_order", "seller_id", "marketplace", "order_id"),
+        Index("idx_interactions_needs_response", "seller_id", "needs_response", occurred_at.desc()),
     )
 
     def __repr__(self):

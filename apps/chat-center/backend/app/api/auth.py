@@ -22,6 +22,7 @@ from app.schemas.auth import (
     SyncNowResponse,
 )
 from app.services.encryption import encrypt_credentials
+from app.services.demo_data import seed_demo_interactions
 from app.services.interaction_ingest import (
     ingest_chat_interactions,
     ingest_wb_questions_to_interactions,
@@ -76,7 +77,7 @@ async def _run_direct_wb_sync(
 
     if include_interactions:
         try:
-            reviews_stats = await ingest_wb_reviews_to_interactions(
+            reviews_result = await ingest_wb_reviews_to_interactions(
                 db=db,
                 seller_id=seller.id,
                 marketplace=seller.marketplace or "wildberries",
@@ -84,6 +85,7 @@ async def _run_direct_wb_sync(
                 max_items=200,
                 page_size=100,
             )
+            reviews_stats = reviews_result.as_dict()
             scopes.append("reviews_direct")
             logger.info("Direct WB reviews sync seller=%s stats=%s", seller.id, reviews_stats)
         except Exception as exc:
@@ -91,7 +93,7 @@ async def _run_direct_wb_sync(
             logger.exception("Direct reviews sync failed for seller=%s", seller.id)
 
         try:
-            questions_stats = await ingest_wb_questions_to_interactions(
+            questions_result = await ingest_wb_questions_to_interactions(
                 db=db,
                 seller_id=seller.id,
                 marketplace=seller.marketplace or "wildberries",
@@ -99,6 +101,7 @@ async def _run_direct_wb_sync(
                 max_items=200,
                 page_size=100,
             )
+            questions_stats = questions_result.as_dict()
             scopes.append("questions_direct")
             logger.info("Direct WB questions sync seller=%s stats=%s", seller.id, questions_stats)
         except Exception as exc:
@@ -172,6 +175,10 @@ async def register(
             marketplace=seller.marketplace,
             is_active=seller.is_active,
             is_verified=seller.is_verified,
+            has_api_credentials=bool(seller.api_key_encrypted),
+            sync_status=seller.sync_status,
+            sync_error=seller.sync_error,
+            last_sync_at=seller.last_sync_at,
             created_at=seller.created_at,
         )
     )
@@ -238,6 +245,10 @@ async def login(
             marketplace=seller.marketplace,
             is_active=seller.is_active,
             is_verified=seller.is_verified,
+            has_api_credentials=bool(seller.api_key_encrypted),
+            sync_status=seller.sync_status,
+            sync_error=seller.sync_error,
+            last_sync_at=seller.last_sync_at,
             created_at=seller.created_at,
         )
     )
@@ -474,3 +485,27 @@ async def logout(
     # - Add token to a blacklist (Redis)
     # - Rotate refresh tokens
     # For now, just log the action
+
+
+@router.post("/seed-demo")
+async def seed_demo(
+    seller: Seller = Depends(get_current_seller),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Seed demo interactions for the current seller.
+
+    Called when user clicks "Пропустить подключение" during onboarding.
+    Creates realistic demo interactions (reviews, questions, chats) so the
+    inbox looks alive. Idempotent — skips if demo data already exists.
+    """
+    try:
+        result = await seed_demo_interactions(db=db, seller_id=seller.id)
+    except Exception as exc:
+        logger.exception("Failed to seed demo data for seller=%s", seller.id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to seed demo data: {exc}",
+        ) from exc
+
+    return result

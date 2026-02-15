@@ -42,6 +42,10 @@ class SellerAuthInfo(BaseModel):
     marketplace: str
     is_active: bool
     is_verified: bool
+    has_api_credentials: bool = False
+    sync_status: Optional[str] = None
+    sync_error: Optional[str] = None
+    last_sync_at: Optional[datetime] = None
     created_at: datetime
 
     class Config:

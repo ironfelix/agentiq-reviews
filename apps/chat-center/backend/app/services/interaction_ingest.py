@@ -14,6 +14,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.settings import get_seller_setting
 from app.models.chat import Chat
 from app.models.interaction import Interaction
+from app.services.customer_profile_service import (
+    get_or_create_profile,
+    update_profile_from_interaction,
+)
 from app.services.interaction_linking import refresh_link_candidates_for_interactions
 from app.services.rate_limiter import get_rate_limiter
 from app.services.wb_connector import get_wb_connector_for_seller
@@ -215,6 +219,64 @@ def _priority_for_question_with_intent(
     return base_priority, intent, sla_minutes
 
 
+async def _update_customer_profiles_for_new_interactions(
+    db: AsyncSession,
+    seller_id: int,
+    marketplace: str,
+    new_interaction_ids: set,
+) -> None:
+    """Update customer profiles for newly created interactions.
+
+    Looks up each interaction by ID, and if it has a customer_id, ensures
+    a profile exists and updates its aggregates. Errors are logged but
+    do not propagate (graceful degradation).
+
+    Args:
+        db: Async database session
+        seller_id: Seller ID
+        marketplace: Marketplace name
+        new_interaction_ids: Set of Interaction IDs that were newly created
+    """
+    if not new_interaction_ids:
+        return
+
+    try:
+        result = await db.execute(
+            select(Interaction).where(
+                Interaction.id.in_(new_interaction_ids),
+                Interaction.customer_id != None,
+            )
+        )
+        interactions = result.scalars().all()
+
+        for interaction in interactions:
+            try:
+                customer_name = None
+                if isinstance(interaction.extra_data, dict):
+                    customer_name = interaction.extra_data.get("user_name")
+
+                profile = await get_or_create_profile(
+                    db=db,
+                    seller_id=seller_id,
+                    marketplace=marketplace,
+                    customer_id=interaction.customer_id,
+                    name=customer_name,
+                )
+                await update_profile_from_interaction(db, profile, interaction)
+            except Exception as exc:
+                logger.debug(
+                    "Customer profile update failed for interaction_id=%s: %s",
+                    interaction.id,
+                    exc,
+                )
+    except Exception as exc:
+        logger.debug(
+            "Customer profile batch update failed for seller=%s: %s",
+            seller_id,
+            exc,
+        )
+
+
 async def ingest_wb_reviews_to_interactions(
     *,
     db: AsyncSession,
@@ -260,6 +322,7 @@ async def ingest_wb_reviews_to_interactions(
     stats = IngestStats()
     seen_ids: set[str] = set()
     touched_ids: set[int] = set()
+    created_ids: set[int] = set()  # Track newly created for customer profile updates
     answer_states = [False] if only_unanswered else [False, True]
     max_occurred_at: Optional[datetime] = None
 
@@ -429,6 +492,7 @@ async def ingest_wb_reviews_to_interactions(
                     db.add(interaction)
                     await db.flush()
                     touched_ids.add(interaction.id)
+                    created_ids.add(interaction.id)
                     stats.created += 1
 
             if page_hit_watermark:
@@ -449,6 +513,14 @@ async def ingest_wb_reviews_to_interactions(
         db=db,
         seller_id=seller_id,
         interaction_ids=touched_ids,
+    )
+
+    # Update customer profiles for newly created interactions
+    await _update_customer_profiles_for_new_interactions(
+        db=db,
+        seller_id=seller_id,
+        marketplace=marketplace,
+        new_interaction_ids=created_ids,
     )
 
     # Store new watermark in stats for the caller to persist.
@@ -500,6 +572,7 @@ async def ingest_wb_questions_to_interactions(
     stats = IngestStats()
     seen_ids: set[str] = set()
     touched_ids: set[int] = set()
+    created_ids: set[int] = set()  # Track newly created for customer profile updates
     answer_states = [False] if only_unanswered else [False, True]
     max_occurred_at: Optional[datetime] = None
 
@@ -696,6 +769,7 @@ async def ingest_wb_questions_to_interactions(
                     db.add(interaction)
                     await db.flush()
                     touched_ids.add(interaction.id)
+                    created_ids.add(interaction.id)
                     stats.created += 1
 
             if page_hit_watermark:
@@ -716,6 +790,14 @@ async def ingest_wb_questions_to_interactions(
         db=db,
         seller_id=seller_id,
         interaction_ids=touched_ids,
+    )
+
+    # Update customer profiles for newly created interactions
+    await _update_customer_profiles_for_new_interactions(
+        db=db,
+        seller_id=seller_id,
+        marketplace=marketplace,
+        new_interaction_ids=created_ids,
     )
 
     # Store new watermark in stats for the caller to persist.

@@ -7,13 +7,17 @@ from typing import Any, Dict, Optional
 
 import httpx
 
+from app.services.base_connector import BaseChannelConnector
+
 logger = logging.getLogger(__name__)
 
 
-class WBQuestionsConnector:
+class WBQuestionsConnector(BaseChannelConnector):
     """Async connector for WB user-communication questions endpoints."""
 
     BASE_URL = "https://feedbacks-api.wildberries.ru"
+    marketplace = "wildberries"
+    channel = "question"
 
     def __init__(self, api_token: str):
         self.api_token = api_token.strip()
@@ -108,6 +112,28 @@ class WBQuestionsConnector:
         """Get unanswered questions counters."""
         return await self._request("GET", "/api/v1/questions/count-unanswered")
 
+    async def list_items(
+        self,
+        *,
+        skip: int = 0,
+        take: int = 100,
+        is_answered: bool = False,
+        order: str = "dateDesc",
+        nm_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """List questions from WB API.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, list_questions() is also available.
+        """
+        return await self.list_questions(
+            skip=skip,
+            take=take,
+            is_answered=is_answered,
+            order=order,
+            nm_id=nm_id,
+        )
+
     async def list_questions(
         self,
         *,
@@ -127,6 +153,35 @@ class WBQuestionsConnector:
             params["nmId"] = nm_id
 
         return await self._request("GET", "/api/v1/questions", params=params)
+
+    async def send_reply(self, *, item_id: str, text: str, **kwargs: Any) -> Dict[str, Any]:
+        """Send reply to a question.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, patch_question() is also available.
+        """
+        state = kwargs.get("state", "wbRu")
+        result = await self.patch_question(
+            question_id=item_id,
+            state=state,
+            answer_text=text,
+        )
+        return {"success": True, **result}
+
+    async def mark_read(self, *, item_id: str, **kwargs: Any) -> bool:
+        """Mark question as viewed.
+
+        This is the BaseChannelConnector interface implementation.
+        """
+        try:
+            await self.patch_question(
+                question_id=item_id,
+                state="wbRu",
+                was_viewed=True,
+            )
+            return True
+        except Exception:
+            return False
 
     async def patch_question(
         self,

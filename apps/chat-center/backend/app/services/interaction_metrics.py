@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.interaction import Interaction
 from app.models.interaction_event import InteractionEvent
+from app.services.sync_metrics import sync_health_monitor
 
 EVENT_DRAFT_GENERATED = "draft_generated"
 EVENT_DRAFT_CACHE_HIT = "draft_cache_hit"
@@ -530,6 +531,33 @@ async def get_ops_alerts(
             }
         )
 
+    # --- Sync health alerts (from in-memory ring buffer) ---
+    sync_health = sync_health_monitor.check_sync_health(seller_id)
+    sync_alerts = sync_health_monitor.get_active_alerts(seller_id)
+    alerts.extend(sync_alerts)
+
+    # --- Celery health alerts ---
+    from app.services.celery_health import get_celery_health
+    celery_health = get_celery_health(timeout=5)
+    if celery_health["status"] == "down":
+        alerts.append(
+            {
+                "code": "celery_worker_down",
+                "severity": "critical",
+                "title": "Celery worker не отвечает",
+                "message": "Фоновые задачи не выполняются (sync, AI analysis, SLA escalation)",
+            }
+        )
+    elif celery_health["status"] == "degraded":
+        alerts.append(
+            {
+                "code": "celery_queue_high",
+                "severity": "medium",
+                "title": "Большая очередь задач в Celery",
+                "message": f"В очереди {celery_health['queue_length']} задач (порог: 100)",
+            }
+        )
+
     return {
         "generated_at": now,
         "question_sla": {
@@ -548,6 +576,8 @@ async def get_ops_alerts(
             "regression_detected": quality_regression,
             "manual_rate_regression_threshold": manual_rate_regression_threshold,
         },
+        "sync_health": sync_health,
+        "celery_health": celery_health,
         "alerts": alerts,
     }
 

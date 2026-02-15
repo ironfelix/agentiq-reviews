@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -14,12 +15,15 @@ from app.models.chat import Chat
 from app.models.interaction import Interaction
 from app.models.message import Message
 from app.services.ai_analyzer import AIAnalyzer, analyze_chat_for_db, _get_seller_tone
+from app.services.customer_profile_service import get_customer_context_for_draft
 from app.services.guardrails import apply_guardrails
 from app.services.llm_runtime import get_llm_runtime_config
+from app.services.product_cache_service import get_or_fetch_product, get_product_context_for_draft
 from app.services.product_context import (
     build_rating_context,
     get_product_context_for_nm_id,
 )
+from app.services.response_cache import get_cached_response
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +64,9 @@ def _fallback_draft(interaction: Interaction) -> DraftResult:
         else:
             draft = "Здравствуйте! Спасибо за отзыв и обратную связь. Если будут вопросы по товару, с радостью поможем."
     elif interaction.channel == "question":
-        draft = "Здравствуйте! Спасибо за вопрос. Уточняем информацию по товару и сразу вернемся с точным ответом."
+        draft = "Здравствуйте! Спасибо за интерес к нашему товару! Уточняем информацию и сразу вернёмся с подробным ответом. Если есть дополнительные вопросы — пишите, с радостью поможем!"
         if any(w in text for w in ["размер", "рост", "вес"]):
-            draft = "Здравствуйте! Спасибо за вопрос. Подскажите, пожалуйста, ваши параметры (рост/вес), чтобы мы точно подсказали размер."
+            draft = "Здравствуйте! Спасибо за вопрос! Подскажите, пожалуйста, ваши параметры (рост/вес), чтобы мы точно подобрали размер. С удовольствием поможем с выбором!"
     else:
         draft = "Здравствуйте! Спасибо за обращение. Поможем разобраться и подскажем оптимальное решение."
 
@@ -155,11 +159,66 @@ async def generate_interaction_draft(
         except Exception as exc:
             logger.debug("Product context fetch failed for nm_id=%s: %s", nm_id_str, exc)
 
+    # --- DB-backed product cache enrichment ---
+    # Supplements the in-memory CDN context with DB-cached product info
+    product_cache_context = ""
+    if nm_id_str:
+        try:
+            db_product = await get_or_fetch_product(db, nm_id_str)
+            product_cache_context = get_product_context_for_draft(db_product)
+        except Exception as exc:
+            logger.debug("Product cache lookup failed for nm_id=%s: %s", nm_id_str, exc)
+
+    # Merge product contexts: prefer CDN (richer), supplement with DB cache
+    if not product_context and product_cache_context:
+        product_context = product_cache_context
+
+    # --- Customer profile context ---
+    customer_context = ""
+    customer_id = interaction.customer_id
+    if customer_id:
+        try:
+            customer_context = await get_customer_context_for_draft(
+                db=db,
+                seller_id=interaction.seller_id,
+                marketplace=interaction.marketplace or "wb",
+                customer_id=customer_id,
+            )
+        except Exception as exc:
+            logger.debug("Customer context lookup failed for customer_id=%s: %s", customer_id, exc)
+
     # --- Rating-aware context ---
     rating_context = build_rating_context(interaction.rating, channel)
 
     # --- Seller tone preference ---
     tone = await _get_seller_tone(db, interaction.seller_id)
+
+    # --- Fast path: check response cache for simple positive reviews ---
+    # For positive 4-5 star reviews with simple text, skip LLM entirely.
+    if channel == "review" and interaction.rating and interaction.rating >= 4:
+        cached = await get_cached_response(
+            intent="thanks",
+            rating=interaction.rating,
+            channel=channel,
+            text=interaction.text or "",
+        )
+        if cached is not None:
+            t_cache = time.monotonic()
+            logger.info(
+                "Draft from cache (no LLM call): channel=%s rating=%s elapsed=%.3fs",
+                channel,
+                interaction.rating,
+                time.monotonic() - t_cache,
+            )
+            draft = DraftResult(
+                text=cached,
+                intent="thanks",
+                sentiment="positive",
+                sla_priority="low",
+                recommendation_reason="Cached template for positive review",
+                source="cache",
+            )
+            return _apply_guardrails_to_draft(draft, interaction)
 
     llm_runtime = await get_llm_runtime_config(db)
     analyzer = AIAnalyzer(
@@ -191,6 +250,7 @@ async def generate_interaction_draft(
         customer_name=customer_name,
         product_context=product_context,
         rating_context=rating_context,
+        customer_context=customer_context,
         channel=channel,
         tone=tone,
         rating=interaction.rating,

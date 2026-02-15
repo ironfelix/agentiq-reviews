@@ -6,14 +6,18 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
 from app.config import get_settings
 
+from app.services.base_connector import BaseChannelConnector
+
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
-class OzonConnector:
+class OzonConnector(BaseChannelConnector):
     """Асинхронный коннектор для Ozon Seller Chat API v1"""
 
     BASE_URL = "https://api-seller.ozon.ru"
+    marketplace = "ozon"
+    channel = "chat"
 
     def __init__(self, client_id: str, api_key: str):
         """
@@ -220,7 +224,59 @@ class OzonConnector:
 
         return await self._request("POST", "/v1/chat/send/file", json_data=payload)
 
+    async def list_items(
+        self,
+        *,
+        skip: int = 0,
+        take: int = 100,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """List chats from Ozon API.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, list_chats() is also available.
+
+        Note: Ozon uses offset/limit pagination similar to skip/take.
+        """
+        result = await self.list_chats(offset=skip, limit=take, **kwargs)
+        return {
+            "data": {"chats": result.get("chats", [])},
+            "total": result.get("total", 0),
+        }
+
+    async def send_reply(self, *, item_id: str, text: str, **kwargs: Any) -> Dict[str, Any]:
+        """Send message to a chat.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, send_message() is also available.
+        """
+        result = await self.send_message(chat_id=item_id, text=text)
+        return {"success": True, **result}
+
     async def get_updates(
+        self,
+        *,
+        since_cursor: Optional[str] = None,
+        limit: int = 50,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Get new messages/events since last cursor.
+
+        This is the BaseConnelConnector interface implementation.
+        Maps to Ozon's get_updates() method.
+        """
+        result = await self._get_updates_internal(
+            from_message_id=since_cursor,
+            limit=limit,
+            **kwargs,
+        )
+        return {
+            "items": result.get("messages", []),
+            "next_cursor": result.get("last_message_id"),
+            "has_more": result.get("total", 0) >= limit,
+        }
+
+    async def _get_updates_internal(
         self,
         chat_id_list: Optional[List[str]] = None,
         from_message_id: Optional[str] = None,

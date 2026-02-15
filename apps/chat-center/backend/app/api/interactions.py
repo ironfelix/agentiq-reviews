@@ -40,6 +40,7 @@ from app.schemas.interaction import (
 from app.services.interaction_ingest import ingest_wb_reviews_to_interactions
 from app.services.interaction_ingest import ingest_wb_questions_to_interactions
 from app.services.interaction_ingest import ingest_chat_interactions
+from app.services.guardrails import validate_reply_text
 from app.services.interaction_drafts import generate_interaction_draft
 from app.services.interaction_linking import get_deterministic_thread_timeline
 from app.services.interaction_metrics import (
@@ -50,8 +51,11 @@ from app.services.interaction_metrics import (
     record_draft_event,
     record_reply_events,
 )
+from app.schemas.analytics import RevenueImpactResponse
+from app.services.revenue_analytics import get_revenue_impact
 from app.services.wb_feedbacks_connector import get_wb_feedbacks_connector_for_seller
 from app.services.wb_questions_connector import get_wb_questions_connector_for_seller
+from app.services.celery_health import get_celery_health
 
 router = APIRouter(prefix="/interactions", tags=["interactions"])
 
@@ -65,6 +69,7 @@ async def list_interactions(
     marketplace: Optional[str] = Query(None, description="Filter by marketplace"),
     source: Optional[str] = Query(None, description="Filter by data source"),
     search: Optional[str] = Query(None, description="Search by text/product/customer/order"),
+    include_total: bool = Query(True, description="Include total count (can be slow for large datasets)"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Items per page"),
     current_seller: Seller = Depends(get_current_seller),
@@ -107,9 +112,12 @@ async def list_interactions(
     if conditions:
         query = query.where(and_(*conditions))
 
-    count_query = select(func.count()).select_from(query.subquery())
-    count_result = await db.execute(count_query)
-    total = count_result.scalar_one()
+    total = 0
+    if include_total:
+        # Avoid counting from a "select *" subquery: SQLite/Postgres can plan it poorly.
+        count_query = select(func.count(Interaction.id)).where(and_(*conditions))
+        count_result = await db.execute(count_query)
+        total = int(count_result.scalar_one() or 0)
 
     query = (
         query.order_by(Interaction.occurred_at.desc().nullslast(), Interaction.created_at.desc())
@@ -141,7 +149,7 @@ async def sync_reviews(
     pull WB reviews and upsert into unified `interactions`.
     """
     try:
-        stats = await ingest_wb_reviews_to_interactions(
+        result = await ingest_wb_reviews_to_interactions(
             db=db,
             seller_id=current_seller.id,
             marketplace=current_seller.marketplace or "wildberries",
@@ -165,7 +173,7 @@ async def sync_reviews(
         seller_id=current_seller.id,
         channel="review",
         source="wb_api",
-        **stats,
+        **result.as_dict(),
     )
 
 
@@ -183,7 +191,7 @@ async def sync_questions(
     pull WB questions and upsert into unified `interactions`.
     """
     try:
-        stats = await ingest_wb_questions_to_interactions(
+        result = await ingest_wb_questions_to_interactions(
             db=db,
             seller_id=current_seller.id,
             marketplace=current_seller.marketplace or "wildberries",
@@ -207,7 +215,7 @@ async def sync_questions(
         seller_id=current_seller.id,
         channel="question",
         source="wb_api",
-        **stats,
+        **result.as_dict(),
     )
 
 
@@ -311,6 +319,7 @@ async def ops_alerts(
         generated_at=payload["generated_at"],
         question_sla=payload["question_sla"],
         quality_regression=payload["quality_regression"],
+        sync_health=payload.get("sync_health"),
         alerts=[InteractionOpsAlert(**item) for item in payload["alerts"]],
     )
 
@@ -353,6 +362,57 @@ async def pilot_readiness(
         thresholds=payload["thresholds"],
         checks=[InteractionPilotReadinessCheck(**item) for item in payload["checks"]],
     )
+
+
+@router.get("/metrics/revenue", response_model=RevenueImpactResponse)
+async def revenue_impact(
+    period_days: int = Query(30, ge=1, le=365, description="Rolling window in days"),
+    avg_order_value: Optional[float] = Query(
+        None, ge=0, description="Average order value in roubles (default 2000)",
+    ),
+    current_seller: Seller = Depends(get_current_seller),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get revenue impact analytics for current seller.
+
+    Calculates monetary impact of communication quality:
+    - Revenue at risk from unresolved negative reviews
+    - Revenue saved by responding to negatives within SLA
+    - Potential additional savings with full coverage
+    - Response time ROI from fast question responses
+    """
+    payload = await get_revenue_impact(
+        db=db,
+        seller_id=current_seller.id,
+        period_days=period_days,
+        avg_order_value=avg_order_value,
+    )
+    return RevenueImpactResponse(**payload)
+
+
+@router.get("/health/celery")
+async def celery_health():
+    """
+    Get Celery worker and scheduler health status.
+
+    Returns:
+        dict with:
+        - worker_alive: bool
+        - active_tasks: int (currently executing)
+        - scheduled_tasks: int (from beat)
+        - last_heartbeat: datetime | None
+        - queue_length: int (reserved tasks)
+        - status: "healthy" | "degraded" | "down"
+
+    Status logic:
+    - "healthy": worker alive + queue_length < 100
+    - "degraded": worker alive but queue_length >= 100
+    - "down": worker not responding
+
+    Note: This endpoint is not seller-scoped (no auth required) for ops monitoring.
+    """
+    health = get_celery_health(timeout=5)
+    return health
 
 
 @router.get("/{interaction_id}", response_model=InteractionResponse)
@@ -459,6 +519,7 @@ async def generate_ai_draft(
             sla_priority=cached.get("sla_priority"),
             recommendation_reason=cached.get("recommendation_reason"),
             source="cached",
+            guardrail_warnings=cached.get("guardrail_warnings", []),
         )
 
     try:
@@ -492,6 +553,7 @@ async def generate_ai_draft(
         sla_priority=draft.sla_priority,
         recommendation_reason=draft.recommendation_reason,
         source=draft.source,
+        guardrail_warnings=draft.guardrail_warnings or [],
     )
 
 
@@ -526,6 +588,21 @@ async def reply_to_interaction(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reply text is required",
+        )
+
+    # --- Pre-send guardrail validation (blocking) ---
+    customer_text = interaction.text or ""
+    validation = validate_reply_text(reply_text, interaction.channel or "review", customer_text)
+    if not validation["valid"]:
+        violation_msgs = [v.get("message", str(v)) for v in validation["violations"]]
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Reply blocked by guardrails",
+                "violations": validation["violations"],
+                "warnings": validation["warnings"],
+                "summary": "; ".join(violation_msgs),
+            },
         )
 
     try:

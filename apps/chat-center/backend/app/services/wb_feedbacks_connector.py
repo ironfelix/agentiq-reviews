@@ -7,10 +7,12 @@ from typing import Any, Dict, Optional
 
 import httpx
 
+from app.services.base_connector import BaseChannelConnector
+
 logger = logging.getLogger(__name__)
 
 
-class WBFeedbacksConnector:
+class WBFeedbacksConnector(BaseChannelConnector):
     """
     Async connector for WB Questions & Reviews API (feedbacks group).
 
@@ -19,6 +21,8 @@ class WBFeedbacksConnector:
     """
 
     BASE_URL = "https://feedbacks-api.wildberries.ru"
+    marketplace = "wildberries"
+    channel = "review"
 
     def __init__(self, api_token: str):
         self.api_token = api_token.strip()
@@ -118,6 +122,28 @@ class WBFeedbacksConnector:
                 raise last_error
             raise RuntimeError("WB feedbacks request failed without explicit error")
 
+    async def list_items(
+        self,
+        *,
+        skip: int = 0,
+        take: int = 100,
+        is_answered: bool = False,
+        order: str = "dateDesc",
+        nm_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """List feedbacks (reviews) from WB API.
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, list_feedbacks() is also available.
+        """
+        return await self.list_feedbacks(
+            skip=skip,
+            take=take,
+            is_answered=is_answered,
+            order=order,
+            nm_id=nm_id,
+        )
+
     async def list_feedbacks(
         self,
         *,
@@ -137,6 +163,15 @@ class WBFeedbacksConnector:
             params["nmId"] = nm_id
 
         return await self._request("GET", "/api/v1/feedbacks", params=params)
+
+    async def send_reply(self, *, item_id: str, text: str, **kwargs: Any) -> Dict[str, Any]:
+        """Send reply to a feedback (review).
+
+        This is the BaseChannelConnector interface implementation.
+        For backwards compatibility, answer_feedback() is also available.
+        """
+        success = await self.answer_feedback(feedback_id=item_id, text=text)
+        return {"success": success}
 
     async def answer_feedback(self, *, feedback_id: str, text: str) -> bool:
         """

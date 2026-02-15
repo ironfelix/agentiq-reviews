@@ -16,6 +16,7 @@ import httpx
 import logging
 import json
 import re
+import time
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 
@@ -27,6 +28,54 @@ from app.services.guardrails import (
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+# ---------------------------------------------------------------------------
+# Shared httpx client for connection reuse (avoids per-request TCP handshake)
+# ---------------------------------------------------------------------------
+_shared_client: Optional[httpx.AsyncClient] = None
+
+
+def _get_shared_client() -> httpx.AsyncClient:
+    """Return a module-level httpx.AsyncClient with connection pooling.
+
+    The client is created lazily on first use. Connection pool limits
+    are tuned for the typical DeepSeek API usage pattern (few concurrent
+    requests, keep-alive connections).
+    """
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(
+                connect=5.0,    # fast fail on connection issues
+                read=30.0,      # DeepSeek can take a few seconds
+                write=10.0,     # request body is small
+                pool=5.0,       # waiting for a free connection
+            ),
+            limits=httpx.Limits(
+                max_connections=10,
+                max_keepalive_connections=5,
+                keepalive_expiry=120,  # reuse connections for 2 minutes
+            ),
+        )
+    return _shared_client
+
+
+# Max tokens tuned per channel and complexity
+_MAX_TOKENS_SIMPLE = 300   # short replies: positive reviews, thanks
+_MAX_TOKENS_STANDARD = 600  # normal replies: most intents
+_MAX_TOKENS_COMPLEX = 1000  # complex replies: defects, escalation
+
+
+def _select_max_tokens(channel: str, intent: Optional[str] = None) -> int:
+    """Choose appropriate max_tokens based on expected response length."""
+    if intent in ("thanks",):
+        return _MAX_TOKENS_SIMPLE
+    if channel == "review" and intent in ("thanks", "positive_feedback"):
+        return _MAX_TOKENS_SIMPLE
+    if intent in ("defect_not_working", "wrong_item", "refund_exchange"):
+        return _MAX_TOKENS_COMPLEX
+    return _MAX_TOKENS_STANDARD
+
 
 # Russian surname suffixes — if a single word ends with these, it's likely a last name
 _SURNAME_SUFFIXES = (
@@ -294,42 +343,51 @@ REVIEW_DRAFT_USER = """Напиши ответ продавца на отзыв 
 - НЕ задавай вопросов — покупатель не ответит на отзыв"""
 
 
-QUESTION_DRAFT_SYSTEM = """Ты — эксперт по клиентскому сервису на маркетплейсах WB/Ozon.
+QUESTION_DRAFT_SYSTEM = """Ты — дружелюбный и внимательный эксперт по клиентскому сервису на маркетплейсах WB/Ozon.
 
-Задача: написать публичный ответ продавца на вопрос покупателя.
+Задача: написать ПОЛЕЗНЫЙ и ЗАБОТЛИВЫЙ публичный ответ продавца на вопрос покупателя.
 
-ВАЖНО — ЭТО ВОПРОС О ТОВАРЕ:
+КЛЮЧЕВОЙ ПРИНЦИП — ПОМОГИ ПОКУПАТЕЛЮ:
 - Ответ публичный, его видят ВСЕ покупатели — он помогает другим
-- Отвечай на вопрос ПРЯМО и КОНКРЕТНО
-- Используй характеристики из карточки товара если есть
-- Если вопрос перед покупкой — помоги покупателю принять решение
+- Покупатель задал вопрос = ему ВАЖНО получить ответ, прояви уважение
+- Отвечай ПОДРОБНО и КОНКРЕТНО — это повышает конверсию
+- Покажи, что продавец разбирается в товаре и заботится о клиентах
+- Если вопрос перед покупкой — помоги принять решение, дай полезную информацию
 
 ТИПЫ ВОПРОСОВ:
-- Pre-purchase: размеры, состав, наличие, совместимость → помоги купить
-- Post-purchase: как пользоваться, проблема → решение/инструкция
-- Характеристики: конкретный факт из карточки → чёткий ответ
+- Pre-purchase: размеры, состав, наличие, совместимость → помоги купить, подскажи детали
+- Post-purchase: как пользоваться, проблема → дай решение/инструкцию, прояви заботу
+- Характеристики: конкретный факт из карточки → чёткий полный ответ
+
+ТОН ОТВЕТА — ДРУЖЕЛЮБНЫЙ И ЗАБОТЛИВЫЙ:
+- Начни с приветствия: "Здравствуйте!" или "Добрый день!"
+- Поблагодари за вопрос: "Спасибо за интерес к товару!" или "Отличный вопрос!"
+- Ответь КОНКРЕТНО и ПОЛЕЗНО — покупатель хочет факты, не отписки
+- Если не знаешь точного ответа — честно скажи, но предложи помощь
+- Закончи дружелюбно: "С радостью поможем с выбором!" или "Пишите, если нужна помощь!"
+- НЕ используй формальные отписки: "информация в карточке", "смотрите описание"
 
 КРИТИЧЕСКИ ВАЖНО — ЗАПРЕЩЕНО писать:
 1. "вернём деньги", "гарантируем возврат/замену" — продавец НЕ контролирует возвраты на WB
 2. "вы неправильно", "ваша вина" — обвинение покупателя запрещено
 3. "ИИ", "бот", "нейросеть", "GPT" — раскрытие автоматизации
-4. "обратитесь в поддержку WB" — отписка
-5. НЕ выдумывай характеристики — только из контекста / карточки
+4. "обратитесь в поддержку WB" — отписка, неуважение к покупателю
+5. "посмотрите в описании" — если информация есть, ПРОЦИТИРУЙ её прямо в ответе
+6. НЕ выдумывай характеристики — только из контекста / карточки
 
 ПРАВИЛА генерации recommendation:
-1. Формат: 1-3 предложения, макс 500 символов
-2. Начни с приветствия
-3. Ответь на вопрос КОНКРЕТНО — не общими фразами
-4. Если вопрос о размере/параметрах — дай конкретные данные
-5. Если не знаешь точный ответ — честно скажи, но предложи где найти
-6. Концовка: "Если остались вопросы — пишите!" допустима для вопросов
-7. НЕ заканчивай шаблонно каждый раз одинаково
+1. Формат: 2-4 предложения, макс 500 символов
+2. Начни с приветствия + благодарности за вопрос
+3. Ответь КОНКРЕТНО — используй факты, цифры, характеристики
+4. Если вопрос о размере/параметрах — дай конкретные данные из карточки
+5. Если не знаешь точный ответ — предложи уточнить у покупателя или обещай проверить
+6. Финал: предложи помощь, покажи заинтересованность в покупателе
 
 ПРИМЕРЫ хороших ответов на вопросы:
-- Размер: "Здравствуйте! Модель соответствует стандартной размерной сетке. При росте 175 и весе 70 кг рекомендуем размер M."
-- Состав: "Здравствуйте! Состав: 95% хлопок, 5% эластан. Ткань мягкая, хорошо тянется."
-- Наличие: "Здравствуйте! Да, товар есть в наличии. Поставки регулярные."
-- Использование: "Здравствуйте! Для начала работы нужно зарядить устройство 2-3 часа. Инструкция есть в карточке товара."
+- Размер: "Здравствуйте! Спасибо за вопрос! Модель соответствует стандартной размерной сетке. При росте 175 и весе 70 кг рекомендуем размер M. Если сомневаетесь — напишите ваши параметры, поможем подобрать!"
+- Состав: "Добрый день! Состав: 95% хлопок, 5% эластан. Ткань мягкая, приятная к телу и хорошо тянется. Подойдёт для повседневной носки."
+- Наличие: "Здравствуйте! Да, товар есть в наличии. Поставки регулярные, так что можно заказывать смело. Будем рады, если выберете нас!"
+- Использование: "Добрый день! Спасибо за вопрос! Для начала работы зарядите устройство 2-3 часа. После полной зарядки индикатор загорится зелёным. Если будут вопросы по использованию — пишите!"
 
 ESCALATION (needs_escalation = true):
 - Аллергия, здоровье → STOP
@@ -403,6 +461,7 @@ def get_user_prompt(
     question_text: str = "",
     product_context_block: str = "",
     rating_context_block: str = "",
+    customer_context_block: str = "",
 ) -> str:
     """Return the appropriate user prompt for the given channel.
 
@@ -415,28 +474,35 @@ def get_user_prompt(
         question_text: Question text (for question channel).
         product_context_block: Product card context block (for chat channel).
         rating_context_block: Rating context block (for chat channel).
+        customer_context_block: Customer profile context block (for all channels).
 
     Returns:
         Formatted user prompt string.
     """
+    # Customer context is appended to the prompt for all channels
+    suffix = customer_context_block if customer_context_block else ""
+
     if channel == "review":
-        return REVIEW_DRAFT_USER.format(
+        base = REVIEW_DRAFT_USER.format(
             product_name=product_name,
             rating=rating if rating is not None else "?",
             review_text=review_text or "(пустой отзыв)",
         )
+        return base + suffix
     elif channel == "question":
-        return QUESTION_DRAFT_USER.format(
+        base = QUESTION_DRAFT_USER.format(
             product_name=product_name,
             question_text=question_text or "(пустой вопрос)",
         )
+        return base + suffix
     else:
-        return CHAT_ANALYSIS_USER.format(
+        base = CHAT_ANALYSIS_USER.format(
             product_name=product_name,
             messages_block=messages_block,
             product_context_block=product_context_block,
             rating_context_block=rating_context_block,
         )
+        return base + suffix
 
 
 class AIAnalyzer:
@@ -477,9 +543,11 @@ class AIAnalyzer:
         customer_name: Optional[str] = None,
         product_context: Optional[str] = None,
         rating_context: Optional[str] = None,
+        customer_context: Optional[str] = None,
         channel: str = "chat",
         tone: str = "neutral",
         rating: Optional[int] = None,
+        sla_config: Optional[Dict] = None,
     ) -> Optional[Dict]:
         """
         Analyze chat/review/question and generate response recommendation.
@@ -493,9 +561,11 @@ class AIAnalyzer:
             customer_name: Customer name for personalization
             product_context: Formatted product card context (from product_context.py)
             rating_context: Rating-aware prompt instructions (from product_context.py)
+            customer_context: Formatted customer profile context (from customer_profile_service.py)
             channel: One of 'review', 'question', 'chat' (selects prompt template)
             tone: One of 'formal', 'friendly', 'neutral' (seller preference)
             rating: Review rating 1-5 (for review channel)
+            sla_config: Optional seller-specific SLA config dict from sla_config service
 
         Returns:
             Analysis dict with keys:
@@ -511,7 +581,7 @@ class AIAnalyzer:
                 - analyzed_at: timestamp
         """
         if not self.enabled or self.provider != "deepseek" or not self.api_key:
-            return self._fallback_analysis(messages, customer_name)
+            return self._fallback_analysis(messages, customer_name, sla_config=sla_config)
 
         if not messages:
             return None
@@ -545,6 +615,9 @@ class AIAnalyzer:
                 rating_context_block=(
                     f"\n{rating_context}\n" if rating_context else ""
                 ),
+                customer_context_block=(
+                    f"\nИнформация о клиенте:\n{customer_context}\n" if customer_context else ""
+                ),
             )
 
             # Call DeepSeek API
@@ -554,7 +627,7 @@ class AIAnalyzer:
             )
 
             if not response:
-                return self._fallback_analysis(messages, customer_name)
+                return self._fallback_analysis(messages, customer_name, sla_config=sla_config)
 
             # Parse and validate response
             analysis = self._parse_response(response)
@@ -577,7 +650,8 @@ class AIAnalyzer:
             analysis["sla_priority"] = self._calculate_sla_priority(
                 intent,
                 analysis.get("urgency", "normal"),
-                messages
+                messages,
+                sla_config=sla_config,
             )
 
             analysis["analyzed_at"] = datetime.utcnow().isoformat()
@@ -586,7 +660,7 @@ class AIAnalyzer:
 
         except Exception as e:
             logger.error(f"AI analysis failed: {e}")
-            return self._fallback_analysis(messages, customer_name)
+            return self._fallback_analysis(messages, customer_name, sla_config=sla_config)
 
     async def _call_llm(
         self,
@@ -620,41 +694,68 @@ class AIAnalyzer:
                 rating_context_block=rating_context_block,
             )
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            try:
-                response = await client.post(
-                    f"{self.base_url}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {self.api_key}",
-                        "Content-Type": "application/json"
-                    },
-                    json={
-                        "model": self.model_name,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": user_prompt}
-                        ],
-                        "temperature": 0.3,
-                        "max_tokens": 1000,
-                        "response_format": {"type": "json_object"}
-                    }
-                )
-                response.raise_for_status()
+        client = _get_shared_client()
+        max_tokens = _select_max_tokens(
+            channel="chat",  # default; callers can refine later
+        )
+        t_start = time.monotonic()
+        try:
+            response = await client.post(
+                f"{self.base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model_name,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": max_tokens,
+                    "response_format": {"type": "json_object"},
+                },
+            )
+            response.raise_for_status()
 
-                data = response.json()
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            elapsed = time.monotonic() - t_start
+            data = response.json()
 
-                return json.loads(content) if content else None
+            # Log timing and token usage for monitoring
+            usage = data.get("usage", {})
+            prompt_tokens = usage.get("prompt_tokens", 0)
+            completion_tokens = usage.get("completion_tokens", 0)
+            total_tokens = usage.get("total_tokens", 0)
+            logger.info(
+                "LLM response in %.1fs | model=%s | tokens: prompt=%d completion=%d total=%d | max_tokens=%d",
+                elapsed,
+                self.model_name,
+                prompt_tokens,
+                completion_tokens,
+                total_tokens,
+                max_tokens,
+            )
 
-            except httpx.HTTPStatusError as e:
-                logger.error(f"DeepSeek API error: {e.response.status_code}")
-                return None
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse LLM response: {e}")
-                return None
-            except Exception as e:
-                logger.error(f"LLM call failed: {e}")
-                return None
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            return json.loads(content) if content else None
+
+        except httpx.HTTPStatusError as e:
+            elapsed = time.monotonic() - t_start
+            logger.error(
+                "DeepSeek API error: status=%s elapsed=%.1fs",
+                e.response.status_code,
+                elapsed,
+            )
+            return None
+        except json.JSONDecodeError as e:
+            elapsed = time.monotonic() - t_start
+            logger.error("Failed to parse LLM response: %s elapsed=%.1fs", e, elapsed)
+            return None
+        except Exception as e:
+            elapsed = time.monotonic() - t_start
+            logger.error("LLM call failed: %s elapsed=%.1fs", e, elapsed)
+            return None
 
     def _format_messages(self, messages: List[Dict], customer_name: Optional[str]) -> str:
         """Format messages for prompt."""
@@ -762,10 +863,25 @@ class AIAnalyzer:
         self,
         intent: str,
         urgency: str,
-        messages: List[Dict]
+        messages: List[Dict],
+        sla_config: Optional[Dict] = None,
     ) -> str:
-        """Calculate SLA priority based on intent, urgency, and message patterns."""
-        base_priority = SLA_PRIORITIES.get(intent, "normal")
+        """Calculate SLA priority based on intent, urgency, and message patterns.
+
+        Args:
+            intent: Classified intent string.
+            urgency: LLM-reported urgency level.
+            messages: List of message dicts.
+            sla_config: Optional seller-specific SLA config dict. If provided,
+                intent priority is looked up from ``sla_config["intents"]``
+                instead of the module-level ``SLA_PRIORITIES`` constant.
+        """
+        if sla_config and isinstance(sla_config, dict):
+            intents_cfg = sla_config.get("intents", {})
+            intent_entry = intents_cfg.get(intent, {})
+            base_priority = intent_entry.get("priority", SLA_PRIORITIES.get(intent, "normal"))
+        else:
+            base_priority = SLA_PRIORITIES.get(intent, "normal")
 
         # Check for repeated messages (escalation)
         buyer_messages = [m for m in messages if m.get("author_type") == "buyer"]
@@ -800,10 +916,21 @@ class AIAnalyzer:
 
         return base_priority
 
+    @staticmethod
+    def _resolve_intent_priority(intent: str, sla_config: Optional[Dict] = None) -> str:
+        """Resolve base priority for an intent, using sla_config if available."""
+        if sla_config and isinstance(sla_config, dict):
+            intents_cfg = sla_config.get("intents", {})
+            intent_entry = intents_cfg.get(intent, {})
+            if isinstance(intent_entry, dict) and "priority" in intent_entry:
+                return intent_entry["priority"]
+        return SLA_PRIORITIES.get(intent, "normal")
+
     def _fallback_analysis(
         self,
         messages: List[Dict],
-        customer_name: Optional[str]
+        customer_name: Optional[str],
+        sla_config: Optional[Dict] = None,
     ) -> Dict:
         """Fallback analysis when LLM is unavailable."""
         # Simple heuristics
@@ -876,7 +1003,7 @@ class AIAnalyzer:
             "recommendation_reason": "Fallback: LLM unavailable",
             "needs_escalation": False,
             "escalation_reason": None,
-            "sla_priority": SLA_PRIORITIES.get(intent, "normal"),
+            "sla_priority": self._resolve_intent_priority(intent, sla_config),
             "analyzed_at": datetime.utcnow().isoformat(),
         }
 
@@ -958,6 +1085,10 @@ async def analyze_chat_for_db(chat_id: int, db_session) -> Optional[Dict]:
     # Read seller tone preference
     tone = await _get_seller_tone(db_session, chat.seller_id)
 
+    # Read seller SLA config (configurable priority thresholds)
+    from app.services.sla_config import get_sla_config
+    sla_config = await get_sla_config(db_session, chat.seller_id)
+
     # Analyze
     llm_runtime = await get_llm_runtime_config(db_session)
     analyzer = AIAnalyzer(
@@ -971,6 +1102,7 @@ async def analyze_chat_for_db(chat_id: int, db_session) -> Optional[Dict]:
         customer_name=chat.customer_name,
         channel="chat",
         tone=tone,
+        sla_config=sla_config,
     )
 
     if analysis:
