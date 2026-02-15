@@ -4,6 +4,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { FolderStrip } from './components/FolderStrip';
 import { Login } from './components/Login';
 import { MarketplaceOnboarding } from './components/MarketplaceOnboarding';
+import { SettingsPage } from './components/SettingsPage';
 import { authApi, chatApi, getToken, interactionsApi } from './services/api';
 import { usePolling } from './hooks/usePolling';
 import type {
@@ -297,7 +298,7 @@ function normalizeIntegerInput(raw: string, fallback: number, min: number, max: 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeWorkspace, setActiveWorkspace] = useState<'messages' | 'analytics'>('messages');
+  const [activeWorkspace, setActiveWorkspace] = useState<'messages' | 'analytics' | 'settings' | 'dashboard'>('messages');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [dismissedSyncOnboarding, setDismissedSyncOnboarding] = useState(false);
   const [connectionSkipped, setConnectionSkipped] = useState<boolean>(() => {
@@ -1204,7 +1205,11 @@ function App() {
             </svg>
           </button>
           <div className="sidebar-nav">
-            <button type="button" className="sidebar-item sidebar-item-disabled">
+            <button
+              type="button"
+              className={`sidebar-item ${activeWorkspace === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveWorkspace('dashboard')}
+            >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <span className="sidebar-label">Главная</span>
             </button>
@@ -1229,7 +1234,11 @@ function App() {
             </button>
           </div>
           <div className="sidebar-bottom">
-            <button type="button" className="sidebar-item sidebar-item-disabled">
+            <button
+              type="button"
+              className={`sidebar-item ${activeWorkspace === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveWorkspace('settings')}
+            >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               <span className="sidebar-label">Настройки</span>
             </button>
@@ -1241,7 +1250,23 @@ function App() {
         </nav>
 
         <div className="app-content">
-          {activeWorkspace === 'analytics' ? (
+          {activeWorkspace === 'settings' ? (
+            <SettingsPage
+              user={user}
+              onOpenConnectOnboarding={handleResumeConnection}
+              onLogout={handleLogout}
+            />
+          ) : activeWorkspace === 'dashboard' ? (
+            <div className="workspace-placeholder">
+              <svg className="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+              <h2>Главная</h2>
+              <p>Дашборд будет доступен в следующем обновлении</p>
+            </div>
+          ) : activeWorkspace === 'analytics' ? (
             <div className="analytics-page mode-ops" id="analyticsPage">
               <div className="analytics-header">
                 <div className="analytics-title">Аналитика</div>
@@ -1860,9 +1885,13 @@ function App() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span>Аналитика</span>
           </button>
-          <button type="button" className="bottom-nav-item" onClick={handleLogout}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            <span>Выйти</span>
+          <button
+            type="button"
+            className={`bottom-nav-item ${activeWorkspace === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveWorkspace('settings')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Настройки</span>
           </button>
         </nav>
       </div>
