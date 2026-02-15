@@ -150,9 +150,9 @@ async def prometheus_http_middleware(request, call_next):
 @app.get("/health")
 async def health_check():
     """Health check endpoint — verifies DB connectivity."""
-    from app.database import async_session
+    from app.database import AsyncSessionLocal
     try:
-        async with async_session() as db:
+        async with AsyncSessionLocal() as db:
             await db.execute(text("SELECT 1"))
         return {"status": "healthy", "service": "agentiq-chat-center", "version": "0.1.0"}
     except Exception as e:
