@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сценарии — AgentIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+            --color-success: #0f7f4e;
+            --color-warning: #f9ab00;
+            --color-danger: #d93025;
+
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+
+            --transition-fast: 0.12s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 220px;
+            background: var(--color-bg-primary);
+            border-right: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-4);
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-6);
+        }
+
+        .sidebar-logo span {
+            color: var(--color-accent);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            width: 100%;
+            transition: all var(--transition-fast);
+        }
+
+        .sidebar-item:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+
+        .sidebar-item.active {
+            background: var(--color-bg-active);
+            color: var(--color-accent);
+        }
+
+        .sidebar-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-label {
+            flex: 1;
+        }
+
+        .sidebar-badge {
+            background: var(--color-accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border-medium);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .content-header {
+            background: var(--color-bg-primary);
+            border-bottom: 1px solid var(--color-border-medium);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .content-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .content-subtitle {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+        }
+
+        .btn-primary svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Toolbar */
+        .content-toolbar {
+            background: var(--color-bg-primary);
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-lg);
+            padding: 8px 12px 8px 36px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background-color: var(--color-bg-primary);
+            border-color: var(--color-border-medium);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--color-border-medium);
+            background: var(--color-bg-primary);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-chip:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .filter-chip.active {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        /* Content body */
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-6);
+        }
+
+        .scenarios-grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .scenario-group {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .scenario-group-header {
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-tertiary);
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .scenario-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scenario-count {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-tertiary);
+            background: var(--color-bg-primary);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .scenario-group-toggle {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: all var(--transition-fast);
+        }
+
+        .scenario-group-toggle svg {
+            width: 16px;
+            height: 16px;
+            transition: transform var(--transition-fast);
+        }
+
+        .scenario-group.collapsed .scenario-group-toggle svg {
+            transform: rotate(-90deg);
+        }
+
+        .scenario-list {
+            display: grid;
+            gap: 0;
+        }
+
+        .scenario-group.collapsed .scenario-list {
+            display: none;
+        }
+
+        .scenario-item {
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-border-light);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+        }
+
+        .scenario-item:last-child {
+            border-bottom: none;
+        }
+
+        .scenario-item:hover {
+            background: var(--color-bg-hover);
+        }
+
+        .scenario-item.active {
+            background: var(--color-bg-active);
+            border-left: 3px solid var(--color-accent);
+            padding-left: calc(var(--space-5) - 3px);
+        }
+
+        .scenario-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--color-text-secondary);
+        }
+
+        .scenario-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .scenario-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .scenario-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .scenario-preview {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .scenario-meta {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: 6px;
+            align-items: center;
+        }
+
+        .scenario-tag {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-secondary);
+        }
+
+        .scenario-tag.intent {
+            background: #e8f0fe;
+            color: #1967d2;
+        }
+
+        .scenario-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .scenario-item:hover .scenario-actions {
+            opacity: 1;
+        }
+
+        .scenario-action-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            color: var(--color-text-tertiary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .scenario-action-btn:hover {
+            background: var(--color-bg-active);
+            color: var(--color-accent);
+        }
+
+        .scenario-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            width: 400px;
+            background: var(--color-bg-primary);
+            border-left: 1px solid var(--color-border-medium);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .detail-panel.hidden {
+            display: none;
+        }
+
+        .detail-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .detail-close {
+            background: none;
+            border: none;
+            padding: 4px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .detail-close:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+
+        .detail-close svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-5);
+        }
+
+        .detail-section {
+            margin-bottom: var(--space-6);
+        }
+
+        .detail-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-3);
+        }
+
+        .detail-field {
+            margin-bottom: var(--space-4);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        .detail-textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--color-text-primary);
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .detail-textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .detail-footer {
+            padding: var(--space-4) var(--space-5);
+            border-top: 1px solid var(--color-border-medium);
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid var(--color-border-medium);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-hover);
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #b31412;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-6) var(--space-4);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--space-4);
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .empty-state-desc {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .detail-panel {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .content-toolbar {
+                flex-wrap: wrap;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">AGENT<span>IQ</span></div>
+
+            <div class="sidebar-nav">
+                <button class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <span class="sidebar-label">Главная</span>
+                </button>
+
+                <button class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="sidebar-label">Сообщения</span>
+                    <div class="sidebar-badge">3</div>
+                </button>
+
+                <button class="sidebar-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <line x1="10" y1="9" x2="8" y2="9"/>
+                    </svg>
+                    <span class="sidebar-label">Сценарии</span>
+                </button>
+
+                <button class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span class="sidebar-label">Аналитика</span>
+                </button>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    <span class="sidebar-label">Настройки</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="content-header">
+                <div>
+                    <div class="content-title">Сценарии ответов</div>
+                    <div class="content-subtitle">25 шаблонов · Последнее обновление сегодня</div>
+                </div>
+                <button class="btn-primary" onclick="createScenario()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Создать сценарий
+                </button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="content-toolbar">
+                <input type="text" class="search-input" placeholder="Поиск сценариев..." id="searchInput" oninput="filterScenarios()">
+
+                <div class="filter-chips">
+                    <button class="filter-chip active" data-category="all" onclick="filterByCategory('all')">Все</button>
+                    <button class="filter-chip" data-category="faq" onclick="filterByCategory('faq')">Частые вопросы</button>
+                    <button class="filter-chip" data-category="problems" onclick="filterByCategory('problems')">Проблемы</button>
+                    <button class="filter-chip" data-category="positive" onclick="filterByCategory('positive')">Позитив</button>
+                    <button class="filter-chip" data-category="pre-purchase" onclick="filterByCategory('pre-purchase')">Pre-purchase</button>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="content-body">
+                <div class="scenarios-grid" id="scenariosGrid">
+                    <!-- Частые вопросы -->
+                    <div class="scenario-group" data-category="faq">
+                        <div class="scenario-group-header">
+                            <div class="scenario-group-title">
+                                <span>📁 Частые вопросы</span>
+                                <span class="scenario-count">12</span>
+                            </div>
+                            <button class="scenario-group-toggle" onclick="toggleGroup(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="scenario-list">
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Где мой заказ?">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="16" x2="12" y2="12"/>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Где мой заказ?</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Здравствуйте! Ваш заказ сейчас находится в пути. Вы можете отследить его статус в личном кабинете WB по номеру заказа. Доставка обычно занимает 2-5 дней...</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">delivery_tracking</span>
+                                        <span class="scenario-tag">Используется: 145 раз</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Как вернуть товар?">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 14 4 9 9 4"/>
+                                        <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Как вернуть товар?</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Вы можете оформить возврат через личный кабинет WB в разделе "Мои заказы" → "Возврат". Выберите причину "Не подошёл по характеристикам". У вас есть 14 дней...</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">return_refund</span>
+                                        <span class="scenario-tag">Используется: 89 раз</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Размерная сетка">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <line x1="3" y1="9" x2="21" y2="9"/>
+                                        <line x1="9" y1="21" x2="9" y2="9"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Размерная сетка</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Размерная сетка указана в описании товара на карточке. Рекомендуем ориентироваться на ваши измерения (обхват груди, талии, бёдер). Если сомневаетесь, выбирайте больший размер...</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">sizing_fit</span>
+                                        <span class="scenario-tag">Используется: 203 раза</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Проблемы -->
+                    <div class="scenario-group" data-category="problems">
+                        <div class="scenario-group-header">
+                            <div class="scenario-group-title">
+                                <span>⚠️ Проблемы</span>
+                                <span class="scenario-count">8</span>
+                            </div>
+                            <button class="scenario-group-toggle" onclick="toggleGroup(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="scenario-list">
+                            <div class="scenario-item active" onclick="showDetail(this)" data-name="Брак/дефект товара">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Брак/дефект товара</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Нам очень жаль, что вы получили бракованный товар! Это недопустимо. Пожалуйста, оформите возврат через ЛК WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней...</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">defect_not_working</span>
+                                        <span class="scenario-tag">Используется: 67 раз</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Не то пришло">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Не то пришло</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Приносим извинения за путаницу! Такое бывает при сборке на складе. Оформите возврат через ЛК WB как "Не тот товар". Если нужна помощь — напишем инструкцию...</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">wrong_item</span>
+                                        <span class="scenario-tag">Используется: 34 раза</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Позитив -->
+                    <div class="scenario-group" data-category="positive">
+                        <div class="scenario-group-header">
+                            <div class="scenario-group-title">
+                                <span>⭐ Позитив</span>
+                                <span class="scenario-count">5</span>
+                            </div>
+                            <button class="scenario-group-toggle" onclick="toggleGroup(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="scenario-list">
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Спасибо за отзыв">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Спасибо за отзыв</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Спасибо за ваш отзыв! Очень рады, что вам всё понравилось. Будем ждать вас снова! 😊</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">positive_feedback</span>
+                                        <span class="scenario-tag">Используется: 512 раз</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scenario-item" onclick="showDetail(this)" data-name="Промокод за 5★">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 12 20 22 4 22 4 12"/>
+                                        <rect x="2" y="7" width="20" height="5"/>
+                                        <line x1="12" y1="22" x2="12" y2="7"/>
+                                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                                    </svg>
+                                </div>
+                                <div class="scenario-content">
+                                    <div class="scenario-header">
+                                        <div class="scenario-name">Промокод за 5★</div>
+                                        <div class="scenario-actions">
+                                            <button class="scenario-action-btn" title="Копировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                            </button>
+                                            <button class="scenario-action-btn" title="Редактировать">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-preview">Большое спасибо за пять звёзд! В знак благодарности дарим вам промокод THANKS10 на скидку 10% на следующую покупку. Действует 30 дней.</div>
+                                    <div class="scenario-meta">
+                                        <span class="scenario-tag intent">positive_feedback</span>
+                                        <span class="scenario-tag">Используется: 78 раз</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <div class="detail-title">Брак/дефект товара</div>
+                <button class="detail-close" onclick="hideDetail()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="detail-body">
+                <div class="detail-section">
+                    <div class="detail-section-title">Основное</div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Название</div>
+                        <div class="detail-value">Брак/дефект товара</div>
+                    </div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Категория</div>
+                        <div class="detail-value">Проблемы</div>
+                    </div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Интент</div>
+                        <div class="detail-value">defect_not_working</div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">Текст сценария</div>
+
+                    <div class="detail-field">
+                        <textarea class="detail-textarea" id="scenarioText">Нам очень жаль, что вы получили бракованный товар! Это недопустимо.
+
+Пожалуйста, оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.
+
+Мы проверим партию товара, чтобы исключить повторение ситуации. Спасибо за понимание!</textarea>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">Статистика</div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Использований</div>
+                        <div class="detail-value">67 раз за последние 30 дней</div>
+                    </div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Последнее использование</div>
+                        <div class="detail-value">Сегодня в 14:23</div>
+                    </div>
+
+                    <div class="detail-field">
+                        <div class="detail-label">Создан</div>
+                        <div class="detail-value">12 января 2026</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-footer">
+                <button class="btn-secondary">Сохранить</button>
+                <button class="btn-secondary btn-danger">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle group collapse
+        function toggleGroup(btn) {
+            btn.closest('.scenario-group').classList.toggle('collapsed');
+        }
+
+        // Show detail panel
+        function showDetail(item) {
+            // Remove active from all items
+            document.querySelectorAll('.scenario-item').forEach(i => i.classList.remove('active'));
+            // Add active to clicked item
+            item.classList.add('active');
+            // Show detail panel
+            document.getElementById('detailPanel').classList.remove('hidden');
+
+            // Update detail panel title
+            const name = item.dataset.name;
+            document.querySelector('.detail-title').textContent = name;
+        }
+
+        // Hide detail panel
+        function hideDetail() {
+            document.getElementById('detailPanel').classList.add('hidden');
+            document.querySelectorAll('.scenario-item').forEach(i => i.classList.remove('active'));
+        }
+
+        // Create scenario
+        function createScenario() {
+            alert('Откроется форма создания нового сценария');
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            // Update active chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter groups
+            const groups = document.querySelectorAll('.scenario-group');
+            groups.forEach(group => {
+                if (category === 'all') {
+                    group.style.display = 'block';
+                } else {
+                    if (group.dataset.category === category) {
+                        group.style.display = 'block';
+                    } else {
+                        group.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Search scenarios
+        function filterScenarios() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.scenario-item');
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentIQ — Пример анализа по артикулу</title>
+    <meta
+      name="description"
+      content="Пример того, как выглядит анализ коммуникаций по артикулу: отзывы, вопросы и чаты, основные проблемы и план действий."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body { margin: 0; font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a1a; background: #ffffff; line-height: 1.55; }
+      a { color: inherit; }
+      img { max-width: 100%; display: block; }
+
+      :root {
+        --bg-2: #fafbfc;
+        --bg-3: #f8f9fa;
+        --border: #e8eaed;
+        --text-2: #5f6368;
+        --text-3: #9aa0a6;
+        --accent: #1a73e8;
+        --accent-2: #0f56b3;
+        --accent-bg: rgba(26, 115, 232, 0.08);
+        --radius: 16px;
+        --radius2: 20px;
+        --shadow: 0 10px 30px rgba(0,0,0,.08);
+        --max: 1100px;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 720px;
+        height: 720px;
+        background: radial-gradient(circle, rgba(26,115,232,.06) 0%, transparent 70%);
+      }
+      .bg::after {
+        content: "";
+        position: absolute;
+        bottom: 10%;
+        left: -15%;
+        width: 560px;
+        height: 560px;
+        background: radial-gradient(circle, rgba(26,115,232,.045) 0%, transparent 70%);
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255,255,255,.92);
+        backdrop-filter: blur(18px) saturate(180%);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        border-bottom: 1px solid var(--border);
+      }
+      .topbar .inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .brand {
+        font-weight: 900;
+        letter-spacing: .6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .brand span { color: var(--accent); }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 9999px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,.7);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
+      }
+      .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.92); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+      .btn.primary { background: #1a1a1a; border-color: transparent; color: #fff; }
+      .btn.primary:hover { box-shadow: 0 10px 30px rgba(26,115,232,.18); }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 28px 20px 72px;
+      }
+      .hero {
+        border: 1px solid var(--border);
+        border-radius: var(--radius2);
+        background: rgba(255,255,255,.86);
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+        padding: 22px;
+        overflow: hidden;
+        position: relative;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(26,115,232,.12), transparent 45%),
+          radial-gradient(circle at 85% 60%, rgba(26,115,232,.08), transparent 45%);
+        pointer-events: none;
+      }
+      .hero .content { position: relative; }
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        background: var(--accent-bg);
+        color: var(--accent-2);
+        font-weight: 800;
+        font-size: 12px;
+      }
+      h1 {
+        margin: 14px 0 0;
+        font-size: clamp(26px, 3.2vw, 40px);
+        letter-spacing: -1px;
+        line-height: 1.06;
+      }
+      .sub {
+        margin-top: 10px;
+        color: var(--text-2);
+        max-width: 85ch;
+      }
+      .hero-actions {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .grid {
+        margin-top: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      @media (min-width: 860px) {
+        .grid { grid-template-columns: 1.2fr .8fr; }
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px;
+      }
+      .card h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -.2px;
+      }
+      .muted { color: var(--text-2); }
+      .note { color: var(--text-3); font-size: 12px; }
+
+      .kpis {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+      @media (min-width: 860px) {
+        .kpis { grid-template-columns: repeat(2, 1fr); }
+      }
+      .kpi {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(26,115,232,.06), rgba(255,255,255,.92));
+        padding: 14px;
+      }
+      .kpi .val { font-weight: 900; font-size: 20px; letter-spacing: -.6px; }
+      .kpi .lbl { margin-top: 6px; color: var(--text-2); font-weight: 700; }
+      .kpi .hint { margin-top: 8px; color: var(--text-3); font-size: 12px; }
+
+      .list {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--text-2);
+      }
+      .list li { margin: 8px 0; }
+
+      .split {
+        margin-top: 12px;
+        display: grid;
+        gap: 12px;
+      }
+      @media (min-width: 860px) {
+        .split { grid-template-columns: 1fr 1fr; }
+      }
+
+      .example {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .example .head {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg-3);
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        background: rgba(0,0,0,.04);
+        color: var(--text-2);
+        font-weight: 800;
+        font-size: 12px;
+      }
+      .pill.bad { background: rgba(234,67,53,.12); color: #8a1a10; }
+      .pill.good { background: rgba(52,168,83,.14); color: #0f5a2a; }
+      .example .body { padding: 12px; }
+      .quote {
+        margin: 0;
+        padding: 12px;
+        border-radius: 14px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        color: #2b2b2b;
+      }
+      .quote + .quote { margin-top: 10px; }
+
+      .media {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--bg-2);
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      }
+      .media .cap {
+        padding: 10px 12px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--text-3);
+      }
+
+      .proto-frame {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--bg-2);
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      }
+      .proto-frame iframe {
+        width: 100%;
+        height: 640px;
+        border: 0;
+        background: var(--bg-2);
+      }
+      @media (max-width: 640px) {
+        .proto-frame iframe {
+          height: 520px;
+        }
+      }
+
+      @media print {
+        .bg, .topbar { display: none !important; }
+        .wrap { padding: 0; }
+        .hero { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="inner">
+        <a class="brand" href="/" aria-label="AgentIQ">
+          AGENT<span>IQ</span>
+        </a>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a class="btn" href="/">На главную</a>
+          <a class="btn primary" href="/?open=1">Получить анализ</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div class="content">
+          <span class="tag">Пример</span>
+          <h1>Как выглядит анализ коммуникаций по артикулу</h1>
+          <p class="sub">
+            Это демонстрационная страница: показывает структуру и подачу. В реальном анализе цифры и примеры берутся из ваших данных по WB.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="/?open=1">Получить анализ по своему артикулу</a>
+            <a class="btn" href="#screens">Посмотреть интерфейс</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Сводка (пример)</h2>
+          <p class="muted" style="margin:10px 0 0;">
+            Артикул: <strong>282955222</strong> · Категория: <strong>товары для дома</strong> · Период: <strong>30 дней</strong>
+          </p>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="val">214</div>
+              <div class="lbl">отзывов за 30 дней</div>
+              <div class="hint">Негатив 1–2★: 18</div>
+            </div>
+            <div class="kpi">
+              <div class="val">37</div>
+              <div class="lbl">вопросов без ответа</div>
+              <div class="hint">Срочные: 9</div>
+            </div>
+            <div class="kpi">
+              <div class="val">12</div>
+              <div class="lbl">чатов “в работе”</div>
+              <div class="hint">Есть повторные обращения</div>
+            </div>
+            <div class="kpi">
+              <div class="val">6</div>
+              <div class="lbl">просрочено по дедлайну</div>
+              <div class="hint">“Горит” в ближайшие 2 часа: 11</div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Что важно прямо сейчас</h2>
+          <ul class="list">
+            <li>Снять просрочку по вопросам (покупатели “уходят” без ответа).</li>
+            <li>Поменять шаблон на негатив: убрать обвинения и “отписки”.</li>
+            <li>Закрыть повторяющуюся проблему в карточке товара (чтобы не множить обращения).</li>
+          </ul>
+          <p class="note" style="margin:10px 0 0;">
+            В рабочем сервисе это подсвечивается как очередь + алерты + приоритеты.
+          </p>
+        </aside>
+      </div>
+
+      <section class="card" style="margin-top: 12px;">
+        <h2>Основные проблемы (пример)</h2>
+        <div class="split">
+          <div class="card" style="padding:14px;">
+            <h2 style="font-size:14px;">Проблема #1: комплектация / брак</h2>
+            <p class="muted" style="margin:8px 0 0;">Повторяется в 23 отзывах и 7 чатах.</p>
+            <ul class="list">
+              <li>Покупатели жалуются на “не доложили деталь”.</li>
+              <li>Часто просят обмен/возврат.</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:14px;">
+            <h2 style="font-size:14px;">Проблема #2: ожидания от товара</h2>
+            <p class="muted" style="margin:8px 0 0;">Повторяется в 16 вопросах “до покупки”.</p>
+            <ul class="list">
+              <li>Непонятны размеры/совместимость.</li>
+              <li>Вопросы типовые, их можно закрыть карточкой.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 12px;">
+        <h2>Пример ответа: как сейчас и как лучше</h2>
+        <div class="example">
+          <div class="head">
+            <span class="pill">Отзыв 1★</span>
+            <span class="pill">Покупатель: Анна</span>
+          </div>
+          <div class="body">
+            <p class="note" style="margin:0 0 8px;">Текст отзыва (пример): “Пришло без детали, как собирать?”</p>
+
+            <div class="quote">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <strong>Ответ продавца (плохо)</strong>
+                <span class="pill bad">вредит</span>
+              </div>
+              <p style="margin:8px 0 0;">
+                “В комплекте всё было. Обратитесь в поддержку WB.”
+              </p>
+            </div>
+
+            <div class="quote">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <strong>Рекомендованный ответ</strong>
+                <span class="pill good">нормально</span>
+              </div>
+              <p style="margin:8px 0 0;">
+                “Анна, добрый день! Извините за ситуацию. Напишите, пожалуйста, номер заказа и какая деталь отсутствует.
+                Мы подскажем решение и поможем оформить замену/компенсацию через WB. Спасибо, что написали.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="screens" style="margin-top: 12px;">
+        <h2>Как выглядит интерфейс (HTML-демо)</h2>
+        <p class="note" style="margin:8px 0 0;">
+          Ниже интерактивный прототип. Можно кликать и переключать экраны как в демо.
+        </p>
+        <div class="proto-frame" role="group" aria-label="Интерактивный прототип интерфейса">
+          <iframe
+            src="/prototype.html"
+            title="AgentIQ — прототип интерфейса"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <div class="hero-actions" style="margin-top: 12px;">
+          <a class="btn" href="/prototype.html" target="_blank" rel="noopener">Открыть прототип в новой вкладке</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

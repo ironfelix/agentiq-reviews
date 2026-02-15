@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Comparison: Сценарии в меню</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-6: 24px;
+
+            --radius-md: 6px;
+            --radius-lg: 8px;
+
+            --transition-fast: 0.12s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            padding: 40px 20px;
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .comparison-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .comparison-header p {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .comparison-container {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+
+        .variant {
+            flex: 0 0 auto;
+        }
+
+        .variant-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--color-text-primary);
+        }
+
+        .variant-label {
+            display: inline-block;
+            background: var(--color-accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .variant-label.alt {
+            background: #9aa0a6;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 220px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-6);
+        }
+
+        .sidebar-logo span {
+            color: var(--color-accent);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            width: 100%;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .sidebar-item:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+
+        .sidebar-item.active {
+            background: var(--color-bg-active);
+            color: var(--color-accent);
+        }
+
+        .sidebar-item.new {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
+            border: 1px dashed var(--color-accent);
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .sidebar-item.new::after {
+            content: "NEW";
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--color-accent);
+            background: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .sidebar-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-label {
+            flex: 1;
+        }
+
+        .sidebar-badge {
+            background: var(--color-accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border-medium);
+        }
+
+        /* Content area preview */
+        .content-preview {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border-medium);
+        }
+
+        .content-preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--color-text-primary);
+        }
+
+        .content-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--color-border-medium);
+        }
+
+        .content-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .content-tab.active {
+            color: var(--color-accent);
+            border-bottom-color: var(--color-accent);
+        }
+
+        .scenario-group {
+            margin-bottom: 16px;
+        }
+
+        .scenario-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .scenario-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .scenario-item:hover {
+            background: var(--color-bg-active);
+            color: var(--color-accent);
+        }
+
+        .pros-cons {
+            margin-top: 20px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .pros, .cons {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+        }
+
+        .pros {
+            background: #f0f9f4;
+            border: 1px solid #d1f4e0;
+        }
+
+        .cons {
+            background: #fef3f2;
+            border: 1px solid #fecdca;
+        }
+
+        .pros h4, .cons h4 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .pros h4 {
+            color: #0f7f4e;
+        }
+
+        .cons h4 {
+            color: #c41e3a;
+        }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pros li, .cons li {
+            margin-bottom: 4px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .pros li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #0f7f4e;
+            font-weight: 600;
+        }
+
+        .cons li::before {
+            content: "×";
+            position: absolute;
+            left: 0;
+            color: #c41e3a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-header">
+        <h1>Куда добавить "Сценарии" в меню?</h1>
+        <p>Сравнение двух вариантов архитектуры навигации</p>
+    </div>
+
+    <div class="comparison-container">
+        <!-- ВАРИАНТ 1: Автоматизация -->
+        <div class="variant">
+            <h2 class="variant-title">Вариант 1: "Автоматизация" <span class="variant-label">Рекомендую</span></h2>
+
+            <div class="sidebar">
+                <div class="sidebar-logo">AGENT<span>IQ</span></div>
+
+                <div class="sidebar-nav">
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <span class="sidebar-label">Главная</span>
+                    </button>
+
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span class="sidebar-label">Сообщения</span>
+                        <div class="sidebar-badge">3</div>
+                    </button>
+
+                    <button class="sidebar-item new active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        </svg>
+                        <span class="sidebar-label">Автоматизация</span>
+                    </button>
+
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        <span class="sidebar-label">Аналитика</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-bottom">
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        <span class="sidebar-label">Настройки</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-preview">
+                <div class="content-preview-title">Автоматизация</div>
+
+                <div class="content-tabs">
+                    <button class="content-tab active">Сценарии</button>
+                    <button class="content-tab">Автоответы</button>
+                    <button class="content-tab">Промокоды</button>
+                    <button class="content-tab">Follow-up</button>
+                </div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Частые вопросы (12)</div>
+                    <div class="scenario-item">"Где мой заказ?"</div>
+                    <div class="scenario-item">"Как вернуть товар?"</div>
+                    <div class="scenario-item">"Размерная сетка"</div>
+                </div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Проблемы (8)</div>
+                    <div class="scenario-item">"Брак/дефект"</div>
+                    <div class="scenario-item">"Не то пришло"</div>
+                </div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Позитив (5)</div>
+                    <div class="scenario-item">"Спасибо за отзыв"</div>
+                    <div class="scenario-item">"Промокод за 5★"</div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Плюсы</h4>
+                    <ul>
+                        <li>Всё про automation в 1 месте</li>
+                        <li>Компактное меню (4 пункта)</li>
+                        <li>Масштабируется (alerts, upsell)</li>
+                        <li>SaaS паттерн (Intercom, Zendesk)</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Минусы</h4>
+                    <ul>
+                        <li>Нужно рефакторить промокоды</li>
+                        <li>Название может быть непонятным</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВАРИАНТ 2: Финальный (промокоды в настройках) -->
+        <div class="variant">
+            <h2 class="variant-title">Финальный вариант <span class="variant-label">✓ Выбран</span></h2>
+
+            <div class="sidebar">
+                <div class="sidebar-logo">AGENT<span>IQ</span></div>
+
+                <div class="sidebar-nav">
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <span class="sidebar-label">Главная</span>
+                    </button>
+
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span class="sidebar-label">Сообщения</span>
+                        <div class="sidebar-badge">3</div>
+                    </button>
+
+                    <button class="sidebar-item new active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <line x1="10" y1="9" x2="8" y2="9"/>
+                        </svg>
+                        <span class="sidebar-label">Сценарии</span>
+                    </button>
+
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        <span class="sidebar-label">Аналитика</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-bottom">
+                    <button class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        <span class="sidebar-label">Настройки</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-preview">
+                <div class="content-preview-title">Сценарии</div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Частые вопросы (12)</div>
+                    <div class="scenario-item">"Где мой заказ?"</div>
+                    <div class="scenario-item">"Как вернуть товар?"</div>
+                    <div class="scenario-item">"Размерная сетка"</div>
+                </div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Проблемы (8)</div>
+                    <div class="scenario-item">"Брак/дефект"</div>
+                    <div class="scenario-item">"Не то пришло"</div>
+                </div>
+
+                <div class="scenario-group">
+                    <div class="scenario-group-title">📁 Позитив (5)</div>
+                    <div class="scenario-item">"Спасибо за отзыв"</div>
+                    <div class="scenario-item">"Промокод за 5★"</div>
+                </div>
+            </div>
+
+            <div class="content-preview" style="margin-top: 16px;">
+                <div class="content-preview-title">Настройки → Промокоды</div>
+                <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.6;">
+                    <p style="margin-bottom: 8px;">Промокоды теперь в <strong>Настройках</strong> (логично — настраиваются редко):</p>
+                    <ul style="padding-left: 20px; margin-bottom: 0;">
+                        <li>Профиль</li>
+                        <li>Подключения (WB, Ozon)</li>
+                        <li><strong>🎁 Промокоды</strong></li>
+                        <li>Уведомления</li>
+                        <li>Биллинг</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Плюсы</h4>
+                    <ul>
+                        <li><strong>4 пункта в меню</strong> (компактно!)</li>
+                        <li>Прямой доступ к сценариям</li>
+                        <li>Промокоды в Настройках (логично)</li>
+                        <li>Не нужен рефакторинг automation</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Минусы</h4>
+                    <ul>
+                        <li>Промокоды на +1 клик дальше</li>
+                        <li>Нет объединения automation-фич</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

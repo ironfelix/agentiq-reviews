@@ -101,6 +101,31 @@ body {
 .screen-nav button:hover { background: rgba(255,255,255,0.1); color: white; }
 .screen-nav button.active { background: var(--color-accent); color: white; }
 
+/* ===== EMBED MODE (for landing iframes) ===== */
+html.embed .screen-nav,
+html.embed .cjm-note {
+    display: none !important;
+}
+html.embed .screen {
+    height: 100vh;
+}
+html.embed body {
+    background: var(--color-bg-primary);
+}
+html.embed .screen.active {
+    animation: none !important;
+}
+
+/* Hide scrollbars completely and prevent “iframe embed” feel */
+html.embed * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+html.embed *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+}
+
 /* ===== SCREEN CONTAINER ===== */
 .screen {
     display: none;
@@ -123,6 +148,18 @@ body {
 .chat-messages,
 .settings-content {
     padding-bottom: 64px !important;
+}
+
+/* Embed previews should look like “snapshots”: no internal scrolling and no extra bottom space */
+html.embed .dashboard,
+html.embed .msg-list,
+html.embed .msg-list-body,
+html.embed .msg-chat-messages,
+html.embed .chat-messages,
+html.embed .settings-content,
+html.embed .analytics-page {
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
 }
 
 /* ===== CJM ANNOTATION ===== */
@@ -4809,9 +4846,15 @@ function showScreen(name) {
     });
     document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
 
-    // Show target
-    document.getElementById('screen-' + name).classList.add('active');
-    document.getElementById('nav-' + name).classList.add('active');
+    // Show target (fallback to onboarding if unknown)
+    let screenEl = document.getElementById('screen-' + name);
+    if (!screenEl) {
+        name = 'onboarding';
+        screenEl = document.getElementById('screen-' + name);
+    }
+    if (screenEl) screenEl.classList.add('active');
+    const navBtn = document.getElementById('nav-' + name);
+    if (navBtn) navBtn.classList.add('active');
 
     // Update bottom nav active states (each app-shell screen has its own bottom-nav)
     document.querySelectorAll('.bottom-nav').forEach(nav => {
@@ -4828,8 +4871,9 @@ function showScreen(name) {
         }
     }
 
-    // Update CJM note
-    document.getElementById('cjm-note').innerHTML = cjmNotes[name] || '';
+    // Update CJM note (hidden in embed mode)
+    const cjmEl = document.getElementById('cjm-note');
+    if (cjmEl) cjmEl.innerHTML = cjmNotes[name] || '';
 
     // Close contextual side panels when switching screens
     const dashboardContextPanel = document.getElementById('dashboardContextPanel');
@@ -4876,8 +4920,34 @@ function showSettingsTab(tab) {
     event.target.closest('.settings-nav-item').classList.add('active');
 }
 
-// Start with onboarding
-showScreen('onboarding');
+// Init from query:
+// - ?screen=messages|analytics|...
+// - ?embed=1 hides dev navigator + CJM notes (for landing iframes)
+// - ?mode=ops|full toggles analytics mode
+(function initFromQuery() {
+    let initialScreen = 'onboarding';
+    try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('embed') === '1') {
+            document.documentElement.classList.add('embed');
+        }
+
+        const requested = url.searchParams.get('screen');
+        if (requested && document.getElementById('screen-' + requested)) {
+            initialScreen = requested;
+        }
+
+        showScreen(initialScreen);
+
+        // Optional analytics mode override
+        const mode = url.searchParams.get('mode');
+        if (initialScreen === 'analytics' && (mode === 'ops' || mode === 'full')) {
+            setAnalyticsMode(mode, null);
+        }
+    } catch (e) {
+        showScreen(initialScreen);
+    }
+})();
 </script>
 
 </body>

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentIQ — Центр контроля коммуникаций Wildberries</title>
+    <title>AgentIQ — Лендинг (черновик)</title>
     <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
+    <meta name="robots" content="noindex,nofollow">
     <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
     <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный анализ коммуникаций.">
     <meta property="og:type" content="website">
@@ -676,7 +677,6 @@
             color: var(--color-text-secondary);
             line-height: 1.6;
         }
-
         /* ===== FEATURES SECTION ===== */
         .features-grid {
             display: grid;
@@ -690,30 +690,93 @@
         }
 
         .feature-card {
-            padding: 28px;
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-lg);
+            padding: 26px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--radius-2xl);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
             transition: all var(--transition-medium);
             position: relative;
             overflow: hidden;
         }
 
         .feature-card:hover {
-            border-color: var(--color-border-dark);
+            border-color: rgba(0,0,0,0.16);
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 18px 48px rgba(0,0,0,0.08);
         }
 
-        .feature-number {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 56px;
+        .feature-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feature-chip {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
             font-weight: 800;
-            color: rgba(26, 115, 232, 0.04);
-            line-height: 1;
-            pointer-events: none;
+            letter-spacing: 0.2px;
+            color: rgba(26,115,232,0.95);
+            background: rgba(26,115,232,0.10);
+            border: 1px solid rgba(26,115,232,0.18);
+            white-space: nowrap;
+        }
+
+        .feature-chip i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(26,115,232,0.85);
+            display: inline-block;
+        }
+
+        .feature-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .feature-icon.queue {
+            background: rgba(26,115,232,0.10);
+            border-color: rgba(26,115,232,0.18);
+            color: rgba(26,115,232,0.95);
+        }
+
+        .feature-icon.deadline {
+            background: rgba(249,171,0,0.14);
+            border-color: rgba(249,171,0,0.22);
+            color: rgba(160,90,0,0.95);
+        }
+
+        .feature-icon.ai {
+            background: rgba(103,58,183,0.10);
+            border-color: rgba(103,58,183,0.18);
+            color: rgba(103,58,183,0.95);
+        }
+
+        .feature-icon.quality {
+            background: rgba(52,168,83,0.10);
+            border-color: rgba(52,168,83,0.18);
+            color: rgba(52,168,83,0.95);
         }
 
         .feature-card h3 {
@@ -727,6 +790,25 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             line-height: 1.6;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .feature-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+            color: rgba(0,0,0,0.62);
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         /* ===== MONEY SECTION ===== */
@@ -792,19 +874,18 @@
         @media (min-width: 768px) {
             .offer-wrapper { grid-template-columns: 1fr 1fr; }
         }
-
         .offer-card {
             padding: 32px;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.08);
             position: relative;
             overflow: hidden;
-            background: var(--color-bg-primary);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
         }
-
         .offer-card.primary {
-            border-color: var(--color-text-primary);
-            box-shadow: 0 0 0 1px var(--color-text-primary);
+            border-color: rgba(0,0,0,0.82);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.82), 0 16px 46px rgba(0,0,0,0.10);
         }
 
         .offer-card.primary::before {
@@ -816,9 +897,8 @@
             height: 3px;
             background: var(--color-text-primary);
         }
-
         .offer-card.secondary {
-            background: var(--color-bg-secondary);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
         }
 
         .offer-badge {
@@ -863,7 +943,6 @@
             gap: 10px;
             margin-bottom: var(--space-6);
         }
-
         .offer-checklist li {
             display: flex;
             align-items: flex-start;
@@ -871,6 +950,10 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.06);
         }
 
         .offer-checklist .check {
@@ -1001,53 +1084,113 @@
             line-height: 1.5;
         }
 
-        /* ===== PRODUCT — “INSIDE” GALLERY ===== */
+        /* ===== PRODUCT — “INSIDE” GALLERY (SaaS snap carousel) ===== */
         .proof-slider {
-            margin-top: 32px;
+            margin-top: 26px;
             position: relative;
+            width: 100vw;
+            /* Break out of the container for the “big screens” SaaS feel */
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
         }
 
         .proof-gallery {
-            display: grid;
-            gap: 16px;
-            margin-top: 18px;
+            --snap-max: 1040px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding: 6px max(16px, calc((100vw - var(--snap-max)) / 2)) 18px;
+            scroll-snap-type: x mandatory;
+            scroll-padding-inline: max(16px, calc((100vw - var(--snap-max)) / 2));
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x pan-y;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-
-        /* Mobile: swipeable cards */
-        @media (max-width: 899px) {
-            .proof-gallery {
-                display: flex;
-                gap: 14px;
-                overflow-x: auto;
-                padding: 2px 4px 10px;
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
-            }
-            .proof-gallery::-webkit-scrollbar { display: none; }
-        }
-
-        /* Desktop: 3-column grid */
-        @media (min-width: 900px) {
-            .proof-gallery {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 22px;
-                align-items: start;
-            }
-        }
+        .proof-gallery::-webkit-scrollbar { display: none; }
 
         .proof-card {
+            flex: 0 0 auto;
+            width: min(96vw, var(--snap-max));
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
             display: flex;
             flex-direction: column;
             gap: 14px;
         }
+        @media (max-width: 640px) {
+            .proof-card { width: 92vw; }
+        }
 
-        @media (max-width: 899px) {
-            .proof-card {
-                flex: 0 0 88%;
-                scroll-snap-align: start;
-            }
+        /* Edge fades to hint “scroll me” without looking like a broken block */
+        .proof-slider::before,
+        .proof-slider::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(22px, 6vw, 96px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .proof-slider::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+        .proof-slider::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+
+        .proof-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .proof-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border-medium);
+            background: rgba(255,255,255,0.9);
+            color: var(--color-text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .proof-arrow:hover {
+            border-color: var(--color-border-dark);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        .proof-arrow:active { transform: scale(0.98); }
+
+        .proof-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        .proof-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.15);
+            transition: all var(--transition-fast);
+        }
+        .proof-dot.active {
+            width: 22px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.75);
+        }
+        @media (max-width: 640px) {
+            .proof-arrow { display: none; }
         }
 
         .proof-slide-img {
@@ -1063,7 +1206,7 @@
         /* “Screenshots” as HTML mockups (no iframe) */
         .proof-mock {
             width: 100%;
-            aspect-ratio: 16 / 10;
+            height: min(72vh, 560px);
             border-radius: var(--radius-2xl);
             border: 1px solid rgba(0,0,0,0.10);
             background: radial-gradient(1200px 600px at 20% 10%, rgba(26,115,232,0.10), transparent 55%),
@@ -1393,14 +1536,15 @@
         }
 
         .proof-swipe-hint {
-            margin-top: 12px;
+            margin-top: 10px;
             font-size: 12px;
             color: var(--color-text-tertiary);
             font-weight: 650;
             letter-spacing: 0.1px;
             display: none;
+            text-align: center;
         }
-        @media (max-width: 899px) {
+        @media (max-width: 900px) {
             .proof-swipe-hint { display: block; }
         }
 
@@ -1812,16 +1956,15 @@
             .comparison-card h3 {
                 font-size: 16px;
             }
-
             /* Feature cards */
             .feature-card {
                 padding: 22px;
             }
 
-            .feature-number {
-                font-size: 44px;
-                top: 14px;
-                right: 14px;
+            .feature-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 12px;
             }
 
             /* Steps */
@@ -1829,7 +1972,7 @@
             .step-num { width: 32px; height: 32px; border-radius: 12px; }
 
             /* Product preview */
-            .proof-card { flex-basis: 92%; }
+            .proof-card { flex-basis: auto; }
             .proof-slide-text h3 { font-size: 17px; }
 
             /* Money cards */
@@ -2166,9 +2309,9 @@
             <h2 class="section-title">Внутри сервиса</h2>
             <p class="section-subtitle">Как выглядит контроль коммуникаций на&nbsp;практике.</p>
         </div>
-        <div class="proof-slider reveal">
-            <div class="proof-gallery" aria-label="Превью интерфейса AgentIQ">
-                <div class="proof-card">
+	        <div class="proof-slider reveal">
+	            <div class="proof-gallery" aria-label="Превью интерфейса AgentIQ">
+	                <div class="proof-card">
                     <div class="proof-slide-img">
                         <div class="proof-mock" aria-label="Единое окно: статичный макет интерфейса">
                         <div class="proof-mock-top">
@@ -2415,11 +2558,20 @@
                         <h3>Приоритеты и SLA</h3>
                         <p>Видно, что просрочено и что “горит” сейчас. Очередь управляется, а не живёт сама по себе.</p>
                     </div>
-                </div>
-            </div>
-            <div class="proof-swipe-hint">На телефоне можно листать превью влево-вправо.</div>
-        </div>
-    </div>
+	                </div>
+	            </div>
+	            <div class="proof-controls" aria-label="Навигация по превью">
+	                <button class="proof-arrow" type="button" data-proof-arrow="-1" aria-label="Предыдущий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	                <div class="proof-dots" id="proofDots" aria-hidden="true"></div>
+	                <button class="proof-arrow" type="button" data-proof-arrow="1" aria-label="Следующий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	            </div>
+	            <div class="proof-swipe-hint">Листайте превью влево-вправо.</div>
+	        </div>
+	    </div>
 </section>
 
 <!-- ===== HOW IT WORKS ===== -->
@@ -2460,24 +2612,76 @@
         </div>
         <div class="features-grid">
             <div class="feature-card reveal reveal-delay-1">
-                <span class="feature-number">01</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Единое окно</span>
+                    <span class="feature-icon queue" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M4 4h10M4 8h10M4 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M2 4h0.01M2 8h0.01M2 12h0.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Единая очередь обращений</h3>
                 <p>Все чаты, вопросы и&nbsp;отзывы&nbsp;WB в&nbsp;одном интерфейсе. Быстро находите нужное и не теряете контекст.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">Чаты</span>
+                    <span class="feature-tag">Вопросы</span>
+                    <span class="feature-tag">Отзывы</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-2">
-                <span class="feature-number">02</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>SLA и приоритет</span>
+                    <span class="feature-icon deadline" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Приоритет и дедлайн ответа</h3>
                 <p>Срочные кейсы всегда наверху. Видно, что просрочено и что “горит” в ближайшее время.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">due soon</span>
+                    <span class="feature-tag">overdue</span>
+                    <span class="feature-tag">алерты</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-3">
-                <span class="feature-number">03</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>AI draft</span>
+                    <span class="feature-icon ai" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M3.5 12.5V4.8c0-.7.6-1.3 1.3-1.3h6.4c.7 0 1.3.6 1.3 1.3v6.4c0 .7-.6 1.3-1.3 1.3H6.7L4.8 13.9c-.6.4-1.3 0-1.3-.7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6 6.7h4M6 9.2h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Черновик ответа от ИИ</h3>
                 <p>ИИ предлагает текст под ситуацию: можно принять как есть или быстро отредактировать и отправить.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">тон общения</span>
+                    <span class="feature-tag">контекст</span>
+                    <span class="feature-tag">скорость</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-4">
-                <span class="feature-number">04</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Контроль качества</span>
+                    <span class="feature-icon quality" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 14s5-2 5-6V4.4L8 2 3 4.4V8c0 4 5 6 5 6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6.2 8.1l1.1 1.1 2.6-2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Контроль качества и проблемных точек</h3>
                 <p>Видно, где ответы чаще редактируются вручную, где растёт негатив и какие товары требуют внимания.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">причины негатива</span>
+                    <span class="feature-tag">товары риска</span>
+                    <span class="feature-tag">обучение</span>
+                </div>
             </div>
         </div>
     </div>
@@ -2744,6 +2948,70 @@
     }
 
     // “Внутри сервиса” is pure HTML mockups with native horizontal scroll on mobile (scroll-snap).
+    (function initProofSnapCarousel() {
+        const track = document.querySelector('#proof .proof-gallery');
+        const dots = document.getElementById('proofDots');
+        if (!track || !dots) return;
+
+        const cards = Array.from(track.querySelectorAll('.proof-card'));
+        if (!cards.length) return;
+
+        dots.innerHTML = '';
+        const dotEls = cards.map((_, i) => {
+            const d = document.createElement('span');
+            d.className = 'proof-dot' + (i === 0 ? ' active' : '');
+            dots.appendChild(d);
+            return d;
+        });
+
+        function scrollByCard(dir) {
+            const card = cards[0];
+            const cardW = card ? card.getBoundingClientRect().width : 0;
+            // Match the CSS gap (18px) so each click lands close to the next snap point.
+            track.scrollBy({ left: dir * (cardW + 18), behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('[data-proof-arrow]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dir = parseInt(btn.getAttribute('data-proof-arrow'), 10) || 0;
+                scrollByCard(dir);
+            });
+        });
+
+        // Active dot: based on which card is closest to the center of the viewport.
+        let raf = 0;
+        function updateActiveDot() {
+            raf = 0;
+            const trackRect = track.getBoundingClientRect();
+            const centerX = trackRect.left + trackRect.width / 2;
+
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            cards.forEach((card, idx) => {
+                const r = card.getBoundingClientRect();
+                const c = r.left + r.width / 2;
+                const dist = Math.abs(c - centerX);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIdx = idx;
+                }
+            });
+
+            dotEls.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        }
+
+        track.addEventListener('scroll', () => {
+            if (raf) return;
+            raf = requestAnimationFrame(updateActiveDot);
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(updateActiveDot);
+        });
+
+        updateActiveDot();
+    })();
 
     // ===== SMOOTH SCROLL =====
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

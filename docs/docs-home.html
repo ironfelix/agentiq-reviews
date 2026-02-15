@@ -288,7 +288,7 @@
       Единая “карта проекта”: модули, продукты внутри продукта, ссылки на документацию и пометки статуса
       (<span class="mono">реализовано</span> / <span class="mono">в процессе</span> / <span class="mono">гипотеза</span>).
     </p>
-    <div class="meta">Last updated: 2026-02-12 • Folder: <span class="mono">docs/</span></div>
+    <div class="meta">Last updated: 2026-02-14 • Folder: <span class="mono">docs/</span></div>
 
     <div class="section" id="legend">
       <h2><span class="badge">1</span> Как читать статусы</h2>
@@ -323,24 +323,21 @@
       </p>
 
       <div class="diagram">
+        <p style="font-weight:600; margin-bottom:12px;">5-Layer Architecture (<a href="./architecture/architecture.md">architecture.md</a>)</p>
         <div class="flow">
-          <div class="flow-step">Connect Marketplace</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step data">Sync events</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step data">Unified Inbox (Interactions)</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step policy">Policy (allow/assist/deny)</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step ops">Operator + AI Draft</div>
+          <div class="flow-step">1. Ingestion<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">WB / Ozon / [email]<br>85% ready</span></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step data">2. Context<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">Linking, timeline<br>40% ready</span></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step policy">3. Orchestration<br><span style="font-size:11px;font-weight:400;color:#6c4d00">Priority, SLA<br>25% ready</span></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step data">4. Intelligence<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">AI + Guardrails<br>75% ready</span></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step ops">5. Analytics<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">Quality, Ops<br>70% ready</span></div>
         </div>
-        <div class="flow" style="margin-top: 10px;">
-          <div class="flow-step ops">Reply dispatcher</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step ops">Quality / SLA / Ops alerts</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step ops">Pilot readiness (GO/NO-GO)</div>
-        </div>
+        <p style="font-size:13px; color:var(--color-text-secondary); margin-top:12px;">
+          Принцип: новый канал = новый коннектор. <span class="mono">Interaction</span> — channel-agnostic модель, все каналы сходятся в одну таблицу.
+        </p>
       </div>
 
       <div class="grid2">
@@ -516,14 +513,387 @@
       </div>
     </div>
 
+    <div class="section" id="guardrails">
+      <h2><span class="badge">5</span> Guardrails System</h2>
+      <p>
+        Guardrails — декларативная этическая и операционная система. Минимум хардкода: правила описаны как таблицы, категории и пороги.
+        Код читает конфиги и применяет правила обобщённо. Новое правило = строка в таблице, не новая ветка кода.
+      </p>
+
+      <div class="callout">
+        <div class="calloutTitle">Единый источник</div>
+        <a href="./GUARDRAILS.md"><strong>docs/GUARDRAILS.md</strong></a> — консолидированная документация.
+        Заменяет разрозненные правила из guardrails.py, interaction_linking.py, llm_analyzer.py, RESPONSE_GUARDRAILS.md.
+      </div>
+
+      <p style="margin-top: 16px; font-weight: 600;">Pipeline (4 этапа):</p>
+      <div class="flow">
+        <div class="flow-step">Content<br><span style="font-size:12px;font-weight:400;color:var(--color-text-secondary)">Banned phrases, длина, тон</span></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step policy">Safety Policies<br><span style="font-size:12px;font-weight:400;color:#6c4d00">A: False Authority<br>B: WB Moderation<br>C: Legal Admissions</span></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step data">Action Policy<br><span style="font-size:12px;font-weight:400;color:var(--color-text-secondary)">auto vs assist-only<br>confidence &ge; 0.85</span></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step ops">Audit Trail<br><span style="font-size:12px;font-weight:400;color:var(--color-text-secondary)">violations, warnings,<br>policy_version</span></div>
+      </div>
+
+      <div class="grid2" style="margin-top: 16px;">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Content Guardrails</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>4 категории banned phrases: ai_mention, promises, blame, dismissive</li>
+            <li>Канальные правила: review/question (strict) vs chat (relaxed)</li>
+            <li>Условная логика возвратов: trigger-based (public) + intent-based (chat)</li>
+          </ul>
+          <p style="margin-top: 8px; margin-bottom: 0;">
+            Code: <a href="../apps/chat-center/backend/app/services/guardrails.py"><span class="mono">guardrails.py</span></a>
+          </p>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Action Policy (Auto-Action)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Deterministic link + confidence &ge; 0.85 &rarr; auto-action allowed</li>
+            <li>Deterministic link + confidence &lt; 0.85 &rarr; assist-only</li>
+            <li>Probabilistic link (any confidence) &rarr; always assist-only</li>
+          </ul>
+          <p style="margin-top: 8px; margin-bottom: 0;">
+            Code: <a href="../apps/chat-center/backend/app/services/interaction_linking.py"><span class="mono">interaction_linking.py</span></a>
+          </p>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Safety Policies (3 группы)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li><strong>A:</strong> False Authority — не обещать то, что не контролируешь</li>
+            <li><strong>B:</strong> WB Moderation — не раскрывать AI, не уводить с площадки</li>
+            <li><strong>C:</strong> Legal Admissions — не признавать вину/дефект/контрафакт</li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Escalation Rules</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Аллергия / здоровье &rarr; STOP, менеджеру</li>
+            <li>Контрафакт / юр. угрозы &rarr; STOP, юристу</li>
+            <li>Массовый дефект / PII &rarr; FLAG + эскалация</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pillRow" style="margin-top: 12px;">
+        <a class="pill" href="./GUARDRAILS.md">GUARDRAILS.md (единый док)</a>
+        <a class="pill" href="./reviews/RESPONSE_GUARDRAILS.md">Legacy: RESPONSE_GUARDRAILS.md</a>
+        <a class="pill" href="./specs/guardrails/AI_DRAFTS.md">Spec: AI Drafts</a>
+        <a class="pill" href="./specs/guardrails/REVIEWS_RESPONSES.md">Spec: Reviews</a>
+        <a class="pill" href="./specs/guardrails/CHAT_RESPONSES.md">Spec: Chat</a>
+      </div>
+    </div>
+
+    <div class="section" id="ai-draft">
+      <h2><span class="badge">6</span> AI Draft Generation Flow</h2>
+      <p>
+        Генерация AI-драфтов — критичный этап в обработке обращений. Текущая имплементация работает on-demand (4-5s задержка),
+        планируется переход на pre-generation в фоновом режиме (instant UX).
+      </p>
+
+      <h3>Current Flow (On-Demand Generation)</h3>
+      <div class="diagram">
+        <p style="font-weight:600; margin-bottom:12px;">Полный цикл генерации драфта при открытии взаимодействия</p>
+        <div class="flow">
+          <div class="flow-step">User opens interaction</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Check last_ai_draft cache</div>
+        </div>
+        <div class="flow" style="margin-top: 8px;">
+          <div class="flow-step ops">HIT: show instantly<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">~0ms</span></div>
+        </div>
+        <div class="flow" style="margin-top: 8px;">
+          <div class="flow-step policy">MISS: POST /ai-draft</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">1. Fetch product card<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">WB CDN, ~200ms, cached 1h</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">2. Read seller tone<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">DB, ~5ms</span></div>
+        </div>
+        <div class="flow" style="margin-top: 8px;">
+          <div class="flow-step data">3. Build channel prompt<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">~1ms</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step policy">4. DeepSeek LLM API<br><span style="font-size:11px;font-weight:400;color:#6c4d00">~3-4s ★bottleneck★</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">5. Apply guardrails<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">~1ms</span></div>
+        </div>
+        <div class="flow" style="margin-top: 8px;">
+          <div class="flow-step ops">6. Save to metadata<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">DB, ~10ms</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Total: ~4-5s</div>
+        </div>
+      </div>
+
+      <h3>Speed Breakdown Table</h3>
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Time</th>
+            <th>Caching</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Product card fetch</strong></td>
+            <td>~200ms</td>
+            <td><span class="status implemented"><span class="statusDot"></span>1h cache</span></td>
+            <td>WB CDN API, hit rate ~85% после разогрева</td>
+          </tr>
+          <tr>
+            <td><strong>Seller tone read</strong></td>
+            <td>~5ms</td>
+            <td><span class="status implemented"><span class="statusDot"></span>SQLAlchemy cache</span></td>
+            <td>DB query, negligible</td>
+          </tr>
+          <tr>
+            <td><strong>Build prompt</strong></td>
+            <td>~1ms</td>
+            <td>—</td>
+            <td>Channel-specific prompt template</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek LLM call</strong></td>
+            <td style="color: var(--color-warning); font-weight: 700;">~3-4s</td>
+            <td><span class="status hypothesis"><span class="statusDot"></span>No cache</span></td>
+            <td>★ Основной bottleneck ★ Network + generation latency</td>
+          </tr>
+          <tr>
+            <td><strong>Guardrails validation</strong></td>
+            <td>~1ms</td>
+            <td>—</td>
+            <td>Regex + policy checks</td>
+          </tr>
+          <tr>
+            <td><strong>Save to metadata</strong></td>
+            <td>~10ms</td>
+            <td>—</td>
+            <td>UPDATE interaction.metadata</td>
+          </tr>
+          <tr style="background: rgba(26,115,232,0.06);">
+            <td colspan="4" style="text-align: center; font-weight: 700;">Total (cold): ~4-5s | Total (cached product): ~3.5s</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Future Flow (Pre-Generation at Sync Time)</h3>
+      <div class="diagram">
+        <p style="font-weight:600; margin-bottom:12px;">Background pre-generation для instant UX</p>
+        <div class="flow">
+          <div class="flow-step data">Sync cycle fetches<br>new interactions</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step policy">Background worker<br>generates drafts</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">User opens interaction</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Draft already cached</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Show instantly (0ms)</div>
+        </div>
+        <div class="callout" style="margin-top: 16px;">
+          <div class="calloutTitle">Fallback</div>
+          Если для взаимодействия нет pre-generated draft → откат на on-demand generation (~4-5s). Гарантирует 100% доступность драфтов.
+        </div>
+      </div>
+
+      <h3>Channel-Specific Prompts</h3>
+      <div class="grid2">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Reviews (strict)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Публичная площадка → strict guardrails</li>
+            <li>Banned: AI mentions, promises, dismissive tone</li>
+            <li>Возврат/замена ТОЛЬКО если покупатель явно попросил</li>
+            <li>Tone: formal, empathetic, brand-safe</li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Questions (strict)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Публичная площадка → strict guardrails</li>
+            <li>Pre-purchase: sizing, availability, compatibility</li>
+            <li>Crisp answers, product specs, no fluff</li>
+            <li>SLA: &lt;5 мин (high priority для pre-purchase)</li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Chats (relaxed)</span>
+            <span class="status implemented"><span class="statusDot"></span>Реализовано</span>
+          </div>
+          <ul class="list">
+            <li>Приватный канал → relaxed guardrails</li>
+            <li>Intent-based return offers (allowed in chat)</li>
+            <li>Conversational tone, iterative problem solving</li>
+            <li>Timeline context: previous messages, linked order</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pillRow" style="margin-top: 16px;">
+        <a class="pill" href="./product/AI_DRAFT_QUALITY_PLAN.md">AI Draft Quality Plan</a>
+        <a class="pill" href="./product/PRE_GENERATE_AI_DRAFTS_PLAN.md">Pre-Generation Plan</a>
+        <a class="pill" href="../apps/chat-center/backend/app/services/interaction_drafts.py">Code: interaction_drafts.py</a>
+        <a class="pill" href="./GUARDRAILS.md">Guardrails (Content + Safety)</a>
+      </div>
+    </div>
+
+    <div class="section" id="lifecycle">
+      <h2><span class="badge">7</span> Communication Strategy (Realistic)</h2>
+      <p>
+        AI-ассистент для идеальной реакции на обращения клиентов на WB/Ozon.
+        <strong>Фокус: Product Quality + Response Excellence</strong>, не lifecycle marketing (т.к. нет истории покупок/email/проактивных кампаний).
+      </p>
+
+      <div class="callout">
+        <div class="calloutTitle">⚠️ Ограничения маркетплейсов + Платные возможности</div>
+        <p style="margin-bottom: 12px;">WB/Ozon <strong>НЕ дают</strong> историю покупок клиентов, email/телефоны. <strong>НО:</strong> платная опция WB позволяет писать в чат при ЛЮБОМ отзыве (включая 5★).</p>
+        <p style="font-weight: 600; margin-bottom: 8px;">Что можем:</p>
+        <ul class="list">
+          <li><strong>+20%</strong> конверсия вопрос→покупка при ответе &lt;1h (реактивный)</li>
+          <li><strong>40-60%</strong> win rate спасения 1★→4-5★ через платный чат WB</li>
+          <li><strong>14%</strong> upsell conversion на 5★ через платный чат WB</li>
+          <li><strong>Product Quality Alerts</strong> — рост негатива >30% → alert менеджеру</li>
+          <li><strong>Fuzzy Linking</strong> — связка чатов/отзывов по clientID</li>
+        </ul>
+      </div>
+
+      <div class="grid2" style="margin-top: 20px;">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Interactive Dashboard (UI Prototype)</span>
+            <span class="status implemented"><span class="statusDot"></span>Готово</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Интерактивный прототип Dashboard для управления реактивными сценариями (с учётом ограничений WB/Ozon API).
+          </p>
+          <ul class="list">
+            <li>Live метрики: Upsell Conversion, Win Rate, ROI</li>
+            <li>8 реалистичных scenario cards (включая Upsell 5★ платный)</li>
+            <li>Product-level analytics + платные фичи WB</li>
+            <li>Fuzzy linking через clientID</li>
+            <li>Automation settings (включая платный upsell)</li>
+          </ul>
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            <a href="../pages/lifecycle-dashboard.html"><strong>Открыть Dashboard →</strong></a>
+          </p>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Detailed Scenarios (Documentation)</span>
+            <span class="status implemented"><span class="statusDot"></span>Готово</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Подробная документация реалистичных сценариев с учётом ограничений маркетплейсов (нет истории покупок, email, проактивных кампаний).
+          </p>
+          <ul class="list">
+            <li>Ограничения API + платные возможности WB</li>
+            <li>6 реалистичных сценариев (включая Upsell 5★)</li>
+            <li>Product-centric подход + платные фичи</li>
+            <li>Generic upsell (нет персонализации по истории)</li>
+            <li>Честный питч: Response Excellence + Paid Features</li>
+          </ul>
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            <a href="../pages/scenarios.html"><strong>Читать документацию →</strong></a>
+          </p>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 24px;">Сценарии (краткая справка)</h3>
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Сценарий</th>
+            <th>Приоритет</th>
+            <th>Метрики</th>
+            <th>ROI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Спасение негатива (1-2★)</strong></td>
+            <td><span class="status" style="border-color: rgba(234,67,53,0.45); background: rgba(234,67,53,0.08); color: #8e1b0f;"><span class="statusDot" style="background: var(--color-danger);"></span>CRITICAL</span></td>
+            <td>58% win rate, 23 спасено/мес</td>
+            <td>2.8x</td>
+          </tr>
+          <tr>
+            <td><strong>Вопрос → Конверсия (&lt;1h)</strong></td>
+            <td><span class="status" style="border-color: rgba(234,67,53,0.45); background: rgba(234,67,53,0.08); color: #8e1b0f;"><span class="statusDot" style="background: var(--color-danger);"></span>CRITICAL</span></td>
+            <td>32% конверсия, 18 мин avg время</td>
+            <td>∞ (бесплатно)</td>
+          </tr>
+          <tr>
+            <td><strong>Churn Prevention</strong></td>
+            <td><span class="status" style="border-color: rgba(234,67,53,0.45); background: rgba(234,67,53,0.08); color: #8e1b0f;"><span class="statusDot" style="background: var(--color-danger);"></span>CRITICAL</span></td>
+            <td>45% prevention, 2.1k₽ avg сохранено</td>
+            <td>14x</td>
+          </tr>
+          <tr>
+            <td><strong>Upsell на 5★ (платный чат WB)</strong></td>
+            <td><span class="status" style="border-color: rgba(52,168,83,0.35); background: rgba(52,168,83,0.06); color: #1f6c37;"><span class="statusDot" style="background: var(--color-success);"></span>HIGH ROI</span></td>
+            <td>14% конверсия, +1.2k₽ AOV (платная опция WB)</td>
+            <td>6.8x</td>
+          </tr>
+          <tr>
+            <td><strong>Апгрейд 3★ → 5★</strong></td>
+            <td><span class="status" style="border-color: rgba(52,168,83,0.35); background: rgba(52,168,83,0.06); color: #1f6c37;"><span class="statusDot" style="background: var(--color-success);"></span>HIGH ROI</span></td>
+            <td>28% upgrade, 42% repeat purchase</td>
+            <td>6.2x</td>
+          </tr>
+          <tr>
+            <td><strong>Product Quality Alert</strong></td>
+            <td><span class="status" style="border-color: rgba(249,171,0,0.45); background: rgba(249,171,0,0.08); color: #6c4d00;"><span class="statusDot" style="background: var(--color-warning);"></span>PRODUCT-LEVEL</span></td>
+            <td>12 alerts/мес, 85% prevented</td>
+            <td>— (внутренний)</td>
+          </tr>
+          <tr>
+            <td><strong>Sizing/Fit FAQ Auto</strong></td>
+            <td><span class="status" style="border-color: rgba(249,171,0,0.45); background: rgba(249,171,0,0.08); color: #6c4d00;"><span class="statusDot" style="background: var(--color-warning);"></span>PRODUCT-LEVEL</span></td>
+            <td>18% конверсия, 2.3 мин avg</td>
+            <td>5.1x</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pillRow" style="margin-top: 16px;">
+        <a class="pill" href="../pages/index.html">Главная страница</a>
+        <a class="pill" href="../pages/lifecycle-dashboard.html">Dashboard (UI prototype)</a>
+        <a class="pill" href="../pages/scenarios.html">Scenarios (documentation)</a>
+        <a class="pill" href="../pages/README.md">README (setup guide)</a>
+      </div>
+    </div>
+
     <div class="section" id="docs">
-      <h2><span class="badge">5</span> Навигация по документации (ссылки + статус)</h2>
+      <h2><span class="badge">8</span> Навигация по документации (ссылки + статус)</h2>
 
       <h3>Product</h3>
       <ul class="list">
         <li><a href="./product/PRODUCT.md">product/PRODUCT.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
-        <li><a href="./product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md">product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
-        <li><a href="./product/BACKLOG_UNIFIED_COMM_V3.md">product/BACKLOG_UNIFIED_COMM_V3.md</a> <span class="status inprogress"><span class="statusDot"></span>В процессе</span></li>
+        <li><a href="./product/BACKLOG.md"><strong>product/BACKLOG.md</strong></a> <span class="status implemented"><span class="statusDot"></span>Единый бэклог (demo / MVP / roadmap)</span></li>
+        <li><a href="./product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md">product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md</a> <span class="status implemented"><span class="statusDot"></span>Execution log</span></li>
+        <li><a href="./product/BACKLOG_UNIFIED_COMM_V3.md">product/BACKLOG_UNIFIED_COMM_V3.md</a> <span class="status research"><span class="statusDot"></span>Legacy (detail per task)</span></li>
       </ul>
 
       <h3>Chat Center</h3>
@@ -538,20 +908,32 @@
       <ul class="list">
         <li><a href="./reviews/README.md">reviews/README.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
         <li><a href="./reviews/PROJECT_SUMMARY.md">reviews/PROJECT_SUMMARY.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
-        <li><a href="./reviews/RESPONSE_GUARDRAILS.md">reviews/RESPONSE_GUARDRAILS.md</a> <span class="status research"><span class="statusDot"></span>Методика</span></li>
+        <li><a href="./reviews/RESPONSE_GUARDRAILS.md">reviews/RESPONSE_GUARDRAILS.md</a> <span class="status research"><span class="statusDot"></span>Legacy (see GUARDRAILS.md)</span></li>
       </ul>
 
-      <h3>Architecture / Ops / Research</h3>
+      <h3>Guardrails</h3>
       <ul class="list">
-        <li><a href="./architecture/architecture.md">architecture/architecture.md</a> <span class="status hypothesis"><span class="statusDot"></span>Док-ориентир</span></li>
-        <li><a href="./architecture/AGENTIQ_2.0_ARCHITECTURE.md">architecture/AGENTIQ_2.0_ARCHITECTURE.md</a> <span class="status hypothesis"><span class="statusDot"></span>Vision</span></li>
+        <li><a href="./GUARDRAILS.md">GUARDRAILS.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
+        <li><a href="./specs/guardrails/AI_DRAFTS.md">specs/guardrails/AI_DRAFTS.md</a> <span class="status hypothesis"><span class="statusDot"></span>Draft</span></li>
+        <li><a href="./specs/guardrails/REVIEWS_RESPONSES.md">specs/guardrails/REVIEWS_RESPONSES.md</a> <span class="status hypothesis"><span class="statusDot"></span>Draft</span></li>
+        <li><a href="./specs/guardrails/CHAT_RESPONSES.md">specs/guardrails/CHAT_RESPONSES.md</a> <span class="status hypothesis"><span class="statusDot"></span>Draft</span></li>
+      </ul>
+
+      <h3>Architecture</h3>
+      <ul class="list">
+        <li><a href="./architecture/architecture.md">architecture/architecture.md</a> <span class="status implemented"><span class="statusDot"></span>5-Layer Model + Gap Analysis</span></li>
+        <li><a href="./architecture/AGENTIQ_2.0_ARCHITECTURE.md">architecture/AGENTIQ_2.0_ARCHITECTURE.md</a> <span class="status hypothesis"><span class="statusDot"></span>Vision (post-PMF)</span></li>
+      </ul>
+
+      <h3>Ops / Research</h3>
+      <ul class="list">
         <li><a href="./ops/DEPLOYMENT.md">ops/DEPLOYMENT.md</a> <span class="status inprogress"><span class="statusDot"></span>В процессе</span></li>
         <li><a href="./research/INDEX.md">research/INDEX.md</a> <span class="status research"><span class="statusDot"></span>Исследование</span></li>
       </ul>
     </div>
 
     <div class="section" id="next">
-      <h2><span class="badge">6</span> Что дальше (как поддерживать актуальность)</h2>
+      <h2><span class="badge">9</span> Что дальше (как поддерживать актуальность)</h2>
       <p>
         Чтобы документация не “протухала”, важно ввести простую дисциплину:
       </p>
@@ -565,9 +947,10 @@
         <a class="pill" href="../next-actions.md">Roadmap: next-actions.md</a>
         <a class="pill" href="./CHANGELOG.md">Chat Center changelog</a>
         <a class="pill" href="./SLA_RULES.md">SLA rules</a>
+        <a class="pill" href="./bugs/%D0%91%D0%90%D0%93%D0%98.md">Bugs/Ideas log</a>
+        <a class="pill" href="./bugs/INBOX.md">Raw inbox</a>
       </div>
     </div>
   </div>
 </body>
 </html>
-

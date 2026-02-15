@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сценарии с AI-генерацией — AgentIQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+            --color-bg-chat: #e8f2f8;
+
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+
+            --color-accent: #1a73e8;
+            --color-success: #0f7f4e;
+            --color-warning: #f9ab00;
+            --color-danger: #d93025;
+            --color-ai: #8e24aa;
+
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+
+            --transition-fast: 0.12s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .demo-container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .demo-tabs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--color-border-medium);
+            padding-bottom: 0;
+        }
+
+        .demo-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .demo-tab.active {
+            color: var(--color-accent);
+            border-bottom-color: var(--color-accent);
+        }
+
+        .demo-view {
+            display: none;
+        }
+
+        .demo-view.active {
+            display: block;
+        }
+
+        /* Scenario Card */
+        .scenario-card {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .scenario-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .scenario-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: #fef3f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--color-danger);
+        }
+
+        .scenario-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .scenario-info {
+            flex: 1;
+        }
+
+        .scenario-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .scenario-meta {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .scenario-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e8f0fe;
+            color: #1967d2;
+            margin-top: 4px;
+        }
+
+        .scenario-template {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-4);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        .scenario-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-ai::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-ai:hover::before {
+            left: 100%;
+        }
+
+        .btn-ai:hover {
+            background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border-medium);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-hover);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--color-border-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-title svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-ai);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 4px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+
+        .modal-close svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-5);
+        }
+
+        .modal-section {
+            margin-bottom: var(--space-5);
+        }
+
+        .modal-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-3);
+        }
+
+        .context-box {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .context-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+        }
+
+        .context-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .context-label {
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            min-width: 100px;
+        }
+
+        .context-value {
+            color: var(--color-text-primary);
+        }
+
+        .ai-output {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border: 2px solid var(--color-ai);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            position: relative;
+        }
+
+        .ai-badge {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            background: var(--color-ai);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ai-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .ai-output-text {
+            padding-top: 8px;
+        }
+
+        .loading-state {
+            display: none;
+            text-align: center;
+            padding: var(--space-6);
+        }
+
+        .loading-state.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border-medium);
+            border-top-color: var(--color-ai);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto var(--space-4);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .modal-footer {
+            padding: var(--space-4) var(--space-5);
+            border-top: 1px solid var(--color-border-medium);
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .editable-output {
+            width: 100%;
+            padding: var(--space-4);
+            border: 2px solid var(--color-ai);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            resize: vertical;
+            min-height: 120px;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .editable-output:focus {
+            outline: none;
+            border-color: #7b1fa2;
+        }
+
+        /* Chat Integration Demo */
+        .chat-demo {
+            display: flex;
+            gap: var(--space-4);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .chat-window {
+            flex: 1;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--color-border-medium);
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-4);
+        }
+
+        .message {
+            margin-bottom: var(--space-4);
+        }
+
+        .message-header {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .message-content {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 80%;
+        }
+
+        .message.customer .message-content {
+            background: var(--color-bg-chat);
+            color: var(--color-text-primary);
+        }
+
+        .message.seller .message-content {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            margin-left: auto;
+        }
+
+        .chat-input-area {
+            padding: var(--space-4);
+            border-top: 1px solid var(--color-border-medium);
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+        }
+
+        .scenarios-sidebar {
+            width: 300px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .scenarios-sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+        }
+
+        .scenario-quick-item {
+            padding: var(--space-3);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-2);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .scenario-quick-item:hover {
+            border-color: var(--color-accent);
+            background: var(--color-bg-hover);
+        }
+
+        .scenario-quick-name {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .scenario-quick-preview {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-5);
+        }
+
+        .highlight-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlight-title svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .highlight-text {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--color-text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .chat-demo {
+                flex-direction: column;
+            }
+
+            .scenarios-sidebar {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <div class="demo-title">Сценарии с AI-генерацией</div>
+            <div class="demo-subtitle">Используй готовый шаблон или генерируй персонализированный ответ с AI</div>
+        </div>
+
+        <div class="demo-tabs">
+            <button class="demo-tab active" onclick="switchTab('standalone')">Standalone сценарий</button>
+            <button class="demo-tab" onclick="switchTab('chat')">Интеграция в Chat Center</button>
+        </div>
+
+        <!-- Standalone View -->
+        <div class="demo-view active" id="view-standalone">
+            <div class="highlight-box">
+                <div class="highlight-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    Как это работает
+                </div>
+                <div class="highlight-text">
+                    <strong>📋 Вставить как есть</strong> — копирует готовый шаблон (быстро, без AI)<br>
+                    <strong>✨ AI-генерация</strong> — адаптирует ответ под контекст чата (умно, персонализированно)
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-card-header">
+                    <div class="scenario-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="scenario-info">
+                        <div class="scenario-name">Брак/дефект товара</div>
+                        <div class="scenario-meta">Категория: Проблемы · Используется: 67 раз</div>
+                        <span class="scenario-tag">defect_not_working</span>
+                    </div>
+                </div>
+
+                <div class="scenario-template">
+                    Нам очень жаль, что вы получили бракованный товар! Это недопустимо.<br><br>
+                    Пожалуйста, оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.<br><br>
+                    Мы проверим партию товара, чтобы исключить повторение ситуации. Спасибо за понимание!
+                </div>
+
+                <div class="scenario-actions">
+                    <button class="btn btn-secondary" onclick="copyTemplate()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Вставить как есть
+                    </button>
+                    <button class="btn btn-ai" onclick="openAIModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        AI-генерация
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Integration View -->
+        <div class="demo-view" id="view-chat">
+            <div class="highlight-box">
+                <div class="highlight-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    В контексте чата
+                </div>
+                <div class="highlight-text">
+                    AI автоматически видит последние сообщения и генерирует персонализированный ответ с учётом имени покупателя, товара и проблемы.
+                </div>
+            </div>
+
+            <div class="chat-demo">
+                <div class="chat-window">
+                    <div class="chat-header">Чат с Марией · Фонарик LED</div>
+                    <div class="chat-messages">
+                        <div class="message customer">
+                            <div class="message-header">Мария · Сегодня в 14:23</div>
+                            <div class="message-content">
+                                Здравствуйте! Получила фонарик, но он вообще не работает. Вставила батарейки — ничего. Это брак?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea class="chat-input" placeholder="Ваш ответ..." id="chatInput"></textarea>
+                        <div class="chat-actions">
+                            <button class="btn btn-secondary" style="flex: 0 0 auto;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-primary">Отправить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scenarios-sidebar">
+                    <div class="scenarios-sidebar-title">Быстрые сценарии</div>
+
+                    <div class="scenario-quick-item" onclick="openAIModalFromChat('defect')">
+                        <div class="scenario-quick-name">⚠️ Брак/дефект</div>
+                        <div class="scenario-quick-preview">Эмпатия + инструкция по возврату, без обещаний замены</div>
+                    </div>
+
+                    <div class="scenario-quick-item" onclick="openAIModalFromChat('wrong_item')">
+                        <div class="scenario-quick-name">📦 Не то пришло</div>
+                        <div class="scenario-quick-preview">Извинения за путаницу + возврат через ЛК</div>
+                    </div>
+
+                    <div class="scenario-quick-item" onclick="openAIModalFromChat('return')">
+                        <div class="scenario-quick-name">↩️ Как вернуть?</div>
+                        <div class="scenario-quick-preview">Инструкция по возврату через ЛК WB</div>
+                    </div>
+
+                    <div class="scenario-quick-item" onclick="openAIModalFromChat('thanks')">
+                        <div class="scenario-quick-name">⭐ Спасибо за отзыв</div>
+                        <div class="scenario-quick-preview">Благодарность за позитивный фидбек</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Modal -->
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    AI генерирует ответ
+                </div>
+                <button class="modal-close" onclick="closeAIModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Loading State -->
+                <div class="loading-state" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">AI анализирует контекст и генерирует ответ...</div>
+                </div>
+
+                <!-- Result State -->
+                <div id="resultState" style="display: none;">
+                    <div class="modal-section">
+                        <div class="modal-section-title">Контекст чата</div>
+                        <div class="context-box">
+                            <div class="context-item">
+                                <div class="context-label">Покупатель:</div>
+                                <div class="context-value">Мария</div>
+                            </div>
+                            <div class="context-item">
+                                <div class="context-label">Товар:</div>
+                                <div class="context-value">Фонарик LED</div>
+                            </div>
+                            <div class="context-item">
+                                <div class="context-label">Проблема:</div>
+                                <div class="context-value">Фонарик не работает (батарейки вставлены)</div>
+                            </div>
+                            <div class="context-item">
+                                <div class="context-label">Интент:</div>
+                                <div class="context-value">defect_not_working</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Сгенерированный ответ</div>
+                        <div class="ai-output">
+                            <div class="ai-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                                AI
+                            </div>
+                            <div class="ai-output-text">
+                                Мария, нам очень жаль что фонарик не работает! Это недопустимо.<br><br>
+                                Пожалуйста, оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.<br><br>
+                                Мы проверим эту партию товара, чтобы исключить повторение ситуации. Спасибо за понимание!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Редактировать перед отправкой</div>
+                        <textarea class="editable-output" id="editableOutput">Мария, нам очень жаль что фонарик не работает! Это недопустимо.
+
+Пожалуйста, оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.
+
+Мы проверим эту партию товара, чтобы исключить повторение ситуации. Спасибо за понимание!</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAIModal()">Отменить</button>
+                <button class="btn btn-ai" onclick="useAIResponse()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Использовать ответ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update views
+            document.querySelectorAll('.demo-view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + tab).classList.add('active');
+        }
+
+        function copyTemplate() {
+            alert('✅ Шаблон скопирован в буфер обмена!\n\n(В реальном приложении текст вставится в поле ввода)');
+        }
+
+        function openAIModal() {
+            const modal = document.getElementById('aiModal');
+            const loading = document.getElementById('loadingState');
+            const result = document.getElementById('resultState');
+
+            modal.classList.add('active');
+            loading.classList.add('active');
+            result.style.display = 'none';
+
+            // Simulate AI generation
+            setTimeout(() => {
+                loading.classList.remove('active');
+                result.style.display = 'block';
+            }, 2000);
+        }
+
+        function openAIModalFromChat(scenario) {
+            openAIModal();
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.remove('active');
+        }
+
+        function useAIResponse() {
+            const text = document.getElementById('editableOutput').value;
+            const chatInput = document.getElementById('chatInput');
+
+            if (chatInput) {
+                chatInput.value = text;
+            }
+
+            closeAIModal();
+            alert('✅ AI-ответ вставлен в поле ввода!\n\nМожете отредактировать и отправить.');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('aiModal').addEventListener('click', (e) => {
+            if (e.target.id === 'aiModal') {
+                closeAIModal();
+            }
+        });
+    </script>
+</body>
+</html>

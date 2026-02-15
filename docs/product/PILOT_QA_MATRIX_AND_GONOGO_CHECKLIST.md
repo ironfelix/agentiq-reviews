@@ -61,11 +61,18 @@ cd apps/chat-center/backend
   --base-url http://localhost:8001/api \
   --email pilot@example.com \
   --password 'your-password' \
-  --send-replies
+  --send-replies \
+  --yes-live-replies \
+  --reply-channels chat \
+  --interaction-id-chat <interaction_id> \
+  --max-replies 1
 ```
 
 Результат: markdown-отчет пишется в  
 `docs/product/reports/pilot-qa-report-<timestamp>.md`.
+
+Примечание: ответы в `review/question` публичные. Для них требуются отдельные флаги
+`--allow-public-replies`, явные `--interaction-id-review/--interaction-id-question` и `--reply-text`.
 
 ## 4. Формальный Go/No-Go
 

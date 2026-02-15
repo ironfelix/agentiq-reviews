@@ -76,6 +76,20 @@
 5. После деплоя фиксов ingestion:
    - нажать `Повторить` (retry sync), чтобы бэкенд перезаполнил `occurred_at` и подтянул `last_reply_text` из WB.
 
+## Важное про WB токены (почему “чаты не грузятся”, но отзывы/вопросы могут работать)
+
+- Для **WB Buyers Chat API** токен должен быть **JWT** (строка из 3 сегментов через точку: `header.payload.signature`).
+  Если токен не JWT, синк чатов завершится `sync_status=error` с `wb_token_invalid`, и в UI появится ошибка синхронизации.
+- Для **feedbacks/questions** (эндпоинты `feedbacks-api.wildberries.ru`) WB исторически принимал разные форматы `Authorization`,
+  поэтому reviews/questions могут продолжать работать даже если chat token не подходит.
+
+## Статус отправки ответов (reply)
+
+- `POST /api/interactions/{id}/reply` реализован для каналов `review`, `question`, `chat`.
+- Для `review/question` ответ уходит в WB API, а в unified inbox сразу фиксируется как `responded`.
+  Если WB не отражает ответ мгновенно (модерация/пропагация), обращение остаётся “закрытым” локально в коротком окне
+  (см. `extra_data.wb_sync_state=pending`).
+
 ## Что осталось до “первого демо” (для зрителей)
 
 - Сделать один “чистый” demo seller на staging (подключённый корректным WB ключом), чтобы inbox был не пустой.

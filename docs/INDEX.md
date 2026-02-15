@@ -63,3 +63,16 @@ Last updated: 2026-02-12
 ## Changelog
 
 - `CHANGELOG.md` — changelog Chat Center
+
+## Specs (Spec-Driven Development)
+
+- `specs/README.md` — как мы пишем спеки и как по ним кодим с AI-агентом
+- `specs/CATALOG.md` — карта спек и инвентарь API (что уже есть и где это описано)
+- `specs/SPEC_DRIVEN_RULES.md` — правила/guardrails для Spec-Driven
+- `specs/TEMPLATE_FEATURE_SPEC.md` — шаблон спеки на фичу/эндпоинт/интеграцию
+- `specs/TEMPLATE_FUNCTION_SPEC.md` — шаблон контракта функции
+
+## Bugs / Ideas Log
+
+- `bugs/БАГИ.md` — единый лог багов, UX/copy и идей/гипотез (demo notes)
+- `bugs/INBOX.md` — сырой поток заметок (без структуры) для триажа

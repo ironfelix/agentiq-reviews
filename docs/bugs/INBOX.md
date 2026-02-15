@@ -33,7 +33,7 @@ Status: ACTIVE (triage queue)
 | 7 | IDEA | Pre-generate AI drafts |
 | 8 | BUG | ✅ FIXED — лимит 300→500 символов (ai_analyzer.py) |
 | 9 | UX | ✅ DONE — Промокоды перенесены в Settings как таб |
-| 10 | IDEA | Auto-reply на позитив (= BL-POST-007) |
+| 10 | IDEA | ✅ DONE — Auto-reply на позитив: реализован сервис + toggle в настройках AI |
 | 11 | BUG | ✅ FIXED — дубликат #2 |
 | 12 | IDEA | ✅ DONE — Статика для demo dashboard |
 | 13 | TODO | ✅ DONE — CJM flow проверен, всё работает |
@@ -44,6 +44,28 @@ Status: ACTIVE (triage queue)
 | 18 | UX | ✅ FIXED — sidebar badge: urgent count, скрыт в messages workspace |
 | 20 | RESEARCH | ✅ DONE — rating-only отзывы НЕ видны на карточке, ответ тоже не виден |
 | 19 | BUG | ✅ FIXED — при переключении каналов данные пропадают (per-channel cache) |
+| 21 | BUG | ✅ FIXED — Worker crash on startup: race condition в create_all |
+| 22 | BUG | ✅ FIXED — 486 questions с NULL occurred_at |
+| 23 | BUG | ✅ FIXED — Ghost sellers генерируют 1080 warnings/hour |
+| 24 | BUG | ✅ FIXED — Дубли nginx .bak configs |
+| 25 | BUG | ✅ FIXED — bcrypt deprecation warning |
+| 26 | BUG | ✅ FIXED — customer_profiles пусто → backfill |
+| 27 | BUG | ✅ FIXED — Sellers 3, 12, 17 дубликаты |
+| 28 | BUG | ✅ FIXED — 3-sec retry при пустом ответе после синка |
+| 29 | BUG | ✅ FIXED — overflow-x:hidden + убрана min-width:300px на мобилке |
+| 30 | BUG | ✅ FIXED — dots: логика на chat_status (waiting/responded/closed), не rating |
+| 31 | BUG | ✅ FIXED — badge показывает total с серым фоном когда needs=0 |
+| 32 | BUG | ✅ FIXED — универсальный fallback «Покупатель» для всех каналов |
+| 33 | UX | ✅ FIXED — Info кнопка в header чата + context back на мобилке |
+| 34 | UX | ✅ FIXED — FolderStrip перемещён выше search wrapper |
+| 35 | PERF | ✅ FIXED — отложен polling аналитики до активации таба, интервалы 30/60с |
+| 36 | PERF | ✅ FIXED — instant show кэшированных сообщений + async подгрузка свежих |
+| 37 | PERF | ✅ FIXED — smart comparison (id+updated_at) предотвращает лишние ре-рендеры |
+| 38 | AI | ✅ FIXED — переписан промпт для вопросов: дружелюбный, помогающий тон |
+| 39 | BUG | ✅ FIXED — chat_status: backend-canonical status для чатов (extra_data.chat_status) |
+| 40 | UX | ✅ FIXED — progressive loading при синхронизации (dual-poll + real count) |
+| 41 | PERF | ✅ FIXED — instant folder switching (pre-populate cache + background pagination) |
+| 42 | UX | ✅ FIXED — Apple Mail progress bar в ChatList (sticky bottom) |
 
 ---
 
@@ -88,3 +110,54 @@ Status: ACTIVE (triage queue)
 18) ~~в меню есть сообщения и бейдж 50~~ — **FIXED (2026-02-15):** Badge теперь показывает urgent count, скрыт в messages workspace и при count=0. Файлы: `App.tsx`.
 
 20) ~~ответ на отзыв без комментария (rating-only) — виден ли на карточке WB?~~ — **DONE (2026-02-15):** Исследование подтвердило: rating-only отзывы (только оценка, без текста/фото/видео) **НЕ отображаются** на публичной карточке товара. WB показывает max 1000 "непустых" отзывов. Rating-only автоматически архивируются в API (`answerState` auto-archive). Ответ продавца виден только автору в ЛК. Наша логика `needs_response=false` корректна. Источники: [WB Official](https://seller.wildberries.ru/instructions/ru/ru/material/customer-reviews), [Moneyplace](https://moneyplace.io/news/na-wildberries-vyroslo-chislo-otzyvov-bez-teksta/).
+
+
+### Новые после демо 2 (2026-02-15):
+
+21) ~~Worker crash при рестарте (race condition)~~ **FIXED (2026-02-15):** 2 uvicorn workers одновременно вызывают `Base.metadata.create_all()` → `UniqueViolationError`. Fix: try/except в `main.py:82-86`.
+
+22) ~~486 вопросов с NULL occurred_at~~ **FIXED (2026-02-15):** Все вопросы имели `occurred_at=NULL` → неправильная сортировка. Fix: backfill `UPDATE interactions SET occurred_at = created_at WHERE occurred_at IS NULL`.
+
+23) ~~Ghost sellers генерируют 1080 warnings/hour~~ **FIXED (2026-02-15):** 12 тестовых продавцов деактивированы. Осталось 2 активных (3 + 14).
+
+24) ~~Дубли nginx .bak configs~~ **FIXED (2026-02-15):** `sudo rm /etc/nginx/sites-enabled/agentiq.bak*`.
+
+25) ~~bcrypt deprecation warning~~ **FIXED (2026-02-15):** Downgrade bcrypt → 4.0.1 (совместим с passlib).
+
+26) ~~customer_profiles пусто~~ **FIXED (2026-02-15):** Backfill SQL → 12 профилей создано.
+
+27) ~~Sellers 3, 12, 17 дубликаты~~ **FIXED (2026-02-15):** Деактивированы 12, 17. Оставлен seller 3.
+
+### Новые после демо 1 (от пользователя):
+
+28) ~~сообщения не показываются после синка, появляются через 30 сек~~ **FIXED (2026-02-15):** Добавлен 3-sec retry в `fetchInteractions` когда initial fetch возвращает 0 items. Файл: `App.tsx`.
+
+29) ~~сломана верстка в мобилке — экран листается влево-вправо~~ **FIXED (2026-02-15):** `html { overflow: hidden }`, `overflow-x: hidden` на body и `.app-shell-page`, убран `min-width: 300px` из `.product-context` на мобилке, добавлен `min-width: 0` на панели. Файл: `index.css`.
+
+30) ~~оценка срочности dots некорректная: на 5★ без ответа всё зелёное~~ **FIXED (2026-02-15):** Заменена логика `needs_response` boolean → полная проверка `chat_status` (waiting/responded/client-replied/auto-response/closed) по наличию reply_text и статусу. Файл: `App.tsx`.
+
+31) ~~при переключении таба спиннер + badge 0 в отзывах~~ **FIXED (2026-02-15):** Badge теперь показывает `total` count с серым фоном когда `needs_response=0`. `getBadgeCount` возвращает `{needs, total}`. Файлы: `FolderStrip.tsx`, `index.css`.
+
+32) ~~в вопросах «автор вопроса» вместо имени клиента~~ **FIXED (2026-02-15):** Универсальный fallback «Покупатель» для всех каналов. Файл: `App.tsx`.
+
+33) ~~мобильная навигация chatlist→window→context panel~~ **FIXED (2026-02-15):** Добавлена Info кнопка в header чата → открывает context panel. Back кнопка в context → возврат к чату. `data-mobile-view` переключает панели. Файлы: `App.tsx`, `ChatWindow.tsx`, `index.css`.
+
+34) ~~папки (каналы) должны быть над поиском~~ **FIXED (2026-02-15):** FolderStrip перемещён выше search wrapper в ChatList. Файл: `ChatList.tsx`.
+
+35) ~~очень долго всё загружается~~ **FIXED (2026-02-15):** Отложен polling аналитики (qualityHistory, opsAlerts, pilotReadiness) до активации таба. Интервалы увеличены: qualityMetrics 15→30с, analytics 30→60с. Файл: `App.tsx`.
+
+36) ~~загрузка чата вместе с AI рекомендацией~~ **FIXED (2026-02-15):** Instant show кэшированных сообщений из `interactionCacheRef` для не-chat каналов, свежие данные загружаются async. Файл: `App.tsx`.
+
+37) ~~коммуникации грузятся заново каждый раз~~ **FIXED (2026-02-15):** Smart comparison (id + updated_at + needs_response) перед обновлением `interactionCache`, предотвращает лишние ре-рендеры когда данные не изменились. Файл: `App.tsx`.
+
+38) ~~ответы на вопросы «посылающие» клиентов~~ **FIXED (2026-02-15):** Переписан `QUESTION_DRAFT_SYSTEM` промпт: добавлен принцип «ПОМОГИ ПОКУПАТЕЛЮ», эмпатия, запрет на отсылающие фразы. Fallback текст тоже обновлён. Файлы: `ai_analyzer.py`, `interaction_drafts.py`.
+
+### Progressive loading + chat_status (2026-02-15):
+
+39) ~~chat_status: кто ответил последним не определяется для чатов/вопросов~~ **FIXED (2026-02-15):** Frontend `App.tsx` re-derived `chat_status` from `extra_data.last_reply_text`, но для chat channel `extra_data` содержит только `chat_status` (из Chat модели), а не `last_reply_text`. Fix: сначала проверяем `extra_data.chat_status` для backend-canonical статуса, fallback на heuristic для reviews/questions. Файл: `App.tsx:137-150`.
+
+40) ~~после ввода API-ключа пустой экран «Обращений пока нет»~~ **FIXED (2026-02-15):** Вместо блокировки до окончания sync — dual-polling `/auth/me` + `/interactions?include_total=true` каждые 3 сек. Показывает реальный счётчик на экране синхронизации. При 50+ загруженных — auto-transition в чат-центр. Файлы: `App.tsx`, `MarketplaceOnboarding.tsx`.
+
+41) ~~спиннер при переключении папок~~ **FIXED (2026-02-15):** Pre-populate per-channel cache из 'all' кэша при переключении. Фоновая пагинация: первая страница (50 items) мгновенно, остальные auto-load с 500ms задержкой. Apple Mail-style индикатор «Загружено X из Y» внизу ChatList. Файлы: `App.tsx`, `ChatList.tsx`, `api.ts`, `types/index.ts`, `index.css`.
+
+42) ~~нет прогресса загрузки в ChatList~~ **FIXED (2026-02-15):** Apple Mail-style sticky progress bar внизу списка чатов: синяя полоса + текст «Загружено N из M». CSS: `.load-progress-bar` с transition animation. Файлы: `ChatList.tsx`, `index.css`.

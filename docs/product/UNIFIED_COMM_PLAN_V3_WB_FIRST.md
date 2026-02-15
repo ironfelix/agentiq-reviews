@@ -10,6 +10,76 @@
 
 ### Execution status (live)
 
+Сделано (2026-02-14, cont.):
+ - **Bug #4 + #5 Fix: Chat list shows "Нет обращений по фильтру" after tab switch** -- badge shows (39) but list is empty.
+   - **Root cause:** Bug #1/#3 fix (CSS show/hide) means ChatList never unmounts. Local `useState` for `activeFilter` and `activeChannel` persists across workspace switches. If user had "Обработаны" or "Без ответа" selected when navigating away, returning to messages kept the stale filter — matching zero items while the pipeline badge showed the full count.
+   - **Fix (ChatList.tsx):** Added `isActive` prop (boolean). When `isActive` transitions from `false` to `true`, a `useEffect` resets `activeFilter` to `'all'`, `activeChannel` to `'all'`, and `searchQuery` to `''`. Uses `prevIsActiveRef` to detect the transition.
+   - **Fix (App.tsx):** Added workspace-change effect that fires when `activeWorkspace` changes to `'messages'`. Resets `filters` to `{}`, restores `interactions` from the `'all|all'` cache, and sets `activeCacheKeyRef` to `'all|all'`. This ensures the App-side data scope matches ChatList's reset filter state. If `filters.has_unread` actually changed (was `true` before), the existing filter-change effect also fires and triggers a fresh API fetch.
+   - **Files:** `apps/chat-center/frontend/src/App.tsx` (workspace-change effect + isActive prop), `apps/chat-center/frontend/src/components/ChatList.tsx` (isActive prop + reset effect).
+   - **Build:** `npm run build` -- OK, no errors.
+
+Сделано (2026-02-14):
+ - **BL-DEMO-005: Demo data при "Пропустить подключение"** -- when user skips WB connection during onboarding, 12 demo interactions are seeded (5 reviews, 4 questions, 3 chats) so the inbox looks alive.
+   - Backend: `app/services/demo_data.py` -- `seed_demo_interactions()` creates realistic Russian WB interactions with varied priorities, statuses, and channels. Idempotent (skips if demo data already exists). All demo records marked with `source="demo"` and `extra_data.is_demo=true`.
+   - Backend: `POST /api/auth/seed-demo` endpoint in `app/api/auth.py` -- called from frontend skip flow, requires auth.
+   - Frontend: `handleSkipConnection()` in `App.tsx` now calls `authApi.seedDemo()` after setting the skip flag, so interactions appear immediately.
+   - Frontend: gray "Demo" badge (`source-badge demo`) shown on demo interactions in `ChatList.tsx`.
+   - Frontend: `api.ts` -- added `authApi.seedDemo()` method.
+   - CSS: `.source-badge.demo` style in `index.css` (subtle gray).
+   - Demo content: 1-5 star reviews (urgent/high/normal/low priorities), pre-purchase questions (availability, sizing, pre_purchase intents), chats (defect with urgent priority, size question with seller reply, delivery inquiry with seller reply). InteractionEvent records created for replied interactions.
+
+Сделано (2026-02-15):
+ - **Bug #1 + #3 Fix: Tab/page switching flicker** -- replaced conditional rendering (ternary chain) with CSS show/hide in `App.tsx`. All workspace pages (messages, analytics, promo, settings) are now rendered simultaneously and toggled via `display: none` instead of mount/unmount. This eliminates DOM destruction/reconstruction on tab switch, preventing layout flicker and loading-state flash caused by useEffect re-fires on component mount.
+   - **Root cause:** `App.tsx` used a ternary chain (`activeWorkspace === 'analytics' ? ... : activeWorkspace === 'promo' ? ... : ...`) which unmounted the old page and mounted the new one on every tab switch. Components like PromoCodes and SettingsPage had useEffect hooks that fetched data on mount, briefly showing loading states. The DOM rebuild also caused visible layout shift.
+   - **Fix:** Each workspace page is now always rendered as a sibling div with `style={{ display: activeWorkspace === 'xxx' ? undefined : 'none' }}`. Settings uses `display: 'contents'` when active to preserve its flex layout.
+   - **File:** `apps/chat-center/frontend/src/App.tsx` (lines 1197-1778)
+   - **Build:** `npm run build` passes cleanly.
+
+ - **Bug #2 Fix: WB API key not persisting on re-login** -- login/register response now includes `has_api_credentials`, `sync_status`, `sync_error`, `last_sync_at` so the frontend can correctly skip onboarding for users who already connected their WB API key.
+   - **Root cause:** `SellerAuthInfo` schema (used by `/auth/login` and `/auth/register` responses) did not include `has_api_credentials`. The field was always `undefined` in the frontend `User` object after login, so `!user.has_api_credentials` was always `true`, triggering the onboarding screen even when the key was already saved in DB.
+   - **Fix (backend):** `app/schemas/auth.py` -- added `has_api_credentials: bool`, `sync_status`, `sync_error`, `last_sync_at` to `SellerAuthInfo`.
+   - **Fix (backend):** `app/api/auth.py` -- both `register()` and `login()` endpoints now pass `has_api_credentials=bool(seller.api_key_encrypted)` plus sync fields to the response.
+   - **No frontend changes needed** -- `User` type in `types/index.ts` already had these as optional fields; they were just never populated from the login response.
+   - **Verification:** The `/auth/me` endpoint (used on page refresh) was already correct. The bug only manifested on fresh login flow.
+
+ - **BL-NEXT-002 (BL-P2-002): E2E Playwright Smoke Tests on CJM** -- headless Playwright test suite covering the critical user journey.
+   - Directory: `apps/chat-center/e2e/` (standalone npm package with `@playwright/test`).
+   - Config: `playwright.config.ts` -- headless Chromium, 30s timeout, screenshot-on-failure, configurable `BASE_URL` env.
+   - Helper: `helpers/auth.ts` -- `registerUser()`, `loginUser()`, `skipOnboarding()`, `loginAndSkipToInbox()`, `navigateToWorkspace()`, `generateTestEmail()` (unique per run).
+   - Tests (`tests/cjm-smoke.spec.ts`) -- 9 smoke tests:
+     1. Registration (fill form, submit, verify onboarding redirect)
+     2. Skip WB onboarding (verify demo banner)
+     3. Main inbox with channel tabs (`filter-pill` in `.channel-filters`) and status filters (Срочно/Без ответа/Обработаны)
+     4. Open interaction detail (click `.chat-item`, verify `.chat-window` / `.product-context`)
+     5. Analytics page (`.analytics-page`, KPI strip, period controls, grids)
+     6. Settings page (3 tabs: Подключения/AI-ассистент/Профиль)
+     7. Sidebar navigation (messages -> analytics -> settings -> promo round-trip)
+     8. Logout (sidebar -> login page)
+     9. Demo mode (no registration)
+   - Run: `cd apps/chat-center/e2e && npm install && npx playwright install chromium && npx playwright test`
+   - Prereqs: backend at `:8001`, frontend at `:5173` (or `BASE_URL=https://agentiq.ru/app`).
+
+Сделано (2026-02-14):
+ - **BL-DEMO-003: Frontend source labeling (wb_api vs wbcon_fallback)** -- добавлены визуальные бейджи источника данных в список чатов.
+   - `source` field добавлен в `Chat` тип (`types/index.ts`) и проброшен через `interactionToChat()` в `App.tsx`.
+   - Бейдж рендерится в `ChatList.tsx` → `.chat-item-meta`: зеленый "WB API" (`wb_api`) или оранжевый "Fallback" (`wbcon_fallback`).
+   - CSS: `.source-badge`, `.source-badge.wb-api`, `.source-badge.fallback` в `index.css` — следует design system (`COMPONENTS.md` badges section).
+   - Build: `npm run build` — OK, без ошибок.
+ - **BL-PILOT-003: LLM Intent Fallback for questions** — добавлен LLM-based fallback для классификации интента вопросов.
+   - Новый модуль: `app/services/ai_question_analyzer.py` — hybrid intent classification (rule-based first, LLM fallback via DeepSeek/OpenAI-compatible API).
+   - Конфиг: `ENABLE_LLM_INTENT` (default `false`) в `app/config.py` — включает LLM fallback, fail-safe, 5s timeout.
+   - Интеграция: `interaction_ingest.py` — при `general_question` + `needs_response=True` вызывает LLM fallback, пересчитывает priority/SLA.
+   - Новое поле `intent_detection_method` в `extra_data` (`rule_based` / `llm`) для трекинга метода классификации.
+   - `_priority_for_question_with_intent()` поддерживает `intent_override` для LLM-detected интентов.
+   - Тесты: `tests/test_ai_question_analyzer.py` — 20 тестов (fast path, LLM fallback, timeout resilience, invalid response, config flag, priority override).
+   - Никогда не блокирует ingestion при ошибке LLM (try/except + logger.debug).
+
+Сделано (2026-02-13):
+ - UI: включены страницы `Промокоды` и `Настройки` в `/app` (sidebar + bottom nav), без влияния на экран сообщений.
+ - Promo (v3): промокоды + help-panel + автосохранение + toggles “AI предлагает промокод” / “предупреждать об отзывах”.
+ - Settings (v3): `Подключения`/`AI-ассистент`/`Профиль` (AI-настройки с сохранением; logout доступен с mobile через профиль).
+ - Backend: добавлен `Settings API` (`/api/settings/promo`, `/api/settings/ai`) с хранением в `runtime_settings` (namespace per seller).
+
 Сделано (2026-02-12):
 0. Demo-fixes / correctness (2026-02-12):
  - Fix ingestion timestamps: `_parse_iso_dt()` восстановлен, `occurred_at` для review/question теперь заполняется (реальные даты вместо “сегодня”).
@@ -789,3 +859,284 @@ AgentIQ — это **WB-first платформа управления комму
 3. Источник данных явно виден в UI и API payload.
 4. Probabilistic link всегда содержит `confidence` и `reasoning_signals`.
 5. На low confidence нет авто-действий.
+
+---
+
+## Execution Log
+
+### 2026-02-14: Alembic Migrations Setup (Claude)
+- **Status:** DONE (files created; runtime test pending — Bash denied in session)
+- **Files created:**
+  - `apps/chat-center/backend/alembic.ini` — Alembic config, sqlalchemy.url placeholder (overridden by env var in env.py)
+  - `apps/chat-center/backend/alembic/README` — standard Alembic readme
+  - `apps/chat-center/backend/alembic/env.py` — async-compatible env (aiosqlite + asyncpg), loads DATABASE_URL from .env, imports all models, render_as_batch=True for SQLite
+  - `apps/chat-center/backend/alembic/script.py.mako` — migration template (matches async template)
+  - `apps/chat-center/backend/alembic/versions/2026_02_14_0001-0001_add_interactions_and_interaction_events.py` — initial migration creating `interactions` and `interaction_events` tables with all indexes, FKs, and unique constraints
+- **Files modified:**
+  - `apps/chat-center/backend/requirements.txt` — added `aiosqlite==0.20.0` (required for SQLite async driver used in dev)
+- **Test results:**
+  - `alembic upgrade head` / `alembic downgrade -1` — NOT RUN (Bash tool was denied during session; must be tested manually)
+  - Migration file manually verified: columns, types, FKs, indexes, unique constraints all match `app/models/interaction.py` and `app/models/interaction_event.py`
+- **Notes:**
+  - env.py uses `load_dotenv()` + `os.getenv("DATABASE_URL")` to avoid hardcoded credentials
+  - Auto-converts `postgresql://` to `postgresql+asyncpg://` and `sqlite:///` to `sqlite+aiosqlite:///`
+  - `render_as_batch=True` enabled in both online and offline modes for SQLite ALTER TABLE compatibility
+  - The `metadata` column in interactions uses `sa.Column('metadata', sa.JSON())` matching the model's `Column("metadata", JSON)` definition
+  - For prod (PostgreSQL): run `alembic stamp head` on existing DB first if tables already exist, then use `alembic upgrade head` for new deployments
+  - For dev (SQLite): run `alembic upgrade head` to create tables from scratch (or keep using `init_db()` for quick resets)
+  - Manual test commands:
+    ```bash
+    cd apps/chat-center/backend
+    source venv/bin/activate
+    pip install aiosqlite  # if not already installed
+    alembic upgrade head      # apply migration
+    alembic downgrade -1      # rollback migration
+    alembic current           # check current revision
+    ```
+
+### 2026-02-14: Contract Tests for WB Feedbacks & Questions Connectors (Claude)
+- **Status:** DONE (files created; test execution pending -- Bash denied in session)
+- **Files created:**
+  - `apps/chat-center/backend/tests/fixtures/wb_api/feedbacks_list.json` -- mock 200 response with 2 feedbacks (Russian text, 5-star and 1-star)
+  - `apps/chat-center/backend/tests/fixtures/wb_api/questions_list.json` -- mock 200 response with 2 questions (one unanswered, one with answer)
+  - `apps/chat-center/backend/tests/fixtures/wb_api/error_401.json` -- unauthorized error response
+  - `apps/chat-center/backend/tests/fixtures/wb_api/error_429.json` -- rate limit error response
+  - `apps/chat-center/backend/tests/test_wb_feedbacks_contract.py` -- 11 tests: parse response, empty list, pagination params, answer success (204), 401 auth retry, 429 rate limit retry, timeout retry, timeout exhausted, 502 raises, auth header candidates (raw/bearer/case-insensitive), whitespace strip
+  - `apps/chat-center/backend/tests/test_wb_questions_contract.py` -- 12 tests: parse response, answer parsing, pagination params, count unanswered, patch answer, patch wasViewed, 429 retry, 429 triple retry backoff, 401 auth fallback, 401 both fail, auth header candidates (raw/bearer)
+- **Mocking strategy:** `unittest.mock.AsyncMock` + `patch("httpx.AsyncClient")` -- no new packages needed (no pytest-httpx/respx)
+- **Test results:** NOT RUN (Bash tool was denied during session; must be tested manually)
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  python -m pytest tests/test_wb_feedbacks_contract.py tests/test_wb_questions_contract.py -v
+  ```
+- **Coverage:**
+  - Success paths: list feedbacks/questions, answer feedback (204), patch question (answer/view), count unanswered
+  - Error paths: 401 auth retry with header fallback, 429 rate limit with exponential backoff, timeout with retry, 502 immediate raise
+  - Auth header logic: raw token -> [raw, Bearer raw], Bearer-prefixed -> [original, raw], case insensitivity, whitespace stripping
+  - Pagination: skip/take/isAnswered/order/nmId params verified
+- **Notes:**
+  - All tests mock at httpx.AsyncClient level (not at connector method level) to verify real connector logic
+  - Real `httpx.Response` objects used (with `raise_for_status()`) for authentic HTTP behavior
+  - Fixtures use realistic Russian text matching WB API payload structure
+  - `asyncio.sleep` patched in retry tests to avoid real delays
+  - All tests run fully offline -- zero real API calls
+
+### 2026-02-14: Channel Guardrails (Claude)
+- **Status:** DONE (files created; test execution pending -- Bash denied in session)
+- **Files created:**
+  - `apps/chat-center/backend/app/services/guardrails.py` -- channel-specific guardrails service ported from `scripts/llm_analyzer.py:478-519`. Contains 4 banned phrase lists (AI mentions, promises, blame, dismissive), return trigger detection, channel-specific apply functions (review/question/chat), unified `apply_guardrails()`, and blocking `validate_reply_text()`.
+  - `apps/chat-center/backend/tests/test_guardrails.py` -- 37 tests covering: all banned phrase categories, return trigger detection, return mention without trigger, channel-specific differences (review=strict, question=strict, chat=relaxed), edge cases (partial word matching, case sensitivity, empty/None text, multiple violations), and pre-send validation (blocking vs warning severity).
+- **Files modified:**
+  - `apps/chat-center/backend/app/services/interaction_drafts.py` -- added `guardrail_warnings` field to `DraftResult` dataclass, added `_apply_guardrails_to_draft()` helper, all draft generation paths now run channel guardrails and attach warnings.
+  - `apps/chat-center/backend/app/schemas/interaction.py` -- added `guardrail_warnings: List[Dict[str, Any]]` field to `InteractionDraftResponse` schema.
+  - `apps/chat-center/backend/app/api/interactions.py` -- (1) draft endpoint now passes `guardrail_warnings` through to response (both cached and fresh); (2) reply endpoint now runs `validate_reply_text()` pre-send validation (HTTP 422 with violation details if blocked).
+- **Channel rules:**
+  - `review` (PUBLIC): strictest -- all 4 banned phrase categories + unsolicited return check + length checks
+  - `question` (PUBLIC): same as review (delegates to `apply_review_guardrails`)
+  - `chat` (PRIVATE): relaxed -- only AI mentions blocked (error), blame phrases soft-warned (warning), promises/dismissive allowed
+- **Key design decisions:**
+  - Guardrails are ADDITIVE at draft stage (warn, don't block) -- warnings attached to `DraftResult.guardrail_warnings`
+  - `validate_reply_text()` is the ONLY blocking check -- used in the reply endpoint, returns 422 on error-severity violations
+  - Word-boundary regex (`\b`) for short tokens like "бот"/"ИИ" to prevent false positives (e.g., "работа" does not match "бот")
+  - Case-insensitive matching throughout
+  - None/empty text handled gracefully in all functions
+- **Test results:** NOT RUN (Bash tool was denied during session; must be tested manually)
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  python -m pytest tests/test_guardrails.py -v
+  ```
+
+### BL-PILOT-005: Sync Observability (metrics + alerting) (2026-02-14)
+
+**Task:** Add structured logging and metrics for sync operations, plus alerting logic for anomalies.
+
+**Files created/modified:**
+- **NEW** `apps/chat-center/backend/app/services/sync_metrics.py` -- SyncMetrics dataclass + SyncHealthMonitor + module-level singleton
+- **MODIFIED** `apps/chat-center/backend/app/tasks/sync.py` -- `sync_seller_interactions()` now records per-channel SyncMetrics (review, question, chat) + aggregate metrics; emits structured JSON logs; feeds into in-memory ring buffer via `sync_health_monitor`
+- **MODIFIED** `apps/chat-center/backend/app/services/interaction_metrics.py` -- `get_ops_alerts()` now appends sync health alerts + `sync_health` dict to response
+- **MODIFIED** `apps/chat-center/backend/app/schemas/interaction.py` -- `InteractionOpsAlertsResponse` now includes optional `sync_health: Dict[str, Any]`
+- **MODIFIED** `apps/chat-center/backend/app/api/interactions.py` -- `ops_alerts()` endpoint passes `sync_health` through to response
+- **NEW** `apps/chat-center/backend/tests/test_sync_metrics.py` -- 30 tests covering SyncMetrics serialization, health check thresholds, alert generation, ring buffer eviction, multi-seller isolation
+
+**Architecture:**
+- **Storage:** Option C (structured logging + in-memory ring buffer). No new DB tables, no external deps.
+- **SyncMetrics** dataclass captures per-channel metrics (fetched/created/updated/skipped/errors/rate_limited/duration). `.finish()` calculates duration, `.log()` emits JSON at appropriate log level (INFO/WARNING/ERROR). `.apply_ingest_stats()` merges IngestStats dict.
+- **SyncHealthMonitor** singleton maintains thread-safe ring buffers (deque maxlen=10) keyed by `{seller_id}:{channel}`. `check_sync_health()` evaluates 4 health signals: sync staleness, error rate, rate limiting, zero-fetch streaks. `get_active_alerts()` returns alert dicts compatible with existing `InteractionOpsAlert` schema.
+- **Alert types:** `sync_stale` (>15 min), `sync_errors` (>20% error rate), `sync_rate_limited` (recent 3 syncs), `sync_zero_fetch` (3+ consecutive zero-fetch).
+- **Integration:** `get_ops_alerts()` in `interaction_metrics.py` calls `sync_health_monitor.get_active_alerts(seller_id)` and appends to existing alerts list. New `sync_health` field in API response provides raw health status.
+
+**Key design decisions:**
+- In-memory only (no Redis dependency) -- suitable for single-process Celery worker. State lost on restart is acceptable for MVP.
+- Thread-safe via `threading.Lock` for concurrent Celery workers in prefork mode.
+- Ring buffer size of 10 per seller/channel prevents unbounded memory growth.
+- Aggregate "all" channel metrics recorded alongside per-channel metrics for dashboard-level views.
+- Backward compatible: `sync_health` field is Optional in schema, existing clients unaffected.
+
+**Test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  python -m pytest tests/test_sync_metrics.py -v
+  ```
+
+### 2026-02-14: DB Performance Indexes for Interactions (BL-PILOT-004) (Claude)
+- **Status:** DONE (files created; migration execution pending)
+- **Task:** Add optimized indexes for production-load critical queries (list_interactions, linking, needs_response filter)
+- **Analysis of query patterns:**
+  - `list_interactions` (main): filters by `seller_id` + optional (channel, status, priority, needs_response, marketplace, source, search), orders by `occurred_at DESC`
+  - Ingestion lookups: `(seller_id, marketplace, channel, external_id)` -- already covered by `uq_interactions_identity` UniqueConstraint
+  - Linking queries (`interaction_linking.py`): `(seller_id, marketplace, channel != X)` + `(order_id OR customer_id OR nm_id OR product_article)`
+- **Existing indexes (migration 0001):**
+  - `ix_interactions_id` -- (id)
+  - `ix_interactions_seller_id` -- (seller_id)
+  - `idx_interactions_channel_status` -- (seller_id, channel, status)
+  - `idx_interactions_priority` -- (seller_id, priority, needs_response)
+  - `idx_interactions_occurred` -- (seller_id, occurred_at)
+  - `idx_interactions_source` -- (seller_id, source)
+  - `uq_interactions_identity` -- (seller_id, marketplace, channel, external_id)
+- **New indexes added (migration 0002):**
+  1. `idx_interactions_list_main` -- (seller_id, occurred_at DESC, needs_response) -- covers main list query with primary sort + common filter
+  2. `idx_interactions_linking_nm` -- (seller_id, marketplace, nm_id) -- linking by product
+  3. `idx_interactions_linking_customer` -- (seller_id, marketplace, customer_id) -- linking by customer
+  4. `idx_interactions_linking_order` -- (seller_id, marketplace, order_id) -- linking by order
+  5. `idx_interactions_needs_response` -- (seller_id, needs_response, occurred_at DESC) -- "needs response" filter with recency sort
+- **Files created:**
+  - `apps/chat-center/backend/alembic/versions/2026_02_14_0002-0002_add_performance_indexes.py` -- migration with idempotent upgrade (checks index existence for both PostgreSQL and SQLite before creating)
+- **Files modified:**
+  - `apps/chat-center/backend/app/models/interaction.py` -- added 5 new Index entries to `__table_args__` to keep model in sync with migration
+- **Key design decisions:**
+  - Migration is idempotent: `_index_exists()` checks `pg_indexes` (PostgreSQL) or `sqlite_master` (SQLite) before creating
+  - DESC sort on `occurred_at` in composite indexes for optimal ORDER BY performance
+  - No existing indexes were duplicated (verified against 0001 migration)
+  - Naming convention follows existing pattern: `idx_interactions_<purpose>`
+  - Revision chain: `0001` -> `0002`
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  alembic upgrade head     # apply new indexes
+  alembic downgrade -1     # rollback to 0001
+  alembic current          # verify current revision
+  ```
+
+### 2026-02-14: Nightly WB Contract Checks -- BL-PILOT-007 (Claude)
+- **Status:** DONE (script created and tested; GitHub Action created)
+- **Files created:**
+  - `scripts/check_wb_contract.py` -- WB API contract validator with two modes:
+    - `offline`: validates fixture files (`feedbacks_list.json`, `questions_list.json`) against schema snapshots
+    - `online`: fetches live WB API responses and validates against the same snapshots (requires `--token`)
+    - `both`: runs both modes sequentially
+    - Exit codes: 0 (pass), 1 (violations), 2 (runtime error)
+  - `apps/chat-center/backend/tests/fixtures/wb_api/feedbacks_schema_snapshot.json` -- expected schema for feedbacks API (envelope, required/optional fields, types, productDetails, answerState enum)
+  - `apps/chat-center/backend/tests/fixtures/wb_api/questions_schema_snapshot.json` -- expected schema for questions API (envelope, required/optional fields, types, productDetails, answer object with nested required/optional)
+  - `.github/workflows/wb-contract-check.yml` -- GitHub Action: daily at 03:00 UTC + manual trigger, offline always runs, online runs only if `WB_API_TOKEN` secret is set
+- **Validation checks performed by the script:**
+  1. **Required fields** -- verifies all required fields present in each item (feedbacks: id, text, productValuation, createdDate, productDetails; questions: id, text, createdDate, state, productDetails)
+  2. **Field types** -- checks each field matches expected Python type from snapshot (str, int, bool, null_or_dict)
+  3. **New field detection** -- warns about fields present in response but absent from snapshot (potential API additions)
+  4. **Structural diff** -- compares overall response shape against snapshot, detects missing required fields across all items and unexpected new fields
+  5. **Nested validation** -- productDetails checked for required nmId/productName; questions answer object checked for required text field when non-null
+- **Test results:** PASS (offline mode verified locally)
+  ```
+  PASS: feedbacks schema validation
+  PASS: feedbacks structural diff
+  PASS: questions schema validation
+  PASS: questions structural diff
+  RESULT: PASS -- all contract checks passed
+  ```
+- **Violation detection verified:** missing fields, wrong types, new unknown fields, broken answer objects -- all correctly detected
+- **No new dependencies:** script uses only stdlib (json, argparse, pathlib, sys, os); httpx imported only for online mode (already in requirements)
+- **Run commands:**
+  ```bash
+  python scripts/check_wb_contract.py --mode offline
+  python scripts/check_wb_contract.py --mode online --token <WB_TOKEN>
+  python scripts/check_wb_contract.py --mode both --token <WB_TOKEN>
+  ```
+
+### 2026-02-14: Configurable reply_pending_window_minutes -- BL-PILOT-006 (Claude)
+- **Status:** DONE
+- **Problem:** `_reply_pending_override()` in `interaction_ingest.py` had `window_minutes=180` hardcoded. Sellers need to configure how long an AgentIQ reply remains in "pending" state while WB moderation processes it.
+- **Files created:**
+  - `apps/chat-center/backend/tests/test_reply_pending_window.py` -- 9 unit tests covering default window (180 min), custom short/long windows, boundary conditions, non-agentiq source, and missing data
+- **Files modified:**
+  - `apps/chat-center/backend/app/schemas/settings.py` -- added `GeneralSettings`, `GeneralSettingsResponse`, `GeneralSettingsUpdateRequest` schemas with `reply_pending_window_minutes` field (min=30, max=1440, default=180)
+  - `apps/chat-center/backend/app/api/settings.py` -- added `get_seller_setting()` public helper (reads a single field from seller's general settings), added `_general_key()`, added `GET/PUT /api/settings/general` endpoints
+  - `apps/chat-center/backend/app/services/interaction_ingest.py` -- added `_DEFAULT_REPLY_PENDING_WINDOW = 180` constant, added `reply_pending_window_minutes` optional param to both `ingest_wb_reviews_to_interactions()` and `ingest_wb_questions_to_interactions()`, both functions now load the setting from DB (via `get_seller_setting()`) if not explicitly passed; both `_reply_pending_override()` calls now pass the resolved window
+- **Key design decisions:**
+  - Three-level resolution: explicit parameter > seller DB setting > module-level default (180 min)
+  - Fully backward compatible: all existing callers pass no explicit window, so they get DB setting or default
+  - Validation via Pydantic: min 30 min, max 1440 min (24h), default 180 min
+  - Reuses existing `runtime_settings` table with namespace `general_settings_v1:seller:{id}`
+  - No circular imports: `interaction_ingest.py` imports from `api/settings.py` (not vice versa)
+  - `get_seller_setting()` is a public helper usable by any service needing seller config
+- **API endpoints:**
+  - `GET /api/settings/general` -- returns current general settings (defaults if not configured)
+  - `PUT /api/settings/general` -- updates general settings with validation
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  pytest -v tests/test_reply_pending_window.py
+  ```
+
+### 2026-02-14: Rate Limiting + Backoff for WB Connectors -- BL-PILOT-002 (Claude)
+- **Status:** DONE (files created; test execution pending -- Bash denied in session)
+- **Task:** Add unified rate limiter preventing WB API rate limit violations across all connector calls for a given seller
+- **Problem:** WB API has rate limits (~30 req/min). Current connectors have per-request 429 retry with exponential backoff, but no global rate limiter per seller. Multiple concurrent sync tasks for the same seller could overwhelm WB API.
+- **Solution (3 layers):**
+  1. **Token-bucket rate limiter** (`rate_limiter.py`): per-seller isolation, default 30 RPM, configurable per seller, async-compatible, no external dependencies
+  2. **Inter-page delay** in ingestion: 0.5s sleep between paginated API calls (~2 req/sec = 120/min, well within limits)
+  3. **Per-seller sync lock** in Celery task: prevents concurrent `sync_seller_interactions` tasks for the same seller
+- **Files created:**
+  - `apps/chat-center/backend/app/services/rate_limiter.py` -- WBRateLimiter class (token-bucket), singleton `get_rate_limiter()`, per-seller sync lock (`try_acquire_sync_lock`/`release_sync_lock`)
+  - `apps/chat-center/backend/tests/test_rate_limiter.py` -- 16 tests: acquire without wait, RPM enforcement, per-seller isolation, custom seller config, bucket reset, concurrent safety, singleton behavior, sync lock acquire/release/isolation/idempotent
+- **Files modified:**
+  - `apps/chat-center/backend/app/services/interaction_ingest.py` -- added `asyncio` import, `rate_limiter` import, `_INTER_PAGE_DELAY` constant (0.5s), rate limiter acquire + inter-page sleep in both `ingest_wb_reviews_to_interactions` and `ingest_wb_questions_to_interactions` page loops
+  - `apps/chat-center/backend/app/tasks/sync.py` -- imported `try_acquire_sync_lock`/`release_sync_lock`, added per-seller sync lock guard at start of `sync_seller_interactions` (skip if already running), added `finally: release_sync_lock()` for cleanup on both success and error paths
+  - `apps/chat-center/backend/app/config.py` -- added `WB_RATE_LIMIT_RPM: int = 30` setting
+- **Architecture decisions:**
+  - In-process token bucket (no Redis): each Celery worker has its own bucket; effective per-seller budget = `RPM / num_workers`; with `worker_prefetch_multiplier=1` (already configured) at most 1 task/worker
+  - Rate limiting at ingestion level (not connector internals): simpler, less intrusive, keeps existing per-request 429 retry as second defense layer
+  - Inter-page delay is the primary throttle; token bucket is the safety net for burst scenarios
+  - Sync lock is non-blocking: if another sync is already running for the seller, the new task logs and returns (no queue buildup)
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  python -m pytest tests/test_rate_limiter.py -v
+  ```
+
+### 2026-02-14: Incremental Sync (Claude)
+- **Status:** DONE
+- **Approach:** Watermark-based (last `occurred_at` per seller+channel)
+  - On each sync cycle, the `occurred_at` of the newest fetched record is saved as a watermark
+  - On the next cycle, ingestion stops pagination when it encounters records older than the watermark
+  - A 2-second overlap buffer prevents records created in the same second from being missed
+  - When no watermark exists (first sync), full sync is performed (backward compatible)
+  - `force_full_sync` flag on the Celery task allows manual override to ignore watermarks
+- **Storage:** `runtime_settings` table, key pattern `sync_watermark:{channel}:{seller_id}`
+  - Separate namespace from chat cursor keys (`sync_cursor:...`)
+  - Watermark stored as ISO 8601 string (UTC)
+- **Files modified:**
+  - `apps/chat-center/backend/app/services/interaction_ingest.py` -- added `since_watermark` parameter to both `ingest_wb_reviews_to_interactions()` and `ingest_wb_questions_to_interactions()`; return type changed from `Dict[str, int]` to `IngestStats` (which has `.as_dict()` for backward compat); added watermark tracking (`max_occurred_at`), overlap buffer (`_WATERMARK_OVERLAP_SECONDS`), and early pagination stop when hitting watermark
+  - `apps/chat-center/backend/app/tasks/sync.py` -- added `_watermark_key()`, `_load_watermark()`, `_save_watermark()` helpers; modified `sync_seller_interactions` to accept `force_full_sync` flag, load watermarks before ingestion, and save new watermarks after successful ingestion
+  - `apps/chat-center/backend/app/api/interactions.py` -- updated sync endpoint callers to use `result.as_dict()` instead of raw dict
+  - `apps/chat-center/backend/app/api/auth.py` -- updated direct sync callers to use `result.as_dict()` instead of raw dict
+- **Files created:**
+  - `apps/chat-center/backend/tests/test_incremental_sync.py` -- 12 tests covering: watermark roundtrip, namespace isolation, overwrite, key format, None/empty noop, IngestStats as_dict backward compat, review stops at watermark, full sync when no watermark, question stops at watermark, overlap buffer edge case, max occurred_at tracking
+- **Edge cases handled:**
+  - Same-second records: 2-second overlap buffer ensures records created in the same second as the watermark are re-processed (deduplicated by `external_id` unique constraint)
+  - Timezone: all watermarks stored and compared in UTC; `_as_utc_dt()` normalizes naive datetimes
+  - Missing watermark: triggers full sync (no behavioral change from before)
+  - API error during ingestion: watermark is NOT saved (no partial progress), will retry from old watermark next cycle
+  - Mixed answer_states: watermark stops apply across both `is_answered=False` and `is_answered=True` passes
+- **Manual test commands:**
+  ```bash
+  cd apps/chat-center/backend
+  source venv/bin/activate
+  python -m pytest tests/test_incremental_sync.py -v
+  ```
