@@ -175,7 +175,7 @@ export function PromoCodes(props: { user: User }) {
   };
 
   return (
-    <div className="settings-content promo-page" style={{ padding: 32, maxWidth: 780 }}>
+    <div className="settings-content promo-page">
       <div className="settings-section-title">Промокоды</div>
       <div className="promo-cabinet-selector">
         <div className="promo-cabinet-icon">W</div>
