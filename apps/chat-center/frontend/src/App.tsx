@@ -130,7 +130,7 @@ function interactionToChat(interaction: Interaction): Chat {
     last_message_at: interaction.occurred_at || interaction.updated_at,
     first_message_at: interaction.occurred_at || interaction.created_at,
     sla_deadline_at: slaDueAt,
-    sla_priority: toSlaPriority(interaction.priority),
+    sla_priority: toSlaPriority(draftPriority || interaction.priority),
     ai_suggestion_text: draftText,
     ai_analysis_json: analysisJson,
     last_message_preview: (() => {
@@ -579,14 +579,25 @@ function App() {
 
       // Update cache: replace first page (newest items)
       const prevItems = interactionCacheRef.current[channelKey];
+      // Compare visually-meaningful fields only (NOT updated_at — it changes every sync cycle)
       const isSame = prevItems
         && prevItems.length >= response.interactions.length
-        && response.interactions.every((item, i) =>
-          prevItems[i]
-          && item.id === prevItems[i].id
-          && item.updated_at === prevItems[i].updated_at
-          && item.needs_response === prevItems[i].needs_response
-        );
+        && response.interactions.every((item, i) => {
+          const prev = prevItems[i];
+          if (!prev || item.id !== prev.id) return false;
+          if (item.needs_response !== prev.needs_response) return false;
+          if (item.priority !== prev.priority) return false;
+          if (item.status !== prev.status) return false;
+          if (item.text !== prev.text) return false;
+          // Extra_data fields that affect section grouping and display
+          const extraA = item.extra_data as Record<string, unknown> | null;
+          const extraB = prev.extra_data as Record<string, unknown> | null;
+          const draftA = extraA?.last_ai_draft as Record<string, unknown> | null;
+          const draftB = extraB?.last_ai_draft as Record<string, unknown> | null;
+          if ((extraA?.chat_status || '') !== (extraB?.chat_status || '')) return false;
+          if ((draftA?.sla_priority || '') !== (draftB?.sla_priority || '')) return false;
+          return true;
+        });
       if (!isSame) {
         // Merge: keep newer first-page items, keep already-loaded older pages
         const firstPageIds = new Set(response.interactions.map(i => i.id));

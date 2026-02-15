@@ -37,9 +37,9 @@ celery_app.conf.update(
             "task": "app.tasks.sync.sync_all_sellers",
             "schedule": 30.0,  # Every 30 seconds
         },
-        "sync-all-seller-interactions-every-5min": {
+        "sync-all-seller-interactions-every-30s": {
             "task": "app.tasks.sync.sync_all_seller_interactions",
-            "schedule": 300.0,  # Every 5 minutes
+            "schedule": 30.0,  # Every 30 seconds (was 300)
         },
         "check-sla-escalation-every-5min": {
             "task": "app.tasks.sync.check_sla_escalation",
