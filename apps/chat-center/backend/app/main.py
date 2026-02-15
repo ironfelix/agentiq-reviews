@@ -1,12 +1,15 @@
 """Main FastAPI application - AgentIQ Chat Center MVP"""
 
 import logging
+import os
 import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from sqlalchemy import text
+from starlette.responses import JSONResponse
 
 from app.config import get_settings
 from app.database import engine, Base
@@ -65,11 +68,27 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Dev: allow all origins for LAN access
+    allow_origins=os.environ.get("CORS_ORIGINS", "https://agentiq.ru,http://localhost:5173,http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    """Catch-all for unhandled exceptions — log + Sentry + clean 500."""
+    import logging
+    logger = logging.getLogger("agentiq")
+    logger.exception("Unhandled exception: %s %s", request.method, request.url)
+    try:
+        import sentry_sdk
+        sentry_sdk.capture_exception(exc)
+    except Exception:
+        pass
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"}
+    )
 
 
 # Lifecycle events
@@ -130,12 +149,17 @@ async def prometheus_http_middleware(request, call_next):
 # Health check
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "agentiq-chat-center",
-        "version": "0.1.0"
-    }
+    """Health check endpoint — verifies DB connectivity."""
+    from app.database import async_session
+    try:
+        async with async_session() as db:
+            await db.execute(text("SELECT 1"))
+        return {"status": "healthy", "service": "agentiq-chat-center", "version": "0.1.0"}
+    except Exception as e:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unhealthy", "service": "agentiq-chat-center", "error": str(e)}
+        )
 
 @app.get("/api/health")
 async def health_check_api():
