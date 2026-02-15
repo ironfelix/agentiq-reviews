@@ -127,7 +127,8 @@ export function ChatList({
       filtered = filtered.filter(chat =>
         chat.customer_name?.toLowerCase().includes(query) ||
         chat.marketplace_chat_id.toLowerCase().includes(query) ||
-        chat.order_id?.toLowerCase().includes(query)
+        chat.order_id?.toLowerCase().includes(query) ||
+        chat.product_name?.toLowerCase().includes(query)
       );
     }
 

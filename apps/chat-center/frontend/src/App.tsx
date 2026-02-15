@@ -244,20 +244,20 @@ const SKIP_CONNECT_STORAGE_KEY = 'agentiq_connect_skipped';
 const INTERACTIONS_CACHE_KEY = 'agentiq_interactions_cache';
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
-function saveInteractionsToCache(channelKey: string, interactions: Interaction[]) {
+function saveInteractionsToCache(channelKey: string, interactions: Interaction[], allLoaded?: boolean) {
   try {
     const existing = JSON.parse(sessionStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
-    existing[channelKey] = { ts: Date.now(), items: interactions };
+    existing[channelKey] = { ts: Date.now(), items: interactions, allLoaded: !!allLoaded };
     sessionStorage.setItem(INTERACTIONS_CACHE_KEY, JSON.stringify(existing));
   } catch { /* quota exceeded or serialization error, ignore */ }
 }
 
-function loadInteractionsFromCache(channelKey: string): Interaction[] | null {
+function loadInteractionsFromCache(channelKey: string): { items: Interaction[]; allLoaded: boolean } | null {
   try {
     const cache = JSON.parse(sessionStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
     const entry = cache[channelKey];
     if (entry && Date.now() - entry.ts < CACHE_TTL_MS) {
-      return entry.items;
+      return { items: entry.items, allLoaded: !!entry.allLoaded };
     }
   } catch { /* corrupted cache, ignore */ }
   return null;
@@ -325,7 +325,13 @@ function normalizeIntegerInput(raw: string, fallback: number, min: number, max: 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [activeWorkspace, setActiveWorkspace] = useState<'messages' | 'analytics' | 'settings' | 'dashboard'>('messages');
+  const [activeWorkspace, setActiveWorkspace] = useState<'messages' | 'analytics' | 'settings' | 'dashboard'>(() => {
+    try {
+      const saved = sessionStorage.getItem('agentiq_workspace');
+      if (saved === 'messages' || saved === 'analytics' || saved === 'settings' || saved === 'dashboard') return saved;
+    } catch { /* ignore */ }
+    return 'messages';
+  });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [dismissedSyncOnboarding, setDismissedSyncOnboarding] = useState(false);
   const [connectionSkipped, setConnectionSkipped] = useState<boolean>(() => {
@@ -373,8 +379,8 @@ function App() {
       } else {
         // Try sessionStorage cache before showing spinner
         const sessionCached = loadInteractionsFromCache(channel);
-        if (sessionCached && sessionCached.length > 0) {
-          setInteractionCache(prev => ({ ...prev, [channel]: sessionCached }));
+        if (sessionCached && sessionCached.items.length > 0) {
+          setInteractionCache(prev => ({ ...prev, [channel]: sessionCached.items }));
           setIsLoadingChats(false);
         } else {
           setIsLoadingChats(true);
@@ -396,6 +402,11 @@ function App() {
     minReplyActivity: 1,
     replyActivityWindowDays: 30,
   });
+
+  // Persist active workspace to sessionStorage
+  useEffect(() => {
+    try { sessionStorage.setItem('agentiq_workspace', activeWorkspace); } catch { /* ignore */ }
+  }, [activeWorkspace]);
 
   const chats = useMemo(() => interactions.map(interactionToChat), [interactions]);
   const selectedChat = useMemo(
@@ -494,6 +505,8 @@ function App() {
     clearInteractionsCache();
     try {
       localStorage.removeItem(SKIP_CONNECT_STORAGE_KEY);
+      sessionStorage.removeItem('agentiq_workspace');
+      sessionStorage.removeItem('agentiq_pagination_loaded');
     } catch {
       // ignore
     }
@@ -616,7 +629,8 @@ function App() {
       }));
 
       // Save first page to sessionStorage for instant restore on next visit
-      saveInteractionsToCache(channelKey, response.interactions);
+      const finalAllLoaded = allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total);
+      saveInteractionsToCache(channelKey, response.interactions, finalAllLoaded);
 
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
         // Selected item might be on a later page — don't deselect
@@ -674,7 +688,7 @@ function App() {
         setTimeout(() => {
           const fullList = interactionCacheRef.current[channelKey];
           if (fullList) {
-            saveInteractionsToCache(channelKey, fullList);
+            saveInteractionsToCache(channelKey, fullList, true);
           }
         }, 0);
       }
@@ -1028,20 +1042,33 @@ function App() {
 
     const channelKey = filters.channel || 'all';
     const cached = loadInteractionsFromCache(channelKey);
-    if (cached && cached.length > 0) {
+    if (cached && cached.items.length > 0) {
       // Show cached data immediately -- NO spinner
-      setInteractionCache(prev => ({ ...prev, [channelKey]: cached }));
+      setInteractionCache(prev => ({ ...prev, [channelKey]: cached.items }));
       setIsLoadingChats(false);
+
+      // Restore pagination meta so sync banner doesn't flash
+      if (cached.allLoaded) {
+        setPaginationMeta(prev => ({
+          ...prev,
+          [channelKey]: {
+            total: cached.items.length,
+            loadedPages: 1,
+            isLoadingMore: false,
+            allLoaded: true,
+          },
+        }));
+      }
 
       // Also populate per-channel caches from 'all' for instant folder switching
       if (channelKey === 'all') {
         const byChannel: Record<string, Interaction[]> = {};
-        for (const item of cached) {
+        for (const item of cached.items) {
           if (!byChannel[item.channel]) byChannel[item.channel] = [];
           byChannel[item.channel].push(item);
         }
         setInteractionCache(prev => {
-          const next: Record<string, Interaction[]> = { ...prev, [channelKey]: cached };
+          const next: Record<string, Interaction[]> = { ...prev, [channelKey]: cached.items };
           for (const [ch, items] of Object.entries(byChannel)) {
             if (!next[ch] || next[ch].length <= items.length) {
               next[ch] = items;
