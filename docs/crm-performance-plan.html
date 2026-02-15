@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM + Performance Marketing: Стратегический план 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-code: #f5f7fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --accent: #1a73e8;
+            --accent-hover: #1557b0;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-code);
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--accent) 0%, #1557b0 100%);
+            color: white;
+            padding: 4rem 2rem;
+            margin: -3rem -2rem 3rem -2rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            max-width: 700px;
+        }
+
+        /* Content */
+        .content {
+            background: var(--bg-primary);
+            border-radius: 0.75rem;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1.25rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.75rem 0;
+            color: var(--text-primary);
+        }
+
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9375rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        thead {
+            background: var(--accent);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Callouts */
+        .callout {
+            background: var(--bg-code);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .callout.success {
+            background: #f0fdf4;
+            border-left-color: var(--success);
+        }
+
+        .callout.warning {
+            background: #fffbeb;
+            border-left-color: var(--warning);
+        }
+
+        .callout.error {
+            background: #fef2f2;
+            border-left-color: var(--error);
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--bg-code);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        /* Highlights */
+        .highlight {
+            background: linear-gradient(120deg, #fef3c7 0%, #fef3c7 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 85%;
+            padding: 0 0.25rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-code);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin: 2rem 0 3rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc a:hover {
+            color: var(--accent);
+        }
+
+        .toc a::before {
+            content: '→';
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            max-width: 900px;
+            margin: 3rem auto 0 auto;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.875rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .content {
+                padding: 2rem 1.5rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-end;
+            }
+
+            table {
+                font-size: 0.8125rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        /* Scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Links */
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        /* Emoji support */
+        .emoji {
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">AGENT<span>IQ</span></a>
+            <div class="header-meta">
+                <span class="badge">📊 Research</span>
+                <span>Февраль 2026</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>CRM + Performance Marketing</h1>
+                <p>Стратегический план усиления performance-оффера через Customer Value Management и data-driven подход в условиях российского рынка 2026</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="toc">
+                <h3>Содержание</h3>
+                <ul>
+                    <li><a href="#executive-summary">Executive Summary</a></li>
+                    <li><a href="#cvm">Customer Value Management в 2026</a></li>
+                    <li><a href="#data">First-party & Zero-party Data</a></li>
+                    <li><a href="#channels">Усиление Performance-каналов</a></li>
+                    <li><a href="#limitations">Ограничения в РФ</a></li>
+                    <li><a href="#architecture">Архитектура решения</a></li>
+                    <li><a href="#offer">Оффер для агентства</a></li>
+                    <li><a href="#roadmap">Roadmap внедрения</a></li>
+                    <li><a href="#tools">Ключевые инструменты</a></li>
+                </ul>
+            </div>
+
+            <h2 id="executive-summary">Executive Summary</h2>
+
+            <p>Performance-маркетинг достиг точки, когда традиционные инструменты платной рекламы сталкиваются с эффектом убывающей отдачи. <strong>Решение — переход от acquisition-only подхода к value-based модели</strong>, где CRM-данные и Customer Value Management становятся ключевым источником конкурентного преимущества.</p>
+
+            <div class="callout success">
+                <h4>Ключевые результаты исследования</h4>
+                <p><strong>Бизнес-эффект от внедрения CRM-маркетинга:</strong></p>
+                <ul>
+                    <li>Рост продаж до <strong>245%</strong></li>
+                    <li>Увеличение конверсии в <strong>2.5 раза</strong></li>
+                    <li>Сокращение цикла сделки на <strong>40%</strong></li>
+                    <li>ROI до <strong>$30 на каждый вложенный доллар</strong></li>
+                    <li><strong>+18% к повторным покупкам</strong> благодаря персонализации (кейс Wildberries)</li>
+                </ul>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">245%</div>
+                    <div class="stat-label">Рост продаж</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.5x</div>
+                    <div class="stat-label">Увеличение конверсии</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$30</div>
+                    <div class="stat-label">ROI на $1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">47 млрд₽</div>
+                    <div class="stat-label">Programmatic РФ 2024</div>
+                </div>
+            </div>
+
+            <h3>Уникальные возможности российского рынка 2026</h3>
+            <ul>
+                <li>Импортозамещение MarTech — появились качественные российские CDP (Mindbox, CleverData, Altcraft)</li>
+                <li>Рост programmatic на <strong>20%</strong>, достиг <strong>47 млрд рублей</strong></li>
+                <li><strong>77% компаний</strong> используют ML для churn prediction и персонализации</li>
+                <li>Privacy-first тренд — first-party data становится золотым стандартом</li>
+            </ul>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="cvm">1. Customer Value Management в 2026</h2>
+
+            <h3>Ключевые тренды CVM</h3>
+
+            <h4>1. От привлечения к максимизации ценности</h4>
+            <p>Годами компании гнались за acquisition at all costs. В 2026 фокус смещается на существующую базу. CLV (Customer Lifetime Value) становится стратегической метрикой, встроенной во все коммерческие решения.</p>
+
+            <h4>2. Real-time интеллектуальное взаимодействие</h4>
+            <p>CVM эволюционирует от campaign management к intelligent real-time engagement. Backed by unified data, AI и creative intelligence, CVM предугадывает потребности клиентов до их возникновения.</p>
+
+            <h4>3. AI и ML интеграция</h4>
+            <p>77% телеком-компаний уже внедрили ML для churn prediction, up-sell, cross-sell. Generative AI, предиктивная аналитика и омниканальная оркестрация обеспечивают гипер-персонализированные офферы.</p>
+
+            <h3>Lifecycle Marketing Framework</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Этап</th>
+                        <th>Цель</th>
+                        <th>Точки касания</th>
+                        <th>KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Awareness</strong></td>
+                        <td>Привлечение внимания</td>
+                        <td>Контекст, таргет, programmatic</td>
+                        <td>CPM, CTR, Reach</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Acquisition</strong></td>
+                        <td>Первая покупка</td>
+                        <td>Landing pages, триггеры</td>
+                        <td>CPA, CR</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Onboarding</strong></td>
+                        <td>Активация продукта</td>
+                        <td>Welcome series</td>
+                        <td>Activation Rate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retention</strong></td>
+                        <td>Повторные покупки</td>
+                        <td>Email, push, SMS</td>
+                        <td>Repeat Rate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Expansion</strong></td>
+                        <td>Up-sell/Cross-sell</td>
+                        <td>Рекомендации</td>
+                        <td>AOV, LTV</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Win-back</strong></td>
+                        <td>Возврат ушедших</td>
+                        <td>Reactivation campaigns</td>
+                        <td>Churn Reduction</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Доказанные кейсы (Россия)</h3>
+            <div class="callout">
+                <p><strong>ECCO:</strong> +51% дохода с клиентской базы за год благодаря CVM-подходу</p>
+                <p><strong>Chocoroom:</strong> 1.6 млн рублей с одной email-рассылки через CRM-сегментацию</p>
+                <p><strong>gw-tools:</strong> 83.3% рост заказов с email за месяц после оптимизации CRM</p>
+                <p><strong>2scoop:</strong> 50% клиентов возвращаются благодаря CRM-маркетингу</p>
+                <p><strong>Wildberries:</strong> +18% повторные покупки через персонализацию на основе истории</p>
+            </div>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="data">2. First-party & Zero-party Data</h2>
+
+            <h3>Ключевые определения</h3>
+
+            <p><strong>First-party data:</strong> Данные, собираемые напрямую от клиентов через собственные каналы</p>
+            <ul>
+                <li>Website behavior (Яндекс.Метрика)</li>
+                <li>Транзакции и покупки</li>
+                <li>CRM-взаимодействия</li>
+                <li>Email engagement</li>
+                <li>Mobile app usage</li>
+            </ul>
+
+            <p><strong>Zero-party data:</strong> Данные, которыми клиенты намеренно делятся</p>
+            <ul>
+                <li>Квизы и опросы</li>
+                <li>Preference centers</li>
+                <li>Wishlists</li>
+                <li>Product reviews</li>
+                <li>Прямые запросы через чат</li>
+            </ul>
+
+            <div class="callout success">
+                <p><strong>Критическое преимущество:</strong> 84% выше completion rate для zero-party data когда есть value exchange (данные Google Consent Mode v2).</p>
+            </div>
+
+            <h3>Privacy-first подход (2026)</h3>
+
+            <div class="callout warning">
+                <h4>152-ФЗ требования:</h4>
+                <ul>
+                    <li>Cookies = персональные данные → требуется согласие</li>
+                    <li>С 1 июля 2025: запрет на сбор ПД россиян в иностранных БД</li>
+                    <li>Обязательная локализация данных в РФ</li>
+                    <li>Штрафы до 300k₽ для юрлиц</li>
+                </ul>
+            </div>
+
+            <p><strong>Решения:</strong></p>
+            <ul>
+                <li>Cookie consent management (равное отображение "Принять"/"Отклонить")</li>
+                <li>First-party cookies приоритет</li>
+                <li>Server-side tracking (bypass ad-blockers)</li>
+                <li>Contextual targeting возвращается</li>
+            </ul>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="channels">3. Усиление Performance-каналов</h2>
+
+            <h3>3.1 Яндекс.Директ — CRM интеграция</h3>
+
+            <h4>Яндекс.Аудитории — ключевая точка</h4>
+            <p><strong>Типы сегментов:</strong></p>
+            <ul>
+                <li>CRM-данные (email, phone)</li>
+                <li>Метрика (поведение на сайте)</li>
+                <li>AppMetrica (мобильное приложение)</li>
+                <li>Look-alike на основе CRM</li>
+            </ul>
+
+            <p><strong>Рекомендации:</strong></p>
+            <ul>
+                <li>Обновление CRM-сегментов: 1-2 недели</li>
+                <li>Минимум 1000 пользователей для LAL</li>
+                <li>LAL на топ-20% по LTV эффективнее, чем на всю базу</li>
+            </ul>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">-30%</div>
+                    <div class="stat-label">CPA через LAL на топ-клиентов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">+25%</div>
+                    <div class="stat-label">CR для returning visitors (RLSA)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2-3x</div>
+                    <div class="stat-label">AOV через Customer Match upsell</div>
+                </div>
+            </div>
+
+            <h3>3.2 VK Реклама и myTarget</h3>
+
+            <p><strong>Стратегии:</strong></p>
+            <ul>
+                <li>Segmented retargeting: Warm (3+ визита) → прямой оффер, Cold (1 визит) → контент</li>
+                <li>CRM-based exclusions: экономия бюджета 15-25%</li>
+                <li>Lookalike optimization: seed = топ-20% по LTV, similarity 1-3%</li>
+                <li>Dynamic retargeting: показ конкретных товаров, +2-3x CTR</li>
+            </ul>
+
+            <h3>3.3 Programmatic (DSP/SSP)</h3>
+
+            <div class="callout">
+                <p><strong>Рынок РФ 2026:</strong></p>
+                <ul>
+                    <li>2024: 47 млрд рублей (+20% vs 2023)</li>
+                    <li>60+ игроков</li>
+                    <li>Тренды: Mobile/Video, AI-антифрод, интеграция с CDP</li>
+                </ul>
+            </div>
+
+            <h3>3.4 Триггерные цепочки (Email/Push/SMS)</h3>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">22.4%</div>
+                    <div class="stat-label">Выручки в месяц</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">29%</div>
+                    <div class="stat-label">CTR (vs 20% массовые)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">5.9%</div>
+                    <div class="stat-label">Конверсия (vs ~2% массовые)</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lifecycle</th>
+                        <th>Триггер</th>
+                        <th>Цепочка</th>
+                        <th>Каналы</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Acquisition</td>
+                        <td>Регистрация</td>
+                        <td>Welcome series (3-5 писем)</td>
+                        <td>Email, push</td>
+                    </tr>
+                    <tr>
+                        <td>Retention</td>
+                        <td>30 дней без покупки</td>
+                        <td>Рекомендации + оффер</td>
+                        <td>Email, push</td>
+                    </tr>
+                    <tr>
+                        <td>Churn risk</td>
+                        <td>60 дней</td>
+                        <td>Win-back серия (3 письма)</td>
+                        <td>Email, SMS, push</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="limitations">4. Ограничения в РФ (2026)</h2>
+
+            <h3>152-ФЗ о персональных данных</h3>
+
+            <div class="callout error">
+                <p><strong>Критические изменения:</strong></p>
+                <ul>
+                    <li>С 1 июля 2025: запрет на первичный сбор ПД россиян в иностранных БД</li>
+                    <li>Массовые проверки регулятором в 2026</li>
+                    <li>Штрафы: до 300k₽ для юрлиц</li>
+                </ul>
+            </div>
+
+            <h3>Отключение западных платформ</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Западная</th>
+                        <th>Российская</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Google Ads ❌</td>
+                        <td>Яндекс.Директ, VK Реклама</td>
+                    </tr>
+                    <tr>
+                        <td>Facebook Ads ❌</td>
+                        <td>VK Реклама, myTarget</td>
+                    </tr>
+                    <tr>
+                        <td>Google Analytics</td>
+                        <td>Яндекс.Метрика, Roistat</td>
+                    </tr>
+                    <tr>
+                        <td>Salesforce ❌</td>
+                        <td>Bitrix24, amoCRM</td>
+                    </tr>
+                    <tr>
+                        <td>HubSpot</td>
+                        <td>Mindbox, Carrot quest</td>
+                    </tr>
+                    <tr>
+                        <td>Mailchimp</td>
+                        <td>Sendsay, UniSender</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Доступные CDP/DMP (РФ)</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Платформа</th>
+                        <th>Best for</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mindbox</strong></td>
+                        <td>Retail, E-commerce, омниканальность</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CleverData</strong></td>
+                        <td>B2B, сложные воронки</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Altcraft</strong></td>
+                        <td>Персонализация, сегментация</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Andata</strong></td>
+                        <td>B2B, аналитика данных</td>
+                    </tr>
+                    <tr>
+                        <td><strong>enKod</strong></td>
+                        <td>Средний бизнес</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="architecture">5. Архитектура решения</h2>
+
+            <h3>Tech Stack</h3>
+
+            <pre><code>DATA SOURCES
+↓
+Website → CRM → E-commerce → Mobile → Email
+↓
+CDP/CRM (Mindbox/CleverData)
+├─ Segmentation (RFM, Behavior, Predictive)
+├─ Analytics (LTV, Cohorts, Attribution)
+└─ Automation (Triggers, Chains, A/B)
+↓
+ACTIVATION
+├─ Яндекс.Директ (Аудитории)
+├─ VK/myTarget (Segments)
+└─ Owned Channels (Email/SMS/Push)
+↓
+ATTRIBUTION & ANALYTICS (Roistat/Метрика)
+↓
+OPTIMIZATION & REPORTING</code></pre>
+
+            <h3>Ключевые интеграции</h3>
+
+            <p><strong>CRM ↔ CDP:</strong></p>
+            <ul>
+                <li>Bitrix24/amoCRM ↔ Mindbox/CleverData</li>
+                <li>API: двусторонняя синхронизация</li>
+                <li>No-code: Albato, ApiMonster</li>
+            </ul>
+
+            <p><strong>CDP ↔ Ad Platforms:</strong></p>
+            <ul>
+                <li>Mindbox → Яндекс.Аудитории (auto update)</li>
+                <li>CDP → VK/myTarget (Custom Audiences)</li>
+            </ul>
+
+            <p><strong>Attribution:</strong></p>
+            <ul>
+                <li>Roistat ↔ CRM ↔ CDP</li>
+                <li>Модели: Last Click, First Click, Linear, Time Decay, Data-driven</li>
+                <li>CLV-weighted attribution (advanced)</li>
+            </ul>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="offer">6. Оффер для агентства</h2>
+
+            <h3>Позиционирование</h3>
+
+            <div class="callout success">
+                <p><strong>От:</strong> "Мы настраиваем рекламу и привлекаем лиды"</p>
+                <p><strong>К:</strong> "Мы управляем customer lifetime value через интеграцию paid channels, CRM-данных и marketing automation"</p>
+                <p><strong>Elevator pitch:</strong><br>
+                "Ваши конкуренты тратят бюджет на привлечение, мы помогаем зарабатывать на каждом клиенте в 3 раза больше. Интегрируем CRM, CDP и performance-каналы. Результат: -30% CPA, +250% LTV, окупаемость за 4-8 месяцев."</p>
+            </div>
+
+            <h3>Tier-структура</h3>
+
+            <h4>Tier 1: "CRM-Performance Foundation" (SMB, до 500k₽/мес ad spend)</h4>
+            <ul>
+                <li>Базовая сквозная аналитика</li>
+                <li>Интеграция CRM с Яндекс.Аудитории</li>
+                <li>3-5 сегментов (RFM, lifecycle)</li>
+                <li>Lookalike на best customers</li>
+                <li>3 триггерные цепочки</li>
+                <li><strong>Результат:</strong> -15-25% CPA, +10-15% повторные покупки</li>
+                <li><strong>Стоимость:</strong> 150-250k₽ setup + 80-120k₽/мес</li>
+            </ul>
+
+            <h4>Tier 2: "Advanced CVM Performance" (500k-2M₽/мес)</h4>
+            <ul>
+                <li>Все из Tier 1 +</li>
+                <li>Внедрение CDP (Mindbox/CleverData)</li>
+                <li>Предиктивная сегментация (churn, LTV)</li>
+                <li>Value-based bidding</li>
+                <li>Омниканальные триггеры</li>
+                <li>Cohort analysis</li>
+                <li><strong>Результат:</strong> -25-40% CPA, +50-100% LTV, LTV/CAC 3:1</li>
+                <li><strong>Стоимость:</strong> 400-700k₽ setup + 250-400k₽/мес</li>
+            </ul>
+
+            <h4>Tier 3: "Enterprise Performance Ecosystem" (2M+₽/мес)</h4>
+            <ul>
+                <li>Все из Tier 2 +</li>
+                <li>Full-stack CDP + DMP + CRM</li>
+                <li>AI/ML персонализация</li>
+                <li>Programmatic integration</li>
+                <li>Incrementality testing</li>
+                <li>Marketing Mix Modeling</li>
+                <li><strong>Результат:</strong> -30-50% CPA, +100-250% LTV, LTV/CAC 4:1+</li>
+                <li><strong>Стоимость:</strong> 1-2M₽ setup + 600k-1M₽/мес</li>
+            </ul>
+
+            <h3>Финансовая модель (пример)</h3>
+
+            <div class="callout">
+                <p><strong>E-commerce клиент, 1M₽/мес ad spend</strong></p>
+
+                <p><strong>До:</strong></p>
+                <ul>
+                    <li>CPA: 5,000₽, AOV: 8,000₽, LTV: 10,000₽</li>
+                    <li>Revenue: 2M₽/мес, ROAS: 2:1</li>
+                </ul>
+
+                <p><strong>После (6 месяцев):</strong></p>
+                <ul>
+                    <li>CPA: 4,000₽ (-20%), AOV: 9,000₽ (+12%), LTV: 18,000₽ (+80%)</li>
+                    <li>Revenue: 4.5M₽/мес, ROAS: 4.5:1</li>
+                    <li><strong>Прирост:</strong> +2.5M₽/мес = +30M₽/год</li>
+                </ul>
+
+                <p><strong>Инвестиция:</strong> 4M₽/год<br>
+                <strong>ROI:</strong> 650%<br>
+                <strong>Payback:</strong> ~2 месяца</p>
+            </div>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="roadmap">7. Roadmap внедрения</h2>
+
+            <h3>Фаза 0: Discovery (2-4 недели)</h3>
+            <ul>
+                <li>Аудит performance-каналов, CRM, воронки</li>
+                <li>RFM-сегментация, cohort analysis</li>
+                <li>SMART цели, roadmap</li>
+            </ul>
+
+            <h3>Фаза 1: Foundation (2-3 месяца)</h3>
+            <ul>
+                <li><strong>Месяц 1:</strong> Сквозная аналитика, CRM clean-up, базовая сегментация</li>
+                <li><strong>Месяц 2:</strong> Яндекс.Аудитории setup, LAL кампании, ретаргетинг</li>
+                <li><strong>Месяц 3:</strong> Email платформа, 3 триггерные цепочки</li>
+                <li><strong>KPI:</strong> -15-20% CPA, +5-10% повторные покупки</li>
+            </ul>
+
+            <h3>Фаза 2: Scale (3-6 месяцев)</h3>
+            <ul>
+                <li><strong>Месяц 4-5:</strong> CDP implementation, миграция данных</li>
+                <li><strong>Месяц 6-7:</strong> Predictive models, расширенная сегментация</li>
+                <li><strong>Месяц 8-9:</strong> Омниканальность (10+ каналов), каскадные цепочки</li>
+                <li><strong>KPI:</strong> +30-50% LTV, LTV/CAC 3:1</li>
+            </ul>
+
+            <h3>Фаза 3: Advanced (6-12 месяцев)</h3>
+            <ul>
+                <li><strong>Месяц 10-12:</strong> Value-based bidding, персонализация, A/B тесты</li>
+                <li><strong>Ongoing:</strong> Incrementality testing, Marketing Mix Modeling, AI/ML</li>
+                <li><strong>KPI:</strong> +50-100% LTV, LTV/CAC 4:1+</li>
+            </ul>
+
+            <div class="callout success">
+                <p><strong>Total:</strong> 12-15 месяцев до полной зрелости<br>
+                <strong>Quick wins:</strong> Видны через 1-2 месяца</p>
+            </div>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2 id="tools">8. Ключевые инструменты (РФ 2026)</h2>
+
+            <h3>CDP/CRM</h3>
+            <ul>
+                <li><strong>Mindbox</strong> (от 150k₽/мес) — retail, omnichannel</li>
+                <li><strong>CleverData</strong> — B2B, сложные воронки</li>
+                <li><strong>Bitrix24</strong> (от 0₽) — SMB универсальное</li>
+                <li><strong>amoCRM</strong> (от 499₽/user) — SMB, простота</li>
+            </ul>
+
+            <h3>Marketing Automation</h3>
+            <ul>
+                <li><strong>Carrot quest</strong> (от 20k₽/мес) — диалоговый маркетинг</li>
+                <li><strong>Sendsay</strong> (от 15k₽/мес) — омниканальность</li>
+                <li><strong>REES46</strong> (от 10k₽/мес) — персонализация</li>
+            </ul>
+
+            <h3>Analytics</h3>
+            <ul>
+                <li><strong>Яндекс.Метрика</strong> (бесплатно) — базовая аналитика</li>
+                <li><strong>Roistat</strong> (от 8k₽/мес) — сквозная аналитика</li>
+                <li><strong>Calltouch</strong> (от 3k₽/мес) — коллтрекинг</li>
+            </ul>
+
+            <h3>Ad Platforms</h3>
+            <ul>
+                <li><strong>Яндекс.Директ</strong> — контекст</li>
+                <li><strong>VK Реклама</strong> — social</li>
+                <li><strong>myTarget</strong> — VK, OK, Mail.ru</li>
+            </ul>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2>Заключение</h2>
+
+            <p>CRM-маркетинг и Customer Value Management — это фундаментальный сдвиг в подходе к performance. В 2026 году компании, которые умеют максимизировать ценность каждого клиента, получают устойчивое конкурентное преимущество.</p>
+
+            <div class="callout success">
+                <h4>Для performance-агентства mgcom это открывает:</h4>
+                <ol>
+                    <li>Новый уровень услуг — управление customer value vs просто реклама</li>
+                    <li>Дифференциацию на рынке</li>
+                    <li>Глубокие отношения с клиентами (стратегический партнер)</li>
+                    <li>Предсказуемый ROI (LTV/CAC, ROAS с retention)</li>
+                    <li>Upsell возможности (Tier 1 → Tier 2-3)</li>
+                </ol>
+            </div>
+
+            <p><strong>Российский рынок готов:</strong></p>
+            <ul>
+                <li>Зрелые локальные CDP/DMP</li>
+                <li>152-ФЗ compliance встроен</li>
+                <li>Programmatic +20%, 47 млрд₽</li>
+                <li>AI/ML доступны (77% используют)</li>
+                <li>Развитая экосистема интеграций</li>
+            </ul>
+
+            <div class="callout">
+                <p><strong>Рекомендация:</strong> Начать с Tier 1 на 2-3 пилотных клиентах, доказать quick wins за 3 месяца, масштабировать.</p>
+            </div>
+
+            <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <h2>Источники</h2>
+            <ul style="font-size: 0.875rem;">
+                <li><a href="https://www.simon-kucher.com/en/insights/why-customer-value-management-cvm-growth-lever-youre-missing" target="_blank">Why CVM is the growth lever you're missing - Simon-Kucher</a></li>
+                <li><a href="https://exacaster.com/cvm-trends/" target="_blank">CVM Trends 2026 - Exacaster</a></li>
+                <li><a href="https://transcend.io/blog/zero-party-data-vs-first-party-data" target="_blank">Zero-Party Data vs First-Party Data - Transcend</a></li>
+                <li><a href="https://secureprivacy.ai/blog/data-privacy-trends-2026" target="_blank">Data Privacy Trends 2026 - SecurePrivacy</a></li>
+                <li><a href="https://retailrocket.ru/blog/hto-takoe-cdp/" target="_blank">Что такое CDP - Retail Rocket</a></li>
+                <li><a href="https://trends.rbc.ru/trends/social/cmrm/694aa9ad9a7947707a70351a" target="_blank">От ИИ до email-ренессанса MarTech - РБК Тренды</a></li>
+                <li><a href="https://elama.ru/blog/tochno-v-cel-kak-nayti-novyh-klientov-s-pomoschyu-segmentov-auditoriy-v-direkte/" target="_blank">Яндекс Аудитории - Elama</a></li>
+                <li><a href="https://yandex.ru/adv/edu/materials/look-alike" target="_blank">Look-alike аудитория - Яндекс</a></li>
+                <li><a href="https://skillbox.ru/media/marketing/s-chem-edyat-cookies-tekhnicheskiy-i-yuridicheskiy-likbez-dlya-marketologov/" target="_blank">152-ФЗ и cookies - Skillbox</a></li>
+                <li><a href="https://www.cossa.ru/news/343925/" target="_blank">Программатик в России 2025 - Cossa</a></li>
+                <li><a href="https://convertmonster.ru/blog/marketing-blog/kejsy-uspeshnogo-vnedreniya-crm/" target="_blank">Успешные кейсы CRM - ConvertMonster</a></li>
+                <li><a href="https://yandex.ru/adv/news/prediktivnaya-model-ltv-teper-vo-vsekh-kampaniyakh-dlya-reklamy-prilozheniy-v-direkte" target="_blank">Предиктивная модель LTV - Яндекс</a></li>
+                <li><a href="https://www.carrotquest.io/blog/anatomiya-triggernyx-rassylok/" target="_blank">Триггерные рассылки - Carrot quest</a></li>
+                <li><a href="https://mindbox.ru/journal/education/chto-takoe-rfm-analiz/" target="_blank">RFM-анализ - Mindbox</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>AgentIQ Research • Февраль 2026 • <a href="/">agentiq.ru</a></p>
+    </footer>
+</body>
+</html>
