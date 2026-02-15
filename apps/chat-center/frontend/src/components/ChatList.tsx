@@ -643,12 +643,16 @@ export function ChatList({
             )}
 
             {/* Apple Mail–style sync banner at bottom */}
-            {loadingProgress && loadingProgress.loaded < loadingProgress.total && (
+            {(loadingProgress && loadingProgress.loaded < loadingProgress.total) || syncStatus === 'syncing' ? (
               <div className="chat-list-sync-banner">
                 <div className="chat-list-sync-spinner"></div>
-                <span>Загрузка... {loadingProgress.loaded} из ~{loadingProgress.total} чатов</span>
+                <span>
+                  {loadingProgress && loadingProgress.loaded < loadingProgress.total
+                    ? `Загрузка... ${loadingProgress.loaded} из ~${loadingProgress.total} чатов`
+                    : 'Синхронизация...'}
+                </span>
               </div>
-            )}
+            ) : null}
           </>
         )}
       </div>

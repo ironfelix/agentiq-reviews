@@ -32,7 +32,20 @@ export function SettingsPage(props: {
   onLogout: () => void;
 }) {
   const { user, onOpenConnectOnboarding, onLogout } = props;
-  const [tab, setTab] = useState<SettingsTab>('connections');
+
+  // Read initial tab from URL hash (e.g., #settings-promo)
+  const getInitialTab = (): SettingsTab => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#settings-')) {
+      const tabFromHash = hash.replace('#settings-', '') as SettingsTab;
+      if (['connections', 'ai', 'promo', 'profile'].includes(tabFromHash)) {
+        return tabFromHash;
+      }
+    }
+    return 'connections';
+  };
+
+  const [tab, setTab] = useState<SettingsTab>(getInitialTab);
 
   const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [aiLoadState, setAILoadState] = useState<'idle' | 'loading' | 'error'>('idle');
@@ -47,6 +60,12 @@ export function SettingsPage(props: {
       : 'Не подключено';
 
   const wbStatusTone = isWbConnected ? 'connected' : 'disconnected';
+
+  // Helper to change tab and update URL hash
+  const changeTab = (newTab: SettingsTab) => {
+    setTab(newTab);
+    window.location.hash = `settings-${newTab}`;
+  };
 
   useEffect(() => {
     if (tab !== 'ai') return;
@@ -103,7 +122,7 @@ export function SettingsPage(props: {
         <button
           className={`settings-nav-item ${tab === 'connections' ? 'active' : ''}`}
           type="button"
-          onClick={() => setTab('connections')}
+          onClick={() => changeTab('connections')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
@@ -116,7 +135,7 @@ export function SettingsPage(props: {
         <button
           className={`settings-nav-item ${tab === 'ai' ? 'active' : ''}`}
           type="button"
-          onClick={() => setTab('ai')}
+          onClick={() => changeTab('ai')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -126,7 +145,7 @@ export function SettingsPage(props: {
         <button
           className={`settings-nav-item ${tab === 'promo' ? 'active' : ''}`}
           type="button"
-          onClick={() => setTab('promo')}
+          onClick={() => changeTab('promo')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 12 20 22 4 22 4 12"/>
@@ -140,7 +159,7 @@ export function SettingsPage(props: {
         <button
           className={`settings-nav-item ${tab === 'profile' ? 'active' : ''}`}
           type="button"
-          onClick={() => setTab('profile')}
+          onClick={() => changeTab('profile')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

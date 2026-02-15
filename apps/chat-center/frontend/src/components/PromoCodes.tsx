@@ -410,24 +410,77 @@ export function PromoCodes(props: { user: User }) {
         <div className="promo-help-title">Как работают промокоды</div>
 
         <div className="promo-help-section">
-          <div className="promo-help-label">Создание</div>
+          <div className="promo-help-label">СОЗДАНИЕ</div>
           <div className="promo-help-text">
-            Промокоды создаются в личном кабинете WB. AgentIQ не создаёт промокоды за вас.
-            Здесь вы просто фиксируете “какие промокоды у вас есть” и где их можно использовать.
+            Промокоды создаются в ЛК Wildberries:<br />
+            <strong>Товары и цены → Календарь акций → По промокодам</strong>
           </div>
         </div>
 
         <div className="promo-help-section">
-          <div className="promo-help-label">Как применяется</div>
+          <div className="promo-help-label">ПАРАМЕТРЫ</div>
+          <table className="promo-help-table">
+            <tbody>
+              <tr>
+                <td className="promo-help-table-key">Скидка</td>
+                <td className="promo-help-table-value">3% — 50%</td>
+              </tr>
+              <tr>
+                <td className="promo-help-table-key">Длительность</td>
+                <td className="promo-help-table-value">1 — 31 день</td>
+              </tr>
+              <tr>
+                <td className="promo-help-table-key">Макс. акций</td>
+                <td className="promo-help-table-value">10 одновременно</td>
+              </tr>
+              <tr>
+                <td className="promo-help-table-key">Код</td>
+                <td className="promo-help-table-value">Авто или свой</td>
+              </tr>
+              <tr>
+                <td className="promo-help-table-key">Использование</td>
+                <td className="promo-help-table-value">Многоразовый</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="promo-help-section">
+          <div className="promo-help-label">КАК ПРИМЕНЯЕТСЯ</div>
           <div className="promo-help-text">
-            Покупатель вводит код в корзине на WB. Код многоразовый, его может использовать любой покупатель.
-            AI может предложить промокод только в релевантном контексте. Для WB чата промокоды считаются P3 и по умолчанию запрещены,
-            кроме узких окон (запрос покупателя / компенсация кейса).
+            Покупатель вводит код в корзине на WB. Код многоразовый — его может использовать любой покупатель.
           </div>
         </div>
 
         <div className="promo-help-warning">
-          Важно: нельзя стимулировать отзывы (“за 5 звезд дадим промокод”). И нельзя уводить покупателя на сторонние ресурсы.
+          <strong>Важно:</strong>
+          <ul>
+            <li>Скидка не суммируется с акциями &gt; 45%</li>
+            <li>Скидка полностью за счёт продавца</li>
+            <li>В ответах на отзывы код виден <strong>всем</strong> посетителям карточки</li>
+          </ul>
+        </div>
+
+        <div className="promo-help-section">
+          <div className="promo-help-label">ЧАТЫ VS ОТЗЫВЫ</div>
+          <table className="promo-help-table">
+            <tbody>
+              <tr>
+                <td className="promo-help-table-key">Чат</td>
+                <td className="promo-help-table-value">Приватно, видит только покупатель</td>
+              </tr>
+              <tr>
+                <td className="promo-help-table-key">Ответ на отзыв</td>
+                <td className="promo-help-table-value">Публично, видят все</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="promo-help-link-section">
+          <a href="https://seller.wildberries.ru/help/marketplaces/wildberries/discounts/promo-codes" target="_blank" rel="noopener noreferrer" className="promo-help-external-link">
+            🔗 Инструкция Wildberries →
+          </a>
         </div>
       </div>
     </div>
