@@ -620,7 +620,9 @@ function App() {
       let resolvedAllLoaded = allLoaded;
       setPaginationMeta(prev => {
         const currentMeta = prev[channelKey];
-        resolvedAllLoaded = allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total);
+        // If cache was fully loaded before, keep allLoaded=true.
+        // New items arrive via polling (page 1 merge) — no need to re-paginate.
+        resolvedAllLoaded = allLoaded || (currentMeta?.allLoaded ?? false);
         return {
           ...prev,
           [channelKey]: {
@@ -632,8 +634,15 @@ function App() {
         };
       });
 
-      // Save first page to sessionStorage for instant restore on next visit
-      saveInteractionsToCache(channelKey, response.interactions, resolvedAllLoaded);
+      // Save to sessionStorage for instant restore on next visit
+      // If allLoaded, save the full merged list (not just page 1)
+      if (resolvedAllLoaded && prevItems && prevItems.length > response.interactions.length) {
+        const firstPageIds = new Set(response.interactions.map(i => i.id));
+        const merged = [...response.interactions, ...prevItems.filter(i => !firstPageIds.has(i.id))];
+        saveInteractionsToCache(channelKey, merged, true);
+      } else {
+        saveInteractionsToCache(channelKey, response.interactions, resolvedAllLoaded);
+      }
 
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
         // Selected item might be on a later page — don't deselect
