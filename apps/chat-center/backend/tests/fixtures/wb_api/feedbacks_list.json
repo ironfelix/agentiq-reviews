@@ -1,0 +1,41 @@
+{
+  "data": {
+    "feedbacks": [
+      {
+        "id": "fb-123456",
+        "text": "Отличный товар, всё работает!",
+        "pros": "Быстрая доставка",
+        "cons": "",
+        "productValuation": 5,
+        "createdDate": "2026-02-10T14:30:00Z",
+        "answerText": "",
+        "answerState": "none",
+        "wasViewed": false,
+        "userName": "Иван",
+        "productDetails": {
+          "nmId": 123456789,
+          "productName": "Тестовый товар",
+          "supplierArticle": "ART-001"
+        }
+      },
+      {
+        "id": "fb-789012",
+        "text": "Пришел бракованный",
+        "pros": "",
+        "cons": "Не работает кнопка",
+        "productValuation": 1,
+        "createdDate": "2026-02-11T09:15:00Z",
+        "answerText": "Приносим извинения!",
+        "answerCreateDate": "2026-02-11T12:00:00Z",
+        "answerState": "wbRu",
+        "wasViewed": true,
+        "userName": "Мария",
+        "productDetails": {
+          "nmId": 123456789,
+          "productName": "Тестовый товар",
+          "supplierArticle": "ART-001"
+        }
+      }
+    ]
+  }
+}

@@ -3,7 +3,10 @@ Pytest configuration and fixtures for AgentIQ Chat Center API tests.
 """
 import pytest
 import httpx
-from typing import Generator
+from typing import Generator, AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+
+from app.database import Base
 
 
 BASE_URL = "http://localhost:8001"
@@ -52,3 +55,34 @@ def auth_token(client: httpx.Client, test_user_data: dict) -> str:
 def auth_headers(auth_token: str) -> dict:
     """Authorization headers with Bearer token."""
     return {"Authorization": f"Bearer {auth_token}"}
+
+
+@pytest.fixture
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Async database session fixture for unit tests.
+
+    Uses SQLite in-memory database for fast isolated tests.
+    """
+    # Create in-memory SQLite database for testing
+    engine = create_async_engine(
+        "sqlite+aiosqlite:///:memory:",
+        echo=False,
+    )
+
+    # Create all tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    # Create session
+    async_session = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
+    async with async_session() as session:
+        yield session
+
+    # Cleanup
+    await engine.dispose()

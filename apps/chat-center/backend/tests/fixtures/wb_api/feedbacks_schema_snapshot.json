@@ -1,0 +1,51 @@
+{
+  "description": "WB Feedbacks API response schema snapshot. Used by scripts/check_wb_contract.py for offline/online contract validation.",
+  "api_endpoint": "GET /api/v1/feedbacks",
+  "last_verified": "2026-02-14",
+  "envelope": {
+    "required_fields": ["data"],
+    "data_required_fields": ["feedbacks"],
+    "feedbacks_type": "array"
+  },
+  "feedback_item": {
+    "required_fields": [
+      "id",
+      "text",
+      "productValuation",
+      "createdDate",
+      "productDetails"
+    ],
+    "optional_fields": [
+      "pros",
+      "cons",
+      "answerText",
+      "answerCreateDate",
+      "answerState",
+      "wasViewed",
+      "userName"
+    ],
+    "field_types": {
+      "id": "str",
+      "text": "str",
+      "pros": "str",
+      "cons": "str",
+      "productValuation": "int",
+      "createdDate": "str",
+      "answerText": "str",
+      "answerCreateDate": "str",
+      "answerState": "str",
+      "wasViewed": "bool",
+      "userName": "str"
+    },
+    "productDetails": {
+      "required_fields": ["nmId", "productName"],
+      "optional_fields": ["supplierArticle"],
+      "field_types": {
+        "nmId": "int",
+        "productName": "str",
+        "supplierArticle": "str"
+      }
+    },
+    "answerState_enum": ["none", "wbRu"]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "data": {
+    "questions": [
+      {
+        "id": "q-111222",
+        "text": "Подскажите, какой размер при росте 170?",
+        "createdDate": "2026-02-12T10:00:00Z",
+        "state": "wbRu",
+        "wasViewed": false,
+        "isWarned": false,
+        "userName": "Анна",
+        "answer": null,
+        "productDetails": {
+          "nmId": 987654321,
+          "productName": "Куртка зимняя",
+          "supplierArticle": "JKT-002"
+        }
+      },
+      {
+        "id": "q-333444",
+        "text": "Есть ли в наличии синий цвет?",
+        "createdDate": "2026-02-13T08:30:00Z",
+        "state": "wbRu",
+        "wasViewed": true,
+        "isWarned": false,
+        "userName": "Дмитрий",
+        "answer": {
+          "text": "Да, синий цвет есть в наличии!",
+          "createDate": "2026-02-13T09:00:00Z",
+          "editable": true
+        },
+        "productDetails": {
+          "nmId": 987654321,
+          "productName": "Куртка зимняя",
+          "supplierArticle": "JKT-002"
+        }
+      }
+    ]
+  }
+}

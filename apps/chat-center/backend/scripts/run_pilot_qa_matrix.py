@@ -4,6 +4,9 @@
 Default mode is safe:
 - sync + draft + metrics/readiness checks
 - no live replies are sent unless --send-replies is explicitly enabled
+
+Live replies are dangerous (may be public for reviews/questions). This script
+includes explicit guardrails to avoid accidental sends.
 """
 
 from __future__ import annotations
@@ -133,6 +136,47 @@ def parse_args() -> argparse.Namespace:
         help="Actually send replies via /reply endpoints (live action)",
     )
     parser.add_argument(
+        "--yes-live-replies",
+        action="store_true",
+        help="Required confirmation flag when --send-replies is enabled",
+    )
+    parser.add_argument(
+        "--reply-channels",
+        default="chat",
+        help="Comma-separated channels to send live replies to (default: chat). Allowed: review,question,chat",
+    )
+    parser.add_argument(
+        "--allow-public-replies",
+        action="store_true",
+        help="Allow sending live replies to public channels (review/question). Strongly discouraged.",
+    )
+    parser.add_argument(
+        "--interaction-id-review",
+        default="",
+        help="Explicit interaction id to reply to for channel=review (required for live reply)",
+    )
+    parser.add_argument(
+        "--interaction-id-question",
+        default="",
+        help="Explicit interaction id to reply to for channel=question (required for live reply)",
+    )
+    parser.add_argument(
+        "--interaction-id-chat",
+        default="",
+        help="Explicit interaction id to reply to for channel=chat (required for live reply)",
+    )
+    parser.add_argument(
+        "--reply-text",
+        default="",
+        help="Reply text to send. Required for public channels; optional for chat.",
+    )
+    parser.add_argument(
+        "--max-replies",
+        type=int,
+        default=1,
+        help="Maximum number of live replies to send total (across all channels)",
+    )
+    parser.add_argument(
         "--min-reply-activity",
         type=int,
         default=1,
@@ -175,11 +219,43 @@ def pick_interaction(payload: dict[str, Any]) -> Optional[dict[str, Any]]:
     return items[0]
 
 
+def parse_reply_channels(raw: str) -> set[str]:
+    parts = [p.strip().lower() for p in (raw or "").split(",") if p.strip()]
+    allowed = {"review", "question", "chat"}
+    return {p for p in parts if p in allowed}
+
+
+def interaction_id_for_channel(args: argparse.Namespace, channel: str) -> str:
+    if channel == "review":
+        return (args.interaction_id_review or "").strip()
+    if channel == "question":
+        return (args.interaction_id_question or "").strip()
+    if channel == "chat":
+        return (args.interaction_id_chat or "").strip()
+    return ""
+
+
 async def run() -> int:
     args = parse_args()
     if not args.email or not args.password:
         print("error: --email and --password are required (or set env vars)")
         return 2
+
+    reply_channels = parse_reply_channels(args.reply_channels)
+    if args.send_replies:
+        if not args.yes_live_replies:
+            print("error: --send-replies requires --yes-live-replies confirmation")
+            return 2
+        if not reply_channels:
+            print("error: --send-replies requires non-empty --reply-channels (review,question,chat)")
+            return 2
+        public_requested = any(ch in reply_channels for ch in ("review", "question"))
+        if public_requested and not args.allow_public_replies:
+            print("error: public channels (review/question) require --allow-public-replies")
+            return 2
+        if int(args.max_replies) <= 0:
+            print("error: --max-replies must be >= 1 when --send-replies is enabled")
+            return 2
 
     output_path = ensure_output_path(args.output)
     steps: list[StepResult] = []
@@ -440,6 +516,8 @@ async def run() -> int:
                 )
             )
 
+        live_replies_sent = 0
+
         for channel, interaction in selected_interactions.items():
             interaction_id = interaction.get("id")
             if not interaction_id:
@@ -471,24 +549,83 @@ async def run() -> int:
                     )
                 )
 
-            if args.send_replies:
-                reply_text = f"[pilot qa {utc_now_iso()}] Спасибо! Проверили обращение."
-                reply_code, reply_payload = await api_request(
-                    client,
-                    "POST",
-                    f"{args.base_url}/interactions/{interaction_id}/reply",
-                    token=token,
-                    json_body={"text": reply_text},
-                )
-                if reply_code == 200:
+            if args.send_replies and channel in reply_channels:
+                if live_replies_sent >= int(args.max_replies):
                     steps.append(
                         StepResult(
                             f"reply_{channel}",
                             f"Reply {channel}",
-                            "pass",
-                            "Ответ отправлен",
+                            "skip",
+                            f"Пропущено: достигнут лимит --max-replies={args.max_replies}",
                         )
                     )
+                    continue
+
+                explicit_id = interaction_id_for_channel(args, channel)
+                if not explicit_id:
+                    steps.append(
+                        StepResult(
+                            f"reply_{channel}",
+                            f"Reply {channel}",
+                            "skip",
+                            "Пропущено: не задан явный interaction id для live reply",
+                        )
+                    )
+                    continue
+
+                get_code, get_payload = await api_request(
+                    client,
+                    "GET",
+                    f"{args.base_url}/interactions/{explicit_id}",
+                    token=token,
+                )
+                if get_code != 200:
+                    steps.append(
+                        StepResult(
+                            f"reply_{channel}",
+                            f"Reply {channel}",
+                            "fail",
+                            f"target interaction fetch failed: {get_code} {short_json(get_payload)}",
+                        )
+                    )
+                    continue
+
+                actual_channel = (get_payload.get("channel") or "").lower()
+                if actual_channel != channel:
+                    steps.append(
+                        StepResult(
+                            f"reply_{channel}",
+                            f"Reply {channel}",
+                            "fail",
+                            f"target channel mismatch: expected={channel} actual={actual_channel}",
+                        )
+                    )
+                    continue
+
+                reply_text = (args.reply_text or "").strip()
+                if channel in ("review", "question") and not reply_text:
+                    steps.append(
+                        StepResult(
+                            f"reply_{channel}",
+                            f"Reply {channel}",
+                            "fail",
+                            "reply_text required for public channels (review/question). Pass --reply-text.",
+                        )
+                    )
+                    continue
+                if not reply_text:
+                    reply_text = f"[pilot qa {utc_now_iso()}] Тестовый ответ. Пожалуйста, игнорируйте."
+
+                reply_code, reply_payload = await api_request(
+                    client,
+                    "POST",
+                    f"{args.base_url}/interactions/{explicit_id}/reply",
+                    token=token,
+                    json_body={"text": reply_text},
+                )
+                if reply_code == 200:
+                    live_replies_sent += 1
+                    steps.append(StepResult(f"reply_{channel}", f"Reply {channel}", "pass", "Ответ отправлен"))
                 else:
                     steps.append(
                         StepResult(

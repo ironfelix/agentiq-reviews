@@ -1,0 +1,5 @@
+{
+  "errors": ["Unauthorized"],
+  "code": 401,
+  "message": "Ключ API не найден или недействителен"
+}

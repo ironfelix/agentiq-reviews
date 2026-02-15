@@ -1,0 +1,54 @@
+{
+  "description": "WB Questions API response schema snapshot. Used by scripts/check_wb_contract.py for offline/online contract validation.",
+  "api_endpoint": "GET /api/v1/questions",
+  "last_verified": "2026-02-14",
+  "envelope": {
+    "required_fields": ["data"],
+    "data_required_fields": ["questions"],
+    "questions_type": "array"
+  },
+  "question_item": {
+    "required_fields": [
+      "id",
+      "text",
+      "createdDate",
+      "state",
+      "productDetails"
+    ],
+    "optional_fields": [
+      "wasViewed",
+      "isWarned",
+      "userName",
+      "answer"
+    ],
+    "field_types": {
+      "id": "str",
+      "text": "str",
+      "createdDate": "str",
+      "state": "str",
+      "wasViewed": "bool",
+      "isWarned": "bool",
+      "userName": "str",
+      "answer": "null_or_dict"
+    },
+    "productDetails": {
+      "required_fields": ["nmId", "productName"],
+      "optional_fields": ["supplierArticle"],
+      "field_types": {
+        "nmId": "int",
+        "productName": "str",
+        "supplierArticle": "str"
+      }
+    },
+    "answer_object": {
+      "description": "When answer is not null, it is a dict with these fields",
+      "required_fields": ["text"],
+      "optional_fields": ["createDate", "editable"],
+      "field_types": {
+        "text": "str",
+        "createDate": "str",
+        "editable": "bool"
+      }
+    }
+  }
+}
