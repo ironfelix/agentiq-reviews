@@ -1,6 +1,6 @@
 # Backlog — Unified Inbox v3 (WB: Reviews + Questions + Chats)
 
-**Last updated:** 2026-02-15
+**Last updated:** 2026-02-15 (evening)
 **Source of truth UI:** `docs/prototypes/app-screens-v3-ru.html`
 
 ---
@@ -17,6 +17,11 @@
                — DB Indexes, Observability, Reply pending config, Nightly checks
 2026-02-15  ✅ Staging deploy + 249 tests GREEN + smoke test + frontend prod deploy
             ✅ Source labeling, demo data, E2E Playwright — всё готово
+            ✅ Wave 1 MVP: product cache, customer profiles, revenue analytics, auto-response, SLA config
+            ✅ 12 post-demo bug fixes (#21-38): worker crash, NULL dates, ghost sellers, mobile, dots, badges
+            ✅ Progressive loading: chat_status fix, dual-poll sync, background pagination, Apple Mail bar
+            ✅ Ops: deploy.sh с rollback, pre-deploy checks, smoke test (16 checks), CI/CD workflows
+            ✅ 6 git commits created (196 files changed)
 2026-02-16  🟢 Buffer day (багфиксы если нужно)
 2026-02-17  🎯 DEMO ← дедлайн (READY)
 2026-02-18  🔧 Фикс багов после демо
@@ -26,7 +31,8 @@
 
 ### Readiness
 - **Demo (функционал):** **100%** ✅ — все задачи закрыты, frontend задеплоен, 249 тестов GREEN
-- **Production (нагрузка):** ~90% → target 95% к 20 фев
+- **Production (нагрузка):** ~95% — deploy script с rollback, smoke tests, CI/CD, load testing, backup/SSL automation
+- **UX polish:** ✅ — 42 bug fixes (INBOX #1-42), progressive loading, instant folder switching
 
 ---
 
@@ -236,6 +242,84 @@
 
 ---
 
+## Wave 1 MVP Features (15 фев) — ВСЕ ЗАКРЫТЫ ✅
+
+41. **BL-W1-001: Product Cache Service**
+    - Status: ✅ DONE. WB CDN card.json + price-history.json, auto-refresh, LRU eviction.
+    - Files: `app/models/product_cache.py`, `app/services/product_cache_service.py`.
+
+42. **BL-W1-002: Customer Profile Model**
+    - Status: ✅ DONE. Aggregated customer data across channels (order count, sentiment, LTV).
+    - Files: `app/models/customer_profile.py`, `app/services/customer_profile_service.py`.
+
+43. **BL-W1-003: Revenue Impact Analytics**
+    - Status: ✅ DONE. Revenue impact per interaction, conversion tracking.
+    - Files: `app/services/revenue_analytics.py`, `app/schemas/analytics.py`.
+
+44. **BL-W1-004: Auto-Response for Positive Reviews**
+    - Status: ✅ DONE. Toggle in AI settings, templates, confidence threshold.
+    - Files: `app/services/auto_response.py`, `tests/test_auto_response.py`.
+
+45. **BL-W1-005: Configurable SLA Priorities**
+    - Status: ✅ DONE. Per-intent SLA config, pre-purchase HIGH priority (2 min chat, 5 min question).
+    - Files: `app/services/sla_config.py`, `tests/test_sla_config.py`.
+
+46. **BL-W1-006: Celery Health Monitoring**
+    - Status: ✅ DONE. Health check endpoint, worker status, beat schedule monitoring.
+    - Files: `app/services/celery_health.py`, `tests/test_celery_health.py`.
+
+47. **BL-W1-007: BaseConnector Interface + Ozon Stub**
+    - Status: ✅ DONE. Abstract connector interface, connector registry, Ozon placeholder.
+    - Files: `app/services/connector_registry.py`, `app/services/ozon_connector.py`.
+
+---
+
+## Post-Demo Bug Fixes (15 фев) — ВСЕ ЗАКРЫТЫ ✅
+
+See `docs/bugs/INBOX.md` items #21-42 for details.
+
+48. **BL-FIX-001: Production stability fixes (#21-27)**
+    - Worker race condition, NULL occurred_at, ghost sellers, nginx dups, bcrypt, customer_profiles backfill, duplicate sellers.
+    - Status: ✅ FIXED (all 7).
+
+49. **BL-FIX-002: UX polish (#28-38)**
+    - 3-sec retry after sync, mobile overflow, dot colors, badge logic, universal fallback names, mobile navigation, FolderStrip position, deferred analytics polling, instant cached messages, smart comparison, question prompt tone.
+    - Status: ✅ FIXED (all 11).
+
+50. **BL-FIX-003: Progressive loading + chat_status (#39-42)**
+    - chat_status backend-canonical for chats (extra_data.chat_status).
+    - Dual-poll sync with real counter, auto-transition at 50 items.
+    - Background pagination with 500ms delay, cache pre-population for instant folder switching.
+    - Apple Mail progress bar at bottom of ChatList.
+    - Status: ✅ FIXED (all 4).
+
+---
+
+## Ops & DevOps (15 фев) — ВСЕ ЗАКРЫТЫ ✅
+
+51. **BL-OPS-001: Deploy Script with Rollback**
+    - Status: ✅ DONE. `scripts/deploy.sh` — backup, build, deploy, smoke test, auto-rollback on failure.
+
+52. **BL-OPS-002: Pre-Deploy Checks**
+    - Status: ✅ DONE. `scripts/pre-deploy-check.sh` — TypeScript check + build + pytest.
+
+53. **BL-OPS-003: Smoke Test Suite**
+    - Status: ✅ DONE. 16 checks: endpoints, auth guards, content, performance, SSL.
+    - File: `apps/chat-center/backend/scripts/ops/smoke-test.sh`.
+
+54. **BL-OPS-004: CI/CD Workflows**
+    - Status: ✅ DONE. GitHub Actions: deploy-staging, deploy-production, AI code review, WB contract check.
+
+55. **BL-OPS-005: DB Backup + SSL Cert Automation**
+    - Status: ✅ DONE. Cron scripts for daily DB backup + SSL cert renewal check.
+    - Files: `scripts/ops/db-backup.sh`, `scripts/ops/ssl-check.sh`.
+
+56. **BL-OPS-006: Load Testing**
+    - Status: ✅ DONE. Locust-based load test scripts.
+    - Files: `scripts/load-test/`.
+
+---
+
 ## Success Metrics (Post-Pilot)
 
 **Pilot считается успешным если:**
@@ -259,6 +343,11 @@
 | Feb 14 (ночь) | Claude | Alembic migrations, channel guardrails (37 tests), contract tests (23 tests) |
 | Feb 14 (ночь) | Claude | **7 pilot задач за ночь (87 тестов):** incremental sync (12), rate limiter (16), LLM intent (20), DB indexes, observability (30), reply pending config (9), nightly contract checks |
 | Feb 15 | Claude | **Staging deploy:** код залит, alembic stamp, 5 индексов, prometheus_client, restart. **Tests: 249 passed / 0 failed / 1 skip** (после фикса 8 edge cases). Smoke test: all API endpoints 200. Source labeling, demo data (12 interactions), E2E Playwright (9 tests). **Frontend deployed to prod** (`agentiq.ru/app/` = 200). |
+| Feb 15 | Claude | **Wave 1 MVP:** product cache, customer profiles, revenue analytics, auto-response, SLA config, celery health, BaseConnector + Ozon stub. |
+| Feb 15 | Claude | **12 bug fixes (#21-38):** worker crash, NULL dates, ghost sellers, nginx dups, bcrypt, mobile overflow, dot colors, badge logic, folder position, analytics defer, cached messages, smart comparison, question prompts. |
+| Feb 15 | Claude | **Progressive loading (#39-42):** chat_status backend-canonical fix, dual-poll sync with real count, background pagination, instant folder switching, Apple Mail progress bar. **2x deploy to prod, 16/16 smoke tests.** |
+| Feb 15 | Claude | **Ops:** deploy.sh (rollback), pre-deploy-check.sh, smoke-test.sh (16 checks), CI/CD workflows (4), load testing, DB backup, SSL cert automation. |
+| Feb 15 | Claude | **Git:** 6 commits created (196 files, ~41k insertions). INBOX.md #39-42 added. Backlog updated. |
 
 ---
 
