@@ -3,12 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentIQ — Лендинг (черновик)</title>
-    <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
-    <meta name="robots" content="noindex,nofollow">
-    <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
-    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный анализ коммуникаций.">
+
+    <!-- SEO -->
+    <title>AgentIQ — Центр контроля коммуникаций Wildberries</title>
+    <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов. Бесплатный анализ коммуникаций.">
+    <meta name="keywords" content="wildberries, вайлдберриз, чаты wb, отзывы wb, вопросы покупателей, центр контроля, agentiq, коммуникации маркетплейс">
+    <meta name="robots" content="index,follow">
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://agentiq.ru/">
+    <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций Wildberries">
+    <meta property="og:description" content="Все чаты, вопросы и отзывы WB в одном окне. Приоритизация, аналитика, контроль качества. Бесплатный анализ коммуникаций.">
+    <meta property="og:image" content="https://agentiq.ru/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AgentIQ — Центр контроля коммуникаций Wildberries">
+    <meta name="twitter:description" content="Все чаты, вопросы и отзывы WB в одном окне. Бесплатный анализ коммуникаций.">
+    <meta name="twitter:image" content="https://agentiq.ru/og-image.jpg">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-weight='700' font-size='16' fill='white' letter-spacing='0.5'%3EIQ%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -415,6 +430,96 @@
         @keyframes fade-up {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TESTIMONIALS (SOCIAL PROOF) ===== */
+        .testimonials {
+            padding: 60px 0;
+            background: var(--color-bg-secondary);
+        }
+
+        @media (min-width: 768px) {
+            .testimonials {
+                padding: 80px 0;
+            }
+        }
+
+        .testimonials-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .testimonials-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--space-3);
+        }
+
+        .testimonials-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        @media (min-width: 768px) {
+            .testimonials-title {
+                font-size: 34px;
+            }
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Компактные карточки (в стиле sidebar-scenarios-comparison) */
+        .testimonial-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+            transition: all var(--transition-fast);
+        }
+
+        .testimonial-card:hover {
+            background: var(--color-bg-active);
+            border-color: var(--color-accent);
+        }
+
+        .testimonial-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .testimonial-meta {
+            display: none;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* ===== SECTION COMMON ===== */
@@ -1044,6 +1149,148 @@
         }
         .offer-link:hover { text-decoration: underline; }
 
+        /* ===== ANALYSIS EXAMPLE ===== */
+        .analysis-example {
+            margin-top: 40px;
+            padding: 28px;
+            background: linear-gradient(135deg, #141e2b 0%, #0f1720 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-2xl);
+            color: #fff;
+        }
+
+        .analysis-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .analysis-header h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #7a9bb5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .analysis-header .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #c8d6e0;
+        }
+
+        .analysis-score {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .analysis-score-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #e8a838;
+        }
+
+        .analysis-score-max {
+            font-size: 20px;
+            color: #7a9bb5;
+            font-weight: 400;
+        }
+
+        .analysis-score-label {
+            font-size: 11px;
+            color: #a8bcc8;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .analysis-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .analysis-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .analysis-stat {
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .analysis-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .analysis-stat-value.red { color: #e85454; }
+        .analysis-stat-value.yellow { color: #e8a838; }
+        .analysis-stat-value.green { color: #4ecb71; }
+        .analysis-stat-value.blue { color: #7db8e8; }
+
+        .analysis-stat-label {
+            font-size: 10px;
+            color: #7a9bb5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .analysis-verdict {
+            background: rgba(232, 84, 84, 0.06);
+            border: 1px solid rgba(232, 84, 84, 0.12);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-verdict-text {
+            font-size: 13px;
+            color: #c8d6e0;
+            line-height: 1.6;
+        }
+
+        .analysis-loss {
+            background: linear-gradient(135deg, rgba(232, 84, 84, 0.12) 0%, rgba(232, 168, 56, 0.08) 100%);
+            border: 1px solid rgba(232, 84, 84, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .analysis-loss-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e8a838;
+            margin-bottom: 4px;
+        }
+
+        .analysis-loss-label {
+            font-size: 11px;
+            color: #a8bcc8;
+            margin-bottom: 12px;
+        }
+
+        .analysis-loss-money {
+            font-size: 22px;
+            font-weight: 700;
+            color: #e8a838;
+            margin-bottom: 6px;
+        }
+
+        .analysis-loss-note {
+            font-size: 10px;
+            color: #7a9bb5;
+            line-height: 1.4;
+        }
+
         /* ===== AUDIENCE SECTION ===== */
         .audience-grid {
             display: grid;
@@ -1119,8 +1366,25 @@
             flex-direction: column;
             gap: 14px;
         }
-        @media (max-width: 640px) {
-            .proof-card { width: 92vw; }
+
+        /* Mobile: full-width cards, horizontal scroll (no shrinking!) */
+        @media (max-width: 768px) {
+            .proof-card {
+                width: 100vw;
+                scroll-snap-align: start;
+            }
+
+            .proof-gallery {
+                padding: 6px 0 18px 0;
+                gap: 0;
+                scroll-padding-inline: 0;
+            }
+
+            /* Hide edge fades on mobile (cards are full-width) */
+            .proof-slider::before,
+            .proof-slider::after {
+                display: none;
+            }
         }
 
         /* Edge fades to hint “scroll me” without looking like a broken block */
@@ -1335,7 +1599,7 @@
             background: rgba(0,0,0,0.04);
             white-space: nowrap;
         }
-        .mock-sla.overdue { background: rgba(234,67,53,0.12); border-color: rgba(234,67,53,0.20); color: rgba(234,67,53,0.95); }
+        .mock-sla.просрочен { background: rgba(234,67,53,0.12); border-color: rgba(234,67,53,0.20); color: rgba(234,67,53,0.95); }
         .mock-sla.soon { background: rgba(249,171,0,0.14); border-color: rgba(249,171,0,0.22); color: rgba(160,90,0,0.95); }
         .mock-preview { font-size: 12px; color: rgba(0,0,0,0.55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -1497,16 +1761,228 @@
         }
         .mock-callout i { width: 8px; height: 8px; border-radius: 50%; background: rgba(26,115,232,0.85); display: inline-block; }
 
-        /* Responsive tweaks for mockups */
-        @media (max-width: 420px) {
-            .proof-mock { aspect-ratio: 4 / 3; }
+        /* Responsive tweaks for mockups — expand to tablet breakpoint */
+        @media (max-width: 768px) {
+            .proof-mock {
+                aspect-ratio: 4 / 3;
+                /* Scale up content on mobile for better readability */
+                font-size: 13px;
+            }
             .mock-app.messages { grid-template-columns: 1fr; }
             .mock-side { display: none; }
             .mock-kpis { grid-template-columns: 1fr; }
             .mock-split { grid-template-columns: 1fr; }
             .mock-topbar { flex-direction: column; align-items: flex-start; }
             .mock-url { justify-content: flex-start; }
+
+            /* Increase touch targets on mobile */
+            .mock-chat-compose { min-height: 48px; }
         }
+
+        /* ===== MOBILE-ONLY CARDS (simple, large elements) ===== */
+        .proof-card-mobile {
+            display: none; /* Hidden on desktop */
+            flex: 0 0 auto;
+            width: 100vw;
+            scroll-snap-align: start;
+            padding: var(--space-6) var(--space-5);
+            background: var(--color-bg-primary);
+        }
+
+        @media (max-width: 768px) {
+            .proof-card-mobile {
+                display: block; /* Show on mobile */
+            }
+
+            .proof-card:not(.proof-card-mobile) {
+                display: none; /* Hide desktop cards on mobile */
+            }
+        }
+
+        /* Mobile card styles — large, simple, readable */
+        .mobile-mock {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+            min-height: 320px; /* Equal height for all mobile cards */
+        }
+
+        .mobile-mock-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-4);
+        }
+
+        .mobile-chat-item {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            border-left: 3px solid transparent;
+        }
+
+        .mobile-chat-item.urgent {
+            border-left-color: var(--color-urgent);
+            background: #fef3f2;
+        }
+
+        .mobile-chat-item.high {
+            border-left-color: var(--color-warning);
+        }
+
+        .mobile-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+        }
+
+        .mobile-chat-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .mobile-sla-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mobile-sla-badge.просрочен {
+            background: #fef3f2;
+            color: var(--color-urgent);
+        }
+
+        .mobile-sla-badge.soon {
+            background: #fef7e0;
+            color: #ea8600;
+        }
+
+        .mobile-sla-badge.ok {
+            background: #e6f4ea;
+            color: var(--color-success);
+        }
+
+        .mobile-chat-preview {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .mobile-ai-draft {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border: 2px solid #8e24aa;
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .mobile-ai-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #8e24aa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-2);
+        }
+
+        .mobile-ai-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+        }
+
+        .mobile-message {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            margin-bottom: var(--space-3);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mobile-message.customer {
+            background: var(--color-bg-active);
+        }
+
+        .mobile-message.seller {
+            background: var(--color-bg-tertiary);
+        }
+
+        .mobile-kpi-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            text-align: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .mobile-kpi-value {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: var(--space-2);
+        }
+
+        .mobile-kpi-value.good { color: var(--color-success); }
+        .mobile-kpi-value.bad { color: var(--color-urgent); }
+        .mobile-kpi-value.neutral { color: var(--color-text-primary); }
+
+        .mobile-kpi-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .mobile-bar {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            margin-bottom: var(--space-2);
+        }
+
+        .mobile-bar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+        }
+
+        .mobile-bar-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .mobile-bar-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .mobile-bar-track {
+            height: 8px;
+            background: var(--color-bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .mobile-bar-fill {
+            height: 100%;
+            background: var(--color-accent);
+            transition: width 0.5s ease;
+        }
+
+        .mobile-bar-fill.good { background: var(--color-success); }
+        .mobile-bar-fill.risky { background: var(--color-warning); }
+        .mobile-bar-fill.harm { background: var(--color-urgent); }
 
         .proof-slide-text {
             padding: 2px 4px 0;
@@ -2167,9 +2643,9 @@
 <nav class="navbar" id="navbar">
     <div class="container navbar-inner">
         <a href="#" class="logo">AGENT<span>IQ</span></a>
-        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Анализ</a>
+        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Демо</a>
         <a href="#" class="navbar-cta" onclick="openModal(event)">
-            Получить анализ
+            Записаться на демо
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
     </div>
@@ -2184,13 +2660,13 @@
                     <span class="hero-badge-dot"></span>
                     Для продавцов Wildberries
                 </div>
-                <h1>Все коммуникации <span class="highlight">Wildberries</span> в одном окне</h1>
+                <h1>Центр контроля коммуникаций <span class="highlight">Wildberries</span></h1>
                 <p class="hero-subtitle">
-                    Очередь, приоритеты, SLA и качество ответов. Чтобы не терять деньги на коммуникациях.
+                    Собираем чаты, вопросы и отзывы по вашим товарам в одном рабочем пространстве и показываем, где есть точки риска и низкая отдача.
                 </p>
                 <div class="hero-cta-group">
                     <a href="#" class="btn-primary" onclick="openModal(event)">
-                        Получить анализ
+                        Записаться на демо (15 мин)
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                     <a href="#proof" class="btn-secondary">
@@ -2211,6 +2687,53 @@
                 <div class="hero-proof-item">
                     <span class="hero-proof-value">100%</span>
                     <span class="hero-proof-label">вопросов закрывают сомнения до&nbsp;покупки</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials">
+    <div class="container">
+        <div class="testimonials-header reveal">
+            <h2 class="testimonials-title">Что говорят селлеры на&nbsp;интервью</h2>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal reveal-delay-1">
+                <div class="testimonial-text">
+                    Отзывы — это валюта, за которую ты покупаешь возможность продаж
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-2">
+                <div class="testimonial-text">
+                    Не смог оцифровать эту работу, по наитию ориентируешься
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-3">
+                <div class="testimonial-text">
+                    Заменили товар и оценка упала с 4.9 до 4.6... если продадим ещё 5 тысяч, какой рейтинг будет? Где граница — не понимаю
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-4">
+                <div class="testimonial-text">
+                    Неприятно когда негативный отзыв последний висит, продажи снижаются
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-5">
+                <div class="testimonial-text">
+                    Товаров если много, отзывы копятся, сначала отвечаешь раз в неделю, и потом копится хвост
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-6">
+                <div class="testimonial-text">
+                    Чатов около 20 в день. Если плохо ответишь — влияет на воронку
                 </div>
             </div>
         </div>
@@ -2335,7 +2858,7 @@
                                             <div class="mock-item-head">
                                                 <div class="mock-avatar" aria-hidden="true"></div>
                                                 <div class="mock-name">Отзыв: возврат</div>
-                                                <span class="mock-sla overdue">overdue</span>
+                                                <span class="mock-sla просрочен">просрочен</span>
                                             </div>
                                             <div class="mock-preview">Покупатель: "Вы обманули..."</div>
                                         </div>
@@ -2343,7 +2866,7 @@
                                             <div class="mock-item-head">
                                                 <div class="mock-avatar" aria-hidden="true"></div>
                                                 <div class="mock-name">Вопрос: размер</div>
-                                                <span class="mock-sla soon">due soon</span>
+                                                <span class="mock-sla soon">скоро</span>
                                             </div>
                                             <div class="mock-preview">"Подойдет ли на рост 180?"</div>
                                         </div>
@@ -2351,7 +2874,7 @@
                                             <div class="mock-item-head">
                                                 <div class="mock-avatar" aria-hidden="true"></div>
                                                 <div class="mock-name">Чат: доставка</div>
-                                                <span class="mock-sla">ok</span>
+                                                <span class="mock-sla">в норме</span>
                                             </div>
                                             <div class="mock-preview">"Когда привезете?"</div>
                                         </div>
@@ -2363,15 +2886,15 @@
                                             <b>Отзыв: возврат</b><br>
                                             <span>негатив, публично</span>
                                         </div>
-                                        <span class="mock-callout"><i></i>SLA и приоритет</span>
+                                        <span class="mock-callout"><i></i>Срок и приоритет</span>
                                     </div>
                                     <div class="mock-msgs">
-                                        <div class="mock-bubble">Товар пришел с браком. Ужасный сервис.</div>
+                                        <div class="mock-bubble">Товар пришел с браком. Вообще не работает!</div>
+                                        <div class="mock-bubble" style="margin-top: 8px;">Ставлю 1 звезду и пишу отзыв. Больше у вас не закажу!</div>
                                         <div class="mock-ai">
-                                            <div class="mock-ai-label">AI draft</div>
-                                            <div class="mock-ai-text">Понимаю ваше раздражение. Давайте решим: оформим замену или возврат, подскажите номер заказа.</div>
+                                            <div class="mock-ai-label">ИИ черновик</div>
+                                            <div class="mock-ai-text">Нам очень жаль что товар оказался бракованным! Это недопустимо.<br><br>Оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.<br><br>Мы проверим партию, чтобы исключить повторение. Спасибо за понимание.</div>
                                         </div>
-                                        <div class="mock-bubble me">Извините за ситуацию. Подскажите номер заказа, и мы решим вопрос.</div>
                                     </div>
                                     <div class="mock-chat-compose">
                                         <div class="mock-input" aria-hidden="true"></div>
@@ -2388,6 +2911,211 @@
                         <p>Вся коммуникация по товарам в одной очереди. Команда не теряет контекст.</p>
                     </div>
                 </div>
+
+                <!-- ===== MOBILE-ONLY CARDS (simple, readable, no English!) ===== -->
+
+                <!-- Mobile Card 1: Priority List -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-mock-title">Приоритеты</div>
+
+                        <div class="mobile-chat-item urgent">
+                            <div class="mobile-chat-header">
+                                <div class="mobile-chat-name">Отзыв: возврат</div>
+                                <span class="mobile-sla-badge просрочен">Просрочен</span>
+                            </div>
+                            <div class="mobile-chat-preview">Покупатель: "Вы обманули, товар не тот..."</div>
+                        </div>
+
+                        <div class="mobile-chat-item high">
+                            <div class="mobile-chat-header">
+                                <div class="mobile-chat-name">Вопрос: размер</div>
+                                <span class="mobile-sla-badge soon">Скоро</span>
+                            </div>
+                            <div class="mobile-chat-preview">"Подойдет ли на рост 180?"</div>
+                        </div>
+
+                        <div class="mobile-chat-item">
+                            <div class="mobile-chat-header">
+                                <div class="mobile-chat-name">Чат: доставка</div>
+                                <span class="mobile-sla-badge ok">В норме</span>
+                            </div>
+                            <div class="mobile-chat-preview">"Когда привезете?"</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">01</span>
+                        <h3>Сортировка по срочности</h3>
+                        <p>Срочные чаты — сверху. Команда видит дедлайны и не пропускает критичное.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Card 2: Chat with AI -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-mock-title">Работа с негативом</div>
+
+                        <div class="mobile-message customer">
+                            Товар пришёл с браком! Вообще не работает.
+                        </div>
+
+                        <div class="mobile-message customer" style="margin-top: 8px;">
+                            Ставлю 1 звезду и пишу отзыв. Больше у вас не закажу!
+                        </div>
+
+                        <div class="mobile-ai-draft" style="margin-top: var(--space-4);">
+                            <div class="mobile-ai-label">ИИ Черновик</div>
+                            <div class="mobile-ai-text">Нам очень жаль что товар оказался бракованным! Это недопустимо.<br><br>Оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.<br><br>Мы проверим партию, чтобы исключить повторение. Спасибо за понимание.</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">02</span>
+                        <h3>ИИ знает как работать с негативом</h3>
+                        <p>Эскалация (брак → угроза 1★) — ИИ генерирует правильный ответ: эмпатия, решение, без вредных фраз.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Card 3: Analytics -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-mock-title">Качество ответов</div>
+
+                        <div class="mobile-bar">
+                            <div class="mobile-bar-header">
+                                <span class="mobile-bar-label">Хорошие</span>
+                                <span class="mobile-bar-value">62%</span>
+                            </div>
+                            <div class="mobile-bar-track">
+                                <div class="mobile-bar-fill good" style="width: 62%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-bar">
+                            <div class="mobile-bar-header">
+                                <span class="mobile-bar-label">Допустимые</span>
+                                <span class="mobile-bar-value">24%</span>
+                            </div>
+                            <div class="mobile-bar-track">
+                                <div class="mobile-bar-fill" style="width: 24%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-bar">
+                            <div class="mobile-bar-header">
+                                <span class="mobile-bar-label">Рискованные</span>
+                                <span class="mobile-bar-value">10%</span>
+                            </div>
+                            <div class="mobile-bar-track">
+                                <div class="mobile-bar-fill risky" style="width: 10%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-bar">
+                            <div class="mobile-bar-header">
+                                <span class="mobile-bar-label">Вредные</span>
+                                <span class="mobile-bar-value">4%</span>
+                            </div>
+                            <div class="mobile-bar-track">
+                                <div class="mobile-bar-fill harm" style="width: 4%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">03</span>
+                        <h3>Аналитика качества</h3>
+                        <p>Видно где ответы вредят: шаблоны, обвинения, игнорирование жалоб.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Card 4: Key Metrics -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-kpi-card">
+                            <div class="mobile-kpi-value bad">7%</div>
+                            <div class="mobile-kpi-label">просрочек по срокам</div>
+                        </div>
+
+                        <div class="mobile-kpi-card">
+                            <div class="mobile-kpi-value good">93%</div>
+                            <div class="mobile-kpi-label">ответов в срок</div>
+                        </div>
+
+                        <div class="mobile-kpi-card">
+                            <div class="mobile-kpi-value neutral">4%</div>
+                            <div class="mobile-kpi-label">вредных ответов</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">04</span>
+                        <h3>Ключевые метрики</h3>
+                        <p>Команда видит где проседает скорость и качество. Можно быстро среагировать.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Card 5: Promo for 5★ (CRM Marketing) -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-mock-title">CRM-маркетинг</div>
+
+                        <div class="mobile-message customer" style="background: #e6f4ea;">
+                            ⭐⭐⭐⭐⭐<br>
+                            Товар отличный, всё быстро пришло!
+                        </div>
+
+                        <div style="margin-top: var(--space-3); padding: var(--space-3); background: white; border-radius: var(--radius-md); border-left: 3px solid #8e24aa;">
+                            <div style="font-size: 11px; font-weight: 600; color: #8e24aa; margin-bottom: 6px;">✓ ИИ АВТООТВЕТ</div>
+                            <div style="font-size: 13px; line-height: 1.6;">Спасибо за отзыв! В знак благодарности дарим промокод <strong>THANKS10</strong> на скидку 10% на следующую покупку. Действует 30 дней.</div>
+                        </div>
+
+                        <div style="margin-top: var(--space-4); padding: var(--space-3); background: white; border-radius: var(--radius-md); text-align: center;">
+                            <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px;">Эффект</div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--color-success);">+30% повторных покупок</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">05</span>
+                        <h3>Промокоды за отзывы</h3>
+                        <p>ИИ автоматически предлагает промокод на 5★ отзывы — растёт лояльность и повторные покупки.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Card 6: Auto-reply Pre-purchase (Conversion) -->
+                <div class="proof-card proof-card-mobile">
+                    <div class="mobile-mock">
+                        <div class="mobile-mock-title">Автоответ (конверсия)</div>
+
+                        <div class="mobile-chat-item" style="border-left-color: var(--color-accent); background: var(--color-bg-active);">
+                            <div class="mobile-chat-header">
+                                <div class="mobile-chat-name">Вопрос: размер XL</div>
+                                <span class="mobile-sla-badge" style="background: #e8f0fe; color: var(--color-accent);">Pre-purchase</span>
+                            </div>
+                            <div class="mobile-chat-preview">"Есть размер XL в наличии?"</div>
+                        </div>
+
+                        <div style="margin-top: var(--space-3); padding: var(--space-3); background: white; border-radius: var(--radius-md); border-left: 3px solid var(--color-success);">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--color-success); margin-bottom: 6px;">✓ АВТООТВЕТ ЧЕРЕЗ 2 МИН</div>
+                            <div style="font-size: 13px; line-height: 1.6;">Да, размер XL в наличии! Доставка 2-5 дней. Размерная сетка в описании товара 👕</div>
+                        </div>
+
+                        <div style="margin-top: var(--space-4); padding: var(--space-3); background: #fef7e0; border-radius: var(--radius-md); text-align: center;">
+                            <div style="font-size: 12px; color: #ea8600; font-weight: 600;">📊 Окно решения: 10-20 сек</div>
+                            <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">Ответ в течение часа = +20% конверсия</div>
+                        </div>
+                    </div>
+
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">06</span>
+                        <h3>Автоответы на вопросы</h3>
+                        <p>Pre-purchase вопросы отвечаются за минуты — покупатель не уходит к конкурентам. +20% конверсия.</p>
+                    </div>
+                </div>
+
+                <!-- END MOBILE CARDS -->
 
                 <div class="proof-card">
                     <div class="proof-slide-img">
@@ -2416,7 +3144,7 @@
                                 <div class="mock-analytics-body">
                                     <div class="mock-kpis">
                                         <div class="mock-card">
-                                            <div class="k">SLA</div>
+                                            <div class="k">Сроки</div>
                                             <div class="v">7%</div>
                                             <div class="s">просрочек</div>
                                         </div>
@@ -2497,7 +3225,7 @@
                                         <h4>Что чинить в первую очередь</h4>
                                         <p>Срочные кейсы, backlog, ответственность</p>
                                     </div>
-                                    <span class="mock-callout"><i></i>due soon / overdue</span>
+                                    <span class="mock-callout"><i></i>скоро / просрочен</span>
                                 </div>
                                 <div class="mock-analytics-body">
                                     <div class="mock-split" style="grid-template-columns: 1fr 1fr;">
@@ -2540,12 +3268,12 @@
                                         <div class="mock-card">
                                             <div class="k">Алерты</div>
                                             <div class="v" style="font-size: 16px;">есть</div>
-                                            <div class="s">overdue / soon</div>
+                                            <div class="s">просрочен / soon</div>
                                         </div>
                                         <div class="mock-card">
                                             <div class="k">Ответст.</div>
                                             <div class="v" style="font-size: 16px;">понятно</div>
-                                            <div class="s">кто держит SLA</div>
+                                            <div class="s">кто держит сроки</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2555,7 +3283,7 @@
                     </div>
                     <div class="proof-slide-text">
                         <span class="proof-slide-num">03</span>
-                        <h3>Приоритеты и SLA</h3>
+                        <h3>Приоритеты и сроки</h3>
                         <p>Видно, что просрочено и что “горит” сейчас. Очередь управляется, а не живёт сама по себе.</p>
                     </div>
 	                </div>
@@ -2595,8 +3323,8 @@
             </div>
             <div class="step-card reveal reveal-delay-3">
                 <div class="step-num">03</div>
-                <h3>Контроль SLA и качества</h3>
-                <p>Приоритеты, due soon/overdue и понятные причины проблем. ИИ предлагает черновики, команда отвечает быстрее и аккуратнее.</p>
+                <h3>Контроль сроков и качества</h3>
+                <p>Приоритеты, скоро/просрочен и понятные причины проблем. ИИ предлагает черновики, команда отвечает быстрее и аккуратнее.</p>
             </div>
         </div>
     </div>
@@ -2607,8 +3335,8 @@
     <div class="container">
         <div class="reveal">
             <span class="section-label">Решение</span>
-            <h2 class="section-title">Как AgentIQ помогает держать коммуникации под&nbsp;контролем</h2>
-            <p class="section-subtitle">Единая очередь, приоритеты с дедлайнами, черновики ответов и контроль качества.</p>
+            <h2 class="section-title">От ответов к лояльности: влияйте на&nbsp;повторные покупки</h2>
+            <p class="section-subtitle">Используйте отзывы, вопросы и&nbsp;чаты как каналы коммуникации&nbsp;— растите рейтинг и&nbsp;LTV.</p>
         </div>
         <div class="features-grid">
             <div class="feature-card reveal reveal-delay-1">
@@ -2631,7 +3359,7 @@
             </div>
             <div class="feature-card reveal reveal-delay-2">
                 <div class="feature-head">
-                    <span class="feature-chip"><i></i>SLA и приоритет</span>
+                    <span class="feature-chip"><i></i>Срок и приоритет</span>
                     <span class="feature-icon deadline" aria-hidden="true">
                         <svg viewBox="0 0 16 16" fill="none">
                             <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2642,14 +3370,14 @@
                 <h3>Приоритет и дедлайн ответа</h3>
                 <p>Срочные кейсы всегда наверху. Видно, что просрочено и что “горит” в ближайшее время.</p>
                 <div class="feature-tags" aria-hidden="true">
-                    <span class="feature-tag">due soon</span>
-                    <span class="feature-tag">overdue</span>
+                    <span class="feature-tag">скоро</span>
+                    <span class="feature-tag">просрочен</span>
                     <span class="feature-tag">алерты</span>
                 </div>
             </div>
             <div class="feature-card reveal reveal-delay-3">
                 <div class="feature-head">
-                    <span class="feature-chip"><i></i>AI draft</span>
+                    <span class="feature-chip"><i></i>ИИ черновик</span>
                     <span class="feature-icon ai" aria-hidden="true">
                         <svg viewBox="0 0 16 16" fill="none">
                             <path d="M3.5 12.5V4.8c0-.7.6-1.3 1.3-1.3h6.4c.7 0 1.3.6 1.3 1.3v6.4c0 .7-.6 1.3-1.3 1.3H6.7L4.8 13.9c-.6.4-1.3 0-1.3-.7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
@@ -2737,10 +3465,9 @@
                     <span class="amount">Бесплатно</span>
                 </div>
                 <a href="#" class="btn-offer primary" onclick="openModal(event)">
-                    Получить анализ
+                    Записаться на демо
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
-                <a class="offer-link" href="/audit.html">Посмотреть пример анализа &rarr;</a>
             </div>
             <div class="offer-card secondary reveal reveal-delay-2">
                 <span class="offer-badge">После аудита</span>
@@ -2795,7 +3522,7 @@
             </div>
             <div class="final-cta-buttons">
                 <a href="#" class="btn-primary" onclick="openModal(event)">
-                    Получить анализ
+                    Записаться на демо
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <a href="#offer" class="btn-secondary">Подробнее</a>
@@ -2820,7 +3547,7 @@
 
 <!-- ===== MOBILE CTA BAR ===== -->
 <div class="mobile-cta-bar" id="mobileCtaBar" aria-hidden="true">
-    <a href="#" class="mobile-cta-btn" onclick="openModal(event)">Получить анализ</a>
+    <a href="#" class="mobile-cta-btn" onclick="openModal(event)">Записаться на демо</a>
 </div>
 
 <!-- ===== MODAL ===== -->
@@ -2829,8 +3556,8 @@
         <button class="modal-close" onclick="closeModal()">&times;</button>
 
         <div id="formContent">
-            <h3>Получить анализ по&nbsp;артикулу</h3>
-            <p class="modal-desc">Оставьте артикул и контакт — мы подготовим анализ отзывов, вопросов и чатов и пришлём рекомендации.</p>
+            <h3>Записаться на демо (15 мин)</h3>
+            <p class="modal-desc">Оставьте артикул и контакт — покажем как AgentIQ работает на ваших данных и расскажем как внедрить.</p>
 
             <form id="auditForm" onsubmit="submitForm(event)">
                 <div class="form-group">

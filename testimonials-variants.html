@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonials — 3 варианта</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f8f9fa;
+            padding: 40px 20px;
+            color: #1a1a1a;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .variant {
+            background: white;
+            border-radius: 16px;
+            padding: 48px 32px;
+            margin-bottom: 48px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .variant-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .variant-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1a73e8;
+            background: #e8f4ff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .variant-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .variant-desc {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        /* ===== ВАРИАНТ A: POST-IT СТИКЕРЫ ===== */
+        .postit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            padding: 20px;
+        }
+
+        .postit-note {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,0.08),
+                0 8px 16px rgba(0,0,0,0.06);
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .postit-note:nth-child(1) { transform: rotate(-1deg); }
+        .postit-note:nth-child(2) {
+            background: linear-gradient(135deg, #ffccbc 0%, #ffab91 100%);
+            transform: rotate(1deg);
+        }
+        .postit-note:nth-child(3) {
+            background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%);
+            transform: rotate(-0.5deg);
+        }
+        .postit-note:nth-child(4) {
+            background: linear-gradient(135deg, #c5e1a5 0%, #aed581 100%);
+            transform: rotate(1.2deg);
+        }
+        .postit-note:nth-child(5) {
+            background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
+            transform: rotate(-0.8deg);
+        }
+        .postit-note:nth-child(6) {
+            background: linear-gradient(135deg, #d1c4e9 0%, #b39ddb 100%);
+            transform: rotate(0.6deg);
+        }
+
+        .postit-note:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow:
+                0 4px 8px rgba(0,0,0,0.12),
+                0 12px 24px rgba(0,0,0,0.08);
+            z-index: 10;
+        }
+
+        .postit-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(0,0,0,0.85);
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .postit-meta {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== ВАРИАНТ B: МИНИМАЛИСТИЧНЫЕ КАРТОЧКИ ===== */
+        .minimal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .minimal-card {
+            background: transparent;
+            padding: 0;
+            position: relative;
+        }
+
+        .minimal-quote {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #1a1a1a;
+            font-weight: 500;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .minimal-quote::before {
+            content: '"';
+            position: absolute;
+            left: 0;
+            top: -8px;
+            font-size: 48px;
+            font-weight: 700;
+            color: #e8eaed;
+            line-height: 1;
+        }
+
+        .minimal-meta {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #9aa0a6;
+            font-weight: 500;
+        }
+
+        /* ===== ВАРИАНТ C: ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ ===== */
+        .scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 20px 0;
+            margin: 0 -32px;
+            padding-left: 32px;
+            padding-right: 32px;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scroll-grid {
+            display: flex;
+            gap: 20px;
+            width: max-content;
+        }
+
+        .scroll-card {
+            flex: 0 0 auto;
+            width: 320px;
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .scroll-card:hover {
+            border-color: #dadce0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .scroll-quote {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .scroll-meta {
+            font-size: 12px;
+            color: #9aa0a6;
+            font-weight: 500;
+            padding-top: 16px;
+            border-top: 1px solid #f5f6f7;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        @media (max-width: 768px) {
+            .variant {
+                padding: 32px 20px;
+            }
+
+            .postit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .minimal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ВАРИАНТ A: POST-IT СТИКЕРЫ -->
+        <div class="variant">
+            <div class="variant-header">
+                <div class="variant-label">Вариант A</div>
+                <h2 class="variant-title">Post-it стикеры (Miro style)</h2>
+                <p class="variant-desc">Живые, цветные, с легким поворотом. Как настоящие стикеры с касдевов.</p>
+            </div>
+
+            <div class="postit-grid">
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Отзывы — это валюта, за которую ты покупаешь возможность продаж
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Не смог оцифровать эту работу, по наитию ориентируешься
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Если продадим ещё 5 тысяч товара, какой у меня рейтинг будет?
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Неприятно когда негативный последний висит
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Товаров много, отзывы копятся, и потом копится хвост
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+
+                <div class="postit-note">
+                    <div class="postit-text">
+                        Чатов около 20 в день. Если плохо ответишь — влияет на воронку
+                    </div>
+                    <div class="postit-meta">из касдева</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВАРИАНТ B: МИНИМАЛИСТИЧНЫЕ КАРТОЧКИ -->
+        <div class="variant">
+            <div class="variant-header">
+                <div class="variant-label">Вариант B</div>
+                <h2 class="variant-title">Минималистичные карточки</h2>
+                <p class="variant-desc">Без фона, без рамок. Только цитаты — очень воздушно.</p>
+            </div>
+
+            <div class="minimal-grid">
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Отзывы — это валюта, за которую ты покупаешь возможность продаж
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Не смог оцифровать эту работу, по наитию ориентируешься
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Если продадим ещё 5 тысяч товара, какой у меня рейтинг будет?
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Неприятно когда негативный последний висит
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Товаров много, отзывы копятся, и потом копится хвост
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+
+                <div class="minimal-card">
+                    <div class="minimal-quote">
+                        Чатов около 20 в день. Если плохо ответишь — влияет на воронку
+                    </div>
+                    <div class="minimal-meta">из касдева</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВАРИАНТ C: ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ -->
+        <div class="variant">
+            <div class="variant-header">
+                <div class="variant-label">Вариант C</div>
+                <h2 class="variant-title">Горизонтальный скролл</h2>
+                <p class="variant-desc">Как стикеры на доске — свайп на мобилке, скролл на десктопе.</p>
+            </div>
+
+            <div class="scroll-container">
+                <div class="scroll-grid">
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Отзывы — это валюта, за которую ты покупаешь возможность продаж
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Не смог оцифровать эту работу, по наитию ориентируешься
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Если продадим ещё 5 тысяч товара, какой у меня рейтинг будет?
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Неприятно когда негативный последний висит
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Товаров много, отзывы копятся, и потом копится хвост
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+
+                    <div class="scroll-card">
+                        <div class="scroll-quote">
+                            Чатов около 20 в день. Если плохо ответишь — влияет на воронку
+                        </div>
+                        <div class="scroll-meta">из касдева</div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-hint">← прокрутите или свайпните →</div>
+        </div>
+
+    </div>
+</body>
+</html>
