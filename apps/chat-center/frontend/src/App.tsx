@@ -82,11 +82,19 @@ function interactionToChat(interaction: Interaction): Chat {
   const draftSentiment = getStringField(draft, 'sentiment');
   const draftPriority = getStringField(draft, 'sla_priority');
   const slaDueAt = getStringField(extra, 'sla_due_at');
-  const productName = interaction.subject || (
-    interaction.channel === 'review' ? 'Отзыв по товару' :
-    interaction.channel === 'question' ? 'Вопрос по товару' :
-    'Чат покупателя'
-  );
+  const productName = (() => {
+    // Chats: extra_data has clean product_name (subject is composite "Чат с покупателем · Customer · Product")
+    if (interaction.channel === 'chat') {
+      return getStringField(extra, 'product_name') || null;
+    }
+    // Reviews/questions: subject has prefix "Отзыв X★ · " / "Вопрос по товару · " — strip it
+    const subj = interaction.subject || '';
+    const stripped = subj
+      .replace(/^Отзыв\s+\d★?\s*·\s*/, '')
+      .replace(/^Вопрос по товару\s*·\s*/, '');
+    if (stripped) return stripped;
+    return interaction.nm_id ? `Арт. ${interaction.nm_id}` : null;
+  })();
   const customerName = getStringField(extra, 'user_name')
     || getStringField(extra, 'customer_name')
     || interaction.customer_id
@@ -141,12 +149,14 @@ function interactionToChat(interaction: Interaction): Chat {
       if (backendStatus && ['waiting', 'responded', 'client-replied', 'auto-response', 'closed'].includes(backendStatus)) {
         return backendStatus;
       }
-      // For reviews/questions: derive from reply presence
+      // For reviews/questions: derive from reply presence + needs_response
       const hasReply = Boolean(getStringField(extra, 'last_reply_text'));
       const isAutoResponse = Boolean(extra.is_auto_response);
       if (isAutoResponse) return 'auto-response';
       if (hasReply && !interaction.needs_response) return 'responded';
       if (hasReply && interaction.needs_response) return 'client-replied';
+      // Answered but no reply text (e.g. WB isAnswered=true with empty answerText)
+      if (!interaction.needs_response) return 'responded';
       return 'waiting';
     })(),
     closed_at: interaction.status === 'closed' ? interaction.updated_at : null,

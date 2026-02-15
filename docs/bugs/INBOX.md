@@ -62,16 +62,8 @@ Status: ACTIVE (triage queue)
 | 36 | PERF | ✅ FIXED — instant show кэшированных сообщений + async подгрузка свежих |
 | 37 | PERF | ✅ FIXED — smart comparison (id+updated_at) предотвращает лишние ре-рендеры |
 | 38 | AI | ✅ FIXED — переписан промпт для вопросов: дружелюбный, помогающий тон |
-| 39 | BUG | ✅ FIXED — chat_status: backend-canonical status для чатов (extra_data.chat_status) |
-| 40 | UX | ✅ FIXED — progressive loading при синхронизации (dual-poll + real count) |
-| 41 | PERF | ✅ FIXED — instant folder switching (pre-populate cache + background pagination) |
-| 42 | UX | ✅ FIXED — Apple Mail progress bar в ChatList (sticky bottom) |
-| 43 | SEC | ✅ FIXED — CORS allow_origins=["*"] → env-based (agentiq.ru + localhost) |
-| 44 | OPS | ✅ FIXED — nginx proxy_read_timeout 300s + rate limiting 30r/s + static cache 1y |
-| 45 | OPS | ✅ FIXED — health check проверяет DB (SELECT 1, было static "healthy") |
-| 46 | OPS | ✅ FIXED — global exception handler → Sentry + clean 500 |
-| 47 | OPS | ✅ FIXED — auth deps в requirements.txt (python-jose, passlib, bcrypt) |
-| 48 | OPS | ✅ DONE — backup cron (daily 3AM) + celery health cron (5 мин) на VPS |
+| 39 | BUG | ✅ FIXED — snippet duplication: "Отзыв · Отзыв по товару" → "Отзыв · Арт. 123456" |
+| 40 | BUG | ✅ FIXED — dot colors: 4849 answered reviews без last_reply_text → fallback на needs_response |
 
 ---
 
@@ -151,19 +143,14 @@ Status: ACTIVE (triage queue)
 34) ~~папки (каналы) должны быть над поиском~~ **FIXED (2026-02-15):** FolderStrip перемещён выше search wrapper в ChatList. Файл: `ChatList.tsx`.
 
 35) ~~очень долго всё загружается~~ **FIXED (2026-02-15):** Отложен polling аналитики (qualityHistory, opsAlerts, pilotReadiness) до активации таба. Интервалы увеличены: qualityMetrics 15→30с, analytics 30→60с. Файл: `App.tsx`.
-
+Так много ошибок делаешь. Может, какие-то доп. тесты нужны? А почему так происходит? 
 36) ~~загрузка чата вместе с AI рекомендацией~~ **FIXED (2026-02-15):** Instant show кэшированных сообщений из `interactionCacheRef` для не-chat каналов, свежие данные загружаются async. Файл: `App.tsx`.
 
 37) ~~коммуникации грузятся заново каждый раз~~ **FIXED (2026-02-15):** Smart comparison (id + updated_at + needs_response) перед обновлением `interactionCache`, предотвращает лишние ре-рендеры когда данные не изменились. Файл: `App.tsx`.
 
 38) ~~ответы на вопросы «посылающие» клиентов~~ **FIXED (2026-02-15):** Переписан `QUESTION_DRAFT_SYSTEM` промпт: добавлен принцип «ПОМОГИ ПОКУПАТЕЛЮ», эмпатия, запрет на отсылающие фразы. Fallback текст тоже обновлён. Файлы: `ai_analyzer.py`, `interaction_drafts.py`.
 
-### Progressive loading + chat_status (2026-02-15):
+новые:
+39) ~~в сниппетах в чатлисте снова пишем чат чат с покупателем, отзыв отзыв, вопрос вопрос по товару~~ **FIXED (2026-02-15):** `App.tsx:85-89` использовал fallback "Отзыв по товару"/"Вопрос по товару"/"Чат покупателя", а `ChatList.tsx:229-234` уже показывает channel label "Отзыв"/"Вопрос"/"Чат" → дубликат. Fix: fallback заменён на `Арт. {nm_id}` или null (пустая строка пропускается). Теперь: "Отзыв · Арт. 123456 · Ожидает ответа".
 
-39) ~~chat_status: кто ответил последним не определяется для чатов/вопросов~~ **FIXED (2026-02-15):** Frontend `App.tsx` re-derived `chat_status` from `extra_data.last_reply_text`, но для chat channel `extra_data` содержит только `chat_status` (из Chat модели), а не `last_reply_text`. Fix: сначала проверяем `extra_data.chat_status` для backend-canonical статуса, fallback на heuristic для reviews/questions. Файл: `App.tsx:137-150`.
-
-40) ~~после ввода API-ключа пустой экран «Обращений пока нет»~~ **FIXED (2026-02-15):** Вместо блокировки до окончания sync — dual-polling `/auth/me` + `/interactions?include_total=true` каждые 3 сек. Показывает реальный счётчик на экране синхронизации. При 50+ загруженных — auto-transition в чат-центр. Файлы: `App.tsx`, `MarketplaceOnboarding.tsx`.
-
-41) ~~спиннер при переключении папок~~ **FIXED (2026-02-15):** Pre-populate per-channel cache из 'all' кэша при переключении. Фоновая пагинация: первая страница (50 items) мгновенно, остальные auto-load с 500ms задержкой. Apple Mail-style индикатор «Загружено X из Y» внизу ChatList. Файлы: `App.tsx`, `ChatList.tsx`, `api.ts`, `types/index.ts`, `index.css`.
-
-42) ~~нет прогресса загрузки в ChatList~~ **FIXED (2026-02-15):** Apple Mail-style sticky progress bar внизу списка чатов: синяя полоса + текст «Загружено N из M». CSS: `.load-progress-bar` с transition animation. Файлы: `ChatList.tsx`, `index.css`.
+40) ~~цвета dots сломаны~~ **FIXED (2026-02-15):** Root cause: 4849 из 4853 answered reviews не имели `last_reply_text` в extra_data (WB API `isAnswered=true`, но `answerText` пустой). Frontend derivation: `hasReply=false + needs_response=false → 'waiting'` (жёлтый) вместо `'responded'` (зелёный). Fix: добавлен fallback `if (!interaction.needs_response) return 'responded'` в `App.tsx:150`. Теперь все answered reviews/questions показывают зелёный dot.
