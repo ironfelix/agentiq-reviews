@@ -62,8 +62,10 @@ Status: ACTIVE (triage queue)
 | 36 | PERF | ✅ FIXED — instant show кэшированных сообщений + async подгрузка свежих |
 | 37 | PERF | ✅ FIXED — smart comparison (id+updated_at) предотвращает лишние ре-рендеры |
 | 38 | AI | ✅ FIXED — переписан промпт для вопросов: дружелюбный, помогающий тон |
-| 39 | BUG | ✅ FIXED — snippet duplication: "Отзыв · Отзыв по товару" → "Отзыв · Арт. 123456" |
+| 39 | BUG | ✅ FIXED — snippet duplication: strip channel prefix from subject, use extra_data.product_name for chats |
 | 40 | BUG | ✅ FIXED — dot colors: 4849 answered reviews без last_reply_text → fallback на needs_response |
+| 41 | DATA | ✅ FIXED — 4 sellers синкали один WB кабинет. Оставлен seller 17 (ivan2), деактивированы 3/12/18 |
+| 42 | FEAT | ✅ DONE — Settings page включена в sidebar + mobile nav, Dashboard placeholder |
 
 ---
 
