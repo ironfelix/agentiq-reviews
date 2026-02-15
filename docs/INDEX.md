@@ -39,6 +39,7 @@ Last updated: 2026-02-12
 - `architecture/architecture.md` — текущая архитектура (общая)
 - `architecture/architecture-mvp2.md` — MVP2 Reviews (архитектурные детали)
 - `architecture/AGENTIQ_2.0_ARCHITECTURE.md` — vision / 2.0
+- `architecture/SCALING_NOTES.md` — заметки о масштабировании AI analysis pipeline (MVP → enterprise)
 - `SLA_RULES.md` — SLA targets + rationale (WB, benchmarks)
 - `BILLING_ARCHITECTURE.md` — дизайн биллинга (план)
 

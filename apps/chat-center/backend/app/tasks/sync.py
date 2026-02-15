@@ -822,13 +822,17 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None) -> Opt
     await db.commit()
     logger.info(f"Synced {len(chats_data)} chats for seller {seller.id}")
 
-    # Immediately queue AI analysis for chats with new buyer messages
-    if chats_needing_analysis:
-        logger.info(f"Queuing immediate AI analysis for {len(chats_needing_analysis)} chats")
-        for chat_id in chats_needing_analysis:
-            analyze_chat_with_ai.delay(chat_id)
+    # --- Inline AI analysis: analyze up to INLINE_ANALYSIS_CAP chats
+    # right inside the sync cycle so they appear in UI with intent/priority/draft.
+    # Remaining chats fall back to async Celery task.
+    from app.services.ai_analyzer import analyze_chat_for_db
 
-    # Also analyze any chats that have no AI analysis yet (e.g. first-time sync)
+    INLINE_ANALYSIS_CAP = 10
+    INLINE_ANALYSIS_TIMEOUT = 8.0  # seconds per chat
+
+    all_to_analyze = list(chats_needing_analysis)
+
+    # Also add chats without analysis (e.g. first-time sync)
     already_queued = set(chats_needing_analysis)
     result = await db.execute(
         select(Chat.id).where(
@@ -840,10 +844,30 @@ async def _sync_wb(db, seller: Seller, last_cursor: Optional[int] = None) -> Opt
         ).limit(20)
     )
     chats_without_analysis = [row[0] for row in result.all() if row[0] not in already_queued]
-    if chats_without_analysis:
-        logger.info(f"Queuing AI analysis for {len(chats_without_analysis)} chats without analysis")
-        for chat_id in chats_without_analysis:
-            analyze_chat_with_ai.delay(chat_id)
+    all_to_analyze.extend(chats_without_analysis)
+
+    if all_to_analyze:
+        inline_count = 0
+        for chat_id in all_to_analyze:
+            if inline_count < INLINE_ANALYSIS_CAP:
+                try:
+                    await asyncio.wait_for(
+                        analyze_chat_for_db(chat_id, db),
+                        timeout=INLINE_ANALYSIS_TIMEOUT,
+                    )
+                    inline_count += 1
+                    logger.info(f"Inline AI analysis done for chat {chat_id}")
+                except asyncio.TimeoutError:
+                    logger.warning(f"Inline analysis timeout for chat {chat_id}, queuing async")
+                    analyze_chat_with_ai.delay(chat_id)
+                except Exception as e:
+                    logger.warning(f"Inline analysis failed for chat {chat_id}: {e}, queuing async")
+                    analyze_chat_with_ai.delay(chat_id)
+            else:
+                analyze_chat_with_ai.delay(chat_id)
+
+        if inline_count:
+            logger.info(f"Inline analyzed {inline_count}/{len(all_to_analyze)} chats for seller {seller.id}")
 
     return final_cursor
 
