@@ -36,6 +36,51 @@
 
 ---
 
+## MVP Scope Fence (ГРАНИЦЫ — НЕ ВЫХОДИТЬ)
+
+> Всё что ниже — это чёткий периметр MVP. Если задача не попадает сюда, она идёт в POST-PILOT.
+> Claude обязан сигнализировать при попытке выйти за рамки.
+
+### IN SCOPE (делаем)
+
+| Категория | Что входит |
+|-----------|-----------|
+| **Маркетплейс** | Только Wildberries (reviews + questions + chats) |
+| **Пользователи** | 1 seller = 1 аккаунт, без команд, без ролей |
+| **Каналы** | Отзывы, вопросы, чаты WB — unified inbox |
+| **AI** | Draft-ответы (assist mode), intent classification, SLA priorities |
+| **Auto-response** | Только позитивные отзывы (4-5★), toggle в настройках |
+| **Аналитика** | Quality metrics, ops alerts, pilot readiness — readonly дашборд |
+| **UX** | Responsive web (desktop + mobile), light theme |
+| **Ops** | 1 VPS, deploy script, smoke tests, DB backup |
+| **Bug fixes** | Любые баги в существующем функционале |
+| **Performance** | Оптимизация загрузки, кэширование, пагинация |
+
+### OUT OF SCOPE (НЕ делаем — POST-PILOT)
+
+| Категория | Почему нет |
+|-----------|-----------|
+| **Ozon / Яндекс.Маркет** | Другие API, другие модели данных — отдельный спринт |
+| **Team roles / RBAC** | 1 seller = 1 user достаточно для пилота |
+| **PWA / offline / push** | Web-версия покрывает пилот |
+| **Биллинг / подписки** | Пилот бесплатный |
+| **Webhooks** | WB не поддерживает, polling работает |
+| **Analytics v2** | Графики трендов, экспорт CSV — после пилота |
+| **AI auto-reply на всё** | Только позитив; негатив/вопросы = assist mode |
+| **Фото/видео модерация** | Текст only для MVP |
+| **A/B тесты промптов** | Один промпт, улучшаем итеративно |
+| **Multi-language** | Только русский |
+
+### Правило scope creep
+
+Если задача **не в IN SCOPE** → спросить пользователя:
+```
+"Это выходит за рамки MVP: [причина]. Добавить в POST-PILOT или делаем сейчас?"
+```
+Если делаем — пометить в беклоге как `SCOPE_EXTENSION` с обоснованием.
+
+---
+
 ## P0 (Demo Blockers) — ВСЕ ЗАКРЫТЫ ✅
 
 1. **BL-P0-001: CJM smoke (registration -> connect/skip -> messages)**
