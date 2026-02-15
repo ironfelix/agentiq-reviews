@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentIQ — Центр контроля коммуникаций Wildberries</title>
+    <title>AgentIQ — Лендинг (черновик)</title>
     <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
+    <meta name="robots" content="noindex,nofollow">
     <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
-    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный аудит коммуникаций.">
+    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный анализ коммуникаций.">
     <meta property="og:type" content="website">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-weight='700' font-size='16' fill='white' letter-spacing='0.5'%3EIQ%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -621,6 +622,61 @@
             color: var(--color-success);
         }
 
+        /* ===== HOW IT WORKS ===== */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+            margin-top: 40px;
+        }
+
+        @media (min-width: 900px) {
+            .steps-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .step-card {
+            padding: 26px 24px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            border-color: var(--color-border-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: var(--color-accent-bg-strong);
+            border: 1px solid rgba(26, 115, 232, 0.16);
+            color: var(--color-accent);
+            font-weight: 900;
+            letter-spacing: 0.2px;
+            margin-bottom: 12px;
+        }
+
+        .step-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        .step-card p {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
         /* ===== FEATURES SECTION ===== */
         .features-grid {
             display: grid;
@@ -634,30 +690,93 @@
         }
 
         .feature-card {
-            padding: 28px;
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-lg);
+            padding: 26px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--radius-2xl);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
             transition: all var(--transition-medium);
             position: relative;
             overflow: hidden;
         }
 
         .feature-card:hover {
-            border-color: var(--color-border-dark);
+            border-color: rgba(0,0,0,0.16);
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 18px 48px rgba(0,0,0,0.08);
         }
 
-        .feature-number {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 56px;
+        .feature-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feature-chip {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
             font-weight: 800;
-            color: rgba(26, 115, 232, 0.04);
-            line-height: 1;
-            pointer-events: none;
+            letter-spacing: 0.2px;
+            color: rgba(26,115,232,0.95);
+            background: rgba(26,115,232,0.10);
+            border: 1px solid rgba(26,115,232,0.18);
+            white-space: nowrap;
+        }
+
+        .feature-chip i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(26,115,232,0.85);
+            display: inline-block;
+        }
+
+        .feature-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .feature-icon.queue {
+            background: rgba(26,115,232,0.10);
+            border-color: rgba(26,115,232,0.18);
+            color: rgba(26,115,232,0.95);
+        }
+
+        .feature-icon.deadline {
+            background: rgba(249,171,0,0.14);
+            border-color: rgba(249,171,0,0.22);
+            color: rgba(160,90,0,0.95);
+        }
+
+        .feature-icon.ai {
+            background: rgba(103,58,183,0.10);
+            border-color: rgba(103,58,183,0.18);
+            color: rgba(103,58,183,0.95);
+        }
+
+        .feature-icon.quality {
+            background: rgba(52,168,83,0.10);
+            border-color: rgba(52,168,83,0.18);
+            color: rgba(52,168,83,0.95);
         }
 
         .feature-card h3 {
@@ -671,6 +790,25 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             line-height: 1.6;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .feature-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+            color: rgba(0,0,0,0.62);
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         /* ===== MONEY SECTION ===== */
@@ -736,19 +874,18 @@
         @media (min-width: 768px) {
             .offer-wrapper { grid-template-columns: 1fr 1fr; }
         }
-
         .offer-card {
             padding: 32px;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.08);
             position: relative;
             overflow: hidden;
-            background: var(--color-bg-primary);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
         }
-
         .offer-card.primary {
-            border-color: var(--color-text-primary);
-            box-shadow: 0 0 0 1px var(--color-text-primary);
+            border-color: rgba(0,0,0,0.82);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.82), 0 16px 46px rgba(0,0,0,0.10);
         }
 
         .offer-card.primary::before {
@@ -760,9 +897,8 @@
             height: 3px;
             background: var(--color-text-primary);
         }
-
         .offer-card.secondary {
-            background: var(--color-bg-secondary);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
         }
 
         .offer-badge {
@@ -807,7 +943,6 @@
             gap: 10px;
             margin-bottom: var(--space-6);
         }
-
         .offer-checklist li {
             display: flex;
             align-items: flex-start;
@@ -815,6 +950,10 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.06);
         }
 
         .offer-checklist .check {
@@ -893,6 +1032,18 @@
             border-color: var(--color-accent);
         }
 
+        .offer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            font-size: 13px;
+            font-weight: 650;
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+        .offer-link:hover { text-decoration: underline; }
+
         /* ===== AUDIENCE SECTION ===== */
         .audience-grid {
             display: grid;
@@ -933,32 +1084,116 @@
             line-height: 1.5;
         }
 
-        /* ===== SOCIAL PROOF — SLIDER ===== */
+        /* ===== PRODUCT — “INSIDE” GALLERY (SaaS snap carousel) ===== */
         .proof-slider {
-            margin-top: 32px;
+            margin-top: 26px;
             position: relative;
-            overflow: hidden;
+            width: 100vw;
+            /* Break out of the container for the “big screens” SaaS feel */
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
         }
 
-        .proof-slide {
-            display: none;
-            gap: 20px;
-            align-items: center;
+        .proof-gallery {
+            --snap-max: 1040px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding: 6px max(16px, calc((100vw - var(--snap-max)) / 2)) 18px;
+            scroll-snap-type: x mandatory;
+            scroll-padding-inline: max(16px, calc((100vw - var(--snap-max)) / 2));
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x pan-y;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .proof-gallery::-webkit-scrollbar { display: none; }
 
-        .proof-slide.active {
+        .proof-card {
+            flex: 0 0 auto;
+            width: min(96vw, var(--snap-max));
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
             display: flex;
             flex-direction: column;
+            gap: 14px;
+        }
+        @media (max-width: 640px) {
+            .proof-card { width: 92vw; }
         }
 
-        @media (min-width: 768px) {
-            .proof-slide.active {
-                flex-direction: row;
-            }
+        /* Edge fades to hint “scroll me” without looking like a broken block */
+        .proof-slider::before,
+        .proof-slider::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(22px, 6vw, 96px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .proof-slider::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+        .proof-slider::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+
+        .proof-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .proof-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border-medium);
+            background: rgba(255,255,255,0.9);
+            color: var(--color-text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .proof-arrow:hover {
+            border-color: var(--color-border-dark);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        .proof-arrow:active { transform: scale(0.98); }
+
+        .proof-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        .proof-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.15);
+            transition: all var(--transition-fast);
+        }
+        .proof-dot.active {
+            width: 22px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.75);
+        }
+        @media (max-width: 640px) {
+            .proof-arrow { display: none; }
         }
 
         .proof-slide-img {
-            flex: 1 1 0;
             min-width: 0;
         }
 
@@ -968,23 +1203,313 @@
             display: block;
         }
 
-        @media (min-width: 768px) {
-            .proof-slide-img img {
-                transform: scale(1.08);
-                transform-origin: center center;
-            }
+        /* “Screenshots” as HTML mockups (no iframe) */
+        .proof-mock {
+            width: 100%;
+            height: min(72vh, 560px);
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.10);
+            background: radial-gradient(1200px 600px at 20% 10%, rgba(26,115,232,0.10), transparent 55%),
+                        linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.10);
+        }
+
+        .proof-mock::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(700px 400px at 85% 85%, rgba(26,115,232,0.08), transparent 60%);
+            pointer-events: none;
+        }
+
+        .proof-mock-top {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(250, 251, 252, 0.95);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .mock-dots { display: flex; gap: 6px; }
+        .mock-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.12); }
+        .mock-dot.red { background: rgba(234,67,53,0.55); }
+        .mock-dot.yellow { background: rgba(249,171,0,0.60); }
+        .mock-dot.green { background: rgba(52,168,83,0.55); }
+
+        .mock-url {
+            flex: 1;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            color: rgba(0,0,0,0.60);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mock-chip {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(26,115,232,0.95);
+            background: rgba(26,115,232,0.10);
+            border: 1px solid rgba(26,115,232,0.18);
+        }
+        .mock-chip i {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(26,115,232,0.85);
+            display: inline-block;
+        }
+
+        .proof-mock-body {
+            height: calc(100% - 44px);
+            position: relative;
+            z-index: 1;
+            padding: 12px;
+        }
+
+        .mock-app {
+            height: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            overflow: hidden;
+            display: grid;
+        }
+
+        /* Messages mock */
+        .mock-app.messages { grid-template-columns: 240px 1fr; }
+        .mock-side {
+            border-right: 1px solid rgba(0,0,0,0.08);
+            background: linear-gradient(180deg, #ffffff, #fbfcfe);
+        }
+        .mock-side-head {
+            padding: 12px 12px 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-side-title { font-size: 13px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 8px; }
+        .mock-search {
+            height: 28px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .mock-list { padding: 10px 10px 12px; display: grid; gap: 8px; }
+        .mock-item {
+            padding: 10px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+            background: #fff;
+            display: grid;
+            gap: 6px;
+        }
+        .mock-item.hot { border-color: rgba(234,67,53,0.20); background: rgba(234,67,53,0.05); }
+        .mock-item-head { display: flex; align-items: center; gap: 8px; }
+        .mock-avatar { width: 18px; height: 18px; border-radius: 5px; background: rgba(26,115,232,0.20); border: 1px solid rgba(26,115,232,0.25); }
+        .mock-name { font-size: 12px; font-weight: 800; color: rgba(0,0,0,0.80); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mock-sla {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.10);
+            color: rgba(0,0,0,0.70);
+            background: rgba(0,0,0,0.04);
+            white-space: nowrap;
+        }
+        .mock-sla.overdue { background: rgba(234,67,53,0.12); border-color: rgba(234,67,53,0.20); color: rgba(234,67,53,0.95); }
+        .mock-sla.soon { background: rgba(249,171,0,0.14); border-color: rgba(249,171,0,0.22); color: rgba(160,90,0,0.95); }
+        .mock-preview { font-size: 12px; color: rgba(0,0,0,0.55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .mock-chat {
+            background: linear-gradient(180deg, rgba(26,115,232,0.06), rgba(26,115,232,0.02));
+            display: grid;
+            grid-template-rows: 48px 1fr 54px;
+        }
+        .mock-chat-head {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.96);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .mock-chat-head b { font-size: 12px; font-weight: 900; letter-spacing: -0.2px; }
+        .mock-chat-head span { font-size: 11px; color: rgba(0,0,0,0.55); font-weight: 700; }
+        .mock-msgs { padding: 12px; display: grid; gap: 10px; }
+        .mock-bubble {
+            max-width: 72%;
+            padding: 9px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.92);
+            font-size: 12px;
+            line-height: 1.35;
+            color: rgba(0,0,0,0.75);
+        }
+        .mock-bubble.me {
+            margin-left: auto;
+            background: rgba(26,115,232,0.12);
+            border-color: rgba(26,115,232,0.18);
+        }
+        .mock-ai {
+            padding: 10px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-ai-label {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.50);
+            margin-bottom: 6px;
+        }
+        .mock-ai-text { font-size: 12px; color: rgba(0,0,0,0.70); line-height: 1.35; }
+        .mock-chat-compose {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.96);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mock-input {
+            flex: 1;
+            height: 34px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+        }
+        .mock-send {
+            height: 34px;
+            width: 88px;
+            border-radius: 12px;
+            background: rgba(26,115,232,0.95);
+            border: 1px solid rgba(26,115,232,0.40);
+        }
+
+        /* Analytics mock */
+        .mock-app.analytics { grid-template-rows: 64px 1fr; }
+        .mock-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            background: linear-gradient(180deg, #ffffff, #fbfcfe);
+        }
+        .mock-topbar h4 { font-size: 13px; font-weight: 900; letter-spacing: -0.2px; }
+        .mock-topbar p { font-size: 11px; font-weight: 650; color: rgba(0,0,0,0.55); }
+        .mock-mode {
+            display: inline-flex;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(0,0,0,0.03);
+        }
+        .mock-mode span {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(0,0,0,0.55);
+        }
+        .mock-mode span.active {
+            background: #fff;
+            color: rgba(0,0,0,0.82);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-analytics-body {
+            padding: 14px 16px;
+            display: grid;
+            gap: 12px;
+            background: radial-gradient(1000px 400px at 10% 0%, rgba(26,115,232,0.08), transparent 60%);
+        }
+        .mock-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .mock-card {
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.92);
+            border-radius: 14px;
+            padding: 12px 12px;
+        }
+        .mock-card .k { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900; color: rgba(0,0,0,0.45); margin-bottom: 6px; }
+        .mock-card .v { font-size: 18px; font-weight: 950; letter-spacing: -0.5px; color: rgba(0,0,0,0.84); }
+        .mock-card .s { margin-top: 4px; font-size: 11px; font-weight: 700; color: rgba(0,0,0,0.55); }
+
+        .mock-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 10px;
+        }
+        .mock-bars { display: grid; gap: 8px; margin-top: 10px; }
+        .mock-bar {
+            display: grid;
+            grid-template-columns: 90px 1fr 40px;
+            gap: 8px;
+            align-items: center;
+        }
+        .mock-bar label { font-size: 11px; font-weight: 800; color: rgba(0,0,0,0.62); }
+        .mock-track { height: 8px; border-radius: 999px; background: rgba(0,0,0,0.06); overflow: hidden; }
+        .mock-fill { height: 100%; border-radius: 999px; background: rgba(26,115,232,0.70); }
+        .mock-fill.good { background: rgba(52,168,83,0.70); }
+        .mock-fill.risky { background: rgba(249,171,0,0.75); }
+        .mock-fill.harm { background: rgba(234,67,53,0.75); }
+        .mock-bar b { font-size: 11px; font-weight: 900; color: rgba(0,0,0,0.70); text-align: right; }
+
+        .mock-callout {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(26,115,232,0.18);
+            background: rgba(26,115,232,0.08);
+            color: rgba(0,0,0,0.70);
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .mock-callout i { width: 8px; height: 8px; border-radius: 50%; background: rgba(26,115,232,0.85); display: inline-block; }
+
+        /* Responsive tweaks for mockups */
+        @media (max-width: 420px) {
+            .proof-mock { aspect-ratio: 4 / 3; }
+            .mock-app.messages { grid-template-columns: 1fr; }
+            .mock-side { display: none; }
+            .mock-kpis { grid-template-columns: 1fr; }
+            .mock-split { grid-template-columns: 1fr; }
+            .mock-topbar { flex-direction: column; align-items: flex-start; }
+            .mock-url { justify-content: flex-start; }
         }
 
         .proof-slide-text {
-            flex: 0 0 220px;
-            padding: 8px 0;
-        }
-
-        @media (max-width: 767px) {
-            .proof-slide-text {
-                flex: none;
-                text-align: center;
-            }
+            padding: 2px 4px 0;
         }
 
         .proof-slide-num {
@@ -1010,51 +1535,17 @@
             line-height: 1.6;
         }
 
-        .proof-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 20px;
+        .proof-swipe-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            font-weight: 650;
+            letter-spacing: 0.1px;
+            display: none;
+            text-align: center;
         }
-
-        .proof-nav-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid var(--color-border-medium);
-            background: var(--color-bg-primary);
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--transition-fast);
-        }
-
-        .proof-nav-btn:hover {
-            border-color: var(--color-text-tertiary);
-            color: var(--color-text-primary);
-        }
-
-        .proof-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .proof-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--color-border-medium);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .proof-dot.active {
-            background: var(--color-text-primary);
-            width: 20px;
-            border-radius: 4px;
+        @media (max-width: 900px) {
+            .proof-swipe-hint { display: block; }
         }
 
         /* ===== FINAL CTA ===== */
@@ -1384,7 +1875,7 @@
 
         /* All mobile (≤640px) */
         @media (max-width: 640px) {
-            body.has-mobile-cta {
+            body {
                 padding-bottom: 86px; /* space for the fixed mobile CTA bar */
             }
 
@@ -1465,17 +1956,24 @@
             .comparison-card h3 {
                 font-size: 16px;
             }
-
             /* Feature cards */
             .feature-card {
                 padding: 22px;
             }
 
-            .feature-number {
-                font-size: 44px;
-                top: 14px;
-                right: 14px;
+            .feature-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 12px;
             }
+
+            /* Steps */
+            .step-card { padding: 22px; }
+            .step-num { width: 32px; height: 32px; border-radius: 12px; }
+
+            /* Product preview */
+            .proof-card { flex-basis: auto; }
+            .proof-slide-text h3 { font-size: 17px; }
 
             /* Money cards */
             .money-card {
@@ -1686,17 +2184,17 @@
                     <span class="hero-badge-dot"></span>
                     Для продавцов Wildberries
                 </div>
-                <h1>Центр контроля коммуникаций <span class="highlight">Wildberries</span></h1>
+                <h1>Все коммуникации <span class="highlight">Wildberries</span> в одном окне</h1>
                 <p class="hero-subtitle">
-                    Собираем чаты, вопросы и&nbsp;отзывы по&nbsp;вашим товарам в&nbsp;одном рабочем пространстве и&nbsp;показываем, где есть точки риска и&nbsp;низкая отдача.
+                    Очередь, приоритеты, SLA и качество ответов. Чтобы не терять деньги на коммуникациях.
                 </p>
                 <div class="hero-cta-group">
                     <a href="#" class="btn-primary" onclick="openModal(event)">
                         Получить анализ
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
-                    <a href="/audit.html" class="btn-secondary">
-                        Посмотреть пример анализа
+                    <a href="#proof" class="btn-secondary">
+                        Посмотреть интерфейс
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                 </div>
@@ -1803,6 +2301,307 @@
     </div>
 </section>
 
+<!-- ===== PRODUCT PREVIEW ===== -->
+<section class="section" id="proof">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Продукт</span>
+            <h2 class="section-title">Внутри сервиса</h2>
+            <p class="section-subtitle">Как выглядит контроль коммуникаций на&nbsp;практике.</p>
+        </div>
+	        <div class="proof-slider reveal">
+	            <div class="proof-gallery" aria-label="Превью интерфейса AgentIQ">
+	                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Единое окно: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app</div>
+                            <span class="mock-chip"><i></i>Wildberries</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app messages">
+                                <div class="mock-side">
+                                    <div class="mock-side-head">
+                                        <div class="mock-side-title">Коммуникации</div>
+                                        <div class="mock-search" aria-hidden="true"></div>
+                                    </div>
+                                    <div class="mock-list">
+                                        <div class="mock-item hot">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Отзыв: возврат</div>
+                                                <span class="mock-sla overdue">overdue</span>
+                                            </div>
+                                            <div class="mock-preview">Покупатель: "Вы обманули..."</div>
+                                        </div>
+                                        <div class="mock-item">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Вопрос: размер</div>
+                                                <span class="mock-sla soon">due soon</span>
+                                            </div>
+                                            <div class="mock-preview">"Подойдет ли на рост 180?"</div>
+                                        </div>
+                                        <div class="mock-item">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Чат: доставка</div>
+                                                <span class="mock-sla">ok</span>
+                                            </div>
+                                            <div class="mock-preview">"Когда привезете?"</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mock-chat">
+                                    <div class="mock-chat-head">
+                                        <div>
+                                            <b>Отзыв: возврат</b><br>
+                                            <span>негатив, публично</span>
+                                        </div>
+                                        <span class="mock-callout"><i></i>SLA и приоритет</span>
+                                    </div>
+                                    <div class="mock-msgs">
+                                        <div class="mock-bubble">Товар пришел с браком. Ужасный сервис.</div>
+                                        <div class="mock-ai">
+                                            <div class="mock-ai-label">AI draft</div>
+                                            <div class="mock-ai-text">Понимаю ваше раздражение. Давайте решим: оформим замену или возврат, подскажите номер заказа.</div>
+                                        </div>
+                                        <div class="mock-bubble me">Извините за ситуацию. Подскажите номер заказа, и мы решим вопрос.</div>
+                                    </div>
+                                    <div class="mock-chat-compose">
+                                        <div class="mock-input" aria-hidden="true"></div>
+                                        <div class="mock-send" aria-hidden="true"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">01</span>
+                        <h3>Единое окно</h3>
+                        <p>Вся коммуникация по товарам в одной очереди. Команда не теряет контекст.</p>
+                    </div>
+                </div>
+
+                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Качество ответов: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app/analytics</div>
+                            <span class="mock-chip"><i></i>Операционный</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app analytics">
+                                <div class="mock-topbar">
+                                    <div>
+                                        <h4>Качество и скорость</h4>
+                                        <p>Где ответы вредят: шаблоны, обвинения, игнор</p>
+                                    </div>
+                                    <div class="mock-mode" aria-hidden="true">
+                                        <span class="active">ops</span>
+                                        <span>full</span>
+                                    </div>
+                                </div>
+                                <div class="mock-analytics-body">
+                                    <div class="mock-kpis">
+                                        <div class="mock-card">
+                                            <div class="k">SLA</div>
+                                            <div class="v">7%</div>
+                                            <div class="s">просрочек</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Качество</div>
+                                            <div class="v">−</div>
+                                            <div class="s">4% вредных</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Потери</div>
+                                            <div class="v">₽</div>
+                                            <div class="s">оценка влияния</div>
+                                        </div>
+                                    </div>
+                                    <div class="mock-split">
+                                        <div class="mock-card">
+                                            <div class="k">Качество ответов</div>
+                                            <div class="mock-bars">
+                                                <div class="mock-bar">
+                                                    <label>Хорошие</label>
+                                                    <div class="mock-track"><div class="mock-fill good" style="width: 62%"></div></div>
+                                                    <b>62%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Допуст.</label>
+                                                    <div class="mock-track"><div class="mock-fill" style="width: 24%"></div></div>
+                                                    <b>24%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Риск</label>
+                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 10%"></div></div>
+                                                    <b>10%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Вред</label>
+                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 4%"></div></div>
+                                                    <b>4%</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Почему падает рейтинг</div>
+                                            <div class="v" style="font-size: 14px; margin-top: 6px;">“Отписки” + “обвинения”</div>
+                                            <div class="s" style="margin-top: 8px;">Команда видит причины, а не просто цифру.</div>
+                                            <div style="margin-top: 10px;">
+                                                <span class="mock-callout"><i></i>Контроль качества</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">02</span>
+                        <h3>Качество ответов</h3>
+                        <p>Понятно, где ответы вредят: шаблоны, обвинения, игнор. Можно обучать команду на реальных кейсах.</p>
+                    </div>
+                </div>
+
+                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Потери и приоритеты: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app</div>
+                            <span class="mock-chip"><i></i>Приоритеты</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app analytics">
+                                <div class="mock-topbar">
+                                    <div>
+                                        <h4>Что чинить в первую очередь</h4>
+                                        <p>Срочные кейсы, backlog, ответственность</p>
+                                    </div>
+                                    <span class="mock-callout"><i></i>due soon / overdue</span>
+                                </div>
+                                <div class="mock-analytics-body">
+                                    <div class="mock-split" style="grid-template-columns: 1fr 1fr;">
+                                        <div class="mock-card">
+                                            <div class="k">Сейчас горит</div>
+                                            <div class="mock-bars">
+                                                <div class="mock-bar">
+                                                    <label>Негатив</label>
+                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 36%"></div></div>
+                                                    <b>36%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Вопросы</label>
+                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 22%"></div></div>
+                                                    <b>22%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Чаты</label>
+                                                    <div class="mock-track"><div class="mock-fill" style="width: 18%"></div></div>
+                                                    <b>18%</b>
+                                                </div>
+                                            </div>
+                                            <div class="s" style="margin-top: 10px;">Видно, что просрочено и кто отвечает.</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Backlog</div>
+                                            <div class="v" style="font-size: 14px; margin-top: 6px;">Единая очередь вместо “прыжков” по кабинетам</div>
+                                            <div class="s" style="margin-top: 8px;">Команда не теряет контекст между разделами.</div>
+                                            <div style="margin-top: 10px;">
+                                                <span class="mock-callout"><i></i>единая картина</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mock-kpis" style="grid-template-columns: 1fr 1fr 1fr;">
+                                        <div class="mock-card">
+                                            <div class="k">Окно</div>
+                                            <div class="v" style="font-size: 16px;">короткое</div>
+                                            <div class="s">момент решения</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Алерты</div>
+                                            <div class="v" style="font-size: 16px;">есть</div>
+                                            <div class="s">overdue / soon</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Ответст.</div>
+                                            <div class="v" style="font-size: 16px;">понятно</div>
+                                            <div class="s">кто держит SLA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">03</span>
+                        <h3>Приоритеты и SLA</h3>
+                        <p>Видно, что просрочено и что “горит” сейчас. Очередь управляется, а не живёт сама по себе.</p>
+                    </div>
+	                </div>
+	            </div>
+	            <div class="proof-controls" aria-label="Навигация по превью">
+	                <button class="proof-arrow" type="button" data-proof-arrow="-1" aria-label="Предыдущий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	                <div class="proof-dots" id="proofDots" aria-hidden="true"></div>
+	                <button class="proof-arrow" type="button" data-proof-arrow="1" aria-label="Следующий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	            </div>
+	            <div class="proof-swipe-hint">Листайте превью влево-вправо.</div>
+	        </div>
+	    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="how">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Процесс</span>
+            <h2 class="section-title">Как это выглядит в работе</h2>
+            <p class="section-subtitle">Без “прыжков” по разделам и без ручного контроля каждого ответа.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card reveal reveal-delay-1">
+                <div class="step-num">01</div>
+                <h3>Подключаете кабинет</h3>
+                <p>Собираем чаты, вопросы и отзывы по вашим товарам в один поток.</p>
+            </div>
+            <div class="step-card reveal reveal-delay-2">
+                <div class="step-num">02</div>
+                <h3>Работаете из одного окна</h3>
+                <p>Очередь, контекст и история общения видны сразу. Процесс “оператор → менеджер” становится управляемым.</p>
+            </div>
+            <div class="step-card reveal reveal-delay-3">
+                <div class="step-num">03</div>
+                <h3>Контроль SLA и качества</h3>
+                <p>Приоритеты, due soon/overdue и понятные причины проблем. ИИ предлагает черновики, команда отвечает быстрее и аккуратнее.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ===== FEATURES ===== -->
 <section class="section" id="features">
     <div class="container">
@@ -1813,24 +2612,76 @@
         </div>
         <div class="features-grid">
             <div class="feature-card reveal reveal-delay-1">
-                <span class="feature-number">01</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Единое окно</span>
+                    <span class="feature-icon queue" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M4 4h10M4 8h10M4 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M2 4h0.01M2 8h0.01M2 12h0.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Единая очередь обращений</h3>
                 <p>Все чаты, вопросы и&nbsp;отзывы&nbsp;WB в&nbsp;одном интерфейсе. Быстро находите нужное и не теряете контекст.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">Чаты</span>
+                    <span class="feature-tag">Вопросы</span>
+                    <span class="feature-tag">Отзывы</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-2">
-                <span class="feature-number">02</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>SLA и приоритет</span>
+                    <span class="feature-icon deadline" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Приоритет и дедлайн ответа</h3>
                 <p>Срочные кейсы всегда наверху. Видно, что просрочено и что “горит” в ближайшее время.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">due soon</span>
+                    <span class="feature-tag">overdue</span>
+                    <span class="feature-tag">алерты</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-3">
-                <span class="feature-number">03</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>AI draft</span>
+                    <span class="feature-icon ai" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M3.5 12.5V4.8c0-.7.6-1.3 1.3-1.3h6.4c.7 0 1.3.6 1.3 1.3v6.4c0 .7-.6 1.3-1.3 1.3H6.7L4.8 13.9c-.6.4-1.3 0-1.3-.7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6 6.7h4M6 9.2h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Черновик ответа от ИИ</h3>
                 <p>ИИ предлагает текст под ситуацию: можно принять как есть или быстро отредактировать и отправить.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">тон общения</span>
+                    <span class="feature-tag">контекст</span>
+                    <span class="feature-tag">скорость</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-4">
-                <span class="feature-number">04</span>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Контроль качества</span>
+                    <span class="feature-icon quality" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 14s5-2 5-6V4.4L8 2 3 4.4V8c0 4 5 6 5 6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6.2 8.1l1.1 1.1 2.6-2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
                 <h3>Контроль качества и проблемных точек</h3>
                 <p>Видно, где ответы чаще редактируются вручную, где растёт негатив и какие товары требуют внимания.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">причины негатива</span>
+                    <span class="feature-tag">товары риска</span>
+                    <span class="feature-tag">обучение</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1889,6 +2740,7 @@
                     Получить анализ
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
+                <a class="offer-link" href="/audit.html">Посмотреть пример анализа &rarr;</a>
             </div>
             <div class="offer-card secondary reveal reveal-delay-2">
                 <span class="offer-badge">После аудита</span>
@@ -1904,9 +2756,7 @@
                     <span class="amount">от 4 990 ₽</span>
                     <span class="period">/мес</span>
                 </div>
-                <a href="#" class="btn-offer secondary" onclick="openModal(event)">
-                    Узнать подробнее
-                </a>
+                <a href="#" class="btn-offer secondary" onclick="openModal(event)">Запросить пилот</a>
             </div>
         </div>
     </div>
@@ -1934,71 +2784,14 @@
             </div>
         </div>
     </div>
-</section>
-
-<!-- ===== SOCIAL PROOF ===== -->
-<section class="section" id="proof">
-    <div class="container">
-        <div class="reveal">
-            <span class="section-label">Продукт</span>
-            <h2 class="section-title">Внутри сервиса</h2>
-            <p class="section-subtitle">Как выглядит контроль коммуникаций на&nbsp;практике.</p>
-        </div>
-        <div class="proof-slider reveal" id="proofSlider">
-            <div class="proof-slide active" data-slide="0">
-                <div class="proof-slide-img">
-                    <img src="screenshots/chat-center.png" alt="Центр коммуникаций">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">01 / 03</span>
-                    <h3>Единое окно</h3>
-                    <p>Чаты, вопросы, отзывы — один поток. ИИ подсказывает ответ.</p>
-                </div>
-            </div>
-            <div class="proof-slide" data-slide="1">
-                <div class="proof-slide-img">
-                    <img src="screenshots/quality-score.png" alt="Оценка качества ответов">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">02 / 03</span>
-                    <h3>Оценка качества</h3>
-                    <p>Что вредит продажам и сколько это стоит в деньгах.</p>
-                </div>
-            </div>
-            <div class="proof-slide" data-slide="2">
-                <div class="proof-slide-img">
-                    <img src="screenshots/review-analysis.png" alt="Разбор проблемного ответа">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">03 / 03</span>
-                    <h3>Разбор ответа</h3>
-                    <p>Что не так и готовый текст — как стоило ответить.</p>
-                </div>
-            </div>
-            <div class="proof-nav">
-                <button class="proof-nav-btn" onclick="changeSlide(-1)">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="proof-dots">
-                    <div class="proof-dot active" onclick="goToSlide(0)"></div>
-                    <div class="proof-dot" onclick="goToSlide(1)"></div>
-                    <div class="proof-dot" onclick="goToSlide(2)"></div>
-                </div>
-                <button class="proof-nav-btn" onclick="changeSlide(1)">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-</section>
-
+    </section>
 <!-- ===== FINAL CTA ===== -->
 <section class="final-cta">
     <div class="container">
         <div class="final-cta-inner reveal">
             <div class="final-cta-text">
-                <h2>Разберём ваши коммуникации и&nbsp;покажем, что исправить</h2>
-                <p class="section-subtitle">Аудит занимает 1–2 дня. Вы получите отчёт с&nbsp;конкретными рекомендациями.</p>
+                <h2>Проанализируем ваши коммуникации и&nbsp;покажем, что исправить</h2>
+                <p class="section-subtitle">Первые выводы за 1–2 дня: просрочки, качество ответов и понятные приоритеты.</p>
             </div>
             <div class="final-cta-buttons">
                 <a href="#" class="btn-primary" onclick="openModal(event)">
@@ -2082,7 +2875,6 @@
         const shouldShow = isMobile && !modalOpen && window.scrollY > 420;
         mobileCtaBar.classList.toggle('show', shouldShow);
         mobileCtaBar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-        document.body.classList.toggle('has-mobile-cta', shouldShow);
     }
 
     window.addEventListener('scroll', () => {
@@ -2155,33 +2947,71 @@
         console.log('Form submitted:', formData);
     }
 
-    // ===== PROOF SLIDER =====
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.proof-slide');
-    const dots = document.querySelectorAll('.proof-dot');
+    // “Внутри сервиса” is pure HTML mockups with native horizontal scroll on mobile (scroll-snap).
+    (function initProofSnapCarousel() {
+        const track = document.querySelector('#proof .proof-gallery');
+        const dots = document.getElementById('proofDots');
+        if (!track || !dots) return;
 
-    function goToSlide(n) {
-        slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
-        currentSlide = (n + slides.length) % slides.length;
-        slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
-    }
+        const cards = Array.from(track.querySelectorAll('.proof-card'));
+        if (!cards.length) return;
 
-    function changeSlide(dir) {
-        goToSlide(currentSlide + dir);
-    }
+        dots.innerHTML = '';
+        const dotEls = cards.map((_, i) => {
+            const d = document.createElement('span');
+            d.className = 'proof-dot' + (i === 0 ? ' active' : '');
+            dots.appendChild(d);
+            return d;
+        });
 
-    // Swipe support
-    let touchStartX = 0;
-    const slider = document.getElementById('proofSlider');
-    if (slider) {
-        slider.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-        slider.addEventListener('touchend', e => {
-            const diff = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+        function scrollByCard(dir) {
+            const card = cards[0];
+            const cardW = card ? card.getBoundingClientRect().width : 0;
+            // Match the CSS gap (18px) so each click lands close to the next snap point.
+            track.scrollBy({ left: dir * (cardW + 18), behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('[data-proof-arrow]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dir = parseInt(btn.getAttribute('data-proof-arrow'), 10) || 0;
+                scrollByCard(dir);
+            });
+        });
+
+        // Active dot: based on which card is closest to the center of the viewport.
+        let raf = 0;
+        function updateActiveDot() {
+            raf = 0;
+            const trackRect = track.getBoundingClientRect();
+            const centerX = trackRect.left + trackRect.width / 2;
+
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            cards.forEach((card, idx) => {
+                const r = card.getBoundingClientRect();
+                const c = r.left + r.width / 2;
+                const dist = Math.abs(c - centerX);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIdx = idx;
+                }
+            });
+
+            dotEls.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        }
+
+        track.addEventListener('scroll', () => {
+            if (raf) return;
+            raf = requestAnimationFrame(updateActiveDot);
         }, { passive: true });
-    }
+
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(updateActiveDot);
+        });
+
+        updateActiveDot();
+    })();
 
     // ===== SMOOTH SCROLL =====
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

@@ -45,12 +45,18 @@ fi
 # Запуск в фоне
 echo -e "\n${YELLOW}🔧 Starting FastAPI server...${NC}"
 source venv/bin/activate
-uvicorn backend.main:app --reload --port 8000 > logs/fastapi.log 2>&1 &
+PY="./venv/bin/python"
+if [ ! -x "$PY" ]; then
+    echo -e "${RED}❌ Python not found at $PY${NC}"
+    exit 1
+fi
+
+"$PY" -m uvicorn backend.main:app --reload --port 8000 > logs/fastapi.log 2>&1 &
 FASTAPI_PID=$!
 echo -e "${GREEN}✅ FastAPI started (PID: $FASTAPI_PID)${NC}"
 
 echo -e "\n${YELLOW}⚙️  Starting Celery worker...${NC}"
-celery -A backend.tasks.celery_app worker --loglevel=info > logs/celery.log 2>&1 &
+"$PY" -m celery -A backend.tasks.celery_app worker --loglevel=info > logs/celery.log 2>&1 &
 CELERY_PID=$!
 echo -e "${GREEN}✅ Celery worker started (PID: $CELERY_PID)${NC}"
 

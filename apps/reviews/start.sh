@@ -16,8 +16,20 @@ if [ ! -d "venv" ]; then
     exit 1
 fi
 
-# Activate venv
+# Activate venv (for env vars / python path), but don't rely on its console
+# script entrypoints: venvs are not relocatable, and their shebangs can break
+# after moving the project directory. We'll run via `python -m ...`.
 source venv/bin/activate
+
+PY="./venv/bin/python"
+if [ ! -x "$PY" ]; then
+    echo "❌ Python not found at $PY"
+    echo "Recreate venv: python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+    exit 1
+fi
+
+UVICORN_CMD=("$PY" -m uvicorn)
+CELERY_CMD=("$PY" -m celery)
 
 # Check if .env exists
 if [ ! -f ".env" ]; then
@@ -50,22 +62,22 @@ case $choice in
         echo "🌐 Starting FastAPI server..."
         echo "Open: http://localhost:8000"
         echo ""
-        uvicorn backend.main:app --reload --port 8000
+        "${UVICORN_CMD[@]}" backend.main:app --reload --port 8000
         ;;
     2)
         echo ""
         echo "⚙️  Starting Celery worker..."
         echo ""
-        celery -A backend.tasks.celery_app worker --loglevel=info
+        "${CELERY_CMD[@]}" -A backend.tasks.celery_app worker --loglevel=info
         ;;
     3)
         echo ""
         echo "🌐 Starting FastAPI server in background..."
-        uvicorn backend.main:app --port 8000 > logs/fastapi.log 2>&1 &
+        "${UVICORN_CMD[@]}" backend.main:app --port 8000 > logs/fastapi.log 2>&1 &
         echo "FastAPI PID: $!"
 
         echo "⚙️  Starting Celery worker in background..."
-        celery -A backend.tasks.celery_app worker --loglevel=info > logs/celery.log 2>&1 &
+        "${CELERY_CMD[@]}" -A backend.tasks.celery_app worker --loglevel=info > logs/celery.log 2>&1 &
         echo "Celery PID: $!"
 
         echo ""

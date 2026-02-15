@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Сценарии коммуникаций — Реалистичные возможности на маркетплейсах</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1018 0%, #1a2332 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e8a838 0%, #f4c95d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #8b95a5;
+            margin-bottom: 40px;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: #141e2b;
+            border: 1px solid #243447;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(232, 168, 56, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e8a838;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #8b95a5;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: #141e2b;
+            border: 1px solid #243447;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e8a838;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3 {
+            color: #f4c95d;
+            font-size: 1.3rem;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: #7db8e8;
+            font-size: 1.1rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .scenario {
+            background: #0f1720;
+            border-left: 4px solid #e8a838;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .scenario-title {
+            font-size: 1.2rem;
+            color: #e8a838;
+            font-weight: 600;
+        }
+
+        .scenario-roi {
+            background: #4ecb71;
+            color: #0a1018;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .scenario-roi.medium {
+            background: #7db8e8;
+        }
+
+        .scenario-roi.high {
+            background: #4ecb71;
+        }
+
+        .scenario-roi.critical {
+            background: #e85454;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .flow-step::before {
+            content: "→";
+            color: #e8a838;
+            font-size: 1.5rem;
+            margin-right: 12px;
+        }
+
+        .flow-step.success::before {
+            content: "✓";
+            color: #4ecb71;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #243447;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-label {
+            color: #8b95a5;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            color: #e8a838;
+            font-weight: 600;
+        }
+
+        .classifier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .classifier-tag {
+            background: #243447;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
+            border: 1px solid #2d4257;
+        }
+
+        .classifier-tag.intent {
+            border-left: 3px solid #7db8e8;
+        }
+
+        .classifier-tag.emotion {
+            border-left: 3px solid #e8a838;
+        }
+
+        .classifier-tag.priority {
+            border-left: 3px solid #e85454;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #243447;
+        }
+
+        th {
+            background: #0f1720;
+            color: #e8a838;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #0f1720;
+        }
+
+        .lifecycle-stage {
+            background: linear-gradient(135deg, #243447 0%, #2d4257 100%);
+            padding: 24px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .lifecycle-stage.acquisition {
+            border-left-color: #7db8e8;
+        }
+
+        .lifecycle-stage.activation {
+            border-left-color: #4ecb71;
+        }
+
+        .lifecycle-stage.retention {
+            border-left-color: #e8a838;
+        }
+
+        .lifecycle-stage.revenue {
+            border-left-color: #f4c95d;
+        }
+
+        .lifecycle-stage.referral {
+            border-left-color: #e85454;
+        }
+
+        .code-block {
+            background: #0a0f16;
+            border: 1px solid #243447;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .expert-insight {
+            background: linear-gradient(135deg, rgba(125, 184, 232, 0.1) 0%, rgba(78, 203, 113, 0.1) 100%);
+            border: 1px solid #7db8e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .expert-insight::before {
+            content: "💡 Expert Insight";
+            display: block;
+            color: #7db8e8;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .warning {
+            background: rgba(232, 84, 84, 0.1);
+            border-left: 4px solid #e85454;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+
+        .mermaid {
+            background: #0f1720;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .scenario-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Сценарии коммуникаций: Реалистичные возможности на маркетплейсах</h1>
+        <p class="subtitle">AI-ассистент для идеальной реакции на обращения клиентов. Фокус: Product Quality + Response Excellence, не lifecycle marketing</p>
+
+        <!-- API Limitations Warning -->
+        <div class="section">
+            <h2>⚠️ Ограничения API маркетплейсов</h2>
+            <div class="warning">
+                <strong>Реальность WB/Ozon/Яндекс.Маркет:</strong> API маркетплейсов НЕ даёт критичные данные для классического lifecycle маркетинга.
+            </div>
+
+            <table>
+                <tr>
+                    <th>Что НЕТ</th>
+                    <th>Последствия</th>
+                </tr>
+                <tr>
+                    <td>❌ История покупок клиента</td>
+                    <td>RFM сегментация невозможна. Не знаем: первая покупка или повторная, VIP или нет</td>
+                </tr>
+                <tr>
+                    <td>❌ Email/телефон клиента</td>
+                    <td>Email кампании невозможны. Win-back, upsell только через чат WB</td>
+                </tr>
+                <tr>
+                    <td>❌ Связь chat → order (WB)</td>
+                    <td>Не знаем автоматически кто заказал. Workaround: запрашивать номер заказа у клиента</td>
+                </tr>
+                <tr>
+                    <td>❌ Инициатива коммуникации</td>
+                    <td>Нельзя писать первым БЕЗ отзыва (но при платной опции WB можно писать при ЛЮБОМ отзыве, включая 5★)</td>
+                </tr>
+            </table>
+
+            <h3>✅ Что МОЖЕМ</h3>
+            <div class="flow-step success">Product-level analytics: все отзывы/вопросы на товар → топ проблем</div>
+            <div class="flow-step success">Message classification: intent + emotion + priority → умная приоритизация</div>
+            <div class="flow-step success">Reactive excellence: идеальный ответ <1h → +20% конверсия (офиц. данные WB)</div>
+            <div class="flow-step success">Fuzzy linking: clientID в чате → связка с отзывами того же клиента (вероятностная)</div>
+        </div>
+
+        <!-- Hero Stats -->
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-number">+20%</div>
+                <div class="stat-label">Конверсия при ответе <1h на вопросы (офиц. данные WB)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">40-60%</div>
+                <div class="stat-label">Win rate спасения 1★→5★ через платную фичу WB</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2-10x</div>
+                <div class="stat-label">ROI правильных сценариев коммуникаций</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">Product-centric</div>
+                <div class="stat-label">Подход: фокус на качество товаров, НЕ lifecycle клиентов</div>
+            </div>
+        </div>
+
+        <!-- AARRR Framework -->
+        <div class="section">
+            <h2>📊 AARRR Framework для маркетплейсов (адаптированный)</h2>
+            <p>Четыре этапа, где коммуникации работают (без Referral — невозможна без email/истории покупок):</p>
+
+            <div class="lifecycle-stage acquisition">
+                <h4>1. Acquisition (Привлечение) — Pre-order</h4>
+                <p><strong>Сущность:</strong> Вопросы покупателей, которые ещё не купили</p>
+                <p><strong>Цель:</strong> Конвертировать интерес в покупку (+20% при ответе <1h)</p>
+                <div class="flow-step">Вопрос: "Подойдёт ли мне 42 размер?"</div>
+                <div class="flow-step">AI ответ с таблицей размеров за 30 сек</div>
+                <div class="flow-step success">Конверсия в покупку</div>
+            </div>
+
+            <div class="lifecycle-stage activation">
+                <h4>2. Activation (Активация) — First Experience (ТОЛЬКО реактивный)</h4>
+                <p><strong>Сущность:</strong> Клиент пишет в чат после доставки</p>
+                <p><strong>Цель:</strong> Решить проблему до негативного отзыва</p>
+                <div class="flow-step">Чат: "Товар пришёл, но не подошёл размер"</div>
+                <div class="flow-step">AI детект: problem_mismatch + churn_risk</div>
+                <div class="flow-step">Предложение обмена → возврат предотвращён</div>
+                <div class="warning">
+                    <strong>⚠️ Проактивная активация НЕВОЗМОЖНА:</strong> Не можем написать через 48h после доставки — не знаем кто заказал (нет связи chat→order на WB).
+                </div>
+            </div>
+
+            <div class="lifecycle-stage retention">
+                <h4>3. Retention (Удержание) — Review Management</h4>
+                <p><strong>Сущность:</strong> Отзывы 1-3★, которые можно апгрейдить</p>
+                <p><strong>Цель:</strong> Превратить недовольство в лояльность</p>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Win-back rate</div>
+                        <div class="metric-value">40-60% (1★→4-5★)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Средний промокод</div>
+                        <div class="metric-value">50-150₽</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">5-10x</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lifecycle-stage revenue">
+                <h4>4. Revenue (Монетизация) — Upsell ТОЛЬКО в чате при обращении</h4>
+                <p><strong>Сущность:</strong> Клиент пишет в чат → контекстное предложение смежного товара</p>
+                <p><strong>Цель:</strong> Увеличить AOV через реактивный upsell</p>
+                <div class="flow-step">Чат: "Спасибо, носки отличные!"</div>
+                <div class="flow-step">AI детект: положительный фидбек + категория носки</div>
+                <div class="flow-step">"Рады! Кстати, наше термобельё отлично сочетается с этими носками"</div>
+                <div class="flow-step success">Допродажа +10-15% conversion (только если клиент сам написал)</div>
+                <div class="warning">
+                    <strong>⚠️ Проактивный upsell НЕВОЗМОЖЕН:</strong> Нельзя написать клиенту через 2-3 дня после 5★ отзыва — маркетплейс запрещает инициировать чат первым.
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Scenarios -->
+        <div class="section">
+            <h2>🔄 Сценарии коммуникаций (реалистичные)</h2>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 1: Спасение негатива через платный чат</div>
+                    <div class="scenario-roi critical">CRITICAL ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Клиент ставит 1-2★ и пишет отзыв</p>
+                <p><strong>WB Механика:</strong> Платная фича "перевод отзыва в чат" (1.75-3.15% доп. комиссии)</p>
+
+                <div class="flow-step">1★ отзыв написан → WB предлагает перевод в чат</div>
+                <div class="flow-step">AgentIQ auto-buy (если настроено) → отзыв НЕ публикуется 3 дня</div>
+                <div class="flow-step">AI детект intent: problem_quality / problem_mismatch</div>
+                <div class="flow-step">Генерация: "Нам очень жаль! Оформим замену. Ваш номер заказа?"</div>
+                <div class="flow-step">Клиент даёт детали → агент решает проблему (замена/возврат/компенсация)</div>
+                <div class="flow-step">[День 2] Follow-up: "Ваша проблема решена?"</div>
+                <div class="flow-step">Клиент: "Да, спасибо!" → "Можем попросить обновить отзыв на 4-5★?"</div>
+                <div class="flow-step success">Отзыв удалён или изменён на позитивный, рейтинг спасён</div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Стоимость</div>
+                        <div class="metric-value">~500-1500₽ за отзыв</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Win rate</div>
+                        <div class="metric-value">40-60%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Impact</div>
+                        <div class="metric-value">+0.05 рейтинг → +5% продаж</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">2-3x при обороте >10M</div>
+                    </div>
+                </div>
+
+                <div class="expert-insight">
+                    <strong>Timing is everything:</strong> Исследования показывают, что ответ на негативный отзыв в первые 60 минут повышает win rate с 40% до 65%. После 24 часов шанс спасения падает до 15%. AgentIQ должен иметь real-time webhook от WB Chat API для мгновенной реакции.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 2: Апгрейд 3★ в 5★</div>
+                    <div class="scenario-roi high">HIGH ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Отзыв 3★ с нейтральным или слегка негативным текстом</p>
+                <p><strong>Insight:</strong> 3★ = "ожидал лучше, но не катастрофа". Самая податливая группа для апгрейда.</p>
+
+                <div class="flow-step">3★ опубликован: "товар ок, но упаковка помялась"</div>
+                <div class="flow-step">AI классификация: problem_packaging, emotion: neutral, opportunity: high</div>
+                <div class="flow-step">[Задержка 2-3 дня] — не спамим сразу, даём остыть</div>
+                <div class="flow-step">Сообщение: "Спасибо за честность! Промокод на след заказ: SORRY15"</div>
+                <div class="flow-step">Клиент использует → повторная покупка + лучший опыт</div>
+                <div class="flow-step">[После доставки] "Как новый заказ? Если всё ок, будем рады обновлённому отзыву :)"</div>
+                <div class="flow-step success">Рейтинг +, retention rate +25%</div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Стоимость промокода</div>
+                        <div class="metric-value">50-150₽</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Repeat purchase rate</div>
+                        <div class="metric-value">35-45%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">3★→5★ conversion</div>
+                        <div class="metric-value">20-30%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">5-10x</div>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>⚠️ Антипаттерн:</strong> НЕ просите изменить отзыв в первом же сообщении. Это выглядит манипулятивно и снижает доверие. Сначала дайте ценность (промокод, помощь), ПОТОМ мягко предложите.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 3: Вопрос → Конверсия (<1h SLA)</div>
+                    <div class="scenario-roi critical">CRITICAL SLA</div>
+                </div>
+                <p><strong>Триггер:</strong> Вопрос от потенциального покупателя</p>
+                <p><strong>Data:</strong> +20% конверсия при ответе <1h (офиц. WB)</p>
+
+                <div class="flow-step">Вопрос: "Подойдёт ли 42 размер на ногу 27см?"</div>
+                <div class="flow-step">AgentIQ real-time alert → SLA timer 60 min</div>
+                <div class="flow-step">AI генерит: "Да! 42 = 26.5-27.5см. Вот таблица: [ссылка]"</div>
+                <div class="flow-step">Ответ отправлен за 3 минуты</div>
+                <div class="flow-step success">Конверсия +20%</div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Question→Purchase</div>
+                        <div class="metric-value">25-35% (vs 12% без ответа)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Optimal SLA</div>
+                        <div class="metric-value"><60 min</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">∞ (бесплатно)</div>
+                    </div>
+                </div>
+
+                <div class="expert-insight">
+                    <strong>Predictive stocking:</strong> Если вопросы типа "когда будет в наличии?" растут на 50%+ за неделю, это early signal дефицита. Интегрируй с системой закупок для авто-заказа у поставщика.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 4: Churn Prevention (реактивный, в чате)</div>
+                    <div class="scenario-roi critical">CRITICAL</div>
+                </div>
+                <p><strong>Триггер:</strong> Сообщение с intent: churn_risk ("верну", "разочарован")</p>
+
+                <div class="flow-step">Чат: "Хочу вернуть, не подошёл цвет. Как оформить?"</div>
+                <div class="flow-step">AI детект: churn_risk + problem_mismatch</div>
+                <div class="flow-step">Генерация: "Понимаем! Можем обменять на другой цвет без возврата. Какой вам нравится?"</div>
+                <div class="flow-step">Клиент: "А синий есть?" → AI подтягивает WB stock API</div>
+                <div class="flow-step">"Да, синий в наличии! Оформлю обмен прямо сейчас?"</div>
+                <div class="flow-step success">Возврат предотвращён, заказ сохранён ~2000₽, клиент доволен</div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Churn prevention rate</div>
+                        <div class="metric-value">30-50%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg saved order</div>
+                        <div class="metric-value">1500-3000₽</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">10-20x</div>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>⚠️ Ограничение:</strong> WB не даёт API для обмена товара напрямую. Нужно гайд клиента через UI или контакт с WB support. AgentIQ может дать инструкции, но автоматизация ограничена.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 5: Upsell в чате при обращении (ТОЛЬКО реактивный)</div>
+                    <div class="scenario-roi medium">MEDIUM ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Клиент сам пишет в чат с позитивным фидбеком</p>
+                <p><strong>Insight:</strong> Upsell работает только если клиент уже написал. Проактивно предлагать нельзя.</p>
+
+                <div class="flow-step">Чат: "Спасибо, носки отлично сидят!"</div>
+                <div class="flow-step">AI детект: positive_feedback + категория носки</div>
+                <div class="flow-step">"Рады! Наше термобельё отлично дополнит эти носки. Вот ссылка: [товар]"</div>
+                <div class="flow-step">Клиент переходит → допродажа +12-18%</div>
+
+                <div class="warning">
+                    <strong>⚠️ Проактивный upsell НЕВОЗМОЖЕН:</strong> Нельзя писать клиенту через 2-3 дня после 5★ отзыва с предложением термобелья. Маркетплейс запрещает инициировать чат первым. Работает ТОЛЬКО если клиент сам написал в чат.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 6: Upsell на 5★ через платный чат WB</div>
+                    <div class="scenario-roi high">HIGH ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Отзыв 5★ опубликован</p>
+                <p><strong>WB Механика:</strong> Платная опция "Чат с покупателем, оставившим отзыв" → можем писать в чат при ЛЮБОМ отзыве</p>
+
+                <div class="flow-step">5★ отзыв опубликован</div>
+                <div class="flow-step">WB платная опция: чат с покупателем открывается</div>
+                <div class="flow-step">AI благодарность: "Спасибо за 5★! 🎁"</div>
+                <div class="flow-step">AI детект категория товара (из WB CDN API)</div>
+                <div class="flow-step">Generic предложение смежного товара: "Вам может понравиться наше термобельё"</div>
+                <div class="flow-step">Промокод THANKS10 + ссылка на товар</div>
+                <div class="flow-step success">Conversion 12-18%, AOV +1200₽</div>
+
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Стоимость</div>
+                        <div class="metric-value">~500-1500₽ за отзыв (bundle)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Conversion</div>
+                        <div class="metric-value">12-18%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">AOV increase</div>
+                        <div class="metric-value">+1200₽</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">ROI</div>
+                        <div class="metric-value">5-10x</div>
+                    </div>
+                </div>
+
+                <div class="expert-insight">
+                    <strong>Ограничение:</strong> Generic upsell, не персонализированный (нет истории покупок).<br>
+                    <strong>Стоимость:</strong> Bundle с "Отложенной публикацией негатива" (~1.5-1.7% комиссии при 10M обороте).<br>
+                    <strong>Timing:</strong> WB не даёт контроль над timing (чат открывается сразу после отзыва).
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 7: Product Quality Alert (проактивный, внутренний)</div>
+                    <div class="scenario-roi medium">MEDIUM ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Рост негативных отзывов на товар >30% за неделю</p>
+                <p><strong>Goal:</strong> Раннее обнаружение дефектов, предотвращение репутационного урона</p>
+
+                <div class="flow-step">AI детект pattern: "бракованная партия", "не соответствует размеру"</div>
+                <div class="flow-step">Alert менеджеру: "Товар X имеет всплеск негатива, проверить поставку"</div>
+                <div class="flow-step">Dashboard: топ проблемных товаров по % негатива</div>
+                <div class="flow-step success">Предотвращение репутационного урона, раннее обнаружение дефектов</div>
+
+                <div class="warning">
+                    <strong>⚠️ Ограничение:</strong> Не можем написать клиентам проактивно с компенсацией. Только внутренний alert для менеджера.
+                </div>
+            </div>
+
+            <div class="scenario">
+                <div class="scenario-header">
+                    <div class="scenario-title">Сценарий 8: Sizing/Fit FAQ Auto-Response (реактивный)</div>
+                    <div class="scenario-roi high">HIGH ROI</div>
+                </div>
+                <p><strong>Триггер:</strong> Вопрос про размер ("какой размер взять?", "подойдёт ли 42?")</p>
+
+                <div class="flow-step">Вопрос: "Какой размер взять на рост 175см?"</div>
+                <div class="flow-step">AI детект intent: sizing_fit</div>
+                <div class="flow-step">AI draft с таблицей размеров из карточки товара (WB CDN API)</div>
+                <div class="flow-step">Auto-response через 2 минуты (high SLA для pre-purchase)</div>
+                <div class="flow-step success">Снижение % возвратов по размеру, +20% конверсия вопрос→покупка</div>
+
+                <div class="expert-insight">
+                    <strong>Pre-purchase = HIGH priority:</strong> Покупатель СЕЙЧАС на карточке товара, окно решения 10-20 сек. Ответ через 5 мин = конверсия +20%, через 1 час = устаревший benchmark.
+                </div>
+            </div>
+        </div>
+
+        <!-- Classifiers -->
+        <div class="section">
+            <h2>🏷️ Классификаторы сообщений (message-level, НЕ customer-level)</h2>
+
+            <div class="warning">
+                <strong>⚠️ Классификация на уровне сообщения, НЕ клиента:</strong> API маркетплейсов не даёт историю покупок клиента. Классифицируем каждое сообщение изолированно, без контекста предыдущих покупок.
+            </div>
+
+            <h3>Intent Classification</h3>
+            <div class="classifier-grid">
+                <div class="classifier-tag intent">problem_delivery</div>
+                <div class="classifier-tag intent">problem_quality</div>
+                <div class="classifier-tag intent">problem_mismatch</div>
+                <div class="classifier-tag intent">problem_packaging</div>
+                <div class="classifier-tag intent">question_preorder</div>
+                <div class="classifier-tag intent">question_usage</div>
+                <div class="classifier-tag intent">question_compatibility</div>
+                <div class="classifier-tag intent">gratitude</div>
+                <div class="classifier-tag intent">churn_risk</div>
+                <div class="classifier-tag intent">spam</div>
+                <div class="classifier-tag intent">request_discount</div>
+            </div>
+
+            <h3>Emotion Detection</h3>
+            <div class="classifier-grid">
+                <div class="classifier-tag emotion">angry</div>
+                <div class="classifier-tag emotion">frustrated</div>
+                <div class="classifier-tag emotion">disappointed</div>
+                <div class="classifier-tag emotion">neutral</div>
+                <div class="classifier-tag emotion">satisfied</div>
+                <div class="classifier-tag emotion">happy</div>
+                <div class="classifier-tag emotion">excited</div>
+            </div>
+
+            <h3>Priority / SLA</h3>
+            <div class="classifier-grid">
+                <div class="classifier-tag priority">critical (<1h)</div>
+                <div class="classifier-tag priority">high (<2h)</div>
+                <div class="classifier-tag priority">normal (<24h)</div>
+                <div class="classifier-tag priority">low (<72h)</div>
+            </div>
+
+            <h3>Пример архитектуры</h3>
+            <div class="code-block">
+{
+  "message_id": "msg_12345",
+  "entity_type": "review",
+  "review_star": 1,
+  "text": "Товар не пришёл, очень зол!",
+
+  "classification": {
+    "intent": "problem_delivery",
+    "emotion": "angry",
+    "priority": "critical",
+    "churn_risk_score": 0.92,
+    "needs_human": true
+  },
+
+  "suggested_actions": [
+    {
+      "action": "escalate_to_human",
+      "reason": "high churn risk + angry emotion"
+    },
+    {
+      "action": "buy_chat_conversion",
+      "reason": "1★ review, ROI positive if churn prevented",
+      "estimated_cost": "1200₽"
+    }
+  ],
+
+  "ai_draft_response": "Нам очень жаль! Проверяю ваш заказ прямо сейчас. Дайте номер заказа, решим в течение часа.",
+
+  "sla_deadline": "2026-02-15T15:30:00Z"
+}
+            </div>
+
+            <div class="expert-insight">
+                <strong>Multi-label vs Single-label:</strong> Используй multi-label classification. Сообщение может быть одновременно "problem_quality" + "churn_risk" + "angry". Single-label упрощает, но теряет нюансы. BERT-based модель на 10k размеченных сообщений даёт F1 ~0.85-0.92.
+            </div>
+        </div>
+
+        <!-- Advanced Lifecycle Tactics -->
+        <div class="section">
+            <h2>🚀 Продвинутые тактики (адаптированные под ограничения API)</h2>
+
+            <h3>1. Optimal Send-Time Prediction</h3>
+            <p>Когда писать follow-up для максимальной конверсии?</p>
+            <div class="expert-insight">
+                <strong>A/B тест результаты (базируясь на e-commerce best practices):</strong><br>
+                • Негатив: <1h = 65% win rate, 1-4h = 45%, >24h = 15%<br>
+                • Промокод на 3★: 2-5 дней (даём остыть эмоциям)<br>
+                • Вопрос без ответа: reminder через 2h, затем 24h, затем забить<br>
+            </div>
+
+            <h3>2. Message Chain Optimization</h3>
+            <p>Сколько сообщений писать в цепочке?</p>
+            <table>
+                <tr>
+                    <th>Сценарий</th>
+                    <th>Оптимум</th>
+                    <th>Почему</th>
+                </tr>
+                <tr>
+                    <td>Спасение негатива</td>
+                    <td>3-5 сообщений</td>
+                    <td>1) Извинения 2) Решение 3) Follow-up 4) Просьба изменить отзыв</td>
+                </tr>
+                <tr>
+                    <td>Вопрос</td>
+                    <td>1 ответ + 1 reminder</td>
+                    <td>Если не ответил на reminder → не заинтересован</td>
+                </tr>
+            </table>
+
+            <h3>3. Product-Level Trend Analysis (вместо Customer-Level)</h3>
+            <p>Фокус на товары, не на клиентов:</p>
+
+            <table>
+                <tr>
+                    <th>Метрика</th>
+                    <th>Что показывает</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td>% негатива по товару</td>
+                    <td>Рост >30% за неделю = проблема партии</td>
+                    <td>Alert менеджеру, проверить поставку</td>
+                </tr>
+                <tr>
+                    <td>Топ вопросов по товару</td>
+                    <td>90% про размерную сетку = контент плохой</td>
+                    <td>Улучшить карточку товара</td>
+                </tr>
+                <tr>
+                    <td>Win rate ответов по товару</td>
+                    <td>Товар А: 60%, товар Б: 20% = разная стратегия</td>
+                    <td>A/B тест шаблонов ответов</td>
+                </tr>
+            </table>
+
+            <h3>4. Fuzzy Linking через clientID (вероятностная связка)</h3>
+            <p>Частичная связка клиентов без истории покупок:</p>
+            <div class="code-block">
+Доступно:
+- clientID в чатах (уникальный ID покупателя на WB)
+- user_id в отзывах WBCON (может совпадать с clientID)
+- Артикул товара
+
+Сценарий:
+1. Клиент пишет в чат → clientID = "12345"
+2. Ищем отзывы с user_id = "12345"
+3. Находим: клиент оставил 1★ на товар X 3 дня назад
+4. Alert агенту: "Внимание! Этот клиент недоволен товаром X"
+
+⚠️ Ограничение: вероятностная связка, не 100% точность
+            </div>
+        </div>
+
+        <!-- ROI Table -->
+        <div class="section">
+            <h2>💰 ROI по сценариям (адаптированный)</h2>
+            <div class="warning">
+                <strong>⚠️ ROI считается на уровне товара, НЕ клиента:</strong> Нет истории покупок клиента → не можем считать LTV. ROI = влияние на рейтинг товара → продажи.
+            </div>
+            <table>
+                <tr>
+                    <th>Сценарий</th>
+                    <th>Стоимость</th>
+                    <th>Выгода</th>
+                    <th>ROI</th>
+                    <th>Приоритет</th>
+                </tr>
+                <tr>
+                    <td>Спасение 1★ через платный чат</td>
+                    <td>315k₽/мес (10M оборот)</td>
+                    <td>+0.05-0.15 рейтинг → +5-15% продаж</td>
+                    <td>2-3x</td>
+                    <td>🔴 CRITICAL</td>
+                </tr>
+                <tr>
+                    <td>Ответ на вопрос <1h</td>
+                    <td>0₽ (время агента)</td>
+                    <td>+20% конверсия вопрос→покупка</td>
+                    <td>∞</td>
+                    <td>🔴 CRITICAL</td>
+                </tr>
+                <tr>
+                    <td>Апгрейд 3★→5★</td>
+                    <td>50-150₽ промокод</td>
+                    <td>20-30% conversion + repeat purchase</td>
+                    <td>5-8x</td>
+                    <td>🟢 HIGH</td>
+                </tr>
+                <tr>
+                    <td>Churn prevention</td>
+                    <td>Время агента</td>
+                    <td>Спасён заказ 1500-3000₽</td>
+                    <td>10-20x</td>
+                    <td>🔴 CRITICAL</td>
+                </tr>
+                <tr>
+                    <td>Product Quality Alert</td>
+                    <td>Время менеджера</td>
+                    <td>Предотвращение репутационного урона</td>
+                    <td>3-5x long-term</td>
+                    <td>🟡 MEDIUM</td>
+                </tr>
+                <tr>
+                    <td>Upsell на 5★ (платный чат WB)</td>
+                    <td>~500-1500₽ за отзыв (bundle)</td>
+                    <td>+12-18% conversion, +1200₽ AOV</td>
+                    <td>5-10x</td>
+                    <td>🟢 HIGH ROI</td>
+                </tr>
+                <tr>
+                    <td>Sizing/Fit Auto-Response</td>
+                    <td>0₽ (AI automation)</td>
+                    <td>Снижение возвратов, +20% конверсия</td>
+                    <td>∞</td>
+                    <td>🟢 HIGH</td>
+                </tr>
+            </table>
+
+            <div class="expert-insight">
+                <strong>Правило приоритизации:</strong> Фокусируйся на сценариях с наивысшим (ROI × Volume). Спасение негатива может быть 3x ROI, но если негатива 2 отзыва/месяц — низкий impact. Вопросы дают ∞ ROI и 100+ штук/месяц — максимальный impact.
+            </div>
+        </div>
+
+        <!-- Implementation Roadmap -->
+        <div class="section">
+            <h2>🗺️ Roadmap внедрения в AgentIQ (адаптированный)</h2>
+
+            <h3>Фаза 1: Foundation (MVP, 2-4 недели)</h3>
+            <div class="flow-step">Интеграция WB Chat API + Questions API + Feedbacks API</div>
+            <div class="flow-step">Real-time webhooks для новых сообщений</div>
+            <div class="flow-step">Базовый intent classifier (10-15 классов)</div>
+            <div class="flow-step">SLA tracking + priority queue</div>
+            <div class="flow-step">AI-ассистент для драфтов ответов (как сейчас на отзывах)</div>
+            <div class="flow-step success">Агенты отвечают быстрее, quality score растёт</div>
+
+            <h3>Фаза 2: Automation (4-6 недель)</h3>
+            <div class="flow-step">Auto-detection негативных отзывов → alert агенту</div>
+            <div class="flow-step">Auto-buy платной фичи WB (если ROI >2x)</div>
+            <div class="flow-step">WB платная опция: auto-buy чата при 5★ отзывах для upsell (если ROI >3x)</div>
+            <div class="flow-step">Follow-up цепочки (reminder на вопросы, follow-up на решённые проблемы)</div>
+            <div class="flow-step success">Automation rate 40-60%, agent time -50%</div>
+
+            <h3>Фаза 3: Intelligence (6-8 недель)</h3>
+            <div class="flow-step">Product analytics dashboard (топ проблемных товаров)</div>
+            <div class="flow-step">Optimal send-time prediction (A/B тесты)</div>
+            <div class="flow-step">Персонализация шаблонов (динамическая генерация)</div>
+            <div class="flow-step">Fuzzy linking через clientID (чат → отзывы)</div>
+            <div class="flow-step success">Conversion rates +25-40%</div>
+
+            <h3>Фаза 4: Marketplace-Specific Hacks (8-12 недель)</h3>
+            <div class="flow-step">WB платная фича auto-buy (умный ROI калькулятор)</div>
+            <div class="flow-step">Workaround для chat→order linking (запрос номера заказа)</div>
+            <div class="flow-step">Ozon Webhooks (июль 2025) — real-time уведомления</div>
+            <div class="flow-step">Analytics dashboard (ROI по товарам, NOT клиентам)</div>
+            <div class="flow-step success">Максимальная адаптация под ограничения маркетплейсов</div>
+
+            <div class="warning">
+                <strong>⚠️ УБРАНО из Roadmap (нереалистично):</strong><br>
+                • RFM segmentation (нет истории покупок)<br>
+                • Cross-product recommendations (нет данных клиента)<br>
+                • Cross-channel messaging (WB + Email) — нет email клиента<br>
+                • Campaign builder — нельзя писать первым
+            </div>
+        </div>
+
+        <!-- Metrics Dashboard -->
+        <div class="section">
+            <h2>📈 Ключевые метрики для Dashboard (адаптированные)</h2>
+
+            <h3>Operational Metrics (работают)</h3>
+            <table>
+                <tr>
+                    <th>Метрика</th>
+                    <th>Описание</th>
+                    <th>Target</th>
+                </tr>
+                <tr>
+                    <td>Response Time (median)</td>
+                    <td>Медианное время ответа на сообщение</td>
+                    <td><30 min для critical, <2h для normal</td>
+                </tr>
+                <tr>
+                    <td>SLA Compliance</td>
+                    <td>% сообщений, отвеченных в SLA</td>
+                    <td>>95%</td>
+                </tr>
+                <tr>
+                    <td>Automation Rate</td>
+                    <td>% сообщений с AI draft (accepted/edited/manual)</td>
+                    <td>40-60%</td>
+                </tr>
+                <tr>
+                    <td>Classification Accuracy</td>
+                    <td>Точность intent classifier</td>
+                    <td>>90% F1-score</td>
+                </tr>
+            </table>
+
+            <h3>Business Metrics (работают)</h3>
+            <table>
+                <tr>
+                    <th>Метрика</th>
+                    <th>Описание</th>
+                    <th>Target</th>
+                </tr>
+                <tr>
+                    <td>Review Conversion Rate</td>
+                    <td>1★→4-5★ через чат</td>
+                    <td>40-60%</td>
+                </tr>
+                <tr>
+                    <td>Question→Unknown Rate</td>
+                    <td>% вопросов без конверсии (не знаем купил ли — ограничение API)</td>
+                    <td>N/A (tracking impossible)</td>
+                </tr>
+                <tr>
+                    <td>Churn Prevention Rate</td>
+                    <td>% возвратов предотвращено через чат (запросили order_id)</td>
+                    <td>30-50%</td>
+                </tr>
+                <tr>
+                    <td>Negative Review Prevention</td>
+                    <td>% негатива предотвращено через быстрый ответ на вопрос</td>
+                    <td>15-25%</td>
+                </tr>
+            </table>
+
+            <h3>Metrics которые НЕ работают (нет данных)</h3>
+            <div class="warning">
+                <strong>❌ Невозможно считать:</strong><br>
+                • LTV by Cohort — нет истории покупок клиента<br>
+                • Repeat Purchase Rate — не знаем кто покупал повторно<br>
+                • VIP Customer Count — не знаем кто купил 3+ раз<br>
+                • Win-back Rate — не можем писать проактивно
+            </div>
+        </div>
+
+        <!-- Mermaid Diagram -->
+        <div class="section">
+            <h2>🔄 Визуализация: Реалистичный Customer Journey Flow</h2>
+            <div class="mermaid">
+graph TD
+    A[Потенциальный клиент] -->|Вопрос о товаре| B{Ответ <1h?}
+    B -->|Да| C[+20% конверсия]
+    B -->|Нет| D[-8% конверсия]
+    C --> E[Покупка]
+    D --> F[Abandonment]
+
+    E --> G[Доставка]
+    G --> H{Клиент пишет в чат?}
+    H -->|Нет| I[Ждём отзыва]
+    H -->|Да| J{Проблема?}
+    J -->|Нет| K[Положительный фидбек]
+    J -->|Да| L[Решение проблемы]
+    L --> M[Негатив предотвращён]
+
+    I --> N{Какой отзыв?}
+    N -->|1-2★| O[Платный чат]
+    N -->|3★| P[Промокод через 2-3 дня]
+    N -->|4-5★| Q[Ждём если клиент сам напишет]
+
+    O --> R{Проблема решена?}
+    R -->|Да| S[1★→5★ conversion]
+    R -->|Нет| T[Escalate to manager]
+
+    P --> U{Промокод использован?}
+    U -->|Да| V[Repeat purchase]
+    U -->|Нет| W[Lost opportunity]
+
+    K --> X[Контекстный upsell в чате]
+
+    style A fill:#7db8e8
+    style E fill:#4ecb71
+    style S fill:#4ecb71
+    style V fill:#4ecb71
+    style O fill:#e85454
+            </div>
+        </div>
+
+        <!-- Final Expert Insights -->
+        <div class="section">
+            <h2>🧠 Финальные инсайты (адаптированные под реальность)</h2>
+
+            <div class="expert-insight">
+                <strong>1. Focus on Product, not Customer:</strong> Без истории покупок клиента невозможно строить customer-centric стратегию. Фокус на product-level analytics: топ проблемных товаров, частые вопросы, win rate ответов по товару.
+            </div>
+
+            <div class="expert-insight">
+                <strong>2. Reactive Excellence > Proactive Campaigns:</strong> Нельзя писать клиентам первым → невозможны проактивные сценарии (активация 48h, win-back). Зато можно быть идеальными в реактивных ответах: <1h SLA, AI drafts, guardrails.
+            </div>
+
+            <div class="expert-insight">
+                <strong>3. Workarounds are your friend:</strong> API ограничен? Ищи workarounds. Нет связи chat→order? Спрашивай номер заказа у клиента. Нет инициативы? Используй WB платную фичу "перевод отзыва в чат".
+            </div>
+
+            <div class="expert-insight">
+                <strong>4. The Golden Hour (всё ещё работает):</strong> Первые 60 минут после негативного события — самое критичное окно. Ответ <1h = 65% win rate, >24h = 15%. Real-time система — не опция, а необходимость.
+            </div>
+
+            <div class="expert-insight">
+                <strong>5. Message-Level, NOT Customer-Level:</strong> Классифицируй каждое сообщение изолированно. Нет контекста клиента → каждый чат = новый кейс. Intent + emotion + priority = достаточно для умной приоритизации.
+            </div>
+
+            <div class="expert-insight">
+                <strong>6. Product Analytics = New North Star:</strong> Вместо LTV by Cohort → Win rate by Product. Вместо VIP segmentation → Top problematic products. Вместо Cross-sell based on history → FAQ-driven content improvements.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="section">
+            <h2>📚 Резюме</h2>
+            <p>Коммуникации на WB — это не полноценный lifecycle маркетинг. Это <strong>AI-ассистент для идеальной реакции на обращения клиентов</strong>, который влияет на:</p>
+            <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                <li>🎯 <strong>Acquisition:</strong> +20% конверсия через быстрые ответы на вопросы</li>
+                <li>✅ <strong>Activation:</strong> Предотвращение негатива через чат (ТОЛЬКО реактивный)</li>
+                <li>🔄 <strong>Retention:</strong> 40-60% win rate спасения 1★ через платный чат</li>
+                <li>💰 <strong>Revenue:</strong> Контекстный upsell в чате (ТОЛЬКО если клиент сам написал)</li>
+            </ul>
+            <p style="margin-top: 20px;"><strong>Честный питч:</strong> AgentIQ — AI-ассистент для идеальной реакции на обращения клиентов. Спасаем негативные отзывы, отвечаем на вопросы <5 мин, предотвращаем возвраты. <strong>Фокус: Product Quality + Response Excellence, не lifecycle marketing.</strong></p>
+            <p style="margin-top: 10px; color: #8b95a5; font-size: 0.9rem;">Документ обновлён: 2026-02-15 | Источник: MARKETPLACE_API_LIMITATIONS.md | AgentIQ Strategy</p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#e8a838',
+                primaryTextColor: '#e0e6ed',
+                primaryBorderColor: '#243447',
+                lineColor: '#7db8e8',
+                secondaryColor: '#4ecb71',
+                tertiaryColor: '#141e2b'
+            }
+        });
+    </script>
+</body>
+</html>

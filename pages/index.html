@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AgentIQ — Lifecycle Communication Strategy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .card.dashboard {
+            --accent-gradient: linear-gradient(90deg, #1a73e8 0%, #4ade80 100%);
+        }
+
+        .card.scenarios {
+            --accent-gradient: linear-gradient(90deg, #e8a838 0%, #f4c95d 100%);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 28px;
+        }
+
+        .card-features li {
+            color: #4b5563;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .card-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #16a34a;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a73e8 0%, #4ade80 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #e8a838 0%, #f4c95d 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(232, 168, 56, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 168, 56, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="logo">🚀 AgentIQ</div>
+            <div class="tagline">Communication Strategy для WB/Ozon</div>
+            <p class="description">
+                AI-ассистент для идеальной реакции на обращения клиентов.
+                Фокус: Product Quality + Response Excellence, не lifecycle marketing
+            </p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value">+20%</div>
+                <div class="stat-label">Конверсия <1h</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">58%</div>
+                <div class="stat-label">Win Rate 1★→5★</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">7.2x</div>
+                <div class="stat-label">ROI</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">315k₽</div>
+                <div class="stat-label">Стоимость/мес</div>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card dashboard">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Interactive Dashboard</div>
+                <div class="card-description">
+                    Интерактивный прототип UI для управления реактивными сценариями с real-time метриками (с учётом ограничений WB/Ozon API)
+                </div>
+                <ul class="card-features">
+                    <li>Product Quality Score + Win Rate + ROI</li>
+                    <li>7 реалистичных сценариев (без VIP/Win-back)</li>
+                    <li>Product-level analytics, не customer-level</li>
+                    <li>Fuzzy linking через clientID</li>
+                    <li>Настройки автоматизации</li>
+                </ul>
+                <a href="lifecycle-dashboard.html" class="btn btn-primary">Открыть Dashboard →</a>
+            </div>
+
+            <div class="card scenarios">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">Detailed Scenarios</div>
+                <div class="card-description">
+                    Подробная документация реалистичных сценариев с учётом ограничений маркетплейсов (нет истории покупок, email, проактивных кампаний)
+                </div>
+                <ul class="card-features">
+                    <li>Ограничения API (что НЕ доступно)</li>
+                    <li>5 реалистичных сценариев + workarounds</li>
+                    <li>Product-centric подход вместо CRM</li>
+                    <li>ROI таблицы (product-level)</li>
+                    <li>Честный питч для клиентов</li>
+                </ul>
+                <a href="scenarios.html" class="btn btn-secondary">Читать документацию →</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>AgentIQ Lifecycle Strategy · Февраль 2026</p>
+        </div>
+    </div>
+</body>
+</html>
