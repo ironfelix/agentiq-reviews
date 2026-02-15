@@ -614,23 +614,26 @@ function App() {
         }
       }
 
-      // Track pagination metadata
+      // Track pagination metadata — use functional updater to read latest state (avoids stale closure)
       const total = response.total || response.interactions.length;
       const allLoaded = response.interactions.length < 50;
-      const currentMeta = paginationMeta[channelKey];
-      setPaginationMeta(prev => ({
-        ...prev,
-        [channelKey]: {
-          total,
-          loadedPages: 1,
-          isLoadingMore: false,
-          allLoaded: allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total),
-        },
-      }));
+      let resolvedAllLoaded = allLoaded;
+      setPaginationMeta(prev => {
+        const currentMeta = prev[channelKey];
+        resolvedAllLoaded = allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total);
+        return {
+          ...prev,
+          [channelKey]: {
+            total,
+            loadedPages: 1,
+            isLoadingMore: false,
+            allLoaded: resolvedAllLoaded,
+          },
+        };
+      });
 
       // Save first page to sessionStorage for instant restore on next visit
-      const finalAllLoaded = allLoaded || ((currentMeta?.allLoaded ?? false) && (prevItems?.length ?? 0) >= total);
-      saveInteractionsToCache(channelKey, response.interactions, finalAllLoaded);
+      saveInteractionsToCache(channelKey, response.interactions, resolvedAllLoaded);
 
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
         // Selected item might be on a later page — don't deselect
