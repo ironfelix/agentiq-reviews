@@ -987,6 +987,8 @@
             overflow: hidden;
             background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
             box-shadow: 0 14px 40px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
         }
         .offer-card.primary {
             border-color: rgba(0,0,0,0.82);
@@ -1099,6 +1101,7 @@
             align-items: center;
             justify-content: center;
             gap: var(--space-2);
+            margin-top: auto;
             width: 100%;
             padding: 13px var(--space-5);
             border: none;
@@ -3483,7 +3486,7 @@
                     <span class="amount">от 4 990 ₽</span>
                     <span class="period">/мес</span>
                 </div>
-                <a href="#" class="btn-offer secondary" onclick="openModal(event)">Запросить пилот</a>
+                <a href="#" class="btn-offer secondary" onclick="openModal(event)">Начать пилот</a>
             </div>
         </div>
     </div>
