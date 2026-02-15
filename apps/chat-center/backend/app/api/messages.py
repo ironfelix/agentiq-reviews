@@ -17,7 +17,7 @@ from app.schemas.message import (
     MessageResponse,
     MessageListResponse
 )
-from app.middleware.auth import get_optional_seller, require_seller_ownership
+from app.middleware.auth import get_current_seller, get_optional_seller, require_seller_ownership
 from app.config import get_settings
 
 settings = get_settings()
@@ -31,7 +31,7 @@ async def list_messages(
     chat_id: int,
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """Get messages for a specific chat"""
@@ -48,8 +48,7 @@ async def list_messages(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     # Count total messages
     count_result = await db.execute(
@@ -76,7 +75,7 @@ async def list_messages(
 @router.post("", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 async def send_message(
     message_data: MessageCreate,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -104,8 +103,7 @@ async def send_message(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     if not message_data.text:
         raise HTTPException(
@@ -161,7 +159,7 @@ async def send_message(
 @router.get("/{message_id}", response_model=MessageResponse)
 async def get_message(
     message_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """Get message by ID"""
@@ -177,12 +175,11 @@ async def get_message(
         )
 
     # Seller isolation: check ownership via chat
-    if current_seller:
-        chat_result = await db.execute(
-            select(Chat).where(Chat.id == message.chat_id)
-        )
-        chat = chat_result.scalar_one_or_none()
-        if chat:
-            require_seller_ownership(chat.seller_id, current_seller)
+    chat_result = await db.execute(
+        select(Chat).where(Chat.id == message.chat_id)
+    )
+    chat = chat_result.scalar_one_or_none()
+    if chat:
+        require_seller_ownership(chat.seller_id, current_seller)
 
     return MessageResponse.model_validate(message)

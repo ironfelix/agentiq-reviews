@@ -71,6 +71,8 @@ Status: ACTIVE (triage queue)
 | 45 | BUG | ✅ FIXED — Mobile chat: header съезжает за app-header |
 | 46 | BUG | ✅ FIXED — Sync indicator не показывается при периодической синхронизации (30 сек) |
 | 47 | UX | ✅ FIXED — Settings navigation: reload сбрасывает активный раздел на Подключения |
+| 48 | PERF | ✅ FIXED — Секции flash на reload: isSame, CSS animation, localStorage cache |
+| 49 | SEC | ✅ FIXED — 6 critical security findings (audit 36 total, docs created) |
 
 ---
 
@@ -171,3 +173,9 @@ Status: ACTIVE (triage queue)
 46) ~~Sync indicator не показывается при периодической синхронизации~~ **FIXED (2026-02-15):** Apple Mail-style sync banner внизу чат-листа показывался только при первой загрузке (loadingProgress.loaded < total), но не при фоновой синхронизации каждые 30 сек. Root cause: при периодической синхронизации `allLoaded=true` и `loadingProgress=null`. Fix: добавлено условие `syncStatus === 'syncing'` OR `loadingProgress` для отображения banner. Теперь показывается "Синхронизация..." при фоновой синхронизации. Файл: `ChatList.tsx:645-656`. Commit: `e4bba04`.
 
 47) ~~Settings navigation: reload сбрасывает активный раздел~~ **FIXED (2026-02-15):** При reload страницы настроек пользователь возвращался к разделу "Подключения" вместо последнего активного (например, "Промокоды"). Root cause: `tab` state хранился локально и сбрасывался в `'connections'` при mount. Fix: (1) добавлена функция `getInitialTab()` которая читает URL hash (`#settings-promo`) при mount, (2) функция `changeTab()` обновляет state + window.location.hash при переключении табов. Теперь активный раздел сохраняется в URL и восстанавливается после reload. Файл: `SettingsPage.tsx`. Commit: `e4bba04`.
+
+### Security & Performance (2026-02-15, night):
+
+48) ~~Секции «В работе» / «Ожидают ответа» мерцают при каждом reload~~ **FIXED (2026-02-15):** Три итерации фикса: (1) smart isSame comparison по визуальным полям (priority, status, needs_response, text, chat_status, ai_draft.sla_priority) вместо `updated_at`; (2) убрана CSS анимация `.queue-section` (`queueSectionIn`); (3) `sessionStorage` → `localStorage` для interaction cache (сохраняется между закрытиями tab / iOS eviction). Файлы: `App.tsx`, `index.css`.
+
+49) ~~Security audit: 6 CRITICAL findings~~ **FIXED (2026-02-15):** Полный security audit проекта (36 findings). 6 критических исправлены: (C-01) startup validation SECRET_KEY, (C-02) `datetime.utcnow()` → `datetime.now(timezone.utc)` в JWT, (C-03) CORS methods/headers restricted, (C-04) max_length на text inputs, (C-05) sentry-test endpoint удалён, (C-06) IDOR fix — `get_optional_seller` → `get_current_seller` на resource endpoints. 458 тестов прошли. Файлы: `main.py`, `auth.py`, `chats.py`, `messages.py`, `schemas/chat.py`, `schemas/message.py`. Доки: `docs/security/SECURITY_AUDIT.md`, `docs/security/SECURITY_REVIEW_PROCESS.md`.

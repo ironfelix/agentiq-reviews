@@ -46,6 +46,20 @@ Path note: in this repo the canonical docs live under `docs/` at the repository 
 3. Execution log for Unified Communications must be maintained in:
 - `docs/product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md`
 
+## Security (MANDATORY)
+
+### Security Documentation
+- **`docs/security/SECURITY_AUDIT.md`** — full audit report (36 findings, action plan)
+- **`docs/security/SECURITY_REVIEW_PROCESS.md`** — CI checks, pre-deploy checklist, secrets rotation, incident response
+
+### Security Rules for Development
+1. **Never commit `.env` files** — secrets only in env vars on production
+2. **All new endpoints** must use `Depends(get_current_seller)` (not optional)
+3. **All text inputs** must have `max_length` in Pydantic schema
+4. **No raw SQL** — only SQLAlchemy ORM with parameterized queries
+5. **Before deploy** — run pre-deploy checklist from `SECURITY_REVIEW_PROCESS.md`
+6. **Secrets rotation** — follow schedule in SECURITY_REVIEW_PROCESS.md
+
 ## Guardrails System (MANDATORY)
 Canonical source: **`docs/GUARDRAILS.md`** — the single consolidated document for all guardrails.
 

@@ -246,15 +246,15 @@ const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 function saveInteractionsToCache(channelKey: string, interactions: Interaction[], allLoaded?: boolean) {
   try {
-    const existing = JSON.parse(sessionStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
+    const existing = JSON.parse(localStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
     existing[channelKey] = { ts: Date.now(), items: interactions, allLoaded: !!allLoaded };
-    sessionStorage.setItem(INTERACTIONS_CACHE_KEY, JSON.stringify(existing));
+    localStorage.setItem(INTERACTIONS_CACHE_KEY, JSON.stringify(existing));
   } catch { /* quota exceeded or serialization error, ignore */ }
 }
 
 function loadInteractionsFromCache(channelKey: string): { items: Interaction[]; allLoaded: boolean } | null {
   try {
-    const cache = JSON.parse(sessionStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
+    const cache = JSON.parse(localStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
     const entry = cache[channelKey];
     if (entry && Date.now() - entry.ts < CACHE_TTL_MS) {
       return { items: entry.items, allLoaded: !!entry.allLoaded };
@@ -265,7 +265,7 @@ function loadInteractionsFromCache(channelKey: string): { items: Interaction[]; 
 
 function clearInteractionsCache() {
   try {
-    sessionStorage.removeItem(INTERACTIONS_CACHE_KEY);
+    localStorage.removeItem(INTERACTIONS_CACHE_KEY);
   } catch { /* ignore */ }
 }
 
@@ -344,7 +344,24 @@ function App() {
   const [selectedInteractionId, setSelectedInteractionId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [filters, setFilters] = useState<ChatFilters>({});
-  const [isLoadingChats, setIsLoadingChats] = useState(true);
+  // Synchronous cache restore — avoids flash on reload by having data from first render
+  const [interactionCache, setInteractionCache] = useState<Record<string, Interaction[]>>(() => {
+    const cached = loadInteractionsFromCache('all');
+    if (cached && cached.items.length > 0) {
+      const result: Record<string, Interaction[]> = { all: cached.items };
+      for (const item of cached.items) {
+        const ch = item.channel;
+        if (!result[ch]) result[ch] = [];
+        result[ch].push(item);
+      }
+      return result;
+    }
+    return {};
+  });
+  const [isLoadingChats, setIsLoadingChats] = useState(() => {
+    const cached = loadInteractionsFromCache('all');
+    return !cached || cached.items.length === 0;
+  });
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isLoadingQuality, setIsLoadingQuality] = useState(false);
   const [isLoadingQualityHistory, setIsLoadingQualityHistory] = useState(false);
@@ -355,16 +372,22 @@ function App() {
   const [isRetryingSync, setIsRetryingSync] = useState(false);
   const [mobileView, setMobileView] = useState<'list' | 'chat' | 'context'>('list');
   const [activeChannel, setActiveChannelRaw] = useState<'all' | 'review' | 'question' | 'chat'>('all');
-  const [interactionCache, setInteractionCache] = useState<Record<string, Interaction[]>>({});
   // Progressive loading state
   const [syncLoadedCount, setSyncLoadedCount] = useState(0);
   const [syncAutoTransitioned, setSyncAutoTransitioned] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState<Record<string, {
     total: number; loadedPages: number; isLoadingMore: boolean; allLoaded: boolean;
-  }>>({});
+  }>>(() => {
+    const cached = loadInteractionsFromCache('all');
+    if (cached && cached.items.length > 0 && cached.allLoaded) {
+      return { all: { total: cached.items.length, loadedPages: 1, isLoadingMore: false, allLoaded: true } };
+    }
+    return {} as Record<string, { total: number; loadedPages: number; isLoadingMore: boolean; allLoaded: boolean }>;
+  });
   const interactionCacheRef = useRef(interactionCache);
   interactionCacheRef.current = interactionCache;
-  const cacheRestoredRef = useRef(false);
+  // If interactionCache was populated synchronously above, mark cache as already restored
+  const cacheRestoredRef = useRef(Object.keys(interactionCache).length > 0);
   const interactions = interactionCache[activeChannel] || [];
   const handleChannelChange = useCallback((channel: 'all' | 'review' | 'question' | 'chat') => {
     setActiveChannelRaw(channel);

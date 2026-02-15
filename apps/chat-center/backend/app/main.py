@@ -70,8 +70,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=os.environ.get("CORS_ORIGINS", "https://agentiq.ru,http://localhost:5173,http://localhost:3000").split(","),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 @app.exception_handler(Exception)
@@ -92,6 +92,15 @@ async def global_exception_handler(request, exc):
 
 
 # Lifecycle events
+@app.on_event("startup")
+async def validate_secrets():
+    from app.config import get_settings as _get_settings
+    _settings = _get_settings()
+    if _settings.SECRET_KEY in ("change-me-in-production", "test-secret-key"):
+        import warnings
+        warnings.warn("SECURITY WARNING: SECRET_KEY is using a default/weak value! Generate a secure key for production.", stacklevel=2)
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize database on startup"""
@@ -175,33 +184,6 @@ async def prometheus_metrics():
     Do not expose publicly in nginx.
     """
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
-
-
-@app.get("/api/health/sentry-test")
-async def sentry_test():
-    """
-    Test endpoint to trigger a Sentry error capture.
-
-    Only works in DEBUG mode to prevent accidental error generation in production.
-    """
-    if not settings.DEBUG:
-        raise HTTPException(status_code=404, detail="Endpoint only available in DEBUG mode")
-
-    if not settings.SENTRY_DSN:
-        return {
-            "status": "sentry_disabled",
-            "message": "Sentry is not configured (SENTRY_DSN is empty)"
-        }
-
-    # Trigger a test error
-    try:
-        raise ValueError("Sentry test error - this is intentional for testing error tracking")
-    except ValueError as e:
-        # Let Sentry capture it
-        if settings.SENTRY_DSN:
-            import sentry_sdk
-            sentry_sdk.capture_exception(e)
-        raise HTTPException(status_code=500, detail=f"Test error triggered: {str(e)}")
 
 
 # Include routers

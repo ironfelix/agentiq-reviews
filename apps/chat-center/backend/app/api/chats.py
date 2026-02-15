@@ -95,7 +95,7 @@ async def list_chats(
 @router.get("/{chat_id}", response_model=ChatResponse)
 async def get_chat(
     chat_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """Get chat by ID"""
@@ -110,9 +110,8 @@ async def get_chat(
             detail=f"Chat {chat_id} not found"
         )
 
-    # Seller isolation: verify ownership if authenticated
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    # Seller isolation: verify ownership
+    require_seller_ownership(chat.seller_id, current_seller)
 
     return ChatResponse.model_validate(chat)
 
@@ -120,7 +119,7 @@ async def get_chat(
 @router.post("/{chat_id}/mark-read", response_model=ChatResponse)
 async def mark_chat_as_read(
     chat_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """Mark all messages in chat as read"""
@@ -136,8 +135,7 @@ async def mark_chat_as_read(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     chat.unread_count = 0
     await db.commit()
@@ -151,7 +149,7 @@ async def mark_chat_as_read(
 async def analyze_chat(
     chat_id: int,
     async_mode: bool = Query(False, description="Run analysis in background"),
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -176,8 +174,7 @@ async def analyze_chat(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     if async_mode:
         # Trigger background task
@@ -211,7 +208,7 @@ async def analyze_chat(
 @router.post("/{chat_id}/close", response_model=ChatResponse)
 async def close_chat(
     chat_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -232,8 +229,7 @@ async def close_chat(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     chat.chat_status = "closed"
     chat.status = "closed"
@@ -248,7 +244,7 @@ async def close_chat(
 @router.post("/{chat_id}/reopen", response_model=ChatResponse)
 async def reopen_chat(
     chat_id: int,
-    current_seller: Optional[Seller] = Depends(get_optional_seller),
+    current_seller: Seller = Depends(get_current_seller),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -268,8 +264,7 @@ async def reopen_chat(
         )
 
     # Seller isolation
-    if current_seller:
-        require_seller_ownership(chat.seller_id, current_seller)
+    require_seller_ownership(chat.seller_id, current_seller)
 
     chat.chat_status = "waiting"
     chat.status = "open"

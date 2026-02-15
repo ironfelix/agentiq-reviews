@@ -14,7 +14,7 @@ class AttachmentSchema(BaseModel):
 
 class MessageBase(BaseModel):
     """Base message schema"""
-    text: Optional[str] = Field(None, description="Message text content")
+    text: Optional[str] = Field(None, max_length=5000, description="Message text content")
     attachments: Optional[List[Dict[str, Any]]] = Field(None, description="Message attachments")
 
 

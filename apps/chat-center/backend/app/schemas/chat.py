@@ -54,6 +54,6 @@ class ChatFilter(BaseModel):
     marketplace: Optional[str] = Field(None, description="Filter by marketplace")
     unread_only: bool = Field(False, description="Show only unread chats")
     sla_overdue_only: bool = Field(False, description="Show only SLA overdue chats")
-    search: Optional[str] = Field(None, description="Search in customer name or order_id")
+    search: Optional[str] = Field(None, max_length=500, description="Search in customer name or order_id")
     limit: int = Field(50, ge=1, le=100)
     offset: int = Field(0, ge=0)
