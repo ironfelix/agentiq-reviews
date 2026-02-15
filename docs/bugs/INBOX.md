@@ -66,6 +66,12 @@ Status: ACTIVE (triage queue)
 | 40 | UX | ✅ FIXED — progressive loading при синхронизации (dual-poll + real count) |
 | 41 | PERF | ✅ FIXED — instant folder switching (pre-populate cache + background pagination) |
 | 42 | UX | ✅ FIXED — Apple Mail progress bar в ChatList (sticky bottom) |
+| 43 | SEC | ✅ FIXED — CORS allow_origins=["*"] → env-based (agentiq.ru + localhost) |
+| 44 | OPS | ✅ FIXED — nginx proxy_read_timeout 300s + rate limiting 30r/s + static cache 1y |
+| 45 | OPS | ✅ FIXED — health check проверяет DB (SELECT 1, было static "healthy") |
+| 46 | OPS | ✅ FIXED — global exception handler → Sentry + clean 500 |
+| 47 | OPS | ✅ FIXED — auth deps в requirements.txt (python-jose, passlib, bcrypt) |
+| 48 | OPS | ✅ DONE — backup cron (daily 3AM) + celery health cron (5 мин) на VPS |
 
 ---
 
