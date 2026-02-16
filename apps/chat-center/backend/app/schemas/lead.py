@@ -52,7 +52,13 @@ class LeadCreate(BaseModel):
                 raise ValueError('Некорректный email')
             return v
 
-        raise ValueError('Контакт должен быть telegram (@username), телефон или email')
+        # If it looks like a telegram username (letters, digits, underscores), add @ automatically
+        if re.match(r'^[a-zA-Z0-9_]+$', v):
+            if len(v) >= 1:
+                return f'@{v}'
+            raise ValueError('Telegram username слишком короткий')
+
+        raise ValueError('Контакт должен быть telegram (username или @username), телефон или email')
 
 
 class LeadResponse(BaseModel):
