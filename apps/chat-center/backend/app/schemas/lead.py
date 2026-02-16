@@ -26,39 +26,21 @@ class LeadCreate(BaseModel):
     @field_validator('contact')
     @classmethod
     def validate_contact(cls, v: str) -> str:
-        """Validate contact - must be telegram, phone or email"""
+        """Validate contact - minimal validation, just ensure it's not empty"""
         v = v.strip()
         if not v:
             raise ValueError('Контакт обязателен')
 
-        # Check if it's a telegram handle (@username)
-        if v.startswith('@'):
-            if len(v) < 2:
-                raise ValueError('Telegram handle должен содержать хотя бы 1 символ после @')
-            return v
+        if len(v) < 2:
+            raise ValueError('Контакт слишком короткий (минимум 2 символа)')
 
-        # Check if it's a phone (starts with + or digit)
-        if v[0] in ['+', '7', '8'] or v[0].isdigit():
-            # Remove spaces, dashes, parentheses
-            phone_clean = re.sub(r'[\s\-\(\)]', '', v)
-            if len(phone_clean) < 10:
-                raise ValueError('Номер телефона слишком короткий')
-            return v
+        # Auto-add @ for telegram usernames (letters only at start, no digits at start to avoid phone confusion)
+        # Only if it looks clearly like a username (starts with letter, only letters/digits/_)
+        if v[0].isalpha() and re.match(r'^[a-zA-Z][a-zA-Z0-9_]*$', v):
+            return f'@{v}'
 
-        # Check if it's an email
-        if '@' in v and '.' in v:
-            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-            if not re.match(email_pattern, v):
-                raise ValueError('Некорректный email')
-            return v
-
-        # If it looks like a telegram username (letters, digits, underscores), add @ automatically
-        if re.match(r'^[a-zA-Z0-9_]+$', v):
-            if len(v) >= 1:
-                return f'@{v}'
-            raise ValueError('Telegram username слишком короткий')
-
-        raise ValueError('Контакт должен быть telegram (username или @username), телефон или email')
+        # Return as-is for everything else (phone, email, telegram with @, or any other format)
+        return v
 
 
 class LeadResponse(BaseModel):
