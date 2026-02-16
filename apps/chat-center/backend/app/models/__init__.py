@@ -9,6 +9,7 @@ from app.models.interaction_event import InteractionEvent
 from app.models.runtime_setting import RuntimeSetting
 from app.models.customer_profile import CustomerProfile
 from app.models.product_cache import ProductCache
+from app.models.lead import Lead
 
 __all__ = [
     "Seller",
@@ -20,4 +21,5 @@ __all__ = [
     "RuntimeSetting",
     "CustomerProfile",
     "ProductCache",
+    "Lead",
 ]

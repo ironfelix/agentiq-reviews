@@ -113,4 +113,7 @@ def decode_access_token(token: str) -> Optional[TokenData]:
 
 def is_token_expired(token_data: TokenData) -> bool:
     """Check if token is expired."""
-    return datetime.now(timezone.utc) > token_data.exp
+    exp = token_data.exp
+    if exp.tzinfo is None:
+        exp = exp.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) > exp

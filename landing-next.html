@@ -3680,10 +3680,8 @@
     });
 
     // ===== FORM SUBMIT =====
-    function submitForm(e) {
+    async function submitForm(e) {
         e.preventDefault();
-        document.getElementById('formContent').style.display = 'none';
-        document.getElementById('formSuccess').classList.add('show');
 
         const formData = {
             nm: document.getElementById('nm').value,
@@ -3691,7 +3689,50 @@
             company: document.getElementById('company').value,
             wblink: document.getElementById('wblink').value,
         };
-        console.log('Form submitted:', formData);
+
+        // Show loading state
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton ? submitButton.textContent : '';
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Отправка...';
+        }
+
+        try {
+            // Detect API URL based on hostname
+            const hostname = window.location.hostname;
+            const apiUrl = (hostname === 'localhost' || hostname === '127.0.0.1')
+                ? 'http://localhost:8001/api/leads'
+                : '/api/leads';
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Ошибка отправки заявки');
+            }
+
+            // Success - show success message
+            document.getElementById('formContent').style.display = 'none';
+            document.getElementById('formSuccess').classList.add('show');
+            console.log('Form submitted successfully:', formData);
+
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('Ошибка отправки заявки. Попробуйте позже или свяжитесь с нами напрямую.');
+
+            // Restore button state
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        }
     }
 
     // “Внутри сервиса” is pure HTML mockups with native horizontal scroll on mobile (scroll-snap).

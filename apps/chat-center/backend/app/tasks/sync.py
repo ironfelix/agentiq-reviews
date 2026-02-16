@@ -347,9 +347,11 @@ def sync_seller_interactions(self, seller_id: int, force_full_sync: bool = False
                 await db.commit()
                 return
 
-            seller.sync_status = "syncing"
-            seller.sync_error = None
-            await db.commit()
+            # Only set 'syncing' for initial sync, not periodic re-syncs
+            if seller.sync_status != "success":
+                seller.sync_status = "syncing"
+                seller.sync_error = None
+                await db.commit()
 
             channel_errors: list[str] = []
             reviews_stats = {"fetched": 0, "created": 0, "updated": 0, "skipped": 0}
@@ -582,10 +584,11 @@ def sync_seller_chats(self, seller_id: int, marketplace: str):
                     await db.commit()
                     return
 
-                # Update sync status to syncing
-                seller.sync_status = "syncing"
-                seller.sync_error = None
-                await db.commit()
+                # Only set 'syncing' for initial sync, not periodic re-syncs
+                if seller.sync_status != "success":
+                    seller.sync_status = "syncing"
+                    seller.sync_error = None
+                    await db.commit()
 
                 # Load last successful cursor to keep sync incremental.
                 last_cursor = await _load_sync_cursor(

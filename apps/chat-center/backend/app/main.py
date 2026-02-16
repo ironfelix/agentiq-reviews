@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse
 
 from app.config import get_settings
 from app.database import engine, Base
-from app.api import sellers, chats, messages, auth, interactions, settings as settings_api
+from app.api import sellers, chats, messages, auth, interactions, settings as settings_api, leads
 from app import models  # noqa: F401
 
 # Configure logging
@@ -193,6 +193,7 @@ app.include_router(chats.router, prefix="/api")
 app.include_router(messages.router, prefix="/api")
 app.include_router(interactions.router, prefix="/api")
 app.include_router(settings_api.router, prefix="/api")
+app.include_router(leads.router, prefix="/api")
 
 
 # Root endpoint
@@ -209,6 +210,7 @@ async def root():
             "chats": "/api/chats",
             "messages": "/api/messages",
             "interactions": "/api/interactions",
+            "leads": "/api/leads",
         }
     }
 
