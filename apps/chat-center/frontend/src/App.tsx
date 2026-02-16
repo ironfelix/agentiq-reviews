@@ -242,14 +242,44 @@ type LinkCandidateView = {
 
 const SKIP_CONNECT_STORAGE_KEY = 'agentiq_connect_skipped';
 const INTERACTIONS_CACHE_KEY = 'agentiq_interactions_cache';
+const SYNC_DISMISSED_KEY = 'agentiq_sync_dismissed';
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+/** Strip extra_data to only fields needed for list rendering (interactionToChat). */
+function slimForCache(item: Interaction): Interaction {
+  const extra = item.extra_data as Record<string, unknown> | null;
+  if (!extra) return item;
+  const draft = extra.last_ai_draft as Record<string, unknown> | null;
+  const slim: Record<string, unknown> = {};
+  if (extra.chat_status) slim.chat_status = extra.chat_status;
+  if (extra.sla_due_at) slim.sla_due_at = extra.sla_due_at;
+  if (extra.product_name) slim.product_name = extra.product_name;
+  if (extra.user_name) slim.user_name = extra.user_name;
+  if (extra.customer_name) slim.customer_name = extra.customer_name;
+  if (extra.last_reply_text) slim.last_reply_text = extra.last_reply_text;
+  if (extra.is_auto_response) slim.is_auto_response = extra.is_auto_response;
+  if (draft) {
+    slim.last_ai_draft = {
+      text: draft.text || null, intent: draft.intent || null,
+      sentiment: draft.sentiment || null, sla_priority: draft.sla_priority || null,
+      recommendation_reason: draft.recommendation_reason || null,
+    };
+  }
+  // Truncate text for preview only
+  const text = typeof item.text === 'string' && item.text.length > 300 ? item.text.slice(0, 300) : item.text;
+  return { ...item, text, extra_data: slim };
+}
 
 function saveInteractionsToCache(channelKey: string, interactions: Interaction[], allLoaded?: boolean) {
   try {
-    const existing = JSON.parse(localStorage.getItem(INTERACTIONS_CACHE_KEY) || '{}');
-    existing[channelKey] = { ts: Date.now(), items: interactions, allLoaded: !!allLoaded };
-    localStorage.setItem(INTERACTIONS_CACHE_KEY, JSON.stringify(existing));
-  } catch { /* quota exceeded or serialization error, ignore */ }
+    const slim = interactions.map(slimForCache);
+    const data = { [channelKey]: { ts: Date.now(), items: slim, allLoaded: !!allLoaded } };
+    const json = JSON.stringify(data);
+    localStorage.setItem(INTERACTIONS_CACHE_KEY, json);
+    console.log(`[cache] saved ${slim.length} items (${(json.length / 1024).toFixed(0)}KB, allLoaded=${!!allLoaded})`);
+  } catch (e) {
+    console.warn('[cache] localStorage save FAILED (quota?):', e);
+  }
 }
 
 function loadInteractionsFromCache(channelKey: string): { items: Interaction[]; allLoaded: boolean } | null {
@@ -333,7 +363,9 @@ function App() {
     return 'messages';
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [dismissedSyncOnboarding, setDismissedSyncOnboarding] = useState(false);
+  const [dismissedSyncOnboarding, setDismissedSyncOnboarding] = useState(() => {
+    try { return localStorage.getItem(SYNC_DISMISSED_KEY) === '1'; } catch { return false; }
+  });
   const [connectionSkipped, setConnectionSkipped] = useState<boolean>(() => {
     try {
       return localStorage.getItem(SKIP_CONNECT_STORAGE_KEY) === '1';
@@ -348,6 +380,7 @@ function App() {
   const [interactionCache, setInteractionCache] = useState<Record<string, Interaction[]>>(() => {
     const cached = loadInteractionsFromCache('all');
     if (cached && cached.items.length > 0) {
+      console.log(`[cache] restored ${cached.items.length} items from localStorage (allLoaded=${cached.allLoaded})`);
       const result: Record<string, Interaction[]> = { all: cached.items };
       for (const item of cached.items) {
         const ch = item.channel;
@@ -356,6 +389,7 @@ function App() {
       }
       return result;
     }
+    console.log('[cache] no cached data found on init');
     return {};
   });
   const [isLoadingChats, setIsLoadingChats] = useState(() => {
@@ -430,6 +464,13 @@ function App() {
   useEffect(() => {
     try { sessionStorage.setItem('agentiq_workspace', activeWorkspace); } catch { /* ignore */ }
   }, [activeWorkspace]);
+
+  // Persist sync onboarding dismissal to localStorage
+  useEffect(() => {
+    try {
+      if (dismissedSyncOnboarding) localStorage.setItem(SYNC_DISMISSED_KEY, '1');
+    } catch { /* ignore */ }
+  }, [dismissedSyncOnboarding]);
 
   const chats = useMemo(() => interactions.map(interactionToChat), [interactions]);
   const selectedChat = useMemo(
@@ -528,6 +569,7 @@ function App() {
     clearInteractionsCache();
     try {
       localStorage.removeItem(SKIP_CONNECT_STORAGE_KEY);
+      localStorage.removeItem(SYNC_DISMISSED_KEY);
       sessionStorage.removeItem('agentiq_workspace');
       sessionStorage.removeItem('agentiq_pagination_loaded');
     } catch {
@@ -591,7 +633,7 @@ function App() {
   const fetchInteractions = useCallback(async () => {
     const channelKey = filters.channel || 'all';
     try {
-      // First page with total count for pagination
+      // First page with total count
       const paginatedFilters = {
         ...buildInteractionFilters(filters),
         page: 1,
@@ -600,8 +642,44 @@ function App() {
       };
       const response = await interactionsApi.getInteractions(paginatedFilters);
 
-      // Update cache: replace first page (newest items)
       const prevItems = interactionCacheRef.current[channelKey];
+      const hasExistingData = prevItems && prevItems.length > 0;
+      const hasMorePages = response.interactions.length >= 50;
+
+      // ——— FIRST LOAD (no data yet): load ALL pages before updating UI ———
+      if (!hasExistingData && hasMorePages) {
+        let allItems = [...response.interactions];
+        let page = 2;
+        let done = false;
+        while (!done) {
+          const pageFilters: InteractionFilters = { page, page_size: 50 };
+          if (channelKey !== 'all') pageFilters.channel = channelKey;
+          const pageResp = await interactionsApi.getInteractions(pageFilters);
+          allItems.push(...pageResp.interactions);
+          if (pageResp.interactions.length < 50) done = true;
+          else page++;
+        }
+        console.log(`[fetch] first load: ${allItems.length} items in ${page} pages`);
+        // Single state update with ALL items — no intermediate renders
+        if (channelKey === 'all') {
+          const byChannel: Record<string, Interaction[]> = {};
+          for (const item of allItems) {
+            if (!byChannel[item.channel]) byChannel[item.channel] = [];
+            byChannel[item.channel].push(item);
+          }
+          setInteractionCache(prev => ({ ...prev, [channelKey]: allItems, ...byChannel }));
+        } else {
+          setInteractionCache(prev => ({ ...prev, [channelKey]: allItems }));
+        }
+        setPaginationMeta(prev => ({
+          ...prev,
+          [channelKey]: { total: allItems.length, loadedPages: page, isLoadingMore: false, allLoaded: true },
+        }));
+        saveInteractionsToCache(channelKey, allItems, true);
+        return; // done — no merge needed
+      }
+
+      // ——— SUBSEQUENT POLLS (data exists): merge page 1 with existing ———
       // Compare visually-meaningful fields only (NOT updated_at — it changes every sync cycle)
       const isSame = prevItems
         && prevItems.length >= response.interactions.length
@@ -611,8 +689,10 @@ function App() {
           if (item.needs_response !== prev.needs_response) return false;
           if (item.priority !== prev.priority) return false;
           if (item.status !== prev.status) return false;
-          if (item.text !== prev.text) return false;
-          // Extra_data fields that affect section grouping and display
+          // Compare text but ignore truncation from cache slim (first 300 chars)
+          const textA = typeof item.text === 'string' ? item.text.slice(0, 300) : item.text;
+          const textB = typeof prev.text === 'string' ? prev.text.slice(0, 300) : prev.text;
+          if (textA !== textB) return false;
           const extraA = item.extra_data as Record<string, unknown> | null;
           const extraB = prev.extra_data as Record<string, unknown> | null;
           const draftA = extraA?.last_ai_draft as Record<string, unknown> | null;
@@ -622,14 +702,8 @@ function App() {
           return true;
         });
       if (!isSame) {
-        // Merge: keep newer first-page items, keep already-loaded older pages
         const firstPageIds = new Set(response.interactions.map(i => i.id));
         const olderItems = (prevItems || []).filter(i => !firstPageIds.has(i.id));
-        setInteractionCache(prev => ({
-          ...prev,
-          [channelKey]: [...response.interactions, ...olderItems],
-        }));
-        // Also split into per-channel caches for instant folder switching
         if (channelKey === 'all') {
           const byChannel: Record<string, Interaction[]> = {};
           for (const item of response.interactions) {
@@ -645,31 +719,28 @@ function App() {
             }
             return next;
           });
+        } else {
+          setInteractionCache(prev => ({
+            ...prev,
+            [channelKey]: [...response.interactions, ...olderItems],
+          }));
         }
       }
 
-      // Track pagination metadata — use functional updater to read latest state (avoids stale closure)
+      // Track pagination
       const total = response.total || response.interactions.length;
       const allLoaded = response.interactions.length < 50;
       let resolvedAllLoaded = allLoaded;
       setPaginationMeta(prev => {
         const currentMeta = prev[channelKey];
-        // If cache was fully loaded before, keep allLoaded=true.
-        // New items arrive via polling (page 1 merge) — no need to re-paginate.
         resolvedAllLoaded = allLoaded || (currentMeta?.allLoaded ?? false);
         return {
           ...prev,
-          [channelKey]: {
-            total,
-            loadedPages: 1,
-            isLoadingMore: false,
-            allLoaded: resolvedAllLoaded,
-          },
+          [channelKey]: { total, loadedPages: 1, isLoadingMore: false, allLoaded: resolvedAllLoaded },
         };
       });
 
-      // Save to sessionStorage for instant restore on next visit
-      // If allLoaded, save the full merged list (not just page 1)
+      // Save to cache
       if (resolvedAllLoaded && prevItems && prevItems.length > response.interactions.length) {
         const firstPageIds = new Set(response.interactions.map(i => i.id));
         const merged = [...response.interactions, ...prevItems.filter(i => !firstPageIds.has(i.id))];
@@ -679,7 +750,6 @@ function App() {
       }
 
       if (selectedInteractionId && !response.interactions.some((item) => item.id === selectedInteractionId)) {
-        // Selected item might be on a later page — don't deselect
         const allCached = interactionCacheRef.current[channelKey] || [];
         if (!allCached.some(item => item.id === selectedInteractionId)) {
           setSelectedInteractionId(null);
@@ -694,66 +764,76 @@ function App() {
     }
   }, [filters, selectedInteractionId, paginationMeta]);
 
-  // Background pagination: auto-load next pages
-  const fetchNextPage = useCallback(async (channelKey: string) => {
+  // Background pagination: load ALL remaining pages in one go, update state once
+  const fetchAllRemainingPages = useCallback(async (channelKey: string) => {
     const meta = paginationMeta[channelKey];
     if (!meta || meta.allLoaded || meta.isLoadingMore) return;
 
-    const nextPage = meta.loadedPages + 1;
     setPaginationMeta(prev => ({
       ...prev,
-      [channelKey]: { ...meta, isLoadingMore: true },
+      [channelKey]: { ...prev[channelKey]!, isLoadingMore: true },
     }));
 
     try {
-      const pageFilters: InteractionFilters = { page: nextPage, page_size: 50 };
-      if (channelKey !== 'all') pageFilters.channel = channelKey;
-      const response = await interactionsApi.getInteractions(pageFilters);
+      const allNewItems: Interaction[] = [];
+      let page = meta.loadedPages + 1;
+      let done = false;
 
+      while (!done) {
+        const pageFilters: InteractionFilters = { page, page_size: 50 };
+        if (channelKey !== 'all') pageFilters.channel = channelKey;
+        const response = await interactionsApi.getInteractions(pageFilters);
+        allNewItems.push(...response.interactions);
+        if (response.interactions.length < 50) {
+          done = true;
+        } else {
+          page++;
+        }
+      }
+
+      // Single state update with ALL remaining items
       setInteractionCache(prev => {
         const existing = prev[channelKey] || [];
         const existingIds = new Set(existing.map(i => i.id));
-        const newItems = response.interactions.filter(i => !existingIds.has(i.id));
+        const newItems = allNewItems.filter(i => !existingIds.has(i.id));
+        if (newItems.length === 0) return prev;
         return { ...prev, [channelKey]: [...existing, ...newItems] };
       });
 
-      const allLoaded = response.interactions.length < 50;
       setPaginationMeta(prev => ({
         ...prev,
         [channelKey]: {
           total: meta.total,
-          loadedPages: nextPage,
+          loadedPages: page,
           isLoadingMore: false,
-          allLoaded,
+          allLoaded: true,
         },
       }));
 
-      // When all pages loaded, save full list to sessionStorage cache
-      if (allLoaded) {
-        // Read from latest state via ref to get the complete merged list
-        setTimeout(() => {
-          const fullList = interactionCacheRef.current[channelKey];
-          if (fullList) {
-            saveInteractionsToCache(channelKey, fullList, true);
-          }
-        }, 0);
-      }
-    } catch {
+      // Save full list to cache
+      setTimeout(() => {
+        const fullList = interactionCacheRef.current[channelKey];
+        if (fullList) {
+          saveInteractionsToCache(channelKey, fullList, true);
+        }
+      }, 0);
+    } catch (e) {
+      console.warn('[pagination] Failed to load remaining pages:', e);
       setPaginationMeta(prev => ({
         ...prev,
-        [channelKey]: { ...meta, isLoadingMore: false },
+        [channelKey]: { ...prev[channelKey]!, isLoadingMore: false },
       }));
     }
   }, [paginationMeta]);
 
-  // Auto-trigger background loading of remaining pages
+  // Auto-trigger background loading of remaining pages (single batch)
   useEffect(() => {
     const channelKey = filters.channel || 'all';
     const meta = paginationMeta[channelKey];
     if (!meta || meta.allLoaded || meta.isLoadingMore) return;
-    const timer = setTimeout(() => fetchNextPage(channelKey), 300);
+    const timer = setTimeout(() => fetchAllRemainingPages(channelKey), 300);
     return () => clearTimeout(timer);
-  }, [paginationMeta, filters.channel, fetchNextPage]);
+  }, [paginationMeta, filters.channel, fetchAllRemainingPages]);
 
   const fetchQualityMetrics = useCallback(async () => {
     try {
@@ -1207,7 +1287,8 @@ function App() {
   const shouldShowSyncOnboarding = Boolean(user.has_api_credentials)
     && user.sync_status === 'syncing'
     && !dismissedSyncOnboarding
-    && !connectionSkipped;
+    && !connectionSkipped
+    && !cacheRestoredRef.current; // Skip onboarding if we have cached data from previous session
   if (shouldShowSyncOnboarding) {
     return (
       <MarketplaceOnboarding

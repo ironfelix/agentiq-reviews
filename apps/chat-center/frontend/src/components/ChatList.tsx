@@ -343,22 +343,14 @@ export function ChatList({
           </button>
         </div>
 
-        {hasApiCredentials && (syncStatus === 'syncing' || syncStatus === 'error') && (
-          <div className={`sync-banner ${syncStatus}`}>
+        {/* Error banner only — sync progress moved to Apple Mail–style bottom banner */}
+        {hasApiCredentials && syncStatus === 'error' && (
+          <div className={`sync-banner error`}>
             <div className="sync-banner-main">
-              {syncStatus === 'syncing' ? (
-                <>
-                  <span className="sync-spinner"></span>
-                  <span>Синхронизация данных в процессе...</span>
-                </>
-              ) : (
-                <>
-                  <span className="sync-banner-dot"></span>
-                  <span>{syncError || 'Синхронизация завершилась с ошибкой'}</span>
-                </>
-              )}
+              <span className="sync-banner-dot"></span>
+              <span>{syncError || 'Синхронизация завершилась с ошибкой'}</span>
             </div>
-            {syncStatus === 'error' && onRetrySync && (
+            {onRetrySync && (
               <button
                 className="sync-retry-btn"
                 onClick={() => onRetrySync()}
