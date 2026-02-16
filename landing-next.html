@@ -3586,7 +3586,7 @@
                 </div>
                 <div class="form-group">
                     <label for="contact">Контакт</label>
-                    <input type="text" id="contact" placeholder="@telegram или +7... или email" required>
+                    <input type="text" id="contact" placeholder="@username или +79991234567 или email@example.com" required>
                 </div>
                 <div class="form-group">
                     <label for="company">Магазин (опционально)</label>
@@ -3715,6 +3715,27 @@
 
             if (!response.ok) {
                 const error = await response.json();
+                console.error('API Error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: error
+                });
+
+                // Handle validation errors (422)
+                if (response.status === 422 && error.detail && Array.isArray(error.detail)) {
+                    const fieldErrors = error.detail.map(err => {
+                        const field = err.loc ? err.loc[err.loc.length - 1] : 'поле';
+                        const fieldNames = {
+                            'nm': 'Артикул',
+                            'contact': 'Контакт',
+                            'company': 'Магазин',
+                            'wblink': 'Ссылка'
+                        };
+                        return `${fieldNames[field] || field}: ${err.msg}`;
+                    }).join('\n');
+                    throw new Error(fieldErrors);
+                }
+
                 throw new Error(error.detail || 'Ошибка отправки заявки');
             }
 
@@ -3725,6 +3746,7 @@
 
         } catch (error) {
             console.error('Form submission error:', error);
+            console.error('Form data was:', formData);
             alert('Ошибка отправки заявки. Попробуйте позже или свяжитесь с нами напрямую.');
 
             // Restore button state
