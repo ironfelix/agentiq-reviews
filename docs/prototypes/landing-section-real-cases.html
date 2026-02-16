@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentIQ — Реальные кейсы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fafafa;
+      color: #1f2937;
+      line-height: 1.6;
+      padding: 48px 20px;
+    }
+
+    .section-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .section-subtitle {
+      font-size: 16px;
+      color: #6b7280;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Case Card */
+    .case-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .case-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .case-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    /* Review Box */
+    .review-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .review-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .review-stars {
+      color: #f59e0b;
+    }
+
+    .review-text {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .response-box {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .response-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .response-text {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    /* Comparison */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .comparison-side {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 18px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .comparison-side.before {
+      border-color: #fca5a5;
+    }
+
+    .comparison-side.after {
+      border-color: #86efac;
+    }
+
+    .comparison-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .comparison-side.before .comparison-label {
+      color: #dc2626;
+    }
+
+    .comparison-side.after .comparison-label {
+      color: #16a34a;
+    }
+
+    .comparison-text {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .tag.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    /* Insight Box */
+    .insight-box {
+      background: #fef3c7;
+      border-left: 3px solid #f59e0b;
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    .insight-title {
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .insight-text {
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body {
+        padding: 32px 16px;
+      }
+
+      .section-title {
+        font-size: 28px;
+      }
+
+      .section-subtitle {
+        font-size: 15px;
+      }
+
+      .case-card {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .case-title {
+        font-size: 18px;
+      }
+
+      .comparison {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .comparison-side {
+        padding: 16px;
+      }
+
+      .review-box {
+        padding: 16px;
+      }
+
+      .insight-box {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .section-title {
+        font-size: 24px;
+      }
+
+      .case-title {
+        font-size: 17px;
+      }
+
+      .comparison-text,
+      .review-text,
+      .response-text {
+        font-size: 13px;
+      }
+
+      .tag {
+        font-size: 10px;
+        padding: 4px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="section-container">
+    <!-- Header -->
+    <div class="section-header">
+      <div class="section-tag">Реальные кейсы</div>
+      <h2 class="section-title">Как отвечают сейчас vs как нужно</h2>
+      <p class="section-subtitle">
+        Разбираем реальные отзывы с маркетплейсов. Шаблонные ответы вредят продажам —
+        мы покажем, как отвечать правильно.
+      </p>
+    </div>
+
+    <!-- Case 1: Размер -->
+    <div class="case-card">
+      <h3 class="case-title">Размерная сетка — системная проблема</h3>
+      <p class="case-subtitle">UrbanThreads · Брюки чинос · 4 отзыва про размер</p>
+
+      <div class="review-box">
+        <div class="review-meta">
+          <span class="review-stars">★★★★☆</span>
+          <span>Дарья</span>
+          <span>·</span>
+          <span>29 января</span>
+        </div>
+        <div class="review-text">
+          <strong>Достоинства:</strong> Качество хорошее, но маломерит на размер
+        </div>
+        <div class="response-box">
+          <div class="response-label">Ответ продавца</div>
+          <div class="response-text">
+            Добрый день. Благодарим за ваш отзыв. Надеемся, что не доставили вам неудобств.
+            Будем рады, если вам подойдет другая модель из нашего ассортимента. С уважением, команда UrbanThreads.
+          </div>
+        </div>
+      </div>
+
+      <div class="comparison">
+        <div class="comparison-side before">
+          <div class="comparison-label">❌ Шаблонный ответ</div>
+          <div class="comparison-text">
+            "Благодарим за ваш отзыв. Надеемся, что не доставили вам неудобств.
+            Будем рады, если вам подойдет другая модель из нашего ассортимента."
+          </div>
+          <div class="tags">
+            <div class="tag error">Игнорирует проблему</div>
+            <div class="tag error">Шаблон</div>
+          </div>
+        </div>
+
+        <div class="comparison-side after">
+          <div class="comparison-label">✅ AgentIQ рекомендует</div>
+          <div class="comparison-text">
+            "Благодарим за отзыв! Нам жаль, что модель маломерит — учтём для описания товара
+            и размерной таблицы. По опыту покупателей, эта модель лучше брать на размер больше.
+            Если нужна помощь — напишите нам!"
+          </div>
+          <div class="tags">
+            <div class="tag success">Эмпатия</div>
+            <div class="tag success">Конкретика</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-title">💡 Что критично</div>
+        <div class="insight-text">
+          4 отзыва подряд про размер — это не единичные случаи, а системная проблема.
+          Продавец штампует шаблоны → следующие покупатели столкнутся с тем же →
+          возвраты продолжаются → потери 150-200k₽/год на логистике.
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 2: Две проблемы -->
+    <div class="case-card">
+      <h3 class="case-title">Две проблемы — упаковка + размер</h3>
+      <p class="case-subtitle">UrbanThreads · 5★ отзыв, но товар вернули</p>
+
+      <div class="review-box">
+        <div class="review-meta">
+          <span class="review-stars">★★★★★</span>
+          <span>Лилиана</span>
+          <span>·</span>
+          <span>06 февраля</span>
+        </div>
+        <div class="review-text">
+          <strong>Достоинства:</strong> Качество хорошее, но не подошел размер, большемерят.<br>
+          <strong>Комментарий:</strong> Ужасно упакован — брюки скомканы, в рванном пакете, заклеен скотчем, кошмар...
+        </div>
+      </div>
+
+      <div class="comparison">
+        <div class="comparison-side before">
+          <div class="comparison-label">⚠️ Текущий ответ</div>
+          <div class="comparison-text">
+            Добрый день. Благодарим за ваш отзыв и искренне извиняемся за состояние упаковки при получении.
+            Мы передадим эту информацию в службу логистики для улучшения процесса.
+            Рады, что качество и дизайн вас порадовали. К сожалению, в этом случае размер не подошел —
+            мы понимаем, как это важно. Надеемся, что в будущем вы найдете у нас модель,
+            которая будет идеально соответствовать вашим ожиданиям. С уважением, команда UrbanThreads.
+          </div>
+          <div class="tags">
+            <div class="tag error">Пассивно</div>
+            <div class="tag error">Не признаёт системность</div>
+          </div>
+        </div>
+
+        <div class="comparison-side after">
+          <div class="comparison-label">✅ AgentIQ рекомендует</div>
+          <div class="comparison-text">
+            Спасибо за отзыв! Нам очень жаль за состояние упаковки — это недопустимо, передали в логистику.
+            По размеру: ваш отзыв критически важен — мы проверим размерную сетку этой модели
+            и добавим рекомендацию в описание. Рады, что качество понравилось. Если нужна помощь — пишите!
+          </div>
+          <div class="tags">
+            <div class="tag success">Обе проблемы адресованы</div>
+            <div class="tag success">Признаёт системность</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-title">💡 Скрытая жалоба в 5★ отзыве</div>
+        <div class="insight-text">
+          Покупатель поставил 5 звёзд, но вернул товар из-за двух проблем.
+          Это "hidden risk" — похвала маскирует жалобу. Продавец должен адресовать ОБЕ проблемы
+          и обещать проверку, иначе следующие покупатели столкнутся с тем же.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -101,6 +101,13 @@ Guardrails are a declarative ethical and operational system, NOT a set of hardco
 2. When implementing backend/service logic, do not redesign layout, hierarchy, or visual patterns.
 3. Allowed UI changes are only data wiring and state handling (loading/error/empty) that preserve the approved design.
 
+## Landing Page (MANDATORY)
+- **Single source:** `docs/prototypes/landing-next.html` (~3500 lines, single-file SPA). NO copies.
+- **Deploy:** SCP directly to VPS → `/var/www/agentiq/landing.html`
+- **Section order:** Hero → Sellers quotes → Problem → Approach → **Cases** → Proof → How it works → Features → Money → Offer → Audience → CTA → Footer
+- **Carousel pattern (reusable):** `.{name}-slider` > `.{name}-gallery` (flex, scroll-snap) > `.{name}-card` + `.{name}-controls` (arrows + dots). Used by `proof` and `cases` sections. JS: `initProofSnapCarousel()`, `initCasesCarousel()`.
+- **Mobile:** arrows hidden at `≤640px`, swipe via scroll-snap.
+
 ## Design System (MANDATORY)
 
 **📚 Full documentation:** `docs/design-system/` — Colors, Typography, Components, Panels

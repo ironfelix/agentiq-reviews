@@ -22,7 +22,8 @@ Last updated: 2026-02-16
 - `product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md` — живой execution-log и текущий scope
 - `chat-center/INDEX.md` — документация Chat Center (как запустить, схема БД, исследования)
 - `chat-center/SCENARIO_ENGINE.md` — сценарность, P0-P3, guardrails (MD)
-- `chat-center/scenario-engine.html` — то же “по-человечески” (HTML)
+- `chat-center/scenario-engine.html` — то же "по-человечески" (HTML)
+- **`chat-center/LOADING_ARCHITECTURE.md`** — архитектура загрузки данных: flow, кэш, пагинация, риски, мировая практика (Zendesk, Intercom, etc.)
 
 ### Reviews Reports (legacy / отдельный контур)
 
@@ -40,6 +41,7 @@ Last updated: 2026-02-16
 - `architecture/architecture-mvp2.md` — MVP2 Reviews (архитектурные детали)
 - `architecture/AGENTIQ_2.0_ARCHITECTURE.md` — vision / 2.0
 - `architecture/SCALING_NOTES.md` — заметки о масштабировании AI analysis pipeline (MVP → enterprise)
+- `chat-center/LOADING_ARCHITECTURE.md` — архитектура загрузки UI: polling, пагинация, кэш, риски, мировые практики
 - `SLA_RULES.md` — SLA targets + rationale (WB, benchmarks)
 - `BILLING_ARCHITECTURE.md` — дизайн биллинга (план)
 
