@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentIQ — Лендинг (черновик)</title>
+    <title>AgentIQ — Все коммуникации Wildberries в одном окне</title>
     <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
-    <meta name="robots" content="noindex,nofollow">
+    <meta name="robots" content="index,follow">
     <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
     <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный анализ коммуникаций.">
     <meta property="og:type" content="website">
@@ -1846,6 +1846,709 @@
             .mock-url { justify-content: flex-start; }
         }
 
+        /* ===== MOBILE MOCKUPS (iPhone style) ===== */
+        .proof-mock.mobile {
+            aspect-ratio: 9 / 19.5;
+            max-width: 340px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 42px;
+            padding: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-statusbar {
+            height: 44px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-time {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mobile-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mobile-icon {
+            width: 18px;
+            height: 12px;
+            background: #1a1a1a;
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .mobile-navbar {
+            height: 56px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .mobile-navbar-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .mobile-navbar-action {
+            padding: 6px 12px;
+            background: #1a73e8;
+            color: #ffffff;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .mobile-content {
+            flex: 1;
+            overflow: hidden;
+            background: #fafbfc;
+        }
+
+        /* Mobile Chat List */
+        .mobile-chatlist {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-chat-item {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mobile-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-chat-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mobile-sla {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mobile-sla.overdue {
+            background: rgba(234,67,53,0.12);
+            color: #ea4335;
+        }
+
+        .mobile-sla.soon {
+            background: rgba(249,171,0,0.12);
+            color: #f9ab00;
+        }
+
+        .mobile-sla.ok {
+            background: rgba(52,168,83,0.12);
+            color: #34a853;
+        }
+
+        .mobile-chat-preview {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.4;
+        }
+
+        .mobile-chat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .mobile-marketplace-icon {
+            width: 16px;
+            height: 16px;
+            background: #8b3eea;
+            border-radius: 4px;
+        }
+
+        /* Mobile Chat Messages */
+        .mobile-chat-messages {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8f9fa;
+            height: 100%;
+        }
+
+        .mobile-message {
+            max-width: 75%;
+            padding: 10px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .mobile-message.customer {
+            align-self: flex-start;
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e8eaed;
+        }
+
+        .mobile-message.seller {
+            align-self: flex-end;
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        .mobile-ai-draft {
+            padding: 12px;
+            background: rgba(26,115,232,0.06);
+            border: 1px solid rgba(26,115,232,0.15);
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        .mobile-ai-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1a73e8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .mobile-ai-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .mobile-ai-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .mobile-ai-btn {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .mobile-ai-btn.primary {
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        .mobile-ai-btn.secondary {
+            background: #f0f7ff;
+            color: #1a73e8;
+        }
+
+        /* Mobile Review */
+        .mobile-review {
+            padding: 16px;
+            background: #ffffff;
+        }
+
+        .mobile-review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .mobile-review-stars {
+            font-size: 16px;
+            color: #f9ab00;
+        }
+
+        .mobile-review-date {
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .mobile-review-text {
+            font-size: 14px;
+            color: #1a1a1a;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .mobile-review-input {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mobile-review-input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f6368;
+            margin-bottom: 6px;
+        }
+
+        .mobile-review-input-text {
+            font-size: 14px;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        /* Mobile CRM Message */
+        .mobile-crm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(52,168,83,0.12);
+            color: #34a853;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mobile-crm-icon {
+            width: 12px;
+            height: 12px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        /* Mobile Auto-Response Badge */
+        .mobile-auto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: rgba(26,115,232,0.08);
+            border: 1px solid rgba(26,115,232,0.2);
+            color: #1a73e8;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .mobile-auto-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* ===== CARD MOCKUPS (like screenshots) ===== */
+        .card-mock {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-mock-section {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #5f6368;
+        }
+
+        .card-mock-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+
+        /* Priority List */
+        .priority-item {
+            padding: 14px;
+            background: #fafbfc;
+            border-radius: 8px;
+            border-left: 3px solid #e8eaed;
+            margin-bottom: 10px;
+        }
+
+        .priority-item.overdue {
+            border-left-color: #ea4335;
+            background: rgba(234,67,53,0.04);
+        }
+
+        .priority-item.soon {
+            border-left-color: #f9ab00;
+            background: rgba(249,171,0,0.04);
+        }
+
+        .priority-item.ok {
+            border-left-color: #34a853;
+            background: rgba(52,168,83,0.04);
+        }
+
+        .priority-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .priority-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-badge.overdue {
+            background: #ea4335;
+            color: #ffffff;
+        }
+
+        .priority-badge.soon {
+            background: rgba(249,171,0,0.25);
+            color: #9a6800;
+        }
+
+        .priority-badge.ok {
+            background: rgba(52,168,83,0.25);
+            color: #1e7e34;
+        }
+
+        .priority-preview {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.4;
+        }
+
+        /* Chat Dialog */
+        .chat-dialog {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 85%;
+        }
+
+        .chat-message.customer {
+            align-self: flex-start;
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .chat-ai-draft {
+            align-self: flex-start;
+            padding: 14px;
+            background: rgba(138,62,234,0.08);
+            border: 1.5px solid rgba(138,62,234,0.25);
+            border-radius: 12px;
+            max-width: 90%;
+        }
+
+        .chat-ai-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #8b3eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .chat-ai-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        /* Quality Bars */
+        .quality-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quality-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quality-label {
+            min-width: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .quality-track {
+            flex: 1;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .quality-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+
+        .quality-fill.good { background: #34a853; }
+        .quality-fill.acceptable { background: #1a73e8; }
+        .quality-fill.risky { background: #f9ab00; }
+        .quality-fill.harmful { background: #ea4335; }
+
+        .quality-value {
+            min-width: 40px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: right;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            background: #fafbfc;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-value.red { color: #ea4335; }
+        .metric-value.green { color: #34a853; }
+        .metric-value.gray { color: #5f6368; }
+
+        .metric-label {
+            font-size: 13px;
+            color: #5f6368;
+            font-weight: 500;
+        }
+
+        /* CRM Card */
+        .crm-review {
+            padding: 14px;
+            background: rgba(249,171,0,0.08);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .crm-stars {
+            font-size: 18px;
+            color: #f9ab00;
+            margin-bottom: 6px;
+        }
+
+        .crm-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .crm-response {
+            padding: 14px;
+            background: rgba(52,168,83,0.08);
+            border-left: 3px solid #34a853;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .crm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34a853;
+            margin-bottom: 8px;
+        }
+
+        .crm-badge-icon {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .crm-effect {
+            padding: 16px;
+            background: rgba(52,168,83,0.06);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .crm-effect-label {
+            font-size: 12px;
+            color: #5f6368;
+            margin-bottom: 6px;
+        }
+
+        .crm-effect-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #34a853;
+        }
+
+        /* Auto Response */
+        .auto-question {
+            padding: 14px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .auto-question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .auto-question-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .auto-pre-badge {
+            padding: 4px 8px;
+            background: #1a73e8;
+            color: #ffffff;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .auto-question-text {
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .auto-answer {
+            padding: 14px;
+            background: rgba(52,168,83,0.08);
+            border-left: 3px solid #34a853;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .auto-answer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34a853;
+            margin-bottom: 8px;
+        }
+
+        .auto-answer-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .auto-timing {
+            padding: 14px;
+            background: rgba(249,171,0,0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auto-timing-icon {
+            font-size: 20px;
+        }
+
+        .auto-timing-text {
+            flex: 1;
+        }
+
+        .auto-timing-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #9a6800;
+            margin-bottom: 2px;
+        }
+
+        .auto-timing-desc {
+            font-size: 11px;
+            color: #5f6368;
+        }
+
+        /* Hide desktop mocks on mobile, show only card mocks */
+        @media (max-width: 768px) {
+            #proof .proof-card:nth-child(1),
+            #proof .proof-card:nth-child(2),
+            #proof .proof-card:nth-child(3) {
+                display: none;
+            }
+        }
+
         .proof-slide-text {
             padding: 2px 4px 0;
         }
@@ -2811,7 +3514,7 @@
                     <div class="insight-box">
                         <div class="insight-title">💡 Что критично</div>
                         <div class="insight-text">
-                            5 звёзд, но товар вернули. Это "hidden risk" — похвала маскирует жалобу. Нужно адресовать ОБЕ проблемы.
+                            5 звёзд, но товар вернули. Это скрытая жалоба — похвала маскирует проблему. Нужно адресовать ОБЕ части.
                         </div>
                     </div>
                 </div>
@@ -3085,9 +3788,216 @@
                     <div class="proof-slide-text">
                         <span class="proof-slide-num">03</span>
                         <h3>Приоритеты и SLA</h3>
-                        <p>Видно, что просрочено и что “горит” сейчас. Очередь управляется, а не живёт сама по себе.</p>
+                        <p>Видно, что просрочено и что "горит" сейчас. Очередь управляется, а не живёт сама по себе.</p>
                     </div>
 	                </div>
+
+                    <!-- Card 1: Приоритеты -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">ПРИОРИТЕТЫ</div>
+                                <div class="priority-item overdue">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Отзыв: возврат</span>
+                                        <span class="priority-badge overdue">ПРОСРОЧЕН</span>
+                                    </div>
+                                    <div class="priority-preview">Покупатель: "Вы обманули, товар не тот..."</div>
+                                </div>
+                                <div class="priority-item soon">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Вопрос: размер</span>
+                                        <span class="priority-badge soon">СКОРО</span>
+                                    </div>
+                                    <div class="priority-preview">"Подойдет ли на рост 180?"</div>
+                                </div>
+                                <div class="priority-item ok">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Чат: доставка</span>
+                                        <span class="priority-badge ok">В НОРМЕ</span>
+                                    </div>
+                                    <div class="priority-preview">"Когда привезете?"</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">04</span>
+                            <h3>Сортировка по срочности</h3>
+                            <p>Срочные чаты — сверху. Команда видит дедлайны и не пропускает критичное.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Работа с негативом -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">РАБОТА С НЕГАТИВОМ</div>
+                                <div class="chat-dialog">
+                                    <div class="chat-message customer">
+                                        Товар пришёл с браком! Вообще не работает.
+                                    </div>
+                                    <div class="chat-message customer">
+                                        Ставлю 1 звезду и пишу отзыв. Больше у вас не закажу!
+                                    </div>
+                                    <div class="chat-ai-draft">
+                                        <div class="chat-ai-label">ИИ ЧЕРНОВИК</div>
+                                        <div class="chat-ai-text">
+                                            Нам очень жаль что товар оказался бракованным! Это недопустимо.
+                                            <br><br>
+                                            Оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.
+                                            <br><br>
+                                            Мы проверим партию, чтобы исключить повторение. Спасибо за понимание.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">05</span>
+                            <h3>ИИ знает как работать с негативом</h3>
+                            <p>Эскалация (брак → угроза 1★) — ИИ генерирует правильный тон и предлагает решение.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Аналитика качества -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">КАЧЕСТВО ОТВЕТОВ</div>
+                                <div class="quality-bars">
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Хорошие</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill good" style="width: 62%"></div>
+                                        </div>
+                                        <span class="quality-value">62%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Допустимые</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill acceptable" style="width: 24%"></div>
+                                        </div>
+                                        <span class="quality-value">24%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Рискованные</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill risky" style="width: 10%"></div>
+                                        </div>
+                                        <span class="quality-value">10%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Вредные</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill harmful" style="width: 4%"></div>
+                                        </div>
+                                        <span class="quality-value">4%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">06</span>
+                            <h3>Аналитика качества</h3>
+                            <p>Видно где ответы вредят: шаблоны, обвинения, игнорирование жалоб.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Ключевые метрики -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="metrics-grid">
+                                    <div class="metric-card">
+                                        <div class="metric-value red">7%</div>
+                                        <div class="metric-label">просрочек по срокам</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-value green">93%</div>
+                                        <div class="metric-label">ответов в срок</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-value gray">4%</div>
+                                        <div class="metric-label">вредных ответов</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">07</span>
+                            <h3>Ключевые метрики</h3>
+                            <p>Команда видит где проседает скорость и качество. Можно быстро среагировать.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: CRM-маркетинг -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">CRM-МАРКЕТИНГ</div>
+                                <div class="crm-review">
+                                    <div class="crm-stars">⭐⭐⭐⭐⭐</div>
+                                    <div class="crm-text">Товар отличный, всё быстро пришло!</div>
+                                </div>
+                                <div class="crm-response">
+                                    <div class="crm-badge">
+                                        <span class="crm-badge-icon"></span>
+                                        ИИ АВТООТВЕТ
+                                    </div>
+                                    <div class="crm-text">
+                                        Спасибо за отзыв! В знак благодарности дарим промокод <strong>THANKS10</strong> на скидку 10% на следующую покупку. Действует 30 дней.
+                                    </div>
+                                </div>
+                                <div class="crm-effect">
+                                    <div class="crm-effect-label">Эффект</div>
+                                    <div class="crm-effect-value">+30% повторных покупок</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">08</span>
+                            <h3>Промокоды за отзывы</h3>
+                            <p>ИИ автоматически предлагает промокод на 5★ отзывы — растёт лояльность и повторные покупки.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Автоответы на вопросы -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">АВТООТВЕТ (КОНВЕРСИЯ)</div>
+                                <div class="auto-question">
+                                    <div class="auto-question-header">
+                                        <span class="auto-question-title">Вопрос: размер XL</span>
+                                        <span class="auto-pre-badge">PRE-PURCHASE</span>
+                                    </div>
+                                    <div class="auto-question-text">"Есть размер XL в наличии?"</div>
+                                </div>
+                                <div class="auto-answer">
+                                    <div class="auto-answer-badge">
+                                        <span class="crm-badge-icon"></span>
+                                        АВТООТВЕТ ЧЕРЕЗ 2 МИН
+                                    </div>
+                                    <div class="auto-answer-text">
+                                        Да, размер XL в наличии! Доставка 2-5 дней. Размерная сетка в описании товара 👕
+                                    </div>
+                                </div>
+                                <div class="auto-timing">
+                                    <span class="auto-timing-icon">📊</span>
+                                    <div class="auto-timing-text">
+                                        <div class="auto-timing-title">Окно решения: 10-20 сек</div>
+                                        <div class="auto-timing-desc">Ответ в течение часа = +20% конверсия</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">09</span>
+                            <h3>Автоответы на вопросы</h3>
+                            <p>Pre-purchase вопросы отвечаются за минуты — покупатель не уходит к конкурентам. +20% конверсия.</p>
+                        </div>
+                    </div>
+
 	            </div>
 	            <div class="proof-controls" aria-label="Навигация по превью">
 	                <button class="proof-arrow" type="button" data-proof-arrow="-1" aria-label="Предыдущий экран">
@@ -3125,7 +4035,7 @@
             <div class="step-card reveal reveal-delay-3">
                 <div class="step-num">03</div>
                 <h3>Контроль сроков и качества</h3>
-                <p>Приоритеты, скоро/просрочен и понятные причины проблем. ИИ предлагает черновики, команда отвечает быстрее и аккуратнее.</p>
+                <p>Приоритеты, скоро/просрочен и понятные причины проблем. ИИ помогает черновиками или автоответами — команда работает быстрее и аккуратнее.</p>
             </div>
         </div>
     </div>
@@ -3178,7 +4088,7 @@
             </div>
             <div class="feature-card reveal reveal-delay-3">
                 <div class="feature-head">
-                    <span class="feature-chip"><i></i>ИИ черновик</span>
+                    <span class="feature-chip"><i></i>ИИ помощник</span>
                     <span class="feature-icon ai" aria-hidden="true">
                         <svg viewBox="0 0 16 16" fill="none">
                             <path d="M3.5 12.5V4.8c0-.7.6-1.3 1.3-1.3h6.4c.7 0 1.3.6 1.3 1.3v6.4c0 .7-.6 1.3-1.3 1.3H6.7L4.8 13.9c-.6.4-1.3 0-1.3-.7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
@@ -3186,11 +4096,11 @@
                         </svg>
                     </span>
                 </div>
-                <h3>Черновик ответа от ИИ</h3>
-                <p>ИИ предлагает текст под ситуацию: можно принять как есть или быстро отредактировать и отправить.</p>
+                <h3>Черновики или автоответы</h3>
+                <p>ИИ предлагает готовый текст под ситуацию — можно отредактировать или отправить как есть. На типовые вопросы и позитив отвечает автоматически.</p>
                 <div class="feature-tags" aria-hidden="true">
-                    <span class="feature-tag">тон общения</span>
-                    <span class="feature-tag">контекст</span>
+                    <span class="feature-tag">черновики</span>
+                    <span class="feature-tag">автоответы</span>
                     <span class="feature-tag">скорость</span>
                 </div>
             </div>
@@ -3269,7 +4179,6 @@
                     Записаться на демо
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
-                <a class="offer-link" href="/audit.html">Посмотреть пример анализа &rarr;</a>
             </div>
             <div class="offer-card secondary reveal reveal-delay-2">
                 <span class="offer-badge">После аудита</span>
