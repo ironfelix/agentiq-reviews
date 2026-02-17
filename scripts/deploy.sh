@@ -8,8 +8,11 @@ VPS="ubuntu@79.137.175.164"
 SSH="ssh -i $SSH_KEY $VPS"
 SCP="scp -i $SSH_KEY"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-BACKEND_DIR="/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend"
-FRONTEND_DIR="/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/frontend"
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+BACKEND_DIR="$REPO_DIR/apps/chat-center/backend"
+FRONTEND_DIR="$REPO_DIR/apps/chat-center/frontend"
+# Landing page source of truth — NEVER use dist/index.html as landing!
+LANDING_SRC="$REPO_DIR/docs/prototypes/landing-next.html"
 
 echo "=============================="
 echo " AgentIQ Deploy ($TIMESTAMP)"
@@ -72,10 +75,19 @@ $SSH "sudo rm -rf /var/www/agentiq/assets/* && \
       sudo cp -r /tmp/agentiq-frontend/assets /var/www/agentiq/ && \
       sudo cp /tmp/agentiq-frontend/*.svg /var/www/agentiq/ 2>/dev/null; \
       sudo chown -R www-data:www-data /var/www/agentiq/"
-echo "  NOTE: Landing page NOT touched. Deploy landing separately:"
-echo "    scp -i \$SSH_KEY docs/prototypes/landing-next.html \$VPS:/tmp/landing.html"
-echo "    ssh -i \$SSH_KEY \$VPS 'sudo cp /tmp/landing.html /var/www/agentiq/landing.html && sudo chown www-data:www-data /var/www/agentiq/landing.html'"
-echo "  ✓ Frontend deployed"
+echo "  ✓ Frontend deployed (app + assets only, landing NOT from dist/)"
+
+# --- Step 5b: Deploy landing from source of truth ---
+echo ""
+echo "--- Deploying landing page ---"
+if [ -f "$LANDING_SRC" ]; then
+    $SCP "$LANDING_SRC" $VPS:/tmp/landing-deploy.html
+    $SSH "sudo cp /tmp/landing-deploy.html /var/www/agentiq/landing.html && \
+          sudo chown www-data:www-data /var/www/agentiq/landing.html"
+    echo "  ✓ Landing deployed from docs/prototypes/landing-next.html"
+else
+    echo "  WARNING: $LANDING_SRC not found, landing NOT updated"
+fi
 
 # --- Step 6: Install deps if needed ---
 echo ""
