@@ -567,24 +567,24 @@ if (error.response?.status === 401) {
 
 | ID | Описание | Файл | Строки | Severity | Effort |
 |----|----------|------|--------|----------|--------|
-| TD-001 | In-process rate limiter не работает при 2+ Celery workers | `services/rate_limiter.py` | 1-10, 164-180 | CRITICAL | M |
-| TD-002 | `create_all()` в startup конкурирует с Alembic в production | `main.py` | 110-115 | CRITICAL | S |
-| TD-003 | bcrypt==4.0.1 несовместим с passlib==1.7.4 | `requirements.txt` | 28-29 | CRITICAL | S |
-| TD-004 | `@app.on_event` deprecated с FastAPI 0.93 | `main.py` | 95, 104, 120 | HIGH | S |
-| TD-005 | JWT в localStorage (XSS risk) | `services/api.ts` | 51-55 | HIGH | M |
-| TD-006 | New httpx.AsyncClient на каждый запрос в WBConnector | `services/wb_connector.py` | 78 | HIGH | S |
-| TD-007 | App.tsx монолит 2199 строк без routing | `App.tsx` | 1-2199 | HIGH | L |
-| TD-008 | 401 handler делает reload без UX | `services/api.ts` | 66-74 | MEDIUM | S |
-| TD-009 | `datetime.utcnow()` deprecated в Python 3.12 | `tasks/sync.py` и др. | Множественные | MEDIUM | S |
-| TD-010 | In-process sync lock (_sync_locks dict) не работает между processes | `services/rate_limiter.py` | 153-180 | HIGH | M |
-| TD-011 | FastAPI 0.109 → 0.115+ minor update | `requirements.txt` | 2 | LOW | XS |
-| TD-012 | Celery 5.3.6 → 5.4+ minor update | `requirements.txt` | 14 | LOW | XS |
-| TD-013 | uvicorn 0.27 → 0.34+ (performance улучшения) | `requirements.txt` | 3 | LOW | XS |
-| TD-014 | Нет React Error Boundaries | `App.tsx`, компоненты | — | MEDIUM | S |
-| TD-015 | Нет coverage gate в CI pipeline | `.github/workflows/deploy-production.yml` | — | MEDIUM | S |
-| TD-016 | db health check не проверяет реальное соединение | `main.py` или `api/` | — | MEDIUM | S |
-| TD-017 | Frontend не имеет E2E тестов в CI (только в `npm run test:e2e`) | `deploy-production.yml` | — | MEDIUM | M |
-| TD-018 | passlib 1.7.4 unmaintained — мигрировать на argon2-cffi | `requirements.txt` | 29 | MEDIUM | M |
+| TD-001 | ~~In-process rate limiter не работает при 2+ Celery workers~~ | `services/rate_limiter.py` | 1-10, 164-180 | ~~CRITICAL~~ | ~~M~~ | **DONE** (Redis-based distributed lock) |
+| TD-002 | ~~`create_all()` в startup конкурирует с Alembic в production~~ | `main.py` | 110-115 | ~~CRITICAL~~ | ~~S~~ | **DONE** (removed, Alembic only) |
+| TD-003 | ~~bcrypt==4.0.1 несовместим с passlib==1.7.4~~ | `requirements.txt` | 28-29 | ~~CRITICAL~~ | ~~S~~ | **DONE** (bcrypt 4.2.1, passlib removed) |
+| TD-004 | ~~`@app.on_event` deprecated с FastAPI 0.93~~ | `main.py` | 95, 104, 120 | ~~HIGH~~ | ~~S~~ | **DONE** (2026-02-17, lifespan ctx manager) |
+| TD-005 | JWT в localStorage (XSS risk) | `services/api.ts` | 51-55 | HIGH | M | |
+| TD-006 | ~~New httpx.AsyncClient на каждый запрос в WBConnector~~ | `services/wb_connector.py` | 78 | ~~HIGH~~ | ~~S~~ | **DONE** (2026-02-17, shared client + pooling) |
+| TD-007 | App.tsx монолит 2199 строк без routing | `App.tsx` | 1-2199 | HIGH | L | |
+| TD-008 | 401 handler делает reload без UX | `services/api.ts` | 66-74 | MEDIUM | S | |
+| TD-009 | ~~`datetime.utcnow()` deprecated в Python 3.12~~ | `tasks/sync.py` и др. | Множественные | ~~MEDIUM~~ | ~~S~~ | **DONE** (2026-02-17, all 8 instances) |
+| TD-010 | ~~In-process sync lock (_sync_locks dict) не работает между processes~~ | `services/rate_limiter.py` | 153-180 | ~~HIGH~~ | ~~M~~ | **DONE** (Redis lock) |
+| TD-011 | ~~FastAPI 0.109 → 0.115+ minor update~~ | `requirements.txt` | 2 | ~~LOW~~ | ~~XS~~ | **DONE** (2026-02-17, → 0.115.6) |
+| TD-012 | Celery 5.3.6 → 5.4+ minor update | `requirements.txt` | 14 | LOW | XS | |
+| TD-013 | ~~uvicorn 0.27 → 0.34+ (performance улучшения)~~ | `requirements.txt` | 3 | ~~LOW~~ | ~~XS~~ | **DONE** (2026-02-17, → 0.34.0) |
+| TD-014 | Нет React Error Boundaries | `App.tsx`, компоненты | — | MEDIUM | S | |
+| TD-015 | Нет coverage gate в CI pipeline | `.github/workflows/deploy-production.yml` | — | MEDIUM | S | |
+| TD-016 | ~~db health check не проверяет реальное соединение~~ | `main.py` или `api/` | — | ~~MEDIUM~~ | ~~S~~ | **DONE** (SELECT 1 в /health) |
+| TD-017 | Frontend не имеет E2E тестов в CI (только в `npm run test:e2e`) | `deploy-production.yml` | — | MEDIUM | M | |
+| TD-018 | ~~passlib 1.7.4 unmaintained — мигрировать на argon2-cffi~~ | `requirements.txt` | 29 | ~~MEDIUM~~ | ~~M~~ | **DONE** (passlib removed, bcrypt direct) |
 
 **Легенда Effort:** XS = часы, S = 1 день, M = 2-5 дней, L = 1-2 недели
 
