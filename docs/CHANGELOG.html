@@ -189,7 +189,7 @@
       <h1>Agent<span>IQ</span> — История изменений</h1>
       <p class="cl-subtitle">Что нового в продукте. Обновляется автоматически при каждом релизе.</p>
       <div class="cl-meta">
-        <span>Обновлено: 17.02.2026 19:26</span>
+        <span>Обновлено: 17.02.2026 21:08</span>
         <a href="docs-home.html">← Документация</a>
         <a href="/">← На сайт</a>
       </div>
@@ -221,47 +221,75 @@
             <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
             <ul class="cl-list"><li class="cl-item">
                   
-                  Cases carousel, restore CTAs, single source file
-                  
-                </li></ul>
-          </div>
-          <div class="cl-cat">
-            <div class="cl-cat-title" style="color:#34a853">Исправления</div>
-            <ul class="cl-list"><li class="cl-item">
-                  
-                  Event-loop tracking in shared httpx clients
+                  Единый inbox: отзывы, вопросы и чаты Wildberries теперь в одном списке — больше не нужно переключаться между вкладками
                   
                 </li><li class="cl-item">
                   
-                  Resolve tech debt TD-005, TD-008, TD-012, TD-014, TD-015, TD-017
+                  ИИ-помощник автоматически составляет черновики ответов на каждое обращение
                   
                 </li><li class="cl-item">
                   
-                  Resolve tech debt TD-004, TD-006, TD-009, TD-011/013
+                  Автоответы на позитивные отзывы (4–5★) без участия менеджера
                   
                 </li><li class="cl-item">
                   
-                  Eliminate 'Event loop is closed' in run_async
-                  <span class="cl-scope">Фоновые задачи</span>
+                  Приоритизация очереди: срочные обращения (дефект, неверный товар) выделены красным и стоят первыми
+                  
                 </li><li class="cl-item">
                   
-                  Remove draft title and enable indexing
-                  <span class="cl-scope">Сайт</span>
+                  Аналитика качества ответов: доля принятых, отредактированных и ручных ответов
+                  
                 </li><li class="cl-item">
                   
-                  Redis rate limiter, remove create_all, drop passlib
-                  <span class="cl-scope">Критическое</span>
+                  Ops-алерты: система сигнализирует о просроченных SLA и аномалиях в отзывах
+                  
+                </li><li class="cl-item">
+                  
+                  История переписки: все обращения одного покупателя по одному товару объединены в цепочку
+                  
                 </li></ul>
           </div>
           <div class="cl-cat">
             <div class="cl-cat-title" style="color:#f9ab00">Стало быстрее</div>
             <ul class="cl-list"><li class="cl-item">
                   
-                  Celery health check
+                  Система стала стабильнее при одновременной работе нескольких менеджеров
                   
                 </li><li class="cl-item">
                   
-                  Reduce celery health check timeout
+                  Синхронизация с Wildberries работает непрерывно в фоне — новые обращения появляются автоматически
+                  
+                </li><li class="cl-item">
+                  
+                  Страница состояния системы теперь загружается мгновенно (была ~15 секунд)
+                  
+                </li><li class="cl-item">
+                  
+                  Устранены периодические зависания фоновых задач при высокой нагрузке
+                  
+                </li><li class="cl-item">
+                  
+                  Авторизация стала безопаснее: обновлён алгоритм хранения паролей
+                  
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#9334e6">Интерфейс</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Фильтры "Срочно", "Без ответа", "Обработаны" в левой панели
+                  
+                </li><li class="cl-item">
+                  
+                  Мобильная версия: полноэкранный чат, свайп между панелями
+                  
+                </li><li class="cl-item">
+                  
+                  Индикатор синхронизации показывает когда данные обновляются
+                  
+                </li><li class="cl-item">
+                  
+                  Настройки вынесены в отдельную вкладку
                   
                 </li></ul>
           </div>
@@ -276,91 +304,43 @@
             <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
             <ul class="cl-list"><li class="cl-item">
                   
-                  Inline LLM analysis in sync pipeline + mobile safe-area fixes
+                  Подключение магазина Wildberries через API-ключ — занимает 2 минуты
                   
                 </li><li class="cl-item">
                   
-                  Enable Settings page + Dashboard placeholder
+                  Регистрация и вход без Telegram: email + пароль
                   
                 </li><li class="cl-item">
                   
-                  Frontend Wave 1 MVP + 42 bug fixes + progressive loading
+                  Черновики ответов: ИИ предлагает готовый текст, менеджер редактирует и отправляет одной кнопкой
                   
                 </li><li class="cl-item">
                   
-                  Backend Wave 1 MVP — models, services, APIs, sync, analytics
+                  Guardrails: система не позволяет отправить ответ с запрещёнными фразами (обещания возврата, упоминание ботов)
                   
                 </li><li class="cl-item">
                   
-                  Reduce cognitive load in app screens and add audit + revenue hypothesis validation docs
+                  Timeline покупателя: история всех его обращений по всем товарам в одном месте
                   
                 </li><li class="cl-item">
                   
-                  Align dashboard help trigger and panel content with promo help-panel pattern
+                  Статус ответа на Wildberries: "ожидает подтверждения", "опубликован"
                   
                 </li><li class="cl-item">
                   
-                  Remove KPI tooltip and use promo-style help link with rewritten dashboard panel copy
+                  Анализ интента: система определяет тип обращения (дефект, возврат, вопрос о размере, предзаказный вопрос)
                   
                 </li><li class="cl-item">
                   
-                  Remove desktop footer bar from dashboard and app shell
+                  SLA таймер: для каждого обращения показан дедлайн ответа
                   
                 </li><li class="cl-item">
                   
-                  Document reusable help panel and apply promo-style triggers on dashboard
+                  Автозакрытие чатов: неактивные чаты закрываются через 10 дней автоматически
                   
                 </li><li class="cl-item">
                   
-                  Add KPI tooltip and left context panel explaining channel impact
-                  
-                </li><li class="cl-item">
-                  
-                  Simplify dashboard with controllable KPI + money effect split
-                  
-                </li><li class="cl-item">
-                  
-                  Add channel-level revenue attribution and transparent ML methodology blocks
-                  
-                </li><li class="cl-item">
-                  
-                  Add RU v3 screen with desktop status bar and revenue-first dashboard KPIs
-                  
-                </li></ul>
-          </div>
-          <div class="cl-cat">
-            <div class="cl-cat-title" style="color:#34a853">Исправления</div>
-            <ul class="cl-list"><li class="cl-item">
-                  
-                  Eliminate chat list section flashing on reload and polling
-                  
-                </li><li class="cl-item">
-                  
-                  Prevent section jank — keep allLoaded when cache was complete
-                  
-                </li><li class="cl-item">
-                  
-                  Stale closure race in paginationMeta — sync banner flash on cached load
-                  
-                </li><li class="cl-item">
-                  
-                  6 mobile/UX issues — navigation, search, overscroll, workspace persistence
-                  
-                </li><li class="cl-item">
-                  
-                  Add missing promo codes CSS from prototype
-                  
-                </li><li class="cl-item">
-                  
-                  Bug #39 snippet duplication + Bug #40 dot colors
-                  
-                </li><li class="cl-item">
-                  
-                  Health check import — AsyncSessionLocal, not async_session
-                  
-                </li><li class="cl-item">
-                  
-                  Production hardening — nginx timeouts, CORS, health check, error handler
+                  Промокоды в настройках аккаунта
                   
                 </li></ul>
           </div>
@@ -368,30 +348,23 @@
             <div class="cl-cat-title" style="color:#f9ab00">Стало быстрее</div>
             <ul class="cl-list"><li class="cl-item">
                   
-                  Progressive loading with sessionStorage cache + Apple Mail sync banner
+                  Инкрементальная синхронизация: загружаем только новые обращения, не всё с нуля
                   
-                </li></ul>
-          </div>
-          <div class="cl-cat">
-            <div class="cl-cat-title" style="color:#9334e6">Интерфейс</div>
-            <ul class="cl-list"><li class="cl-item">
+                </li><li class="cl-item">
                   
-                  Standardize help panels to right slide-out and document pattern
+                  Лимит запросов к API Wildberries: система автоматически соблюдает ограничения платформы
                   
-                </li></ul>
-          </div>
-        </div>
-      </div>
-      <div class="cl-week">
-        <div class="cl-week-header">
-          <span class="cl-week-label">Неделя 2–8 февраля 2026</span>
-        </div>
-        <div class="cl-week-body">
-          <div class="cl-cat">
-            <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
-            <ul class="cl-list"><li class="cl-item">
+                </li><li class="cl-item">
                   
-                  Move conversion loss up, merge 'Why it matters' into actions
+                  Индексы базы данных: списки и фильтры стали работать в 5–10 раз быстрее
+                  
+                </li><li class="cl-item">
+                  
+                  Мониторинг: метрики синхронизации, 4 типа автоматических алертов для команды
+                  
+                </li><li class="cl-item">
+                  
+                  E2E тесты: ключевые сценарии проверяются автоматически при каждом обновлении
                   
                 </li></ul>
           </div>

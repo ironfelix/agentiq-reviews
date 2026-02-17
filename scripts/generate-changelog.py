@@ -24,7 +24,8 @@ from pathlib import Path
 from collections import defaultdict, OrderedDict
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_OUTPUT = ROOT / "docs" / "CHANGELOG.html"
+DEFAULT_OUTPUT  = ROOT / "docs" / "CHANGELOG.html"
+HUMAN_CHANGELOG = ROOT / "docs" / "CHANGELOG_HUMAN.md"
 
 # ── Категории для пользователей ───────────────────────────────────────────────
 CATEGORIES: dict[str, tuple[str, str]] = {
@@ -459,25 +460,107 @@ def render_html(weeks: OrderedDict, generated_at: datetime) -> str:
 </html>"""
 
 
+# ── Human changelog parser ────────────────────────────────────────────────────
+
+def parse_human_changelog(path: Path) -> OrderedDict:
+    """
+    Парсит CHANGELOG_HUMAN.md в тот же формат что group_by_week().
+    Формат:
+      ## YYYY-MM-DD
+      ### Категория
+      - пункт
+    Категория → тип: "Новые возможности"→feat, "Надёжность"→perf, "Интерфейс"→ui,
+                      "Исправления"→fix, прочее→feat
+    """
+    CAT_MAP = {
+        "новые возможности": "feat",
+        "надёжность":        "perf",
+        "скорость":          "perf",
+        "надёжность и скорость": "perf",
+        "исправления":       "fix",
+        "интерфейс":         "ui",
+        "улучшения":         "improve",
+    }
+
+    if not path.exists():
+        return OrderedDict()
+
+    text = path.read_text(encoding="utf-8")
+    weeks: dict[str, dict] = {}
+    current_date: datetime | None = None
+    current_type: str = "feat"
+    current_key: str = ""
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+
+        # Дата-заголовок: ## 2026-02-17
+        m = re.match(r"^##\s+(\d{4}-\d{2}-\d{2})\s*$", line)
+        if m:
+            try:
+                current_date = datetime.strptime(m.group(1), "%Y-%m-%d")
+                current_key = week_key(current_date)
+                if current_key not in weeks:
+                    weeks[current_key] = {
+                        "label":  week_label(current_date),
+                        "by_cat": defaultdict(list),
+                    }
+            except ValueError:
+                pass
+            continue
+
+        # Категория: ### Новые возможности
+        m = re.match(r"^###\s+(.+)$", line)
+        if m and current_date:
+            cat_name = m.group(1).strip().lower()
+            current_type = CAT_MAP.get(cat_name, "feat")
+            continue
+
+        # Пункт: - текст
+        if line.startswith("- ") and current_date and current_key:
+            desc = line[2:].strip()
+            if desc and not desc.startswith("#"):
+                weeks[current_key]["by_cat"][current_type].append({
+                    "desc":        desc,
+                    "scope_label": "",
+                    "breaking":    False,
+                    "sha":         "",
+                })
+
+    return OrderedDict(
+        sorted(weeks.items(), key=lambda x: x[0], reverse=True)
+    )
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate AgentIQ CHANGELOG.html")
-    parser.add_argument("--since",  default="2026-01-01", help="Show commits since date (YYYY-MM-DD)")
+    parser.add_argument("--since",  default="2026-01-01", help="Fallback: git log since (YYYY-MM-DD)")
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Output file path")
+    parser.add_argument("--git-only", action="store_true", help="Ignore CHANGELOG_HUMAN.md, use git log")
     args = parser.parse_args()
 
-    print(f"Reading git log since {args.since}...")
-    commits = git_log(since=args.since)
-    print(f"  {len(commits)} total commits")
-
-    weeks = group_by_week(commits)
-    total_items = sum(
-        len(items)
-        for w in weeks.values()
-        for items in w["by_cat"].values()
-    )
-    print(f"  {total_items} user-facing changes across {len(weeks)} weeks")
+    if not args.git_only and HUMAN_CHANGELOG.exists():
+        print(f"Reading {HUMAN_CHANGELOG.name} (human-written entries)...")
+        weeks = parse_human_changelog(HUMAN_CHANGELOG)
+        total_items = sum(
+            len(items)
+            for w in weeks.values()
+            for items in w["by_cat"].values()
+        )
+        print(f"  {total_items} entries across {len(weeks)} weeks")
+    else:
+        print(f"Reading git log since {args.since} (no human changelog found)...")
+        commits = git_log(since=args.since)
+        print(f"  {len(commits)} total commits")
+        weeks = group_by_week(commits)
+        total_items = sum(
+            len(items)
+            for w in weeks.values()
+            for items in w["by_cat"].values()
+        )
+        print(f"  {total_items} user-facing changes across {len(weeks)} weeks")
 
     html = render_html(weeks, generated_at=datetime.now())
 
