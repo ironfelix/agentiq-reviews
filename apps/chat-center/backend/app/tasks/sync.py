@@ -9,6 +9,7 @@ Tasks:
 
 import asyncio
 import logging
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -104,18 +105,41 @@ async def _set_seller_sync_state(
 
 
 def run_async(coro):
-    """Run async coroutine in sync context (for Celery tasks)."""
+    """Run async coroutine in sync context (for Celery tasks).
+
+    Creates a fresh event loop per invocation. Resets the async Redis client
+    on the rate limiter so it is recreated with the current loop (prevents
+    'Event loop is closed' errors when Celery forks reuse the singleton).
+    """
     from app.database import engine
+    from app.services.rate_limiter import get_rate_limiter
+
+    # The async Redis client is bound to the event loop from the previous
+    # invocation. Reset it so a fresh client is created inside the new loop.
+    limiter = get_rate_limiter()
+    limiter._async_redis = None
+
+    async def _wrapper():
+        try:
+            return await coro
+        finally:
+            # Close async Redis before the loop shuts down to avoid
+            # 'Event loop is closed' errors during GC / connection teardown.
+            if limiter._async_redis is not None:
+                try:
+                    await limiter._async_redis.aclose()
+                except Exception:
+                    pass
+                limiter._async_redis = None
+            await engine.dispose()
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
-        # Dispose stale connections from previous event loops
+        # Dispose stale DB connections from the previous loop.
         loop.run_until_complete(engine.dispose())
-        return loop.run_until_complete(coro)
+        return loop.run_until_complete(_wrapper())
     finally:
-        # Clean up connections before closing loop
-        loop.run_until_complete(engine.dispose())
         loop.close()
 
 
@@ -1246,6 +1270,16 @@ def send_message_to_marketplace(self, message_id: int):
                 logger.error(f"Seller {chat.seller_id} not found or has no credentials")
                 message.status = "failed"
                 await db.commit()
+                return
+
+            # Sandbox mode: simulate send without hitting marketplace API
+            if seller.sandbox_mode:
+                message.status = "sent"
+                message.external_message_id = f"sandbox_{uuid.uuid4().hex[:12]}"
+                chat.chat_status = "responded"
+                chat.unread_count = 0
+                await db.commit()
+                logger.info(f"[SANDBOX] Message {message_id} simulated (not sent to {chat.marketplace})")
                 return
 
             try:
