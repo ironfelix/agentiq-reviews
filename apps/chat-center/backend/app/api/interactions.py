@@ -411,7 +411,7 @@ async def celery_health():
 
     Note: This endpoint is not seller-scoped (no auth required) for ops monitoring.
     """
-    health = get_celery_health(timeout=5)
+    health = get_celery_health(timeout=1)
     return health
 
 
