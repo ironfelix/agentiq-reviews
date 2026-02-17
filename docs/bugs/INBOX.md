@@ -1,6 +1,6 @@
 # INBOX — Raw Notes (unstructured)
 
-Last updated: 2026-02-15
+Last updated: 2026-02-17
 Status: ACTIVE (triage queue)
 
 Сюда можно скидывать заметки **как есть**, без структуры. Я сам буду:
@@ -73,6 +73,15 @@ Status: ACTIVE (triage queue)
 | 47 | UX | ✅ FIXED — Settings navigation: reload сбрасывает активный раздел на Подключения |
 | 48 | PERF | ✅ FIXED — Секции flash на reload: isSame, CSS animation, localStorage cache |
 | 49 | SEC | ✅ FIXED — 6 critical security findings (audit 36 total, docs created) |
+| 50 | UX | ✅ DONE — Landing: cases tabs → carousel, секция перемещена выше proof |
+| 51 | UX | ✅ DONE — Landing: единый source файл (4 копии удалены) |
+| 52 | UX | ✅ FIXED — Landing: CTAs восстановлены ("Записаться на демо"), SLA лейблы на русском |
+| 53 | SEC | ✅ FIXED — SECRET_KEY дефолтный `change-me-in-production` → сгенерирован `secrets.token_hex(32)` на VPS |
+| 54 | P0 | ✅ FIXED — In-process rate limiter → Redis sliding window (multi-worker safe, commit `4b870e1`) |
+| 55 | P0 | ✅ FIXED — `create_all()` при старте убран → только Alembic migrations |
+| 56 | P0 | ✅ FIXED — `passlib[bcrypt]==1.7.4` несовместим с bcrypt>=4.x → заменён на `bcrypt==4.2.1` напрямую |
+| 57 | BUG | ✅ FIXED — `RuntimeError: Event loop is closed` в Celery ForkPoolWorker (async Redis + run_async) |
+| 58 | PERF | ✅ FIXED — `/api/interactions/health/celery` 15s → 4ms (3 inspect calls → 1 ping, timeout 5s→1s) |
 
 ---
 
@@ -177,5 +186,25 @@ Status: ACTIVE (triage queue)
 ### Security & Performance (2026-02-15, night):
 
 48) ~~Секции «В работе» / «Ожидают ответа» мерцают при каждом reload~~ **FIXED (2026-02-15):** Три итерации фикса: (1) smart isSame comparison по визуальным полям (priority, status, needs_response, text, chat_status, ai_draft.sla_priority) вместо `updated_at`; (2) убрана CSS анимация `.queue-section` (`queueSectionIn`); (3) `sessionStorage` → `localStorage` для interaction cache (сохраняется между закрытиями tab / iOS eviction). Файлы: `App.tsx`, `index.css`.
+
+50) ~~Landing: секция "Реальные кейсы" — табы → carousel~~ **DONE (2026-02-16):** Переделана секция cases из табов (`.case-tabs` + `.case-content`) на scroll-snap carousel (`.cases-slider` + `.cases-gallery` + `.case-card`). Паттерн скопирован из proof секции. Карточки: review-box + comparison-grid (before/after) + insight-box. JS: `initCasesCarousel()`. Секция перемещена ВЫШЕ proof (перед "Внутри сервиса"). Mobile: стрелки скрыты ≤640px, свайп работает. Файл: `docs/prototypes/landing-next.html`.
+
+51) ~~Landing: 5 копий → 1 файл~~ **DONE (2026-02-16):** Удалены 4 дублирующих файла: `landing.html` (root), `landing-next.html` (root), `docs/prototypes/landing.html`, `apps/chat-center/frontend/landing.html`, `apps/chat-center/frontend/landing-next.html`. Единственный source: `docs/prototypes/landing-next.html`. Deploy: SCP → VPS `/var/www/agentiq/landing.html`. Обновлены CLAUDE.md + CODEX.md.
+
+52) ~~Landing: CTA "Получить анализ" → "Записаться на демо"~~ **FIXED (2026-02-16):** Восстановлены утверждённые CTA: hero "Записаться на демо (15 мин)", navbar "Записаться на демо", offer "Записаться на демо", final CTA "Записаться на демо", mobile bar "Записаться на демо", paid offer "Начать пилот". Также: hero subtitle восстановлен ("Собираем чаты..."), SLA лейблы переведены на русский (ПРОСРОЧЕН/СКОРО/В НОРМЕ), features title "От ответов к лояльности", feature chips на русском, footer год 2025→2026.
+
+### P0 Production Hardening (2026-02-17):
+
+53) ~~SECRET_KEY дефолтный `change-me-in-production`~~ **FIXED (2026-02-17):** Сгенерирован `secrets.token_hex(32)`, записан в `/opt/agentiq/app/apps/chat-center/backend/.env` через `sed -i`. После ротации пользователи с открытыми сессиями получили `401` — ожидаемо, нужно перелогиниться. `SECURITY WARNING` в логах больше не появляется.
+
+58) ~~`/api/interactions/health/celery` 15 секунд среднее время ответа~~ **FIXED (2026-02-17):** Prometheus показал `sum=91.9s / count=6 = 15.3s/req`. Root cause: 3 отдельных Celery inspect-вызова (ping + active + reserved) × timeout=5s = 15s максимум. Fix: единственный `inspect.ping(timeout=1s)` — воркеры отвечают за <5ms. Удалены active/reserved (не нужны для health check). Результат: **4ms**. Commit `cdf07be`.
+
+57) ~~`RuntimeError: Event loop is closed` в Celery ForkPoolWorker~~ **FIXED (2026-02-17):** `run_async()` создаёт новый event loop на каждый Celery таск, но `WBRateLimiter._async_redis` был singleton, привязанный к предыдущему loop. При следующем таске Redis пытался закрыть соединение на уже закрытом loop. Fix: (1) `limiter._async_redis = None` до создания нового loop → клиент пересоздаётся внутри него; (2) явное `await limiter._async_redis.aclose()` перед `loop.close()` в wrapper. Commit `5141068`.
+
+54) ~~In-process rate limiter ломается при 2+ Celery workers~~ **FIXED (2026-02-17):** `_TokenBucket` (asyncio.Lock) заменён на Redis sliding window (`INCR + EXPIRE` на 1-минутный bucket). `_sync_locks: Dict[int, bool]` → `redis.lock(TTL=60s)`. Все workers теперь делят общий счётчик через Redis. Тесты переписаны с mock Redis. Commit `4b870e1`.
+
+55) ~~`create_all()` конкурирует с Alembic при старте~~ **FIXED (2026-02-17):** Убран блок `try/except engine.begin()...create_all` из `main.py:110-116`. Schema управляется исключительно `alembic upgrade head`. Убран unused import `Base`. Commit `4b870e1`.
+
+56) ~~`passlib[bcrypt]==1.7.4` несовместим с `bcrypt>=4.x` → AttributeError~~ **FIXED (2026-02-17):** Удалён `passlib[bcrypt]` из `requirements.txt`, `bcrypt==4.0.1→4.2.1`. `CryptContext` заменён на прямые `bcrypt.hashpw/checkpw`. Существующие хэши в БД совместимы (тот же формат). Commit `4b870e1`.
 
 49) ~~Security audit: 6 CRITICAL findings~~ **FIXED (2026-02-15):** Полный security audit проекта (36 findings). 6 критических исправлены: (C-01) startup validation SECRET_KEY, (C-02) `datetime.utcnow()` → `datetime.now(timezone.utc)` в JWT, (C-03) CORS methods/headers restricted, (C-04) max_length на text inputs, (C-05) sentry-test endpoint удалён, (C-06) IDOR fix — `get_optional_seller` → `get_current_seller` на resource endpoints. 458 тестов прошли. Файлы: `main.py`, `auth.py`, `chats.py`, `messages.py`, `schemas/chat.py`, `schemas/message.py`. Доки: `docs/security/SECURITY_AUDIT.md`, `docs/security/SECURITY_REVIEW_PROCESS.md`.

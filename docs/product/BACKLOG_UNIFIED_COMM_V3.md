@@ -1,6 +1,6 @@
 # Backlog — Unified Inbox v3 (WB: Reviews + Questions + Chats)
 
-**Last updated:** 2026-02-15 (evening)
+**Last updated:** 2026-02-17
 **Source of truth UI:** `docs/prototypes/app-screens-v3-ru.html`
 
 ---
@@ -25,8 +25,14 @@
             ✅ Security audit: 36 findings documented, 6 CRITICAL fixed (C-01..C-06), 458 tests GREEN
             ✅ Security docs: SECURITY_AUDIT.md + SECURITY_REVIEW_PROCESS.md (CI pipeline, checklists, rotation)
             ✅ Flash fix: localStorage cache, smart isSame comparison, CSS animation removed
-2026-02-16  🟢 Buffer day (багфиксы если нужно)
-2026-02-17  🎯 DEMO ← дедлайн (READY)
+2026-02-16  ✅ Landing: cases carousel, CTAs restored, single source file, deploy
+            ✅ 3 git commits (landing + docs + frontend/scripts)
+2026-02-17  ✅ DEMO — P0 production hardening: Redis rate limiter, remove create_all, bcrypt fix, SECRET_KEY ротация
+            ✅ Деплой на VPS, 464 тестов GREEN, health check OK
+            ✅ Fix: RuntimeError Event loop is closed в Celery (run_async + async Redis lifecycle)
+            ✅ Landing: title, robots index,follow — задеплоен на прод
+            ✅ Perf audit: /health/celery 15s→4ms, все API endpoints <10ms, Celery логи чистые
+            ✅ Fix: celery_health 3 inspect calls → 1 ping (timeout 5s→1s), commit cdf07be
 2026-02-18  🔧 Фикс багов после демо
 2026-02-19  🔧 Production hardening
 2026-02-20  🚀 PILOT START ← дедлайн
@@ -128,7 +134,7 @@
 1. **BL-P2-001: Demo data при "Пропустить подключение"**
    - Goal: в skip-mode показывать демо-поток, чтобы CJM выглядел "живым".
    - Acceptance: при skip UI не пустой, есть демо-треды, аналитика с пометкой "demo".
-   - Status: ❌ TODO.
+   - Status: ✅ DONE (14 фев, Claude). См. задачу #23 / #33 ниже.
 
 2. **BL-P2-002: E2E (Playwright) smoke на CJM**
    - Scope: headless: register -> connect/skip -> messages open -> analytics.
@@ -187,7 +193,7 @@
     - Owner: Claude
     - Status: ✅ DONE (6 файлов создано).
     - Files: `alembic.ini`, `alembic/env.py`, `alembic/versions/0001_*.py`
-    - TODO: протестировать `alembic upgrade head` на staging.
+    - Update (2026-02-16, Codex): `alembic upgrade head` включен в `deploy-staging.yml` и `deploy-production.yml`.
 
 17. **BL-UC-010: Channel Guardrails**
     - Owner: Claude
@@ -400,6 +406,10 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 | Feb 15 (вечер) | Claude | **UI fixes (#44-47):** Promo help panel (tables, callout, WB link), mobile chat header overlap fix, sync indicator for periodic sync (Apple Mail banner), settings hash navigation (сохранение раздела при reload). 4 файла, 145 строк. Commit `e4bba04`. |
 | Feb 15 (вечер) | Claude | **Release cycle & AI code review:** `RELEASE_CYCLE.md` (окружения, CI/CD, testing, monitoring), `ai_code_review.py` (cross-model review: Claude↔o1-preview), 3x GitHub Actions (ai-review, staging deploy, prod deploy). Roadmap: 3 фазы (Foundation → Scale → Advanced). Cost: ~$5/мес для 50 PRs. |
 | Feb 15 (вечер) | Claude | **CRM + Performance research:** `CRM_PERFORMANCE_INTEGRATION_PLAN.md` + `crm-performance-plan.html` — исследование интеграции CRM/CVM с performance-каналами (Яндекс.Директ, VK, programmatic). 3-tier оффер для агентства. 20+ источников. GitHub Pages. |
+| Feb 16 | Codex | **Hard-pilot stabilization package:** frontend lint-fix pass (0 errors), source labels `WB API/Fallback` in inbox + chat header, JWT `exp` timezone fix, pre-deploy lint gate, deploy workflows updated (quality gate + Alembic + health check contract fix). Verification: frontend lint/build green, backend pytest `465 passed`. |
+| Feb 16 | Codex | **Operational follow-up:** pilot QA matrix re-run on server (`localhost`) → report `docs/product/reports/pilot-qa-report-20260216-remote.md`, result `GO` (`pass=8 warn=0 fail=0`). Prod DB migration state reconciled (`alembic_version`: `0003`,`0005`), staging path `/opt/agentiq-staging` not found (infra gap documented). |
+| Feb 16 | Codex | **Docs-only closure:** hard pilot SLO/p95 baseline fixed in `docs/ops/HARD_PILOT_SLO_RUNBOOK_20260216.md`; statuses synced in `MVP_READINESS_STATUS`, stabilization log, and QA checklist. |
+| Feb 16 | Codex | **Full closure (all 3 points):** fixed `react-hooks` warnings to zero (`npm run lint` clean), restored isolated staging contour (`/opt/agentiq-staging`, systemd units `agentiq-staging*`, alembic heads `0003/0005`), enabled IP routes `http://79.137.175.164/staging/app/` and `/staging/api/health` (both `200`). |
 
 ---
 
@@ -409,6 +419,8 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 
 31. **BL-NEXT-001: Frontend деплой новых backend endpoints**
     - Tasks: обновить frontend чтобы показывать `sync_health` алерты, `reply_pending_window` в Settings, source labels.
+    - Owner: Codex
+    - Status: ✅ DONE (2026-02-16) — source labels добавлены в inbox list + chat header.
     - Estimate: 4-5h.
 
 32. **BL-NEXT-002: E2E Playwright smoke на CJM** (= BL-P2-002)
@@ -420,6 +432,8 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 
 33. **BL-NEXT-003: Demo data при "Пропустить подключение"** (= BL-P2-001)
     - Tasks: seed demo interactions/events, пометка "demo" в аналитике.
+    - Owner: Claude
+    - Status: ✅ DONE (14 фев).
     - Estimate: 3-4h.
 
 ### После пилота (post-20 фев)
@@ -451,6 +465,25 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 40. **BL-POST-007: Auto-response mode**
     - Tasks: AI auto-reply для low-risk questions (pre-purchase, positive feedback) с confidence threshold.
     - Estimate: 2-3 дня.
+
+---
+
+## Landing (2026-02-16)
+
+41. **BL-LAND-001: Cases carousel + single source**
+    - Owner: Claude
+    - Status: ✅ DONE (2026-02-16)
+    - Changes: tabs → scroll-snap carousel, section moved above proof, 4 copies deleted, CTAs restored ("Записаться на демо"), SLA labels → Russian, deploy to VPS.
+    - Files: `docs/prototypes/landing-next.html` (single source), CLAUDE.md, CODEX.md
+    - Commits: `573b0e9`, `b2a4672`, `580f353`
+    - INBOX refs: #50, #51, #52
+
+42. **BL-NEXT-004: Inbox reload priority-first queues**
+    - Owner: Codex
+    - Status: ✅ DONE (2026-02-16)
+    - Symptom: после reload сначала рендерились mostly resolved (green), а `В работе`/`Ожидают ответа` приходили позже.
+    - Fix: `apps/chat-center/frontend/src/App.tsx` — fast prefetch `needs_response=true` (page_size=100) перед полной загрузкой, instant merge в cache/очереди.
+    - Verification: `npm run lint -- --max-warnings=0` + `npm run build` (frontend) — green.
 
 ---
 
