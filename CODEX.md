@@ -13,7 +13,7 @@
 ## Architecture: 5-Layer Model
 Canonical doc: **`docs/architecture/architecture.md`** — validated against codebase 2026-02-14.
 
-Five layers: **Ingestion** (85%) → **Context** (40%) → **Orchestration** (25%) → **Intelligence** (75%) → **Analytics** (70%).
+Five layers: **Ingestion** (95%) → **Context** (40%) → **Orchestration** (80%) → **Intelligence** (80%) → **Analytics** (85%).
 
 Key gaps tracked as G1-01..G5-05 in architecture.md. Priority: Context (Customer profile, Product cache) and Analytics (Revenue model) are P1. Orchestration (Routing, Assignment) is P2 — needed when sellers grow to teams.
 
@@ -45,6 +45,16 @@ Path note: in this repo the canonical docs live under `docs/` at the repository 
 - If it's implemented: include pointers to the source of truth (files/endpoints/tables) and current constraints.
 3. Execution log for Unified Communications must be maintained in:
 - `docs/product/UNIFIED_COMM_PLAN_V3_WB_FIRST.md`
+4. After every logic/flow/state change (frontend or backend), update documentation in the same task:
+- Add a dated record with owner in the execution log.
+- Briefly document what changed, why, and which files/endpoints are source of truth.
+5. **Tech Debt:** when closing TD-* tasks from `docs/PROJECT_ANALYSIS_2026.md`, immediately update the Tech Debt table (section 7), marking it **DONE** with date and brief resolution.
+6. **docs-home.html freshness:** `docs/docs-home.html` MUST be updated on every prod deploy (date + layer readiness %), every P0/P1 close, and every metric correction. Run `python scripts/check-docs-freshness.py` to verify before committing doc changes.
+7. **Facts, not guesses** — every % and metric in docs must have a source:
+   - 1★→4-5★ win rate: **15-30%** (WB research, not 40-60%)
+   - Question→purchase conversion <1h: **+20%** (official WB stats)
+   - Chat tariff: **~1.5-1.7%** additional commission at 10M revenue (2025-26)
+   - 10-20% of buyers never respond to seller replies
 
 ## Security (MANDATORY)
 
