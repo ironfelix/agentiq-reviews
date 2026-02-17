@@ -1133,7 +1133,7 @@ def check_sla_escalation():
     async def _check():
         async with AsyncSessionLocal() as db:
             # Find chats where deadline is approaching (< 30 min) and not yet urgent
-            threshold = datetime.utcnow() + timedelta(minutes=30)
+            threshold = _now_utc() + timedelta(minutes=30)
 
             result = await db.execute(
                 select(Chat).where(
@@ -1179,7 +1179,7 @@ def auto_close_inactive_chats():
     async def _close():
         async with AsyncSessionLocal() as db:
             # Find chats inactive for 10+ days
-            threshold = datetime.utcnow() - timedelta(days=10)
+            threshold = _now_utc() - timedelta(days=10)
 
             result = await db.execute(
                 select(Chat).where(
@@ -1199,7 +1199,7 @@ def auto_close_inactive_chats():
 
             for chat in chats:
                 chat.chat_status = "closed"
-                chat.closed_at = datetime.utcnow()
+                chat.closed_at = _now_utc()
                 logger.debug(f"Auto-closed chat {chat.id}")
 
             await db.commit()

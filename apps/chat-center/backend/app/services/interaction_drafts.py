@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import and_, select
@@ -237,7 +237,7 @@ async def generate_interaction_draft(
         {
             "text": message_text,
             "author_type": "buyer",
-            "created_at": interaction.occurred_at or datetime.utcnow(),
+            "created_at": interaction.occurred_at or datetime.now(timezone.utc),
         }
     ]
     customer_name = None

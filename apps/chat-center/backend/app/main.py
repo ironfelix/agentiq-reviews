@@ -3,6 +3,8 @@
 import logging
 import os
 import time
+import warnings
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,13 +58,41 @@ HTTP_REQUEST_DURATION_SECONDS = Histogram(
     buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10),
 )
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan: startup and shutdown logic."""
+    # --- Startup ---
+    _settings = get_settings()
+    if _settings.SECRET_KEY in ("change-me-in-production", "test-secret-key"):
+        warnings.warn(
+            "SECURITY WARNING: SECRET_KEY is using a default/weak value! "
+            "Generate a secure key for production.",
+            stacklevel=2,
+        )
+
+    logger.info("Starting AgentIQ Chat Center API...")
+    logger.info("Database: %s", settings.DATABASE_URL.split("@")[-1])
+    # Schema is managed by Alembic migrations (alembic upgrade head).
+    # create_all() is intentionally removed to prevent schema drift in production.
+    logger.info("Database initialized successfully")
+
+    yield
+
+    # --- Shutdown ---
+    logger.info("Shutting down AgentIQ Chat Center API...")
+    from app.services.wb_connector import close_shared_client
+    await close_shared_client()
+    await engine.dispose()
+
+
 # Create FastAPI app
 app = FastAPI(
     title="AgentIQ Chat Center API",
     description="Unified chat management for marketplace sellers (Ozon, WB, etc.)",
     version="0.1.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -90,33 +120,6 @@ async def global_exception_handler(request, exc):
         content={"detail": "Internal server error"}
     )
 
-
-# Lifecycle events
-@app.on_event("startup")
-async def validate_secrets():
-    from app.config import get_settings as _get_settings
-    _settings = _get_settings()
-    if _settings.SECRET_KEY in ("change-me-in-production", "test-secret-key"):
-        import warnings
-        warnings.warn("SECURITY WARNING: SECRET_KEY is using a default/weak value! Generate a secure key for production.", stacklevel=2)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup"""
-    logger.info("Starting AgentIQ Chat Center API...")
-    logger.info(f"Database: {settings.DATABASE_URL.split('@')[-1]}")  # Hide credentials in logs
-
-    # Schema is managed by Alembic migrations (alembic upgrade head).
-    # create_all() is intentionally removed to prevent schema drift in production.
-    logger.info("Database initialized successfully")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
-    logger.info("Shutting down AgentIQ Chat Center API...")
-    await engine.dispose()
 
 @app.middleware("http")
 async def prometheus_http_middleware(request, call_next):

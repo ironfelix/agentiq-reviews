@@ -3,12 +3,38 @@
 import httpx
 import logging
 from typing import Dict, List, Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import defaultdict
 
 from app.services.base_connector import BaseChannelConnector
 
 logger = logging.getLogger(__name__)
+
+# Module-level shared httpx client with connection pooling (same pattern as ai_analyzer.py).
+# Auth headers are passed per-request, so a single client works for all seller tokens.
+_shared_client: Optional[httpx.AsyncClient] = None
+
+
+def _get_shared_client() -> httpx.AsyncClient:
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.AsyncClient(
+            limits=httpx.Limits(
+                max_connections=20,
+                max_keepalive_connections=10,
+                keepalive_expiry=120,
+            ),
+            timeout=httpx.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0),
+        )
+    return _shared_client
+
+
+async def close_shared_client() -> None:
+    """Close the shared httpx client (call on app shutdown)."""
+    global _shared_client
+    if _shared_client is not None and not _shared_client.is_closed:
+        await _shared_client.aclose()
+        _shared_client = None
 
 
 class WBConnector(BaseChannelConnector):
@@ -74,49 +100,51 @@ class WBConnector(BaseChannelConnector):
             httpx.HTTPStatusError: On HTTP error
         """
         url = f"{self.BASE_URL}{endpoint}"
+        client = _get_shared_client()
 
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            for attempt in range(3):  # Retry up to 3 times
-                try:
-                    if files:
-                        # Multipart form data for file uploads
-                        response = await client.post(
-                            url,
-                            headers={"Authorization": f"Bearer {self.api_token}"},
-                            data=data,
-                            files=files
-                        )
-                    else:
-                        response = await client.request(
-                            method=method,
-                            url=url,
-                            headers=self.headers,
-                            params=params,
-                            json=data if method == "POST" and not files else None
-                        )
+        for attempt in range(3):  # Retry up to 3 times
+            try:
+                if files:
+                    # Multipart form data for file uploads
+                    response = await client.post(
+                        url,
+                        headers={"Authorization": f"Bearer {self.api_token}"},
+                        data=data,
+                        files=files,
+                        timeout=timeout,
+                    )
+                else:
+                    response = await client.request(
+                        method=method,
+                        url=url,
+                        headers=self.headers,
+                        params=params,
+                        json=data if method == "POST" and not files else None,
+                        timeout=timeout,
+                    )
 
-                    response.raise_for_status()
-                    return response.json()
+                response.raise_for_status()
+                return response.json()
 
-                except httpx.HTTPStatusError as e:
-                    logger.error(f"WB API error: {e.response.status_code} - {e.response.text}")
-                    if e.response.status_code == 429:  # Rate limit
-                        import asyncio
-                        await asyncio.sleep(2 ** attempt)  # Exponential backoff
-                        continue
-                    raise
-
-                except httpx.TimeoutException:
-                    logger.warning(f"WB API timeout, attempt {attempt + 1}/3")
-                    if attempt == 2:
-                        raise
+            except httpx.HTTPStatusError as e:
+                logger.error(f"WB API error: {e.response.status_code} - {e.response.text}")
+                if e.response.status_code == 429:  # Rate limit
                     import asyncio
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
                     continue
+                raise
 
-                except Exception as e:
-                    logger.error(f"WB API request failed: {e}")
+            except httpx.TimeoutException:
+                logger.warning(f"WB API timeout, attempt {attempt + 1}/3")
+                if attempt == 2:
                     raise
+                import asyncio
+                await asyncio.sleep(1)
+                continue
+
+            except Exception as e:
+                logger.error(f"WB API request failed: {e}")
+                raise
 
         raise RuntimeError("Max retries exceeded")
 
@@ -212,7 +240,7 @@ class WBConnector(BaseChannelConnector):
 
             message_id = event.get("eventID", f"{event['chatID']}-{next_cursor}")
 
-            created_at = datetime.utcnow()
+            created_at = datetime.now(timezone.utc)
             if event.get("addTimestamp"):
                 created_at = datetime.fromtimestamp(event["addTimestamp"] / 1000)
             elif event.get("addTime"):
@@ -370,7 +398,7 @@ class WBConnector(BaseChannelConnector):
         add_time = result.get("result", {}).get("addTime", 0)
         return {
             "external_message_id": f"{chat_id}-{add_time}",
-            "created_at": datetime.fromtimestamp(add_time / 1000) if add_time else datetime.utcnow()
+            "created_at": datetime.fromtimestamp(add_time / 1000) if add_time else datetime.now(timezone.utc)
         }
 
     async def download_file(self, download_id: str) -> bytes:
@@ -383,13 +411,14 @@ class WBConnector(BaseChannelConnector):
         Returns:
             File content as bytes
         """
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(
-                f"{self.BASE_URL}/api/v1/seller/download/{download_id}",
-                headers=self.headers
-            )
-            response.raise_for_status()
-            return response.content
+        client = _get_shared_client()
+        response = await client.get(
+            f"{self.BASE_URL}/api/v1/seller/download/{download_id}",
+            headers=self.headers,
+            timeout=30.0,
+        )
+        response.raise_for_status()
+        return response.content
 
     async def list_items(
         self,
@@ -535,16 +564,16 @@ async def fetch_product_card(nm_id: int) -> Optional[Dict]:
     url = f"https://basket-{basket}.wbbasket.ru/vol{vol}/part{part}/{nm_id}/info/ru/card.json"
 
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                card = _parse_product_card(data)
-                set_cached_product_card(nm_id, card)
-                return card
-            # Negative cache: remember that this nm_id has no card
-            set_cached_product_card(nm_id, {})
-            return None
+        client = _get_shared_client()
+        response = await client.get(url, timeout=5.0)
+        if response.status_code == 200:
+            data = response.json()
+            card = _parse_product_card(data)
+            set_cached_product_card(nm_id, card)
+            return card
+        # Negative cache: remember that this nm_id has no card
+        set_cached_product_card(nm_id, {})
+        return None
     except Exception as e:
         logger.debug(f"Failed to fetch product card for nmID {nm_id}: {e}")
         return None

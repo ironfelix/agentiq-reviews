@@ -18,7 +18,7 @@ import json
 import re
 import time
 from typing import Dict, List, Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.config import get_settings
 from app.services.guardrails import (
@@ -654,7 +654,7 @@ class AIAnalyzer:
                 sla_config=sla_config,
             )
 
-            analysis["analyzed_at"] = datetime.utcnow().isoformat()
+            analysis["analyzed_at"] = datetime.now(timezone.utc).isoformat()
 
             return analysis
 
@@ -1004,7 +1004,7 @@ class AIAnalyzer:
             "needs_escalation": False,
             "escalation_reason": None,
             "sla_priority": self._resolve_intent_priority(intent, sla_config),
-            "analyzed_at": datetime.utcnow().isoformat(),
+            "analyzed_at": datetime.now(timezone.utc).isoformat(),
         }
 
 
