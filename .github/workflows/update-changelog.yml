@@ -1,0 +1,53 @@
+name: Update Changelog
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  changelog:
+    name: Generate & Deploy Changelog
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # нужна полная история для git log
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate CHANGELOG.html
+        run: python scripts/generate-changelog.py --since 2026-01-01
+
+      - name: Deploy CHANGELOG.html to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "📄 Pulling latest docs from repo..."
+            cd /opt/agentiq && git pull origin main --quiet
+
+            echo "📋 Generating CHANGELOG.html on VPS..."
+            python3 scripts/generate-changelog.py --since 2026-01-01
+
+            echo "🚀 Deploying CHANGELOG.html..."
+            sudo cp /opt/agentiq/docs/CHANGELOG.html /var/www/agentiq/CHANGELOG.html
+            sudo chown www-data:www-data /var/www/agentiq/CHANGELOG.html
+
+            echo "✅ CHANGELOG.html live at https://agentiq.ru/CHANGELOG.html"
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" https://agentiq.ru/CHANGELOG.html)
+          if [ "$CODE" != "200" ]; then
+            echo "❌ CHANGELOG.html not reachable (HTTP $CODE)"
+            exit 1
+          fi
+          echo "✅ https://agentiq.ru/CHANGELOG.html — HTTP $CODE"

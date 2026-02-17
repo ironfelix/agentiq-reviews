@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentIQ — История изменений</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-bg: #f8f9fa;
+      --color-surface: #ffffff;
+      --color-border: #e8eaed;
+      --color-text: #202124;
+      --color-text-secondary: #5f6368;
+      --color-accent: #1a73e8;
+      --color-success: #34a853;
+      --color-warning: #f9ab00;
+      --color-danger: #ea4335;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 8px rgba(0,0,0,0.04);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      padding: 0 16px 48px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .cl-header {
+      padding: 40px 0 32px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 32px;
+    }
+    .cl-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 6px;
+    }
+    .cl-header h1 span { color: var(--color-accent); }
+    .cl-subtitle {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+    .cl-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .cl-meta a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .cl-meta a:hover { text-decoration: underline; }
+
+    /* ── Week card ── */
+    .cl-week {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .cl-week-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--color-border);
+      background: #fafbfc;
+    }
+    .cl-week-label {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cl-week-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Category ── */
+    .cl-cat-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .cl-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cl-item {
+      padding-left: 16px;
+      position: relative;
+      color: var(--color-text);
+      font-size: 14px;
+    }
+    .cl-item::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      color: var(--color-text-secondary);
+    }
+    .cl-item--breaking {
+      background: rgba(234,67,53,0.06);
+      border-left: 3px solid var(--color-danger);
+      border-radius: 4px;
+      padding: 6px 12px 6px 12px;
+    }
+    .cl-item--breaking::before { content: none; }
+    .cl-breaking {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-danger);
+      background: rgba(234,67,53,0.12);
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-right: 6px;
+      vertical-align: middle;
+      letter-spacing: 0.05em;
+    }
+    .cl-scope {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      background: #f1f3f4;
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .cl-empty {
+      color: var(--color-text-secondary);
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* ── Legend ── */
+    .cl-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 12px 16px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .cl-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cl-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .cl-header h1 { font-size: 20px; }
+      .cl-week-body { padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="cl-header">
+      <h1>Agent<span>IQ</span> — История изменений</h1>
+      <p class="cl-subtitle">Что нового в продукте. Обновляется автоматически при каждом релизе.</p>
+      <div class="cl-meta">
+        <span>Обновлено: 17.02.2026 19:26</span>
+        <a href="docs-home.html">← Документация</a>
+        <a href="/">← На сайт</a>
+      </div>
+    </div>
+
+    <div class="cl-legend">
+      <span>Условные обозначения:</span>
+      <span class="cl-legend-item">
+        <span class="cl-legend-dot" style="background:#1a73e8"></span>Новые возможности
+      </span>
+      <span class="cl-legend-item">
+        <span class="cl-legend-dot" style="background:#34a853"></span>Исправления
+      </span>
+      <span class="cl-legend-item">
+        <span class="cl-legend-dot" style="background:#f9ab00"></span>Стало быстрее
+      </span>
+      <span class="cl-legend-item">
+        <span class="cl-scope" style="margin:0">Интерфейс</span>область изменений
+      </span>
+    </div>
+
+
+      <div class="cl-week">
+        <div class="cl-week-header">
+          <span class="cl-week-label">Неделя 16–22 февраля 2026</span>
+        </div>
+        <div class="cl-week-body">
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Cases carousel, restore CTAs, single source file
+                  
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#34a853">Исправления</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Event-loop tracking in shared httpx clients
+                  
+                </li><li class="cl-item">
+                  
+                  Resolve tech debt TD-005, TD-008, TD-012, TD-014, TD-015, TD-017
+                  
+                </li><li class="cl-item">
+                  
+                  Resolve tech debt TD-004, TD-006, TD-009, TD-011/013
+                  
+                </li><li class="cl-item">
+                  
+                  Eliminate 'Event loop is closed' in run_async
+                  <span class="cl-scope">Фоновые задачи</span>
+                </li><li class="cl-item">
+                  
+                  Remove draft title and enable indexing
+                  <span class="cl-scope">Сайт</span>
+                </li><li class="cl-item">
+                  
+                  Redis rate limiter, remove create_all, drop passlib
+                  <span class="cl-scope">Критическое</span>
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#f9ab00">Стало быстрее</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Celery health check
+                  
+                </li><li class="cl-item">
+                  
+                  Reduce celery health check timeout
+                  
+                </li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="cl-week">
+        <div class="cl-week-header">
+          <span class="cl-week-label">Неделя 9–15 февраля 2026</span>
+        </div>
+        <div class="cl-week-body">
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Inline LLM analysis in sync pipeline + mobile safe-area fixes
+                  
+                </li><li class="cl-item">
+                  
+                  Enable Settings page + Dashboard placeholder
+                  
+                </li><li class="cl-item">
+                  
+                  Frontend Wave 1 MVP + 42 bug fixes + progressive loading
+                  
+                </li><li class="cl-item">
+                  
+                  Backend Wave 1 MVP — models, services, APIs, sync, analytics
+                  
+                </li><li class="cl-item">
+                  
+                  Reduce cognitive load in app screens and add audit + revenue hypothesis validation docs
+                  
+                </li><li class="cl-item">
+                  
+                  Align dashboard help trigger and panel content with promo help-panel pattern
+                  
+                </li><li class="cl-item">
+                  
+                  Remove KPI tooltip and use promo-style help link with rewritten dashboard panel copy
+                  
+                </li><li class="cl-item">
+                  
+                  Remove desktop footer bar from dashboard and app shell
+                  
+                </li><li class="cl-item">
+                  
+                  Document reusable help panel and apply promo-style triggers on dashboard
+                  
+                </li><li class="cl-item">
+                  
+                  Add KPI tooltip and left context panel explaining channel impact
+                  
+                </li><li class="cl-item">
+                  
+                  Simplify dashboard with controllable KPI + money effect split
+                  
+                </li><li class="cl-item">
+                  
+                  Add channel-level revenue attribution and transparent ML methodology blocks
+                  
+                </li><li class="cl-item">
+                  
+                  Add RU v3 screen with desktop status bar and revenue-first dashboard KPIs
+                  
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#34a853">Исправления</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Eliminate chat list section flashing on reload and polling
+                  
+                </li><li class="cl-item">
+                  
+                  Prevent section jank — keep allLoaded when cache was complete
+                  
+                </li><li class="cl-item">
+                  
+                  Stale closure race in paginationMeta — sync banner flash on cached load
+                  
+                </li><li class="cl-item">
+                  
+                  6 mobile/UX issues — navigation, search, overscroll, workspace persistence
+                  
+                </li><li class="cl-item">
+                  
+                  Add missing promo codes CSS from prototype
+                  
+                </li><li class="cl-item">
+                  
+                  Bug #39 snippet duplication + Bug #40 dot colors
+                  
+                </li><li class="cl-item">
+                  
+                  Health check import — AsyncSessionLocal, not async_session
+                  
+                </li><li class="cl-item">
+                  
+                  Production hardening — nginx timeouts, CORS, health check, error handler
+                  
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#f9ab00">Стало быстрее</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Progressive loading with sessionStorage cache + Apple Mail sync banner
+                  
+                </li></ul>
+          </div>
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#9334e6">Интерфейс</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Standardize help panels to right slide-out and document pattern
+                  
+                </li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="cl-week">
+        <div class="cl-week-header">
+          <span class="cl-week-label">Неделя 2–8 февраля 2026</span>
+        </div>
+        <div class="cl-week-body">
+          <div class="cl-cat">
+            <div class="cl-cat-title" style="color:#1a73e8">Новые возможности</div>
+            <ul class="cl-list"><li class="cl-item">
+                  
+                  Move conversion loss up, merge 'Why it matters' into actions
+                  
+                </li></ul>
+          </div>
+        </div>
+      </div>
+  </div>
+</body>
+</html>
