@@ -33,6 +33,8 @@
             ✅ Landing: title, robots index,follow — задеплоен на прод
             ✅ Perf audit: /health/celery 15s→4ms, все API endpoints <10ms, Celery логи чистые
             ✅ Fix: celery_health 3 inspect calls → 1 ping (timeout 5s→1s), commit cdf07be
+            ✅ Tech debt hardening: TD-004 (lifespan), TD-006 (httpx shared client), TD-009 (utcnow→timezone.utc), TD-011/013 (FastAPI 0.115.6, uvicorn 0.34.0)
+            ✅ 11/18 tech debt items resolved (all 3 CRITICAL + 5 HIGH + 3 MEDIUM)
 2026-02-18  🔧 Фикс багов после демо
 2026-02-19  🔧 Production hardening
 2026-02-20  🚀 PILOT START ← дедлайн

@@ -82,6 +82,10 @@ Status: ACTIVE (triage queue)
 | 56 | P0 | ✅ FIXED — `passlib[bcrypt]==1.7.4` несовместим с bcrypt>=4.x → заменён на `bcrypt==4.2.1` напрямую |
 | 57 | BUG | ✅ FIXED — `RuntimeError: Event loop is closed` в Celery ForkPoolWorker (async Redis + run_async) |
 | 58 | PERF | ✅ FIXED — `/api/interactions/health/celery` 15s → 4ms (3 inspect calls → 1 ping, timeout 5s→1s) |
+| 59 | TD | ✅ FIXED — TD-004: `@app.on_event` deprecated → lifespan context manager (main.py), commit `52e2cb0` |
+| 60 | TD | ✅ FIXED — TD-006: httpx per-request client в wb_connector → shared module-level client + connection pooling |
+| 61 | TD | ✅ FIXED — TD-009: 8x `datetime.utcnow()` → `datetime.now(timezone.utc)` (sync.py, ai_analyzer.py, wb_connector.py, interaction_drafts.py) |
+| 62 | TD | ✅ FIXED — TD-011/013: FastAPI 0.109→0.115.6, uvicorn 0.27→0.34.0 |
 
 ---
 

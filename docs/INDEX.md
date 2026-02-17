@@ -2,7 +2,7 @@
 
 Главная навигация по проекту: что за модули есть в продукте, где их документация и где смотреть архитектуру.
 
-Last updated: 2026-02-16
+Last updated: 2026-02-17
 
 ## Start Here
 
@@ -34,8 +34,9 @@ Last updated: 2026-02-16
 - `reviews/QUICKSTART.md` — детальный quickstart
 - `reviews/API.md` — API endpoints
 
-## Architecture
+## Architecture & Tech Debt
 
+- **`PROJECT_ANALYSIS_2026.md`** — технический анализ проекта (Feb 2026): оценка 7.5/10, Tech Debt каталог (18 items, 11 resolved)
 - `PROJECT_MAP.md` — high-level архитектура и границы модулей
 - `architecture/architecture.md` — текущая архитектура (общая)
 - `architecture/architecture-mvp2.md` — MVP2 Reviews (архитектурные детали)

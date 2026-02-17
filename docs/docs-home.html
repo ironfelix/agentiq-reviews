@@ -888,8 +888,122 @@
       </div>
     </div>
 
+    <div class="section" id="techdebt">
+      <h2><span class="badge">8</span> Tech Debt Status</h2>
+      <p>
+        Каталог технического долга ведётся в <a href="./PROJECT_ANALYSIS_2026.md">PROJECT_ANALYSIS_2026.md</a> (секция 7).
+        Ниже — сводка по состоянию на 2026-02-17.
+      </p>
+
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Описание</th>
+            <th>Severity</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TD-001</td>
+            <td>In-process rate limiter → Redis distributed lock</td>
+            <td>CRITICAL</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-002</td>
+            <td><code>create_all()</code> в startup → только Alembic</td>
+            <td>CRITICAL</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-003</td>
+            <td>bcrypt/passlib несовместимость → passlib удалён, bcrypt 4.2.1</td>
+            <td>CRITICAL</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-004</td>
+            <td><code>@app.on_event</code> deprecated → lifespan ctx manager</td>
+            <td>HIGH</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-005</td>
+            <td>JWT в localStorage (XSS risk) → httpOnly cookies</td>
+            <td>HIGH</td>
+            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+          </tr>
+          <tr>
+            <td>TD-006</td>
+            <td>httpx per-request client → shared client + pooling</td>
+            <td>HIGH</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-007</td>
+            <td>App.tsx монолит 2199 строк без routing</td>
+            <td>HIGH</td>
+            <td><span class="status inprogress"><span class="statusDot"></span>Post-pilot</span></td>
+          </tr>
+          <tr>
+            <td>TD-008</td>
+            <td>401 reload без UX (потеря черновика)</td>
+            <td>MEDIUM</td>
+            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+          </tr>
+          <tr>
+            <td>TD-009</td>
+            <td><code>datetime.utcnow()</code> → <code>datetime.now(timezone.utc)</code></td>
+            <td>MEDIUM</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-010</td>
+            <td>In-process sync lock → Redis lock</td>
+            <td>HIGH</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-011</td>
+            <td>FastAPI 0.109 → 0.115.6</td>
+            <td>LOW</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-013</td>
+            <td>uvicorn 0.27 → 0.34.0</td>
+            <td>LOW</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-016</td>
+            <td>/health → SELECT 1 DB check</td>
+            <td>MEDIUM</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+          <tr>
+            <td>TD-018</td>
+            <td>passlib unmaintained → removed, bcrypt direct</td>
+            <td>MEDIUM</td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top: 12px; font-size: 14px; color: var(--color-text-secondary);">
+        <strong>11 / 18 resolved</strong> (3 CRITICAL, 5 HIGH, 3 MEDIUM). Remaining: TD-005 (JWT), TD-007 (App.tsx split), TD-008 (401 UX), TD-012 (Celery update), TD-014 (Error Boundaries), TD-015 (coverage CI), TD-017 (E2E in CI).
+      </p>
+
+      <div class="pillRow" style="margin-top: 12px;">
+        <a class="pill" href="./PROJECT_ANALYSIS_2026.md">Full Analysis (Feb 2026)</a>
+        <a class="pill" href="./bugs/INBOX.md">Bug Inbox</a>
+      </div>
+    </div>
+
     <div class="section" id="docs">
-      <h2><span class="badge">8</span> Навигация по документации (ссылки + статус)</h2>
+      <h2><span class="badge">9</span> Навигация по документации (ссылки + статус)</h2>
 
       <h3>Product</h3>
       <ul class="list">
@@ -938,7 +1052,7 @@
     </div>
 
     <div class="section" id="next">
-      <h2><span class="badge">9</span> Что дальше (как поддерживать актуальность)</h2>
+      <h2><span class="badge">10</span> Что дальше (как поддерживать актуальность)</h2>
       <p>
         Чтобы документация не “протухала”, важно ввести простую дисциплину:
       </p>
