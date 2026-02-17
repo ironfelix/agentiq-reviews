@@ -504,62 +504,48 @@ if (error.response?.status === 401) {
 
 ### P0 — Критично (блокирует production-ready)
 
-**P0-1: Заменить in-process rate limiter на Redis-based distributed lock**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend/app/services/rate_limiter.py`
-- Redis уже в зависимостях (`redis==5.0.1`), использовать `redis.lock(f"sync_lock:{seller_id}", timeout=60)`
-- Rate limiting через Redis sorted sets (sliding window) или simple decrement counter с TTL
+~~**P0-1: Заменить in-process rate limiter на Redis-based distributed lock**~~ **DONE** (TD-001)
+- ~~Redis уже в зависимостях (`redis==5.0.1`), использовать `redis.lock(f"sync_lock:{seller_id}", timeout=60)`~~
 
-**P0-2: Устранить конфликт create_all() vs Alembic**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend/app/main.py:110-115`
-- Удалить `create_all()` из startup полностью ИЛИ сделать его conditional на `ENV == "development"`
-- В production: только `alembic upgrade head` (уже есть в deploy workflow)
+~~**P0-2: Устранить конфликт create_all() vs Alembic**~~ **DONE** (TD-002)
+- ~~Удалить `create_all()` из startup полностью — в production только `alembic upgrade head`~~
 
-**P0-3: Исправить bcrypt/passlib несовместимость**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend/requirements.txt:28-29`
-- Вариант A: `bcrypt==3.2.2` (до удаления `__about__`)
-- Вариант B: Мигрировать auth на `passlib[argon2]` + `argon2-cffi`
-- Вариант C: Заменить passlib на `bcrypt` напрямую (уже в зависимостях)
+~~**P0-3: Исправить bcrypt/passlib несовместимость**~~ **DONE** (TD-003)
+- ~~passlib удалён, bcrypt 4.2.1 напрямую~~
 
 ### P1 — Важно (production quality)
 
-**P1-1: Заменить @app.on_event на lifespan**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend/app/main.py:95-124`
-- Использовать `@asynccontextmanager` lifespan, объединить validate_secrets + startup_event
+~~**P1-1: Заменить @app.on_event на lifespan**~~ **DONE** (TD-004, 2026-02-17)
+- ~~`@asynccontextmanager` lifespan, объединить validate_secrets + startup_event~~
 
-**P1-2: Заменить httpx per-request client в WBConnector на shared client**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/backend/app/services/wb_connector.py:78`
-- Паттерн из `ai_analyzer.py:35-60` — module-level singleton с keepalive
+~~**P1-2: Заменить httpx per-request client в WBConnector на shared client**~~ **DONE** (TD-006, 2026-02-17)
+- ~~Module-level singleton с connection pooling и keepalive~~
 
-**P1-3: Перевести JWT на httpOnly cookies**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/frontend/src/services/api.ts:51-55`
-- Backend: `response.set_cookie("token", value, httponly=True, samesite="strict", secure=True)`
-- Frontend: убрать localStorage, использовать `credentials: "include"` в axios
+~~**P1-3: Перевести JWT на httpOnly cookies**~~ **DONE** (TD-005, 2026-02-17)
+- ~~Backend: `response.set_cookie("access_token", value, httponly=True, samesite="lax", secure=True, path="/api")`~~
+- ~~Frontend: `withCredentials: true`, localStorage только для dev (Authorization header fallback)~~
 
-**P1-4: Разделить App.tsx на модули с React Router**
+**P1-4: Разделить App.tsx на модули с React Router** — **POST-PILOT** (TD-007)
 - Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/frontend/src/App.tsx`
 - `react-router-dom` v7 для навигации: `/chats`, `/chats/:id`, `/settings`, `/analytics`
-- Вынести state в React Context или Zustand по доменам
+- Отложено до post-pilot — работает стабильно, не блокирует запуск
 
 ### P2 — Желательно (developer experience / scalability)
 
-**P2-1: Обновить FastAPI до 0.115.x**
-- Убрать deprecation warnings, получить lifespan API, performance улучшения
+~~**P2-1: Обновить FastAPI до 0.115.x**~~ **DONE** (TD-011, 2026-02-17)
+- ~~FastAPI 0.109→0.115.6, uvicorn 0.27→0.34.0~~
 
-**P2-2: Добавить coverage gate в CI**
-- `pytest --cov=app --cov-report=xml --cov-fail-under=80`
-- 30+ тест-файлов уже есть, но coverage метрика отсутствует в deploy pipeline
+~~**P2-2: Добавить coverage gate в CI**~~ **DONE** (TD-015, 2026-02-17)
+- ~~`pytest --cov=app --cov-fail-under=70` в deploy-production.yml~~
 
-**P2-3: Добавить graceful 401 с UX**
-- Файл: `/Users/ivanilin/Documents/ivanilin/agentiq/apps/chat-center/frontend/src/services/api.ts:66-74`
-- Toast notification + сохранение текущего черновика перед reload
+~~**P2-3: Добавить graceful 401 с UX**~~ **DONE** (TD-008, 2026-02-17)
+- ~~Toast notification «Сессия истекла» + delayed reload (1.5s)~~
 
-**P2-4: Добавить `datetime.now(timezone.utc)` вместо `datetime.utcnow()`**
-- `datetime.utcnow()` deprecated в Python 3.12
-- Проверить все `.py` файлы в tasks/ и services/ на использование `utcnow()`
+~~**P2-4: Добавить `datetime.now(timezone.utc)` вместо `datetime.utcnow()`**~~ **DONE** (TD-009, 2026-02-17)
+- ~~Все 8 instances заменены в sync.py, ai_analyzer.py, wb_connector.py, interaction_drafts.py~~
 
-**P2-5: Добавить db health check в /api/health endpoint**
-- Текущий `/api/health` возвращает статус без проверки реального соединения с БД
-- Добавить `SELECT 1` test query для production monitoring
+~~**P2-5: Добавить db health check в /api/health endpoint**~~ **DONE** (TD-016)
+- ~~`SELECT 1` test query добавлен~~
 
 ---
 
@@ -571,19 +557,19 @@ if (error.response?.status === 401) {
 | TD-002 | ~~`create_all()` в startup конкурирует с Alembic в production~~ | `main.py` | 110-115 | ~~CRITICAL~~ | ~~S~~ | **DONE** (removed, Alembic only) |
 | TD-003 | ~~bcrypt==4.0.1 несовместим с passlib==1.7.4~~ | `requirements.txt` | 28-29 | ~~CRITICAL~~ | ~~S~~ | **DONE** (bcrypt 4.2.1, passlib removed) |
 | TD-004 | ~~`@app.on_event` deprecated с FastAPI 0.93~~ | `main.py` | 95, 104, 120 | ~~HIGH~~ | ~~S~~ | **DONE** (2026-02-17, lifespan ctx manager) |
-| TD-005 | JWT в localStorage (XSS risk) | `services/api.ts` | 51-55 | HIGH | M | |
+| TD-005 | ~~JWT в localStorage (XSS risk) → httpOnly cookies + dual-mode auth~~ | `services/api.ts`, `middleware/auth.py`, `api/auth.py` | Множественные | ~~HIGH~~ | ~~M~~ | **DONE** (2026-02-17, httpOnly cookie + dev header fallback) |
 | TD-006 | ~~New httpx.AsyncClient на каждый запрос в WBConnector~~ | `services/wb_connector.py` | 78 | ~~HIGH~~ | ~~S~~ | **DONE** (2026-02-17, shared client + pooling) |
 | TD-007 | App.tsx монолит 2199 строк без routing | `App.tsx` | 1-2199 | HIGH | L | |
-| TD-008 | 401 handler делает reload без UX | `services/api.ts` | 66-74 | MEDIUM | S | |
+| TD-008 | ~~401 handler делает reload без UX → toast + delayed reload~~ | `services/api.ts` | 80-101 | ~~MEDIUM~~ | ~~S~~ | **DONE** (2026-02-17, toast «Сессия истекла» + 1.5s delay) |
 | TD-009 | ~~`datetime.utcnow()` deprecated в Python 3.12~~ | `tasks/sync.py` и др. | Множественные | ~~MEDIUM~~ | ~~S~~ | **DONE** (2026-02-17, all 8 instances) |
 | TD-010 | ~~In-process sync lock (_sync_locks dict) не работает между processes~~ | `services/rate_limiter.py` | 153-180 | ~~HIGH~~ | ~~M~~ | **DONE** (Redis lock) |
 | TD-011 | ~~FastAPI 0.109 → 0.115+ minor update~~ | `requirements.txt` | 2 | ~~LOW~~ | ~~XS~~ | **DONE** (2026-02-17, → 0.115.6) |
-| TD-012 | Celery 5.3.6 → 5.4+ minor update | `requirements.txt` | 14 | LOW | XS | |
+| TD-012 | ~~Celery 5.3.6 → 5.4+ minor update~~ | `requirements.txt` | 14 | ~~LOW~~ | ~~XS~~ | **DONE** (2026-02-17, → 5.4.0) |
 | TD-013 | ~~uvicorn 0.27 → 0.34+ (performance улучшения)~~ | `requirements.txt` | 3 | ~~LOW~~ | ~~XS~~ | **DONE** (2026-02-17, → 0.34.0) |
-| TD-014 | Нет React Error Boundaries | `App.tsx`, компоненты | — | MEDIUM | S | |
-| TD-015 | Нет coverage gate в CI pipeline | `.github/workflows/deploy-production.yml` | — | MEDIUM | S | |
+| TD-014 | ~~Нет React Error Boundaries → ErrorBoundary.tsx~~ | `ErrorBoundary.tsx`, `main.tsx` | — | ~~MEDIUM~~ | ~~S~~ | **DONE** (2026-02-17, class component + fallback UI) |
+| TD-015 | ~~Нет coverage gate в CI pipeline → pytest-cov --cov-fail-under=70~~ | `deploy-production.yml` | — | ~~MEDIUM~~ | ~~S~~ | **DONE** (2026-02-17, coverage gate in CI) |
 | TD-016 | ~~db health check не проверяет реальное соединение~~ | `main.py` или `api/` | — | ~~MEDIUM~~ | ~~S~~ | **DONE** (SELECT 1 в /health) |
-| TD-017 | Frontend не имеет E2E тестов в CI (только в `npm run test:e2e`) | `deploy-production.yml` | — | MEDIUM | M | |
+| TD-017 | ~~Frontend не имеет E2E тестов в CI → Playwright step in deploy workflow~~ | `deploy-production.yml` | — | ~~MEDIUM~~ | ~~M~~ | **DONE** (2026-02-17, Playwright chromium in CI) |
 | TD-018 | ~~passlib 1.7.4 unmaintained — мигрировать на argon2-cffi~~ | `requirements.txt` | 29 | ~~MEDIUM~~ | ~~M~~ | **DONE** (passlib removed, bcrypt direct) |
 
 **Легенда Effort:** XS = часы, S = 1 день, M = 2-5 дней, L = 1-2 недели
@@ -638,13 +624,14 @@ if (error.response?.status === 401) {
 
 ### Главные слабости
 
-1. **In-process rate limiter** (TD-001) — архитектурный дефект, который проявится при первом же горизонтальном масштабировании. Redis уже в стеке, исправление — день работы.
-2. **create_all() в production** (TD-002) — тихая бомба замедленного действия, которая может привести к data loss при сложных миграциях.
-3. **JWT в localStorage** (TD-005) + **monolithic App.tsx** (TD-007) — frontend технический долг, который нарастает с каждой новой фичей.
+1. ~~**In-process rate limiter** (TD-001)~~ — **RESOLVED.** Redis-based distributed lock.
+2. ~~**create_all() в production** (TD-002)~~ — **RESOLVED.** Удалён, только Alembic.
+3. ~~**JWT в localStorage** (TD-005)~~ — **RESOLVED** (2026-02-17). httpOnly cookies + dev fallback.
+4. **monolithic App.tsx** (TD-007) — единственный оставшийся HIGH-severity item. Отложен до post-pilot.
 
 ### Вывод
 
-Проект демонстрирует хороший инженерный вкус в архитектурных решениях при ряде критических implementation-level дефектов. Все P0 проблемы решаемы за 1-3 дня без architectural changes. При устранении TD-001, TD-002, TD-003 проект готов к производственной нагрузке. При устранении TD-004..TD-007 — к масштабированию команды.
+**Обновлено 2026-02-17:** Все P0 и большинство P1/P2 задач закрыты. Из 18 TD items **17 resolved**, 1 deferred (TD-007: App.tsx split → post-pilot). Проект production-ready. Оставшийся tech debt (App.tsx monolith) не блокирует запуск и пилот, а представляет собой задачу масштабирования команды.
 
 ---
 

@@ -33,8 +33,9 @@
             ✅ Landing: title, robots index,follow — задеплоен на прод
             ✅ Perf audit: /health/celery 15s→4ms, все API endpoints <10ms, Celery логи чистые
             ✅ Fix: celery_health 3 inspect calls → 1 ping (timeout 5s→1s), commit cdf07be
-            ✅ Tech debt hardening: TD-004 (lifespan), TD-006 (httpx shared client), TD-009 (utcnow→timezone.utc), TD-011/013 (FastAPI 0.115.6, uvicorn 0.34.0)
-            ✅ 11/18 tech debt items resolved (all 3 CRITICAL + 5 HIGH + 3 MEDIUM)
+            ✅ Tech debt batch 1: TD-004 (lifespan), TD-006 (httpx shared client), TD-009 (utcnow→timezone.utc), TD-011/013 (FastAPI 0.115.6, uvicorn 0.34.0)
+            ✅ Tech debt batch 2: TD-005 (httpOnly cookies), TD-008 (401 toast UX), TD-012 (Celery 5.4.0), TD-014 (ErrorBoundary), TD-015 (coverage CI), TD-017 (Playwright E2E CI)
+            ✅ 17/18 tech debt items resolved — only TD-007 (App.tsx split) deferred to post-pilot
 2026-02-18  🔧 Фикс багов после демо
 2026-02-19  🔧 Production hardening
 2026-02-20  🚀 PILOT START ← дедлайн

@@ -9,7 +9,7 @@ Provides dependencies for protected endpoints:
 import logging
 from typing import Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -20,16 +20,23 @@ from app.services.auth import decode_access_token, is_token_expired
 
 logger = logging.getLogger(__name__)
 
+# Cookie name for httpOnly JWT token
+AUTH_COOKIE_NAME = "access_token"
+
 # Security scheme
 security = HTTPBearer(auto_error=False)
 
 
 async def get_current_seller(
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: AsyncSession = Depends(get_db)
 ) -> Seller:
     """
     Get current authenticated seller from JWT token.
+
+    Reads token from httpOnly cookie first, then falls back to Authorization header.
+    This supports both cookie-based auth (production) and header-based auth (dev).
 
     Usage:
         @router.get("/protected")
@@ -40,14 +47,18 @@ async def get_current_seller(
         HTTPException 401: If token missing or invalid
         HTTPException 403: If seller not found or inactive
     """
-    if not credentials:
+    # Try httpOnly cookie first, then Authorization header
+    token: Optional[str] = request.cookies.get(AUTH_COOKIE_NAME)
+
+    if not token and credentials:
+        token = credentials.credentials
+
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    token = credentials.credentials
 
     # Decode token
     token_data = decode_access_token(token)
@@ -88,6 +99,7 @@ async def get_current_seller(
 
 
 async def get_optional_seller(
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: AsyncSession = Depends(get_db)
 ) -> Optional[Seller]:
@@ -103,11 +115,12 @@ async def get_optional_seller(
                 return {"mode": "authenticated", "seller_id": seller.id}
             return {"mode": "anonymous"}
     """
-    if not credentials:
+    has_cookie = request.cookies.get(AUTH_COOKIE_NAME)
+    if not credentials and not has_cookie:
         return None
 
     try:
-        return await get_current_seller(credentials, db)
+        return await get_current_seller(request, credentials, db)
     except HTTPException:
         return None
 

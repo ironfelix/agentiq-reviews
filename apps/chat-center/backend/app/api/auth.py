@@ -1,6 +1,6 @@
 """Auth API endpoints"""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime, timezone
@@ -39,6 +39,24 @@ from app.middleware.auth import get_current_seller
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
+
+
+def _set_auth_cookie(response: Response, token: str, max_age: int) -> None:
+    """Set httpOnly auth cookie. Token is also returned in body for dev/header fallback."""
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=True,      # only sent over HTTPS (production)
+        samesite="lax",    # works for same-site XHR and top-level nav
+        path="/api",       # scoped to API endpoints only
+        max_age=max_age,
+    )
+
+
+def _clear_auth_cookie(response: Response) -> None:
+    """Clear the httpOnly auth cookie on logout."""
+    response.delete_cookie(key="access_token", path="/api")
 
 
 async def _run_direct_wb_sync(
@@ -125,6 +143,7 @@ async def _run_direct_wb_sync(
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     payload: RegisterRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -164,6 +183,8 @@ async def register(
 
     logger.info(f"New seller registered: {seller.email} (id={seller.id})")
 
+    _set_auth_cookie(response, access_token, expires_in)
+
     return AuthResponse(
         access_token=access_token,
         token_type="bearer",
@@ -187,6 +208,7 @@ async def register(
 @router.post("/login", response_model=AuthResponse)
 async def login(
     payload: LoginRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -233,6 +255,8 @@ async def login(
     expires_in = ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
     logger.info(f"Seller logged in: {seller.email} (id={seller.id})")
+
+    _set_auth_cookie(response, access_token, expires_in)
 
     return AuthResponse(
         access_token=access_token,
@@ -472,19 +496,17 @@ async def sync_now(
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
+    response: Response,
     seller: Seller = Depends(get_current_seller)
 ):
     """
     Logout current session.
 
-    Note: JWT tokens are stateless, so this endpoint just serves as a
-    placeholder. Client should remove token from storage.
+    Clears httpOnly auth cookie. Client should also remove token from local storage
+    (if used in development mode).
     """
     logger.info(f"Seller logged out: {seller.email}")
-    # In a real implementation, you might want to:
-    # - Add token to a blacklist (Redis)
-    # - Rotate refresh tokens
-    # For now, just log the action
+    _clear_auth_cookie(response)
 
 
 @router.post("/seed-demo")

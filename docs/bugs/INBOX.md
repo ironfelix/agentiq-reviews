@@ -86,6 +86,12 @@ Status: ACTIVE (triage queue)
 | 60 | TD | ✅ FIXED — TD-006: httpx per-request client в wb_connector → shared module-level client + connection pooling |
 | 61 | TD | ✅ FIXED — TD-009: 8x `datetime.utcnow()` → `datetime.now(timezone.utc)` (sync.py, ai_analyzer.py, wb_connector.py, interaction_drafts.py) |
 | 62 | TD | ✅ FIXED — TD-011/013: FastAPI 0.109→0.115.6, uvicorn 0.27→0.34.0 |
+| 63 | TD | ✅ FIXED — TD-005: JWT localStorage → httpOnly cookies (backend set_cookie + middleware cookie-first + frontend withCredentials) |
+| 64 | TD | ✅ FIXED — TD-008: 401 reload без UX → toast «Сессия истекла» + 1.5s delayed reload |
+| 65 | TD | ✅ FIXED — TD-012: Celery 5.3.6 → 5.4.0 |
+| 66 | TD | ✅ FIXED — TD-014: React Error Boundaries (ErrorBoundary.tsx class component + fallback UI, wraps App in main.tsx) |
+| 67 | TD | ✅ FIXED — TD-015: coverage gate в CI (pytest-cov --cov-fail-under=70 в deploy-production.yml) |
+| 68 | TD | ✅ FIXED — TD-017: Playwright E2E step добавлен в deploy-production.yml (non-blocking) |
 
 ---
 

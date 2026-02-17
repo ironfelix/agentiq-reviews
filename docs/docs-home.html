@@ -931,9 +931,9 @@
           </tr>
           <tr>
             <td>TD-005</td>
-            <td>JWT в localStorage (XSS risk) → httpOnly cookies</td>
+            <td>JWT в localStorage (XSS risk) → httpOnly cookies + dual-mode auth</td>
             <td>HIGH</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-006</td>
@@ -949,9 +949,9 @@
           </tr>
           <tr>
             <td>TD-008</td>
-            <td>401 reload без UX (потеря черновика)</td>
+            <td>401 reload без UX → toast «Сессия истекла» + delayed reload</td>
             <td>MEDIUM</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-009</td>
@@ -973,9 +973,9 @@
           </tr>
           <tr>
             <td>TD-012</td>
-            <td>Celery 5.3.6 → 5.4+ minor update</td>
+            <td>Celery 5.3.6 → 5.4.0</td>
             <td>LOW</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-013</td>
@@ -985,15 +985,15 @@
           </tr>
           <tr>
             <td>TD-014</td>
-            <td>Нет React Error Boundaries</td>
+            <td>React Error Boundaries → ErrorBoundary.tsx + fallback UI</td>
             <td>MEDIUM</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-015</td>
-            <td>Нет coverage gate в CI pipeline</td>
+            <td>Coverage gate → pytest-cov --cov-fail-under=70 в CI</td>
             <td>MEDIUM</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-016</td>
@@ -1003,9 +1003,9 @@
           </tr>
           <tr>
             <td>TD-017</td>
-            <td>E2E тесты (Playwright) не в CI</td>
+            <td>E2E тесты (Playwright) → step в deploy-production.yml</td>
             <td>MEDIUM</td>
-            <td><span class="status inprogress"><span class="statusDot"></span>Open</span></td>
+            <td><span class="status implemented"><span class="statusDot"></span>Done</span></td>
           </tr>
           <tr>
             <td>TD-018</td>
@@ -1017,7 +1017,7 @@
       </table>
 
       <p style="margin-top: 12px; font-size: 14px; color: var(--color-text-secondary);">
-        <strong>11 / 18 resolved</strong> (3 CRITICAL, 5 HIGH, 3 MEDIUM). Remaining: TD-005 (JWT), TD-007 (App.tsx split), TD-008 (401 UX), TD-012 (Celery update), TD-014 (Error Boundaries), TD-015 (coverage CI), TD-017 (E2E in CI).
+        <strong>17 / 18 resolved</strong> (3 CRITICAL, 6 HIGH, 5 MEDIUM, 3 LOW). Remaining: TD-007 (App.tsx split → post-pilot).
       </p>
 
       <div class="pillRow" style="margin-top: 12px;">

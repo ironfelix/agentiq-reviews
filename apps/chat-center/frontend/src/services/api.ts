@@ -31,6 +31,7 @@ import type {
 // Uses indirect window access to prevent build-time optimization
 const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,  // send httpOnly cookies with requests
 });
 
 // Set baseURL at runtime (not build time) using request interceptor
@@ -48,27 +49,52 @@ api.interceptors.request.use((config) => {
 });
 
 // Auth token management
+// In production: httpOnly cookie handles auth (set by backend, sent automatically).
+// In development (localhost): localStorage fallback for cross-origin requests.
 const TOKEN_KEY = 'auth_token';
 
+function _isLocalDev(): boolean {
+  const loc = window['location'];
+  return loc.hostname === 'localhost' || loc.hostname === '127.0.0.1';
+}
+
 export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY);
-export const setToken = (token: string): void => localStorage.setItem(TOKEN_KEY, token);
+export const setToken = (token: string): void => {
+  // Always store — needed for isAuthenticated() check and dev Authorization header
+  localStorage.setItem(TOKEN_KEY, token);
+};
 export const removeToken = (): void => localStorage.removeItem(TOKEN_KEY);
 
 api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // In dev (cross-origin), send Authorization header since cookies won't work.
+  // In prod (same-origin), httpOnly cookie is sent automatically.
+  if (_isLocalDev()) {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
 
-// Handle 401 errors
+// Handle 401 errors — show message before redirect to login
+let _sessionExpiredHandled = false;
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !_sessionExpiredHandled) {
+      _sessionExpiredHandled = true;
       removeToken();
-      window.location.reload();
+      // Show brief toast so user understands why they're being redirected
+      const toast = document.createElement('div');
+      toast.textContent = 'Сессия истекла. Перенаправляем на вход\u2026';
+      toast.style.cssText =
+        'position:fixed;top:20px;left:50%;transform:translateX(-50%);' +
+        'background:#333;color:#fff;padding:12px 24px;border-radius:8px;' +
+        'z-index:99999;font-family:Inter,sans-serif;font-size:14px;';
+      document.body.appendChild(toast);
+      setTimeout(() => window.location.reload(), 1500);
     }
     return Promise.reject(error);
   }

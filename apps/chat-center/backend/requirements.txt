@@ -11,7 +11,7 @@ alembic==1.13.1
 
 # Redis and Celery (for background tasks)
 redis==5.0.1
-celery==5.3.6
+celery==5.4.0
 
 # HTTP client
 httpx==0.26.0
@@ -38,6 +38,7 @@ sentry-sdk[fastapi]==2.22.0
 # Development
 pytest==7.4.4
 pytest-asyncio==0.23.3
+pytest-cov==6.0.0
 black==24.1.1
 flake8==7.0.0
 mypy==1.8.0

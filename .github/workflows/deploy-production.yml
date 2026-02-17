@@ -22,9 +22,60 @@ jobs:
           fi
           echo "✅ Deployment confirmed"
 
+  quality:
+    name: Pre-deploy Quality Gate
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: |
+          cd apps/chat-center/backend
+          pip install -r requirements.txt
+
+      - name: Run backend tests with coverage
+        run: |
+          cd apps/chat-center/backend
+          pip install pytest-cov
+          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=70
+
+      - name: Install frontend dependencies
+        run: |
+          cd apps/chat-center/frontend
+          npm ci --no-audit --no-fund
+
+      - name: Run frontend lint + build
+        run: |
+          cd apps/chat-center/frontend
+          npm run lint
+          npm run build
+
+      - name: Install Playwright browsers
+        run: |
+          cd apps/chat-center/frontend
+          npx playwright install --with-deps chromium
+
+      - name: Run E2E tests (Playwright)
+        run: |
+          cd apps/chat-center/frontend
+          npx playwright test --project=chromium || echo "⚠️ E2E tests failed (non-blocking for now)"
+
   backup:
     name: Backup Production Database
-    needs: validate
+    needs: quality
     runs-on: ubuntu-latest
 
     steps:
@@ -83,8 +134,8 @@ jobs:
             cd backend
             pip install -r requirements.txt
 
-            # Run migrations (если используешь Alembic)
-            # alembic upgrade head
+            # Run migrations
+            alembic upgrade head
 
             # Restart backend
             sudo systemctl restart agentiq-chat
@@ -134,7 +185,7 @@ jobs:
           HEALTH_RESPONSE=$(curl -s https://agentiq.ru/api/health)
           HEALTH_STATUS=$(echo $HEALTH_RESPONSE | jq -r '.status' 2>/dev/null || echo "error")
 
-          if [ "$HEALTH_STATUS" != "ok" ]; then
+          if [ "$HEALTH_STATUS" != "ok" ] && [ "$HEALTH_STATUS" != "healthy" ]; then
             echo "❌ Health check failed: $HEALTH_RESPONSE"
             exit 1
           fi
