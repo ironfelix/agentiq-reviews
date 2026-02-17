@@ -12,6 +12,7 @@ Guardrails: all banned phrases and replacements are sourced from
 ``app.services.guardrails`` (single source of truth).
 """
 
+import asyncio
 import httpx
 import logging
 import json
@@ -33,6 +34,7 @@ settings = get_settings()
 # Shared httpx client for connection reuse (avoids per-request TCP handshake)
 # ---------------------------------------------------------------------------
 _shared_client: Optional[httpx.AsyncClient] = None
+_client_loop: Optional[asyncio.AbstractEventLoop] = None
 
 
 def _get_shared_client() -> httpx.AsyncClient:
@@ -41,9 +43,31 @@ def _get_shared_client() -> httpx.AsyncClient:
     The client is created lazily on first use. Connection pool limits
     are tuned for the typical DeepSeek API usage pattern (few concurrent
     requests, keep-alive connections).
+
+    When called from Celery workers (via run_async), each task invocation
+    creates a fresh event loop. The previous client's transport is bound
+    to the now-closed loop, causing 'Event loop is closed' errors.
+    We detect this by comparing the current running loop to the one
+    stored at client creation time and recreate the client when they differ.
     """
-    global _shared_client
-    if _shared_client is None or _shared_client.is_closed:
+    global _shared_client, _client_loop
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        current_loop = None
+
+    needs_new = (
+        _shared_client is None
+        or _shared_client.is_closed
+        or (current_loop is not None and current_loop is not _client_loop)
+    )
+    if needs_new:
+        # Close the stale client to release file descriptors gracefully.
+        if _shared_client is not None and not _shared_client.is_closed:
+            try:
+                _shared_client._transport.close()  # type: ignore[union-attr]
+            except Exception:
+                pass
         _shared_client = httpx.AsyncClient(
             timeout=httpx.Timeout(
                 connect=5.0,    # fast fail on connection issues
@@ -57,6 +81,7 @@ def _get_shared_client() -> httpx.AsyncClient:
                 keepalive_expiry=120,  # reuse connections for 2 minutes
             ),
         )
+        _client_loop = current_loop
     return _shared_client
 
 

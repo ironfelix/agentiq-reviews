@@ -1,5 +1,6 @@
 """Wildberries Chat API connector - асинхронный клиент для работы с WB Chat API"""
 
+import asyncio
 import httpx
 import logging
 from typing import Dict, List, Optional, Any
@@ -10,14 +11,31 @@ from app.services.base_connector import BaseChannelConnector
 
 logger = logging.getLogger(__name__)
 
-# Module-level shared httpx client with connection pooling (same pattern as ai_analyzer.py).
-# Auth headers are passed per-request, so a single client works for all seller tokens.
+# Module-level shared httpx client with connection pooling and event-loop tracking.
+# Celery workers create a new event loop per task (via run_async), so we must detect
+# loop changes and recreate the client to avoid "Event loop is closed" errors.
 _shared_client: Optional[httpx.AsyncClient] = None
+_client_loop: Optional[asyncio.AbstractEventLoop] = None
 
 
 def _get_shared_client() -> httpx.AsyncClient:
-    global _shared_client
-    if _shared_client is None or _shared_client.is_closed:
+    global _shared_client, _client_loop
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        current_loop = None
+
+    if (
+        _shared_client is None
+        or _shared_client.is_closed
+        or (current_loop is not None and current_loop is not _client_loop)
+    ):
+        # Close stale client bound to a dead event loop
+        if _shared_client is not None and not _shared_client.is_closed:
+            try:
+                _shared_client._transport.close()  # type: ignore[union-attr]
+            except Exception:
+                pass
         _shared_client = httpx.AsyncClient(
             limits=httpx.Limits(
                 max_connections=20,
@@ -26,15 +44,17 @@ def _get_shared_client() -> httpx.AsyncClient:
             ),
             timeout=httpx.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0),
         )
+        _client_loop = current_loop
     return _shared_client
 
 
 async def close_shared_client() -> None:
     """Close the shared httpx client (call on app shutdown)."""
-    global _shared_client
+    global _shared_client, _client_loop
     if _shared_client is not None and not _shared_client.is_closed:
         await _shared_client.aclose()
         _shared_client = None
+        _client_loop = None
 
 
 class WBConnector(BaseChannelConnector):
