@@ -1,19 +1,19 @@
-name: Update Changelog
+name: Update Changelog & Sync Docs
 
 on:
   push:
     branches: [main]
 
 jobs:
-  changelog:
-    name: Generate & Deploy Changelog
+  sync-docs:
+    name: Generate Changelog & Sync docs/ to VPS
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code (full history)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # нужна полная история для git log
+          fetch-depth: 0   # полная история для git log
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -21,38 +21,54 @@ jobs:
           python-version: '3.11'
 
       - name: Generate CHANGELOG.html
-        run: python scripts/generate-changelog.py --since 2026-01-01
+        run: python scripts/generate-changelog.py
 
-      - name: Deploy CHANGELOG.html to VPS
+      - name: Copy docs/ to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docs/"
+          target: "/tmp/agentiq-docs-deploy"
+          strip_components: 0
+
+      - name: Install to web root
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 79.137.175.164
           username: ubuntu
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            echo "📄 Pulling latest docs from repo..."
-            cd /opt/agentiq && git pull origin main --quiet
+            echo "🔄 Syncing docs/ → /var/www/agentiq/docs/ ..."
+            sudo rsync -a --delete \
+              --exclude="*.pyc" \
+              --exclude=".DS_Store" \
+              /tmp/agentiq-docs-deploy/docs/ \
+              /var/www/agentiq/docs/
 
-            echo "📋 Generating CHANGELOG.html on VPS..."
-            python3 /opt/agentiq/scripts/generate-changelog.py
+            # Дубль в корне для /docs-home.html без /docs/
+            sudo cp /var/www/agentiq/docs/docs-home.html \
+                    /var/www/agentiq/docs-home.html
 
-            echo "🚀 Deploying to /docs/..."
-            sudo cp /opt/agentiq/docs/CHANGELOG.html /var/www/agentiq/docs/CHANGELOG.html
-            sudo cp /opt/agentiq/docs/docs-home.html  /var/www/agentiq/docs/docs-home.html
-            sudo cp /opt/agentiq/docs/docs-home.html  /var/www/agentiq/docs-home.html
-            sudo chown www-data:www-data \
-              /var/www/agentiq/docs/CHANGELOG.html \
-              /var/www/agentiq/docs/docs-home.html \
+            sudo chown -R www-data:www-data \
+              /var/www/agentiq/docs/ \
               /var/www/agentiq/docs-home.html
 
-            echo "✅ Docs live at https://agentiq.ru/docs/"
+            # Cleanup
+            rm -rf /tmp/agentiq-docs-deploy
+
+            echo "✅ $(ls /var/www/agentiq/docs/ | wc -l) файлов в /docs/"
 
       - name: Verify deployment
         run: |
           sleep 5
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" -u docs:docs https://agentiq.ru/docs/CHANGELOG.html)
-          if [ "$CODE" != "200" ]; then
-            echo "❌ /docs/CHANGELOG.html not reachable (HTTP $CODE)"
-            exit 1
-          fi
-          echo "✅ https://agentiq.ru/docs/CHANGELOG.html — HTTP $CODE"
+          for FILE in docs-home.html CHANGELOG.html; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -u docs:docs "https://agentiq.ru/docs/$FILE")
+            if [ "$CODE" != "200" ]; then
+              echo "❌ /docs/$FILE — HTTP $CODE"
+              exit 1
+            fi
+            echo "✅ /docs/$FILE — $CODE"
+          done

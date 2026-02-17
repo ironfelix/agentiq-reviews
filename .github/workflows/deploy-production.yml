@@ -177,6 +177,16 @@ jobs:
 
             echo "✅ Frontend deployed"
 
+      - name: Copy docs/ to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docs/"
+          target: "/tmp/agentiq-docs-deploy"
+          strip_components: 0
+
       - name: Deploy docs to production
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -184,10 +194,16 @@ jobs:
           username: ubuntu
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            echo "📄 Deploying docs-home.html..."
-            sudo cp /opt/agentiq/docs/docs-home.html /var/www/agentiq/docs-home.html
-            sudo chown www-data:www-data /var/www/agentiq/docs-home.html
-            echo "✅ docs-home.html deployed to /var/www/agentiq/"
+            echo "🔄 Syncing docs/ → /var/www/agentiq/docs/ ..."
+            sudo rsync -a --delete \
+              --exclude="*.pyc" \
+              --exclude=".DS_Store" \
+              /tmp/agentiq-docs-deploy/docs/ \
+              /var/www/agentiq/docs/
+            sudo cp /var/www/agentiq/docs/docs-home.html /var/www/agentiq/docs-home.html
+            sudo chown -R www-data:www-data /var/www/agentiq/docs/ /var/www/agentiq/docs-home.html
+            rm -rf /tmp/agentiq-docs-deploy
+            echo "✅ $(ls /var/www/agentiq/docs/ | wc -l) файлов в /docs/"
 
       - name: Wait for services to start
         run: sleep 15
