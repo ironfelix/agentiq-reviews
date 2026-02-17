@@ -14,84 +14,47 @@ class TestCeleryHealthService:
 
     @patch('app.services.celery_health.celery_app')
     def test_healthy_state(self, mock_celery_app):
-        """Test healthy Celery state with normal queue."""
-        # Mock inspector responses
+        """Test healthy Celery state — single ping call."""
         mock_inspect = MagicMock()
         mock_inspect.ping.return_value = {"worker1@hostname": {"ok": "pong"}}
-        mock_inspect.active.return_value = {
-            "worker1@hostname": [{"id": "task1", "name": "app.tasks.sync.sync_seller_chats"}]
-        }
-        mock_inspect.reserved.return_value = {
-            "worker1@hostname": [
-                {"id": "task1", "name": "app.tasks.sync.sync_seller_chats"},
-                {"id": "task2", "name": "app.tasks.sync.analyze_chat_with_ai"}
-            ]
-        }
-        mock_inspect.scheduled.return_value = {
-            "worker1@hostname": []
-        }
-        mock_inspect.stats.return_value = {
-            "worker1@hostname": {
-                "clock": datetime.now(timezone.utc).timestamp()
-            }
-        }
-
         mock_celery_app.control.inspect.return_value = mock_inspect
 
-        # Execute
-        health = get_celery_health(timeout=5)
+        health = get_celery_health(timeout=1)
 
-        # Assert
         assert health["worker_alive"] is True
-        assert health["active_tasks"] == 1
-        assert health["queue_length"] == 2
+        assert health["active_tasks"] == 0   # not fetched for perf
+        assert health["queue_length"] == 0   # not fetched for perf
         assert health["scheduled_tasks"] == 0
-        assert health["status"] == "healthy"
-        # last_heartbeat is None since stats call was removed for performance
         assert health["last_heartbeat"] is None
+        assert health["worker_count"] == 1
+        assert health["status"] == "healthy"
 
     @patch('app.services.celery_health.celery_app')
     def test_degraded_state_high_queue(self, mock_celery_app):
-        """Test degraded state when queue length >= 100."""
-        # Mock inspector with high queue
+        """Degraded state is no longer supported (queue not fetched for perf).
+        Worker alive → always 'healthy' from ping alone."""
         mock_inspect = MagicMock()
         mock_inspect.ping.return_value = {"worker1@hostname": {"ok": "pong"}}
-        mock_inspect.active.return_value = {"worker1@hostname": [{"id": f"task{i}"} for i in range(10)]}
-        # 100+ reserved tasks
-        mock_inspect.reserved.return_value = {"worker1@hostname": [{"id": f"task{i}"} for i in range(120)]}
-        mock_inspect.scheduled.return_value = {"worker1@hostname": []}
-        mock_inspect.stats.return_value = {
-            "worker1@hostname": {"clock": datetime.now(timezone.utc).timestamp()}
-        }
-
         mock_celery_app.control.inspect.return_value = mock_inspect
 
-        # Execute
-        health = get_celery_health(timeout=5)
+        health = get_celery_health(timeout=1)
 
-        # Assert
         assert health["worker_alive"] is True
-        assert health["active_tasks"] == 10
-        assert health["queue_length"] == 120
-        assert health["status"] == "degraded"
+        assert health["status"] == "healthy"
 
     @patch('app.services.celery_health.celery_app')
     def test_down_state_no_ping(self, mock_celery_app):
         """Test down state when worker doesn't respond to ping."""
-        # Mock inspector with no ping response
         mock_inspect = MagicMock()
         mock_inspect.ping.return_value = None
-
         mock_celery_app.control.inspect.return_value = mock_inspect
 
-        # Execute
-        health = get_celery_health(timeout=5)
+        health = get_celery_health(timeout=1)
 
-        # Assert
         assert health["worker_alive"] is False
         assert health["active_tasks"] is None
         assert health["queue_length"] is None
-        assert health["scheduled_tasks"] is None
+        assert health["scheduled_tasks"] == 0
         assert health["last_heartbeat"] is None
         assert health["status"] == "down"
 
@@ -132,39 +95,18 @@ class TestCeleryHealthService:
 
     @patch('app.services.celery_health.celery_app')
     def test_multiple_workers(self, mock_celery_app):
-        """Test health check with multiple workers."""
-        # Mock inspector with 2 workers
+        """Test health check reports correct worker_count for multiple workers."""
         mock_inspect = MagicMock()
         mock_inspect.ping.return_value = {
             "worker1@hostname": {"ok": "pong"},
-            "worker2@hostname": {"ok": "pong"}
+            "worker2@hostname": {"ok": "pong"},
         }
-        mock_inspect.active.return_value = {
-            "worker1@hostname": [{"id": "task1"}],
-            "worker2@hostname": [{"id": "task2"}, {"id": "task3"}]
-        }
-        mock_inspect.reserved.return_value = {
-            "worker1@hostname": [{"id": "task1"}],
-            "worker2@hostname": [{"id": "task2"}, {"id": "task3"}]
-        }
-        mock_inspect.scheduled.return_value = {
-            "worker1@hostname": [],
-            "worker2@hostname": []
-        }
-        mock_inspect.stats.return_value = {
-            "worker1@hostname": {"clock": datetime.now(timezone.utc).timestamp()},
-            "worker2@hostname": {"clock": datetime.now(timezone.utc).timestamp()}
-        }
-
         mock_celery_app.control.inspect.return_value = mock_inspect
 
-        # Execute
-        health = get_celery_health(timeout=5)
+        health = get_celery_health(timeout=1)
 
-        # Assert
         assert health["worker_alive"] is True
-        assert health["active_tasks"] == 3  # Sum across workers
-        assert health["queue_length"] == 3
+        assert health["worker_count"] == 2
         assert health["status"] == "healthy"
 
     @patch('app.services.celery_health.celery_app')

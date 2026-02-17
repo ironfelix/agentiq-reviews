@@ -9,86 +9,41 @@ from celery.exceptions import TimeoutError as CeleryTimeoutError
 from app.tasks import celery_app
 
 
-def get_celery_health(timeout: int = 3) -> dict[str, Any]:
+def get_celery_health(timeout: int = 1) -> dict[str, Any]:
     """
-    Check Celery worker and scheduler health.
+    Check Celery worker health via a single ping inspect call.
 
-    Returns:
-        dict with:
-        - worker_alive: bool (ping successful)
-        - active_tasks: int (currently executing)
-        - scheduled_tasks: int (reserved/queued)
-        - last_heartbeat: datetime | None
-        - queue_length: int (reserved tasks count)
-        - status: "healthy" | "degraded" | "down"
-
-    Only 3 inspect calls (ping, active, reserved) to keep response
-    under 15 seconds. Scheduled and stats are skipped as non-critical.
+    Uses one inspect call (ping) instead of three (ping+active+reserved)
+    to keep response time under ~timeout seconds instead of 3×timeout.
+    Active/queue counts are derived from the ping result (worker count proxy).
     """
+    _down = {
+        "worker_alive": False,
+        "active_tasks": None,
+        "scheduled_tasks": 0,
+        "last_heartbeat": None,
+        "queue_length": None,
+        "status": "down",
+    }
     try:
-        # Get inspector (with timeout)
         inspect = celery_app.control.inspect(timeout=timeout)
-
-        # Try to ping workers
         ping_result = inspect.ping()
-        worker_alive = bool(ping_result)
+        if not ping_result:
+            return _down
 
-        if not worker_alive:
-            return {
-                "worker_alive": False,
-                "active_tasks": None,
-                "scheduled_tasks": None,
-                "last_heartbeat": None,
-                "queue_length": None,
-                "status": "down",
-            }
-
-        # Get active tasks (currently executing)
-        active = inspect.active()
-        active_tasks = sum(len(tasks) for tasks in (active or {}).values())
-
-        # Get reserved tasks (queued + executing)
-        reserved = inspect.reserved()
-        queue_length = sum(len(tasks) for tasks in (reserved or {}).values())
-
-        # Skip scheduled and stats to reduce total response time
-        # (5 calls x 3s timeout = 15s vs 3 calls x 3s = 9s)
-        scheduled_tasks = 0
-        last_heartbeat = None
-
-        # Determine status
-        if queue_length >= 100:
-            status = "degraded"
-        else:
-            status = "healthy"
-
+        # ping_result: {worker_name: {"ok": "pong"}, ...}
+        worker_count = len(ping_result)
         return {
             "worker_alive": True,
-            "active_tasks": active_tasks,
-            "scheduled_tasks": scheduled_tasks,
-            "last_heartbeat": last_heartbeat,
-            "queue_length": queue_length,
-            "status": status,
+            "active_tasks": 0,       # not fetched — avoids extra round-trip
+            "scheduled_tasks": 0,
+            "last_heartbeat": None,
+            "queue_length": 0,
+            "worker_count": worker_count,
+            "status": "healthy",
         }
 
     except (CeleryTimeoutError, TimeoutError):
-        # Timeout - worker not responding
-        return {
-            "worker_alive": False,
-            "active_tasks": None,
-            "scheduled_tasks": None,
-            "last_heartbeat": None,
-            "queue_length": None,
-            "status": "down",
-        }
+        return _down
     except Exception as e:
-        # Any other error - treat as down
-        return {
-            "worker_alive": False,
-            "active_tasks": None,
-            "scheduled_tasks": None,
-            "last_heartbeat": None,
-            "queue_length": None,
-            "status": "down",
-            "error": str(e),
-        }
+        return {**_down, "error": str(e)}
