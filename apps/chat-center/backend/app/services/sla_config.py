@@ -42,6 +42,8 @@ DEFAULT_SLA_CONFIG: Dict[str, Any] = {
     },
     "auto_response_enabled": False,
     "auto_response_intents": ["thanks"],
+    "auto_response_channels": ["review"],
+    "auto_response_nm_ids": [],
 }
 
 
@@ -100,6 +102,14 @@ async def get_sla_config(db: AsyncSession, seller_id: int) -> Dict[str, Any]:
             "auto_response_intents": config.get(
                 "auto_response_intents",
                 defaults["auto_response_intents"],
+            ),
+            "auto_response_channels": config.get(
+                "auto_response_channels",
+                defaults["auto_response_channels"],
+            ),
+            "auto_response_nm_ids": config.get(
+                "auto_response_nm_ids",
+                defaults["auto_response_nm_ids"],
             ),
         }
 

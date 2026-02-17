@@ -142,12 +142,14 @@ async def get_ai_settings(
         logger.warning("Invalid ai settings for seller=%s: %s", seller.id, exc)
         settings = AISettings()
 
-    # Sync: read actual auto_response_enabled from SLA config
+    # Sync: read actual auto_response fields from SLA config
     try:
         from app.services.sla_config import get_sla_config
 
         sla = await get_sla_config(db, seller.id)
         settings.auto_replies_positive = sla.get("auto_response_enabled", False)
+        settings.auto_response_channels = sla.get("auto_response_channels", ["review"])
+        settings.auto_response_nm_ids = sla.get("auto_response_nm_ids", [])
     except Exception:
         pass  # Keep whatever was stored in ai_settings
 
@@ -163,21 +165,36 @@ async def update_ai_settings(
     state = AISettingsResponse(settings=payload.settings)
     await _set_runtime_setting(db, _ai_key(seller.id), json.dumps(state.model_dump(mode="json")))
 
-    # Sync auto_replies_positive toggle → SLA config auto_response_enabled
+    # Sync auto-response fields → SLA config
     try:
         from app.services.sla_config import get_sla_config, update_sla_config
 
         current_sla = await get_sla_config(db, seller.id)
+        sla_changed = False
+
         if current_sla.get("auto_response_enabled") != payload.settings.auto_replies_positive:
             current_sla["auto_response_enabled"] = payload.settings.auto_replies_positive
+            sla_changed = True
+
+        if current_sla.get("auto_response_channels") != payload.settings.auto_response_channels:
+            current_sla["auto_response_channels"] = payload.settings.auto_response_channels
+            sla_changed = True
+
+        if current_sla.get("auto_response_nm_ids") != payload.settings.auto_response_nm_ids:
+            current_sla["auto_response_nm_ids"] = payload.settings.auto_response_nm_ids
+            sla_changed = True
+
+        if sla_changed:
             await update_sla_config(db, seller.id, current_sla)
             logger.info(
-                "Synced auto_response_enabled=%s for seller=%s",
-                payload.settings.auto_replies_positive,
+                "Synced auto_response settings for seller=%s enabled=%s channels=%s nm_ids=%s",
                 seller.id,
+                payload.settings.auto_replies_positive,
+                payload.settings.auto_response_channels,
+                payload.settings.auto_response_nm_ids,
             )
     except Exception as exc:
-        logger.warning("Failed to sync auto_response_enabled for seller=%s: %s", seller.id, exc)
+        logger.warning("Failed to sync auto_response settings for seller=%s: %s", seller.id, exc)
 
     return state
 

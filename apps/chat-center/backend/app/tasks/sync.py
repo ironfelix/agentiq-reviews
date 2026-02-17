@@ -1433,17 +1433,26 @@ def process_auto_responses(self):
                         continue
 
                     # Find eligible interactions for this seller
+                    auto_channels = sla_config.get("auto_response_channels", ["review"])
+                    auto_nm_ids = sla_config.get("auto_response_nm_ids", [])
                     from app.models.interaction import Interaction as InteractionModel
+
+                    query_filters = [
+                        InteractionModel.seller_id == seller.id,
+                        InteractionModel.status == "open",
+                        InteractionModel.needs_response == True,
+                        InteractionModel.is_auto_response == False,
+                        InteractionModel.rating >= 4,
+                        InteractionModel.channel.in_(auto_channels),
+                    ]
+                    # Pre-filter by nm_id whitelist if configured
+                    if auto_nm_ids:
+                        nm_id_strings = [str(nm) for nm in auto_nm_ids]
+                        query_filters.append(InteractionModel.nm_id.in_(nm_id_strings))
+
                     interactions_result = await db.execute(
                         select(InteractionModel).where(
-                            and_(
-                                InteractionModel.seller_id == seller.id,
-                                InteractionModel.status == "open",
-                                InteractionModel.needs_response == True,
-                                InteractionModel.is_auto_response == False,
-                                InteractionModel.rating >= 4,
-                                InteractionModel.channel.in_(["review", "question"]),
-                            )
+                            and_(*query_filters)
                         ).limit(10)  # Process max 10 per seller per cycle
                     )
                     interactions = interactions_result.scalars().all()

@@ -43,13 +43,15 @@ async def process_auto_response(
 
     Steps:
     1. Check seller's SLA config: auto_response_enabled == True
-    2. Check intent: ai_result["intent"] in auto_response_intents
-    3. Check rating: must be 4-5 (safety -- never auto-respond to negatives)
-    4. Generate AI draft via generate_interaction_draft()
-    5. Run guardrails check on the draft
-    6. If guardrails pass -> send reply via WB connector
-    7. Mark interaction: is_auto_response=True, status='responded'
-    8. Log the auto-response
+    2. Check channel against auto_response_channels whitelist
+    2b. Check nm_id against auto_response_nm_ids whitelist (empty = all)
+    3. Check intent: ai_result["intent"] in auto_response_intents
+    4. Check rating: must be 4-5 (safety -- never auto-respond to negatives)
+    5. Generate AI draft via generate_interaction_draft()
+    6. Run guardrails check on the draft
+    7. If guardrails pass -> send reply via WB connector
+    8. Mark interaction: is_auto_response=True, status='responded'
+    9. Log the auto-response
     """
     interaction_id = interaction.id
     seller_id = seller.id
@@ -71,7 +73,36 @@ async def process_auto_response(
         )
         return False
 
-    # --- Step 2: Check intent ---
+    # --- Step 2: Check channel against allowed channels ---
+    channel = interaction.channel or "review"
+    allowed_channels = sla_config.get("auto_response_channels", ["review"])
+    if channel not in allowed_channels:
+        logger.debug(
+            "auto_response: channel=%s not in allowed_channels=%s for seller=%s interaction=%s",
+            channel, allowed_channels, seller_id, interaction_id,
+        )
+        return False
+
+    # --- Step 2b: Check nm_id whitelist (empty = all articles) ---
+    nm_id_whitelist = sla_config.get("auto_response_nm_ids", [])
+    if nm_id_whitelist:
+        interaction_nm_id = interaction.nm_id
+        # nm_id is stored as String in DB; compare as int when possible
+        nm_id_match = False
+        if interaction_nm_id:
+            try:
+                nm_id_int = int(interaction_nm_id)
+                nm_id_match = nm_id_int in nm_id_whitelist
+            except (ValueError, TypeError):
+                nm_id_match = False
+        if not nm_id_match:
+            logger.debug(
+                "auto_response: nm_id=%s not in whitelist=%s for seller=%s interaction=%s",
+                interaction_nm_id, nm_id_whitelist, seller_id, interaction_id,
+            )
+            return False
+
+    # --- Step 3: Check intent ---
     intent = ai_result.get("intent", "")
     allowed_intents = sla_config.get("auto_response_intents", [])
     if intent not in allowed_intents:
@@ -81,7 +112,7 @@ async def process_auto_response(
         )
         return False
 
-    # --- Step 3: Check rating (SAFETY -- never auto-respond to negatives) ---
+    # --- Step 4: Check rating (SAFETY -- never auto-respond to negatives) ---
     rating = interaction.rating
     if rating is None or rating < MIN_AUTO_RESPONSE_RATING:
         logger.info(
@@ -90,7 +121,7 @@ async def process_auto_response(
         )
         return False
 
-    # --- Step 4: Generate AI draft ---
+    # --- Step 5: Generate AI draft ---
     try:
         draft: DraftResult = await generate_interaction_draft(
             db=db,
@@ -112,8 +143,7 @@ async def process_auto_response(
 
     reply_text = draft.text.strip()
 
-    # --- Step 5: Run guardrails check ---
-    channel = interaction.channel or "review"
+    # --- Step 6: Run guardrails check ---
     customer_text = interaction.text or ""
     _, warnings = apply_guardrails(reply_text, channel, customer_text)
 
@@ -127,7 +157,7 @@ async def process_auto_response(
         )
         return False
 
-    # --- Step 6: Send reply via WB connector ---
+    # --- Step 7: Send reply via WB connector ---
     try:
         sent = await _send_reply(db, interaction, seller, reply_text)
     except Exception as exc:
@@ -144,7 +174,7 @@ async def process_auto_response(
         )
         return False
 
-    # --- Step 7: Mark interaction ---
+    # --- Step 8: Mark interaction ---
     now_iso = datetime.now(timezone.utc).isoformat()
     interaction.is_auto_response = True
     interaction.status = "responded"
@@ -179,7 +209,7 @@ async def process_auto_response(
 
     await db.commit()
 
-    # --- Step 8: Log success ---
+    # --- Step 9: Log success ---
     logger.info(
         "auto_response: SUCCESS interaction=%s seller=%s intent=%s rating=%s len=%s source=%s",
         interaction_id, seller_id, intent, rating, len(reply_text), draft.source,

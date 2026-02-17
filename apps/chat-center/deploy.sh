@@ -29,10 +29,15 @@ echo "[2/5] Preparing deploy directory..."
 sudo mkdir -p "$DEPLOY_DIR/app"
 sudo mkdir -p "$DEPLOY_DIR/assets"
 
-# 3. Copy landing
-echo "[3/5] Copying landing page..."
-sudo cp "$SCRIPT_DIR/../../docs/prototypes/landing.html" "$DEPLOY_DIR/landing.html"
-echo "  Done: $DEPLOY_DIR/landing.html"
+# 3. Copy landing (only if landing-next.html exists — deployed separately on prod)
+echo "[3/5] Checking landing page..."
+LANDING_SRC="$SCRIPT_DIR/../../docs/prototypes/landing-next.html"
+if [ -f "$LANDING_SRC" ]; then
+    sudo cp "$LANDING_SRC" "$DEPLOY_DIR/landing.html"
+    echo "  Done: $DEPLOY_DIR/landing.html (from landing-next.html)"
+else
+    echo "  Skip: landing-next.html not found, keeping existing landing"
+fi
 
 # 4. Copy built frontend
 echo "[4/5] Copying frontend build..."

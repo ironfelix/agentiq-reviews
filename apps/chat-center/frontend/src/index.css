@@ -3082,6 +3082,121 @@
     line-height: 1.5;
 }
 
+/* Auto-response options (channels + nm_ids) */
+.auto-response-options {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.auto-response-section {
+    margin-bottom: 16px;
+}
+
+.auto-response-section:last-child {
+    margin-bottom: 0;
+}
+
+.auto-response-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.auto-response-channels {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.channel-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
+.channel-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.channel-checkbox-mark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border-dark);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.channel-checkbox input[type="checkbox"]:checked + .channel-checkbox-mark {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.channel-checkbox input[type="checkbox"]:checked + .channel-checkbox-mark::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-top: -1px;
+}
+
+.channel-checkbox-text {
+    user-select: none;
+}
+
+.auto-response-nm-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.auto-response-nm-input:focus {
+    border-color: var(--color-accent);
+}
+
+.auto-response-nm-input::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+.auto-response-hint {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 4px;
+}
+
+.auto-response-nm-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.nm-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-family: var(--font-mono, 'SF Mono', monospace);
+}
+
 /* Toggle switch */
 .toggle {
     width: 42px;

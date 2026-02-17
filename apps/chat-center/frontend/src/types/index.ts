@@ -120,10 +120,14 @@ export type PromoSettingsUpdateRequest = Partial<PromoSettingsResponse>;
 
 export type AITone = 'formal' | 'friendly' | 'neutral';
 
+export type AutoResponseChannel = 'review' | 'question' | 'chat';
+
 export type AISettings = {
   tone: AITone;
   auto_replies_positive: boolean;
   ai_suggestions: boolean;
+  auto_response_channels: AutoResponseChannel[];
+  auto_response_nm_ids: number[];
 };
 
 export type AISettingsResponse = {

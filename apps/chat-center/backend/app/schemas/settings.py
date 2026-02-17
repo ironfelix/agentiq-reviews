@@ -53,6 +53,14 @@ class AISettings(BaseModel):
     tone: Tone = "friendly"
     auto_replies_positive: bool = False
     ai_suggestions: bool = True
+    auto_response_channels: list[str] = Field(
+        default_factory=lambda: ["review"],
+        description="Which channels to auto-respond on: review, question, chat",
+    )
+    auto_response_nm_ids: list[int] = Field(
+        default_factory=list,
+        description="Whitelist of article IDs (nm_id) for auto-response. Empty = all articles.",
+    )
 
 
 class AISettingsResponse(BaseModel):
@@ -102,6 +110,14 @@ class SLAConfig(BaseModel):
     intents: dict[str, IntentSLAConfig] = Field(default_factory=dict)
     auto_response_enabled: bool = False
     auto_response_intents: list[str] = Field(default_factory=list)
+    auto_response_channels: list[str] = Field(
+        default_factory=lambda: ["review"],
+        description="Which channels to auto-respond on: review, question, chat",
+    )
+    auto_response_nm_ids: list[int] = Field(
+        default_factory=list,
+        description="Whitelist of article IDs (nm_id) for auto-response. Empty = all articles.",
+    )
 
 
 class SLAConfigResponse(BaseModel):

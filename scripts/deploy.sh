@@ -68,11 +68,13 @@ echo ""
 echo "--- Deploying frontend ---"
 rsync -avz --delete -e "ssh -i $SSH_KEY" "$FRONTEND_DIR/dist/" $VPS:/tmp/agentiq-frontend/ 2>/dev/null
 $SSH "sudo rm -rf /var/www/agentiq/assets/* && \
-      sudo cp /tmp/agentiq-frontend/index.html /var/www/agentiq/landing.html && \
       sudo cp -r /tmp/agentiq-frontend/app /var/www/agentiq/ && \
       sudo cp -r /tmp/agentiq-frontend/assets /var/www/agentiq/ && \
       sudo cp /tmp/agentiq-frontend/*.svg /var/www/agentiq/ 2>/dev/null; \
       sudo chown -R www-data:www-data /var/www/agentiq/"
+echo "  NOTE: Landing page NOT touched. Deploy landing separately:"
+echo "    scp -i \$SSH_KEY docs/prototypes/landing-next.html \$VPS:/tmp/landing.html"
+echo "    ssh -i \$SSH_KEY \$VPS 'sudo cp /tmp/landing.html /var/www/agentiq/landing.html && sudo chown www-data:www-data /var/www/agentiq/landing.html'"
 echo "  ✓ Frontend deployed"
 
 # --- Step 6: Install deps if needed ---
