@@ -41,6 +41,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Check docs freshness
+        run: python scripts/check-docs-freshness.py
+
       - name: Install backend dependencies
         run: |
           cd apps/chat-center/backend
@@ -174,6 +177,18 @@ jobs:
 
             echo "✅ Frontend deployed"
 
+      - name: Deploy docs to production
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "📄 Deploying docs-home.html..."
+            sudo cp /opt/agentiq/docs/docs-home.html /var/www/agentiq/docs-home.html
+            sudo chown www-data:www-data /var/www/agentiq/docs-home.html
+            echo "✅ docs-home.html deployed to /var/www/agentiq/"
+
       - name: Wait for services to start
         run: sleep 15
 
@@ -212,6 +227,15 @@ jobs:
           fi
 
           echo "✅ Login endpoint check passed"
+
+          # Docs check
+          DOCS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://agentiq.ru/docs-home.html)
+          if [ "$DOCS_CODE" != "200" ]; then
+            echo "❌ docs-home.html check failed (HTTP $DOCS_CODE)"
+            exit 1
+          fi
+          echo "✅ docs-home.html check passed"
+
           echo "✅ All smoke tests passed"
 
       - name: Notify on success
