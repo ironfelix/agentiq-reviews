@@ -1,12 +1,8 @@
 """Per-seller rate limiter for WB API calls.
 
-Provides a lightweight in-process token-bucket limiter that prevents
-exceeding WB API rate limits across all connector calls for a given seller.
-
-No external dependencies (no Redis): works in both single-process (dev)
-and multi-worker (prod Celery) modes.  In multi-worker mode each worker
-maintains its own bucket, so the effective per-seller budget should be
-divided by the number of workers via ``max_requests_per_minute``.
+Redis-based sliding window rate limiter that works correctly across multiple
+Celery workers. Each worker shares the same counters via Redis, preventing
+the WB API rate from doubling/tripling with multiple workers.
 """
 
 from __future__ import annotations
@@ -14,8 +10,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from dataclasses import dataclass, field
 from typing import Dict, Optional
+
+import redis
+import redis.asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -23,93 +21,70 @@ logger = logging.getLogger(__name__)
 _DEFAULT_RPM = 30
 
 
-@dataclass
-class _TokenBucket:
-    """Simple token-bucket state for a single seller."""
-
-    max_tokens: float
-    refill_rate: float  # tokens per second
-    tokens: float = field(init=False)
-    last_refill: float = field(init=False)
-    _lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
-
-    def __post_init__(self) -> None:
-        self.tokens = self.max_tokens
-        self.last_refill = time.monotonic()
-
-    def _refill(self) -> None:
-        now = time.monotonic()
-        elapsed = now - self.last_refill
-        self.tokens = min(self.max_tokens, self.tokens + elapsed * self.refill_rate)
-        self.last_refill = now
-
-    async def acquire(self) -> float:
-        """Wait until a token is available and consume it.
-
-        Returns the number of seconds we waited (0.0 if no wait was needed).
-        """
-        async with self._lock:
-            self._refill()
-            if self.tokens >= 1.0:
-                self.tokens -= 1.0
-                return 0.0
-
-            # Calculate wait time until we have 1 token.
-            deficit = 1.0 - self.tokens
-            wait_seconds = deficit / self.refill_rate
-
-        # Sleep outside the lock so other coroutines can check their buckets.
-        logger.debug("Rate limiter: waiting %.2fs for token", wait_seconds)
-        await asyncio.sleep(wait_seconds)
-
-        async with self._lock:
-            self._refill()
-            self.tokens = max(0.0, self.tokens - 1.0)
-            return wait_seconds
-
-
 class WBRateLimiter:
     """Per-seller rate limiter for WB API calls.
+
+    Uses Redis sliding window (per-minute bucket) so all Celery workers
+    share the same rate counters.
 
     Usage::
 
         limiter = get_rate_limiter()
         await limiter.acquire(seller_id)
         # ... make API call ...
-
-    The limiter is designed to be used as a singleton via ``get_rate_limiter()``.
     """
 
     def __init__(self, max_requests_per_minute: int = _DEFAULT_RPM) -> None:
         self._default_rpm = max_requests_per_minute
-        self._buckets: Dict[int, _TokenBucket] = {}
-        self._seller_overrides: Dict[int, int] = {}  # seller_id -> custom RPM
+        self._seller_overrides: Dict[int, int] = {}
+        self._async_redis: Optional[redis.asyncio.Redis] = None
+
+    def _get_async_redis(self) -> redis.asyncio.Redis:
+        if self._async_redis is None:
+            from app.config import get_settings
+            settings = get_settings()
+            self._async_redis = redis.asyncio.Redis.from_url(
+                settings.REDIS_URL, decode_responses=True
+            )
+        return self._async_redis
 
     def configure_seller(self, seller_id: int, max_requests_per_minute: int) -> None:
-        """Set a custom rate limit for a specific seller.
-
-        If the bucket already exists it will be recreated with the new limit.
-        """
+        """Set a custom rate limit for a specific seller."""
         self._seller_overrides[seller_id] = max_requests_per_minute
-        # Invalidate existing bucket so it gets recreated on next acquire.
-        self._buckets.pop(seller_id, None)
-
-    def _get_bucket(self, seller_id: int) -> _TokenBucket:
-        if seller_id not in self._buckets:
-            rpm = self._seller_overrides.get(seller_id, self._default_rpm)
-            self._buckets[seller_id] = _TokenBucket(
-                max_tokens=float(rpm),
-                refill_rate=rpm / 60.0,
-            )
-        return self._buckets[seller_id]
 
     async def acquire(self, seller_id: int) -> float:
         """Wait until rate limit allows next request for *seller_id*.
 
+        Uses a 1-minute sliding window bucket in Redis (INCR + EXPIRE).
         Returns the number of seconds we waited.
         """
-        bucket = self._get_bucket(seller_id)
-        waited = await bucket.acquire()
+        rpm = self._seller_overrides.get(seller_id, self._default_rpm)
+        r = self._get_async_redis()
+        waited = 0.0
+
+        while True:
+            bucket_key = f"wb_rl:{seller_id}:{int(time.time() // 60)}"
+            count = await r.incr(bucket_key)
+            if count == 1:
+                # First request in this bucket — set 2-min TTL so key auto-expires
+                await r.expire(bucket_key, 120)
+
+            if count <= rpm:
+                # Token available
+                break
+
+            # Over limit — roll back and wait until next minute
+            await r.decr(bucket_key)
+            wait_seconds = 2.0
+            logger.info(
+                "Rate limiter: seller=%s over rpm=%s, waiting %.1fs",
+                seller_id,
+                rpm,
+                wait_seconds,
+            )
+            await asyncio.sleep(wait_seconds)
+            waited += wait_seconds
+
         if waited > 0:
             logger.info(
                 "Rate limiter: seller=%s waited %.2fs before API call",
@@ -119,11 +94,10 @@ class WBRateLimiter:
         return waited
 
     def reset(self, seller_id: Optional[int] = None) -> None:
-        """Reset bucket(s) -- mainly useful for testing."""
-        if seller_id is not None:
-            self._buckets.pop(seller_id, None)
-        else:
-            self._buckets.clear()
+        """Reset bucket(s) — mainly useful for testing."""
+        # In Redis mode we can't easily reset without a sync client;
+        # acceptable for tests which typically use a fresh Redis DB.
+        logger.debug("reset() called (seller_id=%s) — no-op in Redis mode", seller_id)
 
 
 # ---------------------------------------------------------------------------
@@ -148,9 +122,20 @@ def reset_rate_limiter() -> None:
 
 # ---------------------------------------------------------------------------
 # Per-seller sync lock (prevents concurrent sync tasks for same seller)
+# Uses Redis distributed lock so it works across multiple Celery workers.
 # ---------------------------------------------------------------------------
 
-_sync_locks: Dict[int, bool] = {}
+_sync_redis: Optional[redis.Redis] = None
+_active_locks: Dict[int, redis.lock.Lock] = {}
+
+
+def _get_sync_redis() -> redis.Redis:
+    global _sync_redis
+    if _sync_redis is None:
+        from app.config import get_settings
+        settings = get_settings()
+        _sync_redis = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    return _sync_redis
 
 
 class SyncAlreadyRunning(Exception):
@@ -165,16 +150,21 @@ def try_acquire_sync_lock(seller_id: int) -> bool:
     """Non-blocking attempt to acquire the per-seller sync lock.
 
     Returns True if lock was acquired, False if another sync is already running.
-    Thread-safe for Celery workers (uses a plain dict -- each worker process
-    has its own copy, and ``worker_prefetch_multiplier=1`` ensures at most
-    one task per worker at a time).
+    Uses a Redis distributed lock (TTL=60s) so it works across multiple workers.
     """
-    if _sync_locks.get(seller_id, False):
-        return False
-    _sync_locks[seller_id] = True
-    return True
+    r = _get_sync_redis()
+    lock = r.lock(f"wb_sync_lock:{seller_id}", timeout=60, blocking_timeout=0)
+    acquired = lock.acquire(blocking=False)
+    if acquired:
+        _active_locks[seller_id] = lock
+    return acquired
 
 
 def release_sync_lock(seller_id: int) -> None:
     """Release the per-seller sync lock."""
-    _sync_locks.pop(seller_id, None)
+    lock = _active_locks.pop(seller_id, None)
+    if lock is not None:
+        try:
+            lock.release()
+        except Exception as e:
+            logger.warning("Failed to release sync lock for seller %s: %s", seller_id, e)

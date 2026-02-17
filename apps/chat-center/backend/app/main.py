@@ -12,7 +12,7 @@ from sqlalchemy import text
 from starlette.responses import JSONResponse
 
 from app.config import get_settings
-from app.database import engine, Base
+from app.database import engine
 from app.api import sellers, chats, messages, auth, interactions, settings as settings_api, leads
 from app import models  # noqa: F401
 
@@ -107,13 +107,8 @@ async def startup_event():
     logger.info("Starting AgentIQ Chat Center API...")
     logger.info(f"Database: {settings.DATABASE_URL.split('@')[-1]}")  # Hide credentials in logs
 
-    # Create tables (for development - use Alembic migrations in production)
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-    except Exception as exc:
-        logger.warning("create_all race condition (harmless if tables exist): %s", exc)
-
+    # Schema is managed by Alembic migrations (alembic upgrade head).
+    # create_all() is intentionally removed to prevent schema drift in production.
     logger.info("Database initialized successfully")
 
 

@@ -11,17 +11,14 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings
 ALGORITHM = "HS256"
@@ -35,18 +32,18 @@ class TokenData(BaseModel):
     exp: datetime
 
 
+def get_password_hash(password: str) -> str:
+    """Hash password using bcrypt."""
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash."""
     try:
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
     except Exception as e:
         logger.error(f"Password verification failed: {e}")
         return False
-
-
-def get_password_hash(password: str) -> str:
-    """Hash password using bcrypt."""
-    return pwd_context.hash(password)
 
 
 def create_access_token(
@@ -96,7 +93,10 @@ def decode_access_token(token: str) -> Optional[TokenData]:
 
         seller_id = int(payload.get("sub"))
         email = payload.get("email")
-        exp = datetime.fromtimestamp(payload.get("exp"))
+        exp_raw = payload.get("exp")
+        if exp_raw is None:
+            return None
+        exp = datetime.fromtimestamp(float(exp_raw), tz=timezone.utc)
 
         if not seller_id or not email:
             return None
