@@ -185,16 +185,20 @@ jobs:
             npm install
             npm run build
 
-            # Backup current frontend
-            if [ -d "/var/www/agentiq.backup" ]; then
-              sudo rm -rf /var/www/agentiq.backup
-            fi
-            sudo cp -r /var/www/agentiq /var/www/agentiq.backup
+            # Rename index.html → landing.html (nginx serves landing.html at /)
+            mv dist/index.html dist/landing.html
 
-            # Deploy new frontend
-            sudo rm -rf /var/www/agentiq/*
-            sudo cp -r dist/* /var/www/agentiq/
-            sudo chown -R www-data:www-data /var/www/agentiq
+            # Deploy: update landing.html + assets only (preserves docs/, app/ etc.)
+            sudo cp dist/landing.html /var/www/agentiq/landing.html
+            sudo rm -rf /var/www/agentiq/assets/
+            sudo cp -r dist/assets/ /var/www/agentiq/assets/
+            # Update app/ SPA if present in build output
+            if [ -d dist/app ]; then
+              sudo rm -rf /var/www/agentiq/app/
+              sudo cp -r dist/app/ /var/www/agentiq/app/
+            fi
+            sudo chown -R www-data:www-data /var/www/agentiq/landing.html \
+              /var/www/agentiq/assets/
 
             echo "✅ Frontend deployed"
 
