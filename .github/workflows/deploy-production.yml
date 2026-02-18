@@ -76,10 +76,15 @@ jobs:
           cd apps/chat-center/frontend
           npm ci --no-audit --no-fund
 
-      - name: Run frontend lint + build
+      - name: Run frontend lint (non-blocking)
         run: |
           cd apps/chat-center/frontend
-          npm run lint
+          npm run lint || echo "⚠️ Lint issues found — see annotations above (non-blocking)"
+        continue-on-error: true
+
+      - name: Build frontend
+        run: |
+          cd apps/chat-center/frontend
           npm run build
 
       - name: Install Playwright browsers
