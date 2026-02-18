@@ -165,12 +165,15 @@ class _DummyTask:
 
 @pytest_asyncio.fixture(autouse=True)
 async def _reset_db():
+    # Dispose stale connections from the previous test's event loop before creating new ones.
+    await engine.dispose()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="module", autouse=True)
