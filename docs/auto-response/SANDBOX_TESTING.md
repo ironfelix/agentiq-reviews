@@ -1,7 +1,92 @@
 # Auto-Response Testing Guide — Sandbox & Safe Testing
 
-> Last updated: 2026-02-17
+> Last updated: 2026-02-18
 > Status: Active
+
+---
+
+## Quick Start Checklist (TL;DR)
+
+Два способа тестирования. Выбери нужный:
+
+### A) Preview — быстрая проверка "что ответит AI" (без Celery, без Redis)
+
+```bash
+# 1. Запусти backend
+cd apps/chat-center/backend && source venv/bin/activate
+DEEPSEEK_API_KEY=sk-... uvicorn app.main:app --port 8001
+
+# 2. Залогинься
+TOKEN=$(curl -s -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@test.com","password":"demo1234"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+# 3. Тестируй — меняй text/rating/channel
+curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Отличный товар! Спасибо!","rating":5,"channel":"review"}' \
+  | python3 -m json.tool
+```
+
+Что видишь в ответе:
+- `intent` — какой интент определил AI (thanks, delivery_status, defect_not_working...)
+- `recommendation` — текст ответа который сгенерировал AI
+- `would_auto_send` — отправился бы автоматически или нет
+- `guardrails_passed` / `auto_guardrails_passed` — прошёл ли проверку
+- `scenario_action` — auto / draft / block
+
+### B) Sandbox — полный цикл worker'а, но без отправки на WB
+
+```bash
+# 1. Запусти backend (терминал 1)
+cd apps/chat-center/backend && source venv/bin/activate
+DEEPSEEK_API_KEY=sk-... uvicorn app.main:app --port 8001
+
+# 2. Запусти Redis (терминал 2, или Docker)
+redis-server
+# или: docker run -d -p 6379:6379 redis:7-alpine
+
+# 3. Запусти Celery worker (терминал 3)
+cd apps/chat-center/backend && source venv/bin/activate
+celery -A app.tasks worker --loglevel=info
+
+# 4. Запусти Celery Beat (терминал 4)
+cd apps/chat-center/backend && source venv/bin/activate
+celery -A app.tasks beat --loglevel=info
+
+# 5. Залогинься (как в способе A)
+TOKEN=$(curl -s -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@test.com","password":"demo1234"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+# 6. Включи sandbox mode
+curl -X POST http://localhost:8001/api/settings/sandbox-mode \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"enabled": true}'
+
+# 7. Включи автоответы (safe пресет — только "спасибо" на отзывы)
+curl -X POST http://localhost:8001/api/settings/auto-response/apply-preset \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"preset": "safe"}'
+
+# 8. Жди 3 минуты, смотри логи в терминале 3:
+#    [INFO] auto_response: SANDBOX interaction=... (NOT sent)
+```
+
+### Зависимости по способам
+
+| Компонент | Preview (A) | Sandbox (B) |
+|-----------|:-----------:|:-----------:|
+| uvicorn (backend) | да | да |
+| PostgreSQL / SQLite | да | да |
+| `DEEPSEEK_API_KEY` | да | да |
+| Redis | нет | да |
+| Celery worker | нет | да |
+| Celery beat | нет | да |
+| WB API ключ (seller) | нет | да (для sync) |
 
 ---
 
@@ -134,7 +219,7 @@ ORDER BY created_at DESC;
 
 ## 2. Preview Endpoint
 
-### `POST /api/auto-response/preview`
+### `POST /api/settings/auto-response/preview`
 
 The preview endpoint lets you test what the AI would respond to a given input **without creating any database records** or sending anything. It runs:
 1. Intent classification
@@ -185,7 +270,7 @@ And returns the full result for inspection.
 #### Thanks (Благодарность) -- 5-star review
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -217,7 +302,7 @@ Expected response:
 #### Delivery Status (WISMO) -- question
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -248,7 +333,7 @@ Expected response:
 #### Pre-Purchase -- question
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -280,7 +365,7 @@ Expected response:
 #### Sizing/Fit -- question
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -294,7 +379,7 @@ curl -X POST http://localhost:8001/api/auto-response/preview \
 #### Defect (should be BLOCKED)
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -325,7 +410,7 @@ Expected response:
 #### Quality Complaint -- low rating
 
 ```bash
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -368,12 +453,9 @@ celery -A app.tasks beat --loglevel=info
 
 ```bash
 # Login to get auth token
-curl -X POST http://localhost:8001/api/auth/login \
+curl -s -X POST http://localhost:8001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "demo@example.com",
-    "password": "demo123"
-  }'
+  -d '{"email": "demo@test.com", "password": "demo1234"}'
 
 # Response:
 # {"access_token": "eyJ...", "token_type": "bearer"}
@@ -383,19 +465,25 @@ Save the token for subsequent requests:
 
 ```bash
 export TOKEN="eyJ..."
+# или одной командой:
+TOKEN=$(curl -s -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@test.com","password":"demo1234"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 ```
 
 ### Enable Sandbox Mode
 
 ```bash
-curl -X PUT http://localhost:8001/api/settings \
+# Эндпоинт: POST /api/settings/sandbox-mode
+curl -X POST http://localhost:8001/api/settings/sandbox-mode \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "settings": {
-      "sandbox_mode": true
-    }
-  }'
+  -d '{"enabled": true}'
+
+# Проверить текущий статус:
+curl -s http://localhost:8001/api/settings/sandbox-mode \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
 ```
 
 ### Enable Auto-Responses with Safe Preset
@@ -408,37 +496,46 @@ curl -X POST http://localhost:8001/api/settings/auto-response/apply-preset \
   -d '{"preset": "safe"}'
 ```
 
+Пресет "safe" автоматически включает `auto_replies_positive: true` и настраивает сценарии. Если нужно включить вручную:
+
 ```bash
-# Enable auto-response
+# Ручное включение автоответов
 curl -X PUT http://localhost:8001/api/settings \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "settings": {
-      "auto_replies_positive": true
+      "auto_replies_positive": true,
+      "auto_response_channels": ["review"]
     }
   }'
 ```
 
-### Test Preview
+### Test Preview (не требует Celery)
 
 ```bash
-# Test what AI would respond to a positive review
-curl -X POST http://localhost:8001/api/auto-response/preview \
+# Тест: что ответит AI на позитивный отзыв?
+curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "text": "Спасибо за отличный товар!",
-    "rating": 5,
-    "channel": "review"
-  }'
+  -d '{"text":"Спасибо за отличный товар!","rating":5,"channel":"review"}' \
+  | python3 -m json.tool
+
+# Тест: негативный отзыв (должен быть заблокирован)
+curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Пришло сломанное!","rating":1,"channel":"review"}' \
+  | python3 -m json.tool
 ```
 
 ### Verify Sandbox Results
 
+После того как Celery Beat прогнал цикл (ждать ~3 мин):
+
 ```bash
 # Check recent interaction events
-curl http://localhost:8001/api/interactions?limit=10 \
+curl -s http://localhost:8001/api/interactions?limit=10 \
   -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
 ```
 
@@ -471,20 +568,16 @@ Follow these steps to safely test auto-responses on a real seller account withou
 
 ```bash
 # On the production server
-curl -X PUT https://agentiq.ru/api/settings \
+curl -X POST https://agentiq.ru/api/settings/sandbox-mode \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "settings": {
-      "sandbox_mode": true
-    }
-  }'
+  -d '{"enabled": true}'
 ```
 
 Verify:
 ```bash
-curl https://agentiq.ru/api/settings \
-  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool | grep sandbox
+curl -s https://agentiq.ru/api/settings/sandbox-mode \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
 ```
 
 #### Step 2: Configure Auto-Response Settings
@@ -567,14 +660,10 @@ Review each draft for:
 #### Step 6: When Satisfied, Disable Sandbox Mode
 
 ```bash
-curl -X PUT https://agentiq.ru/api/settings \
+curl -X POST https://agentiq.ru/api/settings/sandbox-mode \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "settings": {
-      "sandbox_mode": false
-    }
-  }'
+  -d '{"enabled": false}'
 ```
 
 #### Step 7: Enable Auto-Responses for Real
@@ -622,7 +711,7 @@ Test that guardrails catch known bad patterns:
 
 ```bash
 # This should show guardrails blocking the response
-curl -X POST http://localhost:8001/api/auto-response/preview \
+curl -X POST http://localhost:8001/api/settings/auto-response/preview \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -685,7 +774,7 @@ Expected: guardrails should flag "бот" as a banned phrase.
 
 1. Run the preview endpoint to see exact warnings:
    ```bash
-   curl -X POST http://localhost:8001/api/auto-response/preview \
+   curl -X POST http://localhost:8001/api/settings/auto-response/preview \
      -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"text": "Your test text", "rating": 5, "channel": "review"}'
@@ -706,7 +795,7 @@ Expected: guardrails should flag "бот" as a banned phrase.
 1. Test with the preview endpoint and different text variations:
    ```bash
    # Test same message with slight variations
-   curl -X POST http://localhost:8001/api/auto-response/preview \
+   curl -X POST http://localhost:8001/api/settings/auto-response/preview \
      -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"text": "Спасибо, всё отлично!", "rating": 5, "channel": "review"}'
@@ -883,7 +972,7 @@ echo "=== Testing auto-response preview ==="
 
 # Thanks (should be auto-eligible)
 echo -e "\n--- thanks (rating=5, review) ---"
-curl -s -X POST "$BASE_URL/api/auto-response/preview" \
+curl -s -X POST "$BASE_URL/api/settings/auto-response/preview" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"text":"Отличный товар! Спасибо!","rating":5,"channel":"review"}' \
@@ -891,7 +980,7 @@ curl -s -X POST "$BASE_URL/api/auto-response/preview" \
 
 # Delivery status (question)
 echo -e "\n--- delivery_status (question) ---"
-curl -s -X POST "$BASE_URL/api/auto-response/preview" \
+curl -s -X POST "$BASE_URL/api/settings/auto-response/preview" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"text":"Когда приедет заказ?","rating":null,"channel":"question"}' \
@@ -899,7 +988,7 @@ curl -s -X POST "$BASE_URL/api/auto-response/preview" \
 
 # Pre-purchase (question)
 echo -e "\n--- pre_purchase (question) ---"
-curl -s -X POST "$BASE_URL/api/auto-response/preview" \
+curl -s -X POST "$BASE_URL/api/settings/auto-response/preview" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"text":"Подойдёт ли на iPhone 15?","rating":null,"channel":"question","product_name":"Защитное стекло"}' \
@@ -907,7 +996,7 @@ curl -s -X POST "$BASE_URL/api/auto-response/preview" \
 
 # Defect (should be BLOCKED)
 echo -e "\n--- defect (rating=1, review) -- SHOULD BE BLOCKED ---"
-curl -s -X POST "$BASE_URL/api/auto-response/preview" \
+curl -s -X POST "$BASE_URL/api/settings/auto-response/preview" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"text":"Пришло сломанное!","rating":1,"channel":"review"}' \
@@ -915,7 +1004,7 @@ curl -s -X POST "$BASE_URL/api/auto-response/preview" \
 
 # Quality complaint (should be BLOCKED)
 echo -e "\n--- quality_complaint (rating=2, review) -- SHOULD BE BLOCKED ---"
-curl -s -X POST "$BASE_URL/api/auto-response/preview" \
+curl -s -X POST "$BASE_URL/api/settings/auto-response/preview" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"text":"Качество отвратительное","rating":2,"channel":"review"}' \
