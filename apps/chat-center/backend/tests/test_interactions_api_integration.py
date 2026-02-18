@@ -165,8 +165,12 @@ class _DummyTask:
 
 @pytest_asyncio.fixture(autouse=True)
 async def _reset_db():
-    # Dispose stale connections from the previous test's event loop before creating new ones.
+    # Dispose stale DB connections and reset the rate-limiter singleton so its
+    # cached redis.asyncio.Redis connection (bound to the previous test's event loop)
+    # is not reused in a new event loop — prevents "Event loop is closed" errors.
     await engine.dispose()
+    from app.services.rate_limiter import reset_rate_limiter
+    reset_rate_limiter()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -174,6 +178,7 @@ async def _reset_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
     await engine.dispose()
+    reset_rate_limiter()
 
 
 @pytest_asyncio.fixture(scope="module", autouse=True)
