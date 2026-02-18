@@ -19,5 +19,14 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // react-hooks v7 experimental rules — disable until adopted:
+      // set-state-in-effect: flags setState in useEffect (valid pattern for syncing derived state)
+      // purity: flags Date.now() etc. as impure (false positives in event handlers)
+      // react-compiler: for React Compiler-compiled code only
+      'react-hooks/react-compiler': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/purity': 'off',
+    },
   },
 ])

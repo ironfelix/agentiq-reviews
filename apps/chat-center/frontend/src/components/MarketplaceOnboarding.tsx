@@ -47,7 +47,7 @@ export function MarketplaceOnboarding({
     setError('');
     try {
       await onConnectMarketplace(apiKey.trim());
-    } catch (e) {
+    } catch {
       setError('Не удалось подключить ключ. Проверьте API-ключ и права доступа.');
     }
   };

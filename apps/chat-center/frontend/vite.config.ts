@@ -1,11 +1,14 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin, type ViteDevServer, type PreviewServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 
-const appEntryRedirectPlugin = {
+type NextFn = (err?: unknown) => void
+
+const appEntryRedirectPlugin: Plugin = {
   name: 'app-entry-redirect',
-  configureServer(server: any) {
-    server.middlewares.use((req: any, res: any, next: any) => {
+  configureServer(server: ViteDevServer) {
+    server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: NextFn) => {
       if (req.url === '/app') {
         res.statusCode = 302
         res.setHeader('Location', '/app/')
@@ -15,8 +18,8 @@ const appEntryRedirectPlugin = {
       next()
     })
   },
-  configurePreviewServer(server: any) {
-    server.middlewares.use((req: any, res: any, next: any) => {
+  configurePreviewServer(server: PreviewServer) {
+    server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: NextFn) => {
       if (req.url === '/app') {
         res.statusCode = 302
         res.setHeader('Location', '/app/')

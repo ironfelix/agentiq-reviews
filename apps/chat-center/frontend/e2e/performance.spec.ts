@@ -107,21 +107,22 @@ test.describe('Performance', () => {
     await ensureAuthenticated(page, TEST_CREDENTIALS);
 
     const slowRequests: Array<{ url: string; duration: number }> = [];
+    const requestStartTimes = new Map<string, number>();
 
     // Track API timing
     page.on('request', (request) => {
       const url = request.url();
       if (url.includes('/api/')) {
-        (request as any).__startTime = Date.now();
+        requestStartTimes.set(request.url(), Date.now());
       }
     });
 
     page.on('response', (response) => {
-      const request = response.request();
-      const url = request.url();
-      const start = (request as any).__startTime;
+      const url = response.url();
+      const start = requestStartTimes.get(url);
       if (start && url.includes('/api/')) {
         const duration = Date.now() - start;
+        requestStartTimes.delete(url);
         if (duration > 1_000) {
           slowRequests.push({ url, duration });
         }

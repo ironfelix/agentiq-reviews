@@ -175,7 +175,7 @@ export interface Message {
   external_message_id: string;
   direction: 'incoming' | 'outgoing';
   text: string | null;
-  attachments: any[] | null;
+  attachments: unknown[] | null;
   author_type: string | null;
   author_id: string | null;
   status: string;

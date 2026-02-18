@@ -27,8 +27,9 @@ export function Login({ onLogin }: LoginProps) {
         const response = await authApi.login({ email, password });
         onLogin(response.seller);
       }
-    } catch (err: any) {
-      const message = err.response?.data?.detail || 'Ошибка авторизации';
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { detail?: string } } };
+      const message = axiosErr.response?.data?.detail || 'Ошибка авторизации';
       setError(message);
     } finally {
       setIsLoading(false);

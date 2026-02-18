@@ -669,7 +669,7 @@ function App() {
 
       // ——— FIRST LOAD (no data yet): load ALL pages before updating UI ———
       if (!hasExistingData && hasMorePages) {
-        let allItems = [...response.interactions];
+        const allItems = [...response.interactions];
         let page = 2;
         let done = false;
         while (!done) {
@@ -1651,7 +1651,7 @@ function App() {
                         <span className="insight-badge">
                           SLA due soon: {Number(opsAlerts.question_sla.due_soon_total || 0)}
                         </span>
-                        <span className={`insight-badge${Boolean(opsAlerts.quality_regression.regression_detected) ? ' urgent' : ''}`}>
+                        <span className={`insight-badge${opsAlerts.quality_regression.regression_detected ? ' urgent' : ''}`}>
                           Manual delta: {Math.round(Number(opsAlerts.quality_regression.manual_rate_delta || 0) * 100)}%
                         </span>
                       </div>
