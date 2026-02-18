@@ -146,6 +146,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'apps/chat-center/frontend/package-lock.json'
+
+      - name: Build frontend
+        run: |
+          cd apps/chat-center/frontend
+          npm ci --no-audit --no-fund
+          npm run build
+          cp dist/index.html dist/landing.html
+
       - name: Deploy backend to production
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -175,6 +189,16 @@ jobs:
 
             echo "✅ Backend deployed"
 
+      - name: Copy frontend build to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 79.137.175.164
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "apps/chat-center/frontend/dist/"
+          target: "/tmp/agentiq-frontend-deploy"
+          strip_components: 0
+
       - name: Deploy frontend to production
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -184,26 +208,17 @@ jobs:
           script: |
             echo "🚀 Deploying frontend to production..."
 
-            cd /opt/agentiq/frontend
+            DIST="/tmp/agentiq-frontend-deploy/apps/chat-center/frontend/dist"
 
-            # Install deps and build
-            npm install
-            npm run build
-
-            # Rename index.html → landing.html (nginx serves landing.html at /)
-            mv dist/index.html dist/landing.html
-
-            # Deploy: update landing.html + assets only (preserves docs/, app/ etc.)
-            sudo cp dist/landing.html /var/www/agentiq/landing.html
-            sudo rm -rf /var/www/agentiq/assets/
-            sudo cp -r dist/assets/ /var/www/agentiq/assets/
-            # Update app/ SPA if present in build output
-            if [ -d dist/app ]; then
-              sudo rm -rf /var/www/agentiq/app/
-              sudo cp -r dist/app/ /var/www/agentiq/app/
-            fi
-            sudo chown -R www-data:www-data /var/www/agentiq/landing.html \
-              /var/www/agentiq/assets/
+            sudo cp "$DIST/landing.html" /var/www/agentiq/landing.html
+            sudo rm -rf /var/www/agentiq/assets/ /var/www/agentiq/app/
+            sudo cp -r "$DIST/assets/" /var/www/agentiq/assets/
+            sudo cp -r "$DIST/app/" /var/www/agentiq/app/
+            sudo chown -R www-data:www-data \
+              /var/www/agentiq/landing.html \
+              /var/www/agentiq/assets/ \
+              /var/www/agentiq/app/
+            rm -rf /tmp/agentiq-frontend-deploy
 
             echo "✅ Frontend deployed"
 
