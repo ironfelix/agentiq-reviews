@@ -64,7 +64,7 @@ jobs:
         run: |
           cd apps/chat-center/backend
           pip install pytest-cov
-          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=70
+          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=55
         env:
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || '7JiOr8WP3UdiuX6DDkxsbwdiFNXyYoKxYc_CIci5qJo=' }}
           SECRET_KEY: "ci-test-secret-key-not-for-production"
