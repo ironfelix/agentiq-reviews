@@ -27,6 +27,17 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,6 +65,11 @@ jobs:
           cd apps/chat-center/backend
           pip install pytest-cov
           pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=70
+        env:
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || '7JiOr8WP3UdiuX6DDkxsbwdiFNXyYoKxYc_CIci5qJo=' }}
+          SECRET_KEY: "ci-test-secret-key-not-for-production"
+          DATABASE_URL: "sqlite+aiosqlite:///:memory:"
+          REDIS_URL: "redis://localhost:6379/0"
 
       - name: Install frontend dependencies
         run: |
