@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentIQ — Авто-ответы: Sandbox & Тестирование</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f8f9fa; --surface: #fff; --border: #e8eaed;
+    --text: #202124; --text2: #5f6368; --text3: #9aa0a6;
+    --accent: #1a73e8; --success: #34a853; --warning: #f9ab00; --danger: #ea4335;
+    --radius: 10px; --shadow: 0 1px 4px rgba(0,0,0,.08);
+    --code-bg: #f1f3f4;
+  }
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.65;
+    color: var(--text); background: var(--bg); padding: 0 16px 64px; }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  /* Header */
+  .page-header { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .breadcrumb { font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .tagline { color: var(--text2); font-size: 14px; }
+  .meta-row { display: flex; gap: 16px; margin-top: 14px; font-size: 12px; color: var(--text3); flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px; }
+  .badge-green { background: #e6f4ea; color: #1e8e3e; }
+  .badge-blue { background: #e8f0fe; color: #1a73e8; }
+
+  /* TOC */
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px 24px; margin-bottom: 28px; }
+  .toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--text3); margin-bottom: 12px; }
+  .toc-list { display: flex; flex-direction: column; gap: 6px; list-style: none; }
+  .toc-list li a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  .toc-list li a:hover { text-decoration: underline; }
+
+  /* Sections */
+  .card { background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+  .card-header { padding: 14px 20px; background: #fafbfc; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; }
+  .card-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent);
+    color: white; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .card-body { padding: 20px; }
+
+  h3 { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase;
+    letter-spacing: .06em; margin-bottom: 10px; margin-top: 20px; }
+  h3:first-child { margin-top: 0; }
+  p { margin-bottom: 10px; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  /* Method tabs */
+  .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
+  @media (max-width: 600px) { .methods { grid-template-columns: 1fr; } }
+  .method { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .method-head { padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
+  .method-a .method-head { background: #e8f0fe; }
+  .method-b .method-head { background: #e6f4ea; }
+  .method-label { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .method-a .method-label { background: var(--accent); color: white; }
+  .method-b .method-label { background: var(--success); color: white; }
+  .method-name { font-size: 13px; font-weight: 600; }
+  .method-desc { font-size: 12px; color: var(--text2); padding: 0 16px 14px; }
+  .method-needs { display: flex; flex-direction: column; gap: 4px; padding: 0 16px 16px; }
+  .need { font-size: 11px; display: flex; align-items: center; gap: 6px; color: var(--text2); }
+  .need svg { flex-shrink: 0; }
+  .need.yes { color: var(--success); }
+  .need.no { color: var(--text3); }
+
+  /* Code blocks */
+  .code-block { background: #1e1e2e; border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .code-label { padding: 8px 14px 0; font-size: 10px; font-weight: 600; color: #7c7f93;
+    letter-spacing: .08em; text-transform: uppercase; }
+  pre { padding: 12px 16px 14px; overflow-x: auto; }
+  code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 12px; line-height: 1.6;
+    color: #cdd6f4; }
+  .comment { color: #6c7086; }
+  code.inline { background: var(--code-bg); padding: 1px 5px; border-radius: 3px;
+    font-size: 12px; color: #c0392b; font-family: 'Menlo', monospace; }
+
+  /* Checklist */
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 7px; cursor: pointer;
+    transition: background .12s; }
+  .check-item:hover { background: #f8f9fa; }
+  .check-item.done { background: #f0faf3; border-color: #b7dfca; }
+  .check-item input[type=checkbox] { width: 16px; height: 16px; margin-top: 1px;
+    accent-color: var(--success); cursor: pointer; flex-shrink: 0; }
+  .check-text { font-size: 13px; line-height: 1.5; }
+  .check-item.done .check-text { color: var(--text2); }
+  .check-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px;
+    border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+  .tag-critical { background: #fce8e6; color: var(--danger); }
+  .tag-important { background: #fef7e0; color: #a05300; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { background: #f1f3f4; text-align: left; padding: 8px 12px; font-weight: 600;
+    font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--text2); }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .yes-cell { color: var(--success); font-weight: 600; }
+  .no-cell { color: var(--text3); }
+  .block-cell { color: var(--danger); font-weight: 600; }
+  .dep-cell { color: var(--warning); font-weight: 600; }
+
+  /* Troubleshoot */
+  .trouble-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .trouble-q { padding: 12px 16px; background: #fff8e1; font-weight: 600; font-size: 13px;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .trouble-q svg { transition: transform .15s; }
+  .trouble-item.open .trouble-q svg { transform: rotate(180deg); }
+  .trouble-a { display: none; padding: 14px 16px; font-size: 13px; border-top: 1px solid var(--border); }
+  .trouble-item.open .trouble-a { display: block; }
+  .trouble-a ol, .trouble-a ul { padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+
+  /* Alert box */
+  .alert { display: flex; gap: 10px; padding: 12px 14px; border-radius: 8px; font-size: 13px; margin: 12px 0; }
+  .alert-warn { background: #fff8e1; border: 1px solid #ffe082; }
+  .alert-info { background: #e8f0fe; border: 1px solid #b3cef6; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; }
+
+  /* Footer nav */
+  .page-footer { display: flex; justify-content: space-between; align-items: center;
+    padding-top: 24px; border-top: 1px solid var(--border); margin-top: 8px;
+    font-size: 12px; color: var(--text3); }
+  .page-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .page-footer a:hover { text-decoration: underline; }
+
+  /* Progress bar */
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 24px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--success); border-radius: 2px; width: 0%;
+    transition: width .3s; }
+  .progress-label { font-size: 11px; color: var(--text3); text-align: right; margin-top: 4px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="../docs-home.html">Документация</a> / <a href="ARCHITECTURE.md">Авто-ответы</a> / Sandbox & Тестирование
+    </div>
+    <h1>Авто-ответы: Sandbox & Тестирование</h1>
+    <p class="tagline">Как проверить авто-ответы до включения в бою. Два способа — Preview (без Celery) и Sandbox (полный цикл).</p>
+    <div class="meta-row">
+      <span class="badge badge-green">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="3.5"/></svg>
+        Реализовано
+      </span>
+      <span class="badge badge-blue">Обновлено: 18.02.2026</span>
+      <a href="SANDBOX_TESTING.md" style="color:var(--accent);font-size:12px;">Raw Markdown →</a>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Содержание</div>
+    <ul class="toc-list">
+      <li><a href="#quick-start">Quick Start — два способа тестирования</a></li>
+      <li><a href="#preview">A) Preview — быстрая проверка без Celery</a></li>
+      <li><a href="#sandbox">B) Sandbox — полный цикл без отправки на WB</a></li>
+      <li><a href="#checklist">Чеклист перед запуском в бой</a></li>
+      <li><a href="#test-matrix">Матрица тестирования</a></li>
+      <li><a href="#troubleshoot">Troubleshooting</a></li>
+    </ul>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="card" id="quick-start">
+    <div class="card-header">
+      <div class="card-num">1</div>
+      <div class="card-title">Quick Start — выбери способ</div>
+    </div>
+    <div class="card-body">
+      <div class="methods">
+        <div class="method method-a">
+          <div class="method-head">
+            <span class="method-label">A</span>
+            <span class="method-name">Preview</span>
+          </div>
+          <div class="method-desc">Быстрая проверка "что ответит AI" на конкретный текст. Без Celery, без Redis. Ответ за секунды.</div>
+          <div class="method-needs">
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>uvicorn (backend)</div>
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>DEEPSEEK_API_KEY</div>
+            <div class="need no"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Redis — не нужен</div>
+            <div class="need no"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Celery — не нужен</div>
+            <div class="need no"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>WB API ключ — не нужен</div>
+          </div>
+        </div>
+        <div class="method method-b">
+          <div class="method-head">
+            <span class="method-label">B</span>
+            <span class="method-name">Sandbox</span>
+          </div>
+          <div class="method-desc">Полный цикл worker'а на реальных данных WB. Ответы генерируются и сохраняются, но не уходят на WB.</div>
+          <div class="method-needs">
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>uvicorn (backend)</div>
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Redis</div>
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>Celery worker + beat</div>
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>WB API ключ (для sync)</div>
+            <div class="need yes"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>DEEPSEEK_API_KEY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="card" id="preview">
+    <div class="card-header">
+      <div class="card-num" style="background:#1a73e8">A</div>
+      <div class="card-title">Preview — быстрая проверка</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <span>Endpoint <code class="inline">POST /api/settings/auto-response/preview</code> запускает intent classification + генерацию ответа + guardrails и возвращает всё без сохранения в БД и без отправки.</span>
+      </div>
+
+      <h3>Шаг 1 — Запусти backend + получи токен</h3>
+      <div class="code-block">
+        <div class="code-label">bash</div>
+        <pre><code>cd apps/chat-center/backend && source venv/bin/activate
+DEEPSEEK_API_KEY=sk-... uvicorn app.main:app --port 8001
+
+<span class="comment"># В другом терминале — залогинься:</span>
+TOKEN=$(curl -s -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@test.com","password":"demo1234"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")</code></pre>
+      </div>
+
+      <h3>Шаг 2 — Тестируй интенты</h3>
+      <div class="code-block">
+        <div class="code-label">Позитивный отзыв — должен уйти</div>
+        <pre><code>curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Отличный товар! Спасибо!","rating":5,"channel":"review"}' \
+  | python3 -m json.tool</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Брак — должен быть заблокирован</div>
+        <pre><code>curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Пришло сломанное, кнопка не работает","rating":1,"channel":"review"}' \
+  | python3 -m json.tool</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Вопрос о совместимости</div>
+        <pre><code>curl -s -X POST http://localhost:8001/api/settings/auto-response/preview \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Подойдёт ли на iPhone 15?","channel":"question","product_name":"Защитное стекло"}' \
+  | python3 -m json.tool</code></pre>
+      </div>
+
+      <h3>Что смотреть в ответе</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Поле</th><th>Что значит</th></tr>
+          <tr><td><code class="inline">intent</code></td><td>Интент: <code class="inline">thanks</code>, <code class="inline">defect_not_working</code>, <code class="inline">pre_purchase</code>…</td></tr>
+          <tr><td><code class="inline">would_send</code></td><td><strong>true</strong> — авто-ответ ушёл бы, <strong>false</strong> — заблокирован</td></tr>
+          <tr><td><code class="inline">blocked_reason</code></td><td>Причина блокировки (intent blocked, rating &lt; 4, guardrails…)</td></tr>
+          <tr><td><code class="inline">recommendation</code></td><td>Текст который сгенерировал AI</td></tr>
+          <tr><td><code class="inline">guardrails_passed</code></td><td>Прошёл ли проверку на banned phrases / тон</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sandbox -->
+  <div class="card" id="sandbox">
+    <div class="card-header">
+      <div class="card-num" style="background:#34a853">B</div>
+      <div class="card-title">Sandbox — полный цикл без отправки</div>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠️</span>
+        <span>Sandbox mode обрабатывает реальные отзывы из WB, генерирует ответы и сохраняет их в БД — но <strong>не отправляет</strong> в WB API. В логах будет <code class="inline">[SANDBOX] Message N simulated (not sent)</code>.</span>
+      </div>
+
+      <h3>Запуск (4 терминала)</h3>
+      <div class="code-block">
+        <div class="code-label">Терминал 1 — Backend</div>
+        <pre><code>cd apps/chat-center/backend && source venv/bin/activate
+DEEPSEEK_API_KEY=sk-... uvicorn app.main:app --port 8001</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Терминал 2 — Redis</div>
+        <pre><code>redis-server
+<span class="comment"># или: docker run -d -p 6379:6379 redis:7-alpine</span></code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Терминал 3 — Celery Worker</div>
+        <pre><code>cd apps/chat-center/backend && source venv/bin/activate
+celery -A app.tasks worker --loglevel=info</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">Терминал 4 — Celery Beat (scheduler)</div>
+        <pre><code>cd apps/chat-center/backend && source venv/bin/activate
+celery -A app.tasks beat --loglevel=info</code></pre>
+      </div>
+
+      <h3>Включи sandbox + авто-ответы</h3>
+      <div class="code-block">
+        <div class="code-label">bash</div>
+        <pre><code><span class="comment"># Sandbox mode — ответы не уйдут на WB</span>
+curl -X POST http://localhost:8001/api/settings/sandbox-mode \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"enabled": true}'
+
+<span class="comment"># Применить безопасный пресет (только "спасибо" → отзывы)</span>
+curl -X POST http://localhost:8001/api/settings/auto-response/apply-preset \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"preset": "safe"}'</code></pre>
+      </div>
+
+      <h3>Проверка результата (~3 мин)</h3>
+      <div class="code-block">
+        <div class="code-label">Посмотри события в логах Celery (Терминал 3)</div>
+        <pre><code><span class="comment"># Ожидаемые строки в логах:</span>
+[INFO] auto_response: found 3 eligible interactions for seller=1
+[INFO] auto_response: SUCCESS interaction=42 intent=thanks rating=5 len=87
+[INFO] [SANDBOX] Message 456 simulated (not sent to wildberries)</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">SQL — проверь sandbox-события</div>
+        <pre><code>SELECT ie.event_type, ie.details->>'intent', ie.created_at
+FROM interaction_events ie
+WHERE ie.seller_id = &lt;seller_id&gt;
+  AND ie.event_type LIKE 'auto_response%'
+ORDER BY ie.created_at DESC LIMIT 20;</code></pre>
+      </div>
+
+      <h3>Выключить sandbox и запустить по-настоящему</h3>
+      <div class="code-block">
+        <div class="code-label">bash</div>
+        <pre><code>curl -X POST http://localhost:8001/api/settings/sandbox-mode \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"enabled": false}'
+<span class="comment"># После этого авто-ответы начнут уходить реально на WB</span></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div class="card" id="checklist">
+    <div class="card-header">
+      <div class="card-num">✓</div>
+      <div class="card-title">Чеклист перед запуском в бой</div>
+    </div>
+    <div class="card-body">
+      <p style="color:var(--text2);margin-bottom:16px;">Отмечай пункты — они сохраняются в браузере.</p>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-label" id="progress-label">0 / 11 выполнено</div>
+      <div class="checklist" id="checklist">
+        <label class="check-item">
+          <input type="checkbox" data-id="c1">
+          <span class="check-text">Sandbox протестирован минимум на 10 взаимодействиях — AI генерирует нормальные ответы<span class="check-tag tag-critical">Критично</span></span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c2">
+          <span class="check-text">Прочитан каждый sandbox-черновик — тексты уместны, естественны, не выглядят как бот</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c3">
+          <span class="check-text">Guardrails блокируют вредный контент — проверено preview-эндпоинтом с текстом "Наш бот рад помочь!"<span class="check-tag tag-critical">Критично</span></span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c4">
+          <span class="check-text">Нет авто-ответов на отзывы с рейтингом ≤ 3 — SQL запрос вернул 0 строк<span class="check-tag tag-critical">Критично</span></span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c5">
+          <span class="check-text">Фильтр по каналам работает — ответы идут только в разрешённые каналы (отзывы / вопросы)</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c6">
+          <span class="check-text">Если включён фильтр по артикулам — проверено что работают только нужные nm_ids</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c7">
+          <span class="check-text">Промокод вставляется корректно (если включено) — только в 5★ отзывы, формат правильный<span class="check-tag tag-important">Важно</span></span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c8">
+          <span class="check-text">Интент-классификация точная — "спасибо" не путается с жалобой</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c9">
+          <span class="check-text">Celery Beat работает — task <code class="inline">process_auto_responses</code> запускается каждые 3 мин</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c10">
+          <span class="check-text">SLA config сохранился корректно — прочитал настройки обратно и сверил</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" data-id="c11">
+          <span class="check-text">На проде: мониторинг включён — <code class="inline">journalctl -u agentiq-celery -f | grep auto_response</code> показывает активность</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Matrix -->
+  <div class="card" id="test-matrix">
+    <div class="card-header">
+      <div class="card-num">2</div>
+      <div class="card-title">Матрица тестирования</div>
+    </div>
+    <div class="card-body">
+      <p style="margin-bottom:12px;">Проверь все ключевые сценарии через Preview-эндпоинт:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Интент</th><th>Канал</th><th>Рейтинг</th><th>would_send</th><th>Причина блока</th></tr>
+          <tr><td>thanks</td><td>review</td><td>5</td><td class="yes-cell">✓ true</td><td>—</td></tr>
+          <tr><td>thanks</td><td>review</td><td>4</td><td class="yes-cell">✓ true</td><td>—</td></tr>
+          <tr><td>thanks</td><td>review</td><td>3</td><td class="block-cell">✗ false</td><td>rating &lt; 4</td></tr>
+          <tr><td>thanks</td><td>question</td><td>—</td><td class="dep-cell">~ зависит</td><td>channel not allowed</td></tr>
+          <tr><td>delivery_status</td><td>question</td><td>—</td><td class="dep-cell">~ зависит</td><td>scenario disabled (safe)</td></tr>
+          <tr><td>pre_purchase</td><td>question</td><td>—</td><td class="dep-cell">~ зависит</td><td>scenario disabled (safe)</td></tr>
+          <tr><td>defect_not_working</td><td>review</td><td>1</td><td class="block-cell">✗ false</td><td>intent blocked + rating &lt; 4</td></tr>
+          <tr><td>quality_complaint</td><td>review</td><td>2</td><td class="block-cell">✗ false</td><td>intent blocked + rating &lt; 4</td></tr>
+          <tr><td>wrong_item</td><td>review</td><td>1</td><td class="block-cell">✗ false</td><td>intent blocked + rating &lt; 4</td></tr>
+          <tr><td>refund_exchange</td><td>review</td><td>4</td><td class="block-cell">✗ false</td><td>action=draft (не auto)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Troubleshoot -->
+  <div class="card" id="troubleshoot">
+    <div class="card-header">
+      <div class="card-num">?</div>
+      <div class="card-title">Troubleshooting</div>
+    </div>
+    <div class="card-body">
+
+      <div class="trouble-item" onclick="this.classList.toggle('open')">
+        <div class="trouble-q">
+          Авто-ответы не срабатывают
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="#5f6368" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="trouble-a">
+          <p>Проверь по порядку:</p>
+          <ol>
+            <li><code class="inline">auto_response_enabled</code> = true в SLA config</li>
+            <li>Канал есть в <code class="inline">auto_response_channels</code></li>
+            <li>Интент включён и action = auto (не draft/block)</li>
+            <li>Рейтинг отзыва ≥ 4 (hard gate — всегда)</li>
+            <li>Статус взаимодействия = open, <code class="inline">needs_response = true</code></li>
+            <li>Celery Beat запущен: <code class="inline">systemctl status agentiq-celery-beat</code></li>
+            <li>Логи worker'а: <code class="inline">journalctl -u agentiq-celery -f | grep auto_response</code></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="trouble-item" onclick="this.classList.toggle('open')">
+        <div class="trouble-q">
+          Guardrails блокируют слишком много
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="#5f6368" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="trouble-a">
+          <p>Частые причины:</p>
+          <ul>
+            <li>AI добавляет слова "бот", "ИИ", "автоматически" — попадает в banned phrases</li>
+            <li>Ответ слишком длинный (&gt;500 символов для отзывов/вопросов)</li>
+            <li>Unsolicited return mention — AI предлагает возврат без запроса</li>
+          </ul>
+          <p style="margin-top:10px;">Запусти Preview с конкретным текстом — <code class="inline">guardrails.warnings</code> покажет что именно поймалось.</p>
+        </div>
+      </div>
+
+      <div class="trouble-item" onclick="this.classList.toggle('open')">
+        <div class="trouble-q">
+          Неправильная классификация интента
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="#5f6368" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="trouble-a">
+          <p>Частые случаи:</p>
+          <ul>
+            <li>"Спасибо" + жалоба → должен быть <code class="inline">quality_complaint</code>, не <code class="inline">thanks</code></li>
+            <li>Общий позитив без "спасибо" → может попасть в <code class="inline">other</code></li>
+            <li>Вопрос внутри отзыва → может классифицироваться как question intent</li>
+          </ul>
+          <p style="margin-top:10px;">Тестируй вариации текста через Preview — смотри разницу в <code class="inline">intent</code>.</p>
+        </div>
+      </div>
+
+      <div class="trouble-item" onclick="this.classList.toggle('open')">
+        <div class="trouble-q">
+          Промокод не вставляется
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="#5f6368" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="trouble-a">
+          <ol>
+            <li>Рейтинг должен быть ровно 5 (не 4)</li>
+            <li>Канал — только "review" (не question/chat)</li>
+            <li><code class="inline">auto_response_promo_on_5star = true</code> в SLA config</li>
+            <li>Активный промокод с флагом <code class="inline">channels.reviews_positive = true</code></li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a href="../docs-home.html">← Документация</a>
+    <span>AgentIQ Auto-Response · 2026</span>
+    <a href="ARCHITECTURE.md">Архитектура →</a>
+  </div>
+
+</div>
+
+<script>
+  // Checklist persistence
+  const checks = document.querySelectorAll('.checklist input[type=checkbox]');
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label');
+
+  function updateProgress() {
+    const done = [...checks].filter(c => c.checked).length;
+    const pct = Math.round(done / checks.length * 100);
+    fill.style.width = pct + '%';
+    fill.style.background = pct === 100 ? '#34a853' : '#1a73e8';
+    label.textContent = done + ' / ' + checks.length + ' выполнено' + (pct === 100 ? ' ✓' : '');
+    checks.forEach(c => {
+      c.closest('.check-item').classList.toggle('done', c.checked);
+    });
+    const state = {};
+    checks.forEach(c => { state[c.dataset.id] = c.checked; });
+    localStorage.setItem('ar_sandbox_checklist', JSON.stringify(state));
+  }
+
+  // Load saved state
+  try {
+    const saved = JSON.parse(localStorage.getItem('ar_sandbox_checklist') || '{}');
+    checks.forEach(c => { if (saved[c.dataset.id]) c.checked = true; });
+  } catch(e) {}
+  updateProgress();
+  checks.forEach(c => c.addEventListener('change', updateProgress));
+</script>
+</body>
+</html>
