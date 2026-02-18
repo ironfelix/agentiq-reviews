@@ -261,6 +261,34 @@
     .list { margin-left: 18px; margin-bottom: 0; }
     .list li { margin-bottom: 6px; }
 
+    /* Pipeline visualization */
+    .pipeline-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+    .pipe-step {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 2px solid var(--color-accent);
+      background: var(--color-bg);
+    }
+    .pipe-step.gate { border-color: var(--color-warning); background: rgba(249,171,0,0.07); }
+    .pipe-step.info { border-color: #7a64ff; background: rgba(122,100,255,0.06); }
+    .pipe-step.done { border-color: var(--color-success); background: rgba(52,168,83,0.06); }
+    .pipe-out {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 7px;
+      white-space: nowrap;
+    }
+    .pipe-out.skip { background: rgba(95,99,104,0.08); color: #5f6368; border: 1px solid rgba(95,99,104,0.25); }
+    .pipe-out.blocked { background: rgba(234,67,53,0.08); color: #c62828; border: 1px solid rgba(234,67,53,0.3); }
+    .pipe-out.draft-only { background: rgba(26,115,232,0.07); color: #1a73e8; border: 1px solid rgba(26,115,232,0.2); }
+    .pipe-out.sandbox { background: rgba(249,171,0,0.08); color: #6c4d00; border: 1px solid rgba(249,171,0,0.3); }
+    .pipe-down { padding: 1px 0 1px 20px; font-size: 16px; color: #9aa0a6; line-height: 1.6; }
+    .pipe-down small { font-size: 11px; color: var(--color-text-tertiary); margin-left: 6px; vertical-align: middle; }
+
     /* Mobile */
     @media (max-width: 768px) {
       body { padding: 20px 12px; }
@@ -767,17 +795,305 @@
       </div>
     </div>
 
-    <div class="section" id="lifecycle">
-      <h2><span class="badge">7</span> Communication Strategy (Realistic)</h2>
+    <div class="section" id="auto-response">
+      <h2><span class="badge">7</span> Auto-Response System</h2>
       <p>
-        AI-ассистент для идеальной реакции на обращения клиентов на WB/Ozon.
-        <strong>Фокус: Product Quality + Response Excellence</strong>, не lifecycle marketing (т.к. нет истории покупок/email/проактивных кампаний).
+        Система автоматических ответов на обращения покупателей без участия продавца.
+        Генерирует AI-ответ, проходит 4 независимых уровня защиты и отправляет в WB API.
+        Запускается через Celery Beat каждые 3 минуты.
+        <strong>MVP scope:</strong> только отзывы ≥ 4★ и явно разрешённые интенты.
+        Код: <a href="../apps/chat-center/backend/app/services/auto_response.py"><span class="mono">auto_response.py</span></a>
       </p>
 
       <div class="callout">
-        <div class="calloutTitle">⚠️ Ограничения маркетплейсов + Платные возможности</div>
-        <p style="margin-bottom: 12px;">WB/Ozon <strong>НЕ дают</strong> историю покупок клиентов, email/телефоны. <strong>НО:</strong> платная опция WB позволяет писать в чат при ЛЮБОМ отзыве (включая 5★).</p>
-        <p style="font-weight: 600; margin-bottom: 8px;">Что можем:</p>
+        <div class="calloutTitle">Главное правило безопасности</div>
+        Никогда не отвечает автоматически на рейтинг &lt; 4 — это хардкодированная константа,
+        её нельзя переопределить через настройки продавца. При любом сбое на любом шаге — тихий пропуск,
+        продавец отвечает вручную.
+      </div>
+
+      <h3>Как запускается (Celery Beat)</h3>
+      <div class="diagram">
+        <div class="flow">
+          <div class="flow-step policy">Celery Beat<br><span style="font-size:11px;font-weight:400;color:#6c4d00">каждые 3 мин</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><code style="font-size:12px">process_auto_responses()</code><br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">все активные продавцы</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step data">Фильтр eligible<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">open, needs_response,<br>rating ≥ 4, not auto,<br>max 10 / seller / цикл</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step ops">Pipeline<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">9 шагов<br>per interaction</span></div>
+        </div>
+        <p style="font-size:13px;color:var(--color-text-secondary);margin-top:12px;">
+          Latency: лучший случай ~30 сек (взаимодействие приходит прямо перед циклом),
+          худший случай ~3.5 мин (только что пропустили цикл).
+          Sync данных от WB происходит каждые 30 сек (отдельная задача <code>sync_all_sellers</code>).
+        </p>
+      </div>
+
+      <h3>9-шаговый pipeline (блок-схема решений)</h3>
+      <div class="diagram">
+        <p style="font-weight:600;margin-bottom:14px;font-size:13px;color:var(--color-text-secondary)">
+          Жёлтый = проверка / gate. Синий = получение данных. Зелёный = успех. Красный = заблокировано.
+        </p>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 1 — SLA Config</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>auto_response_enabled == True</code>?</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ НЕТ</span>
+          <div class="pipe-out skip">SKIP &nbsp;— авто-ответ выключен</div>
+        </div>
+        <div class="pipe-down">↓ <small>ДА</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 2 — Channel check</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>interaction.channel</code> in <code>auto_response_channels</code>?</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ НЕТ</span>
+          <div class="pipe-out skip">SKIP &nbsp;— канал не разрешён</div>
+        </div>
+        <div class="pipe-down">↓ <small>ДА</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 2b — nm_id whitelist</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>nm_id</code> in <code>auto_response_nm_ids</code>? &nbsp;(пустой = все)</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ НЕТ</span>
+          <div class="pipe-out skip">SKIP &nbsp;— артикул не в списке</div>
+        </div>
+        <div class="pipe-down">↓ <small>ДА</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 3 — Scenario routing</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>scenarios[intent].action</code>? + <code>enabled</code>?</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→</span>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="pipe-out blocked">action="block" → BLOCKED</div>
+            <div class="pipe-out draft-only">action="draft" → только драфт</div>
+            <div class="pipe-out skip">enabled=false → SKIP</div>
+          </div>
+        </div>
+        <div class="pipe-down">↓ <small>action="auto" + enabled=true</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate" style="border-color:var(--color-danger);background:rgba(234,67,53,0.06);">
+            <strong>Шаг 4 — Rating gate ⚠️ SAFETY</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>rating &gt;= 4</code>? &nbsp;(хардкод, нельзя переопределить)</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ НЕТ</span>
+          <div class="pipe-out blocked">BLOCKED &nbsp;— негатив защищён</div>
+        </div>
+        <div class="pipe-down">↓ <small>ДА (rating ≥ 4)</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step info">
+            <strong>Шаг 4b — Product context (non-blocking)</strong><br>
+            <span style="font-size:12px;font-weight:400">WB CDN card.json, кэш 1ч. Только для review / question. Сбой не блокирует.</span>
+          </div>
+        </div>
+        <div class="pipe-down">↓</div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step">
+            <strong>Шаг 5 — Generate AI draft</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>generate_interaction_draft()</code> — DeepSeek LLM, ~3-4 сек</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ fail</span>
+          <div class="pipe-out skip">SKIP &nbsp;— ошибка или пустой драфт</div>
+        </div>
+        <div class="pipe-down">↓</div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step info">
+            <strong>Шаг 5b — Promo injection (non-blocking)</strong><br>
+            <span style="font-size:12px;font-weight:400">Условия: rating=5 + channel=review + <code>auto_response_promo_on_5star=True</code>. Сбой не блокирует.</span>
+          </div>
+        </div>
+        <div class="pipe-down">↓</div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 6 — Content guardrails</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>apply_guardrails()</code>: banned phrases, длина, тон канала</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ error</span>
+          <div class="pipe-out blocked">BLOCKED &nbsp;— нарушение правил</div>
+        </div>
+        <div class="pipe-down">↓ <small>no errors</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 6b — Auto-response guardrails (строже)</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>validate_auto_response()</code>: дополнительные проверки для авто-режима</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ fail</span>
+          <div class="pipe-out blocked">BLOCKED</div>
+        </div>
+        <div class="pipe-down">↓ <small>PASS</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step gate">
+            <strong>Шаг 6c — Sandbox mode?</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>seller.sandbox_mode == True</code>?</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ ДА</span>
+          <div class="pipe-out sandbox">LOG + return True &nbsp;— в WB НЕ отправляется</div>
+        </div>
+        <div class="pipe-down">↓ <small>НЕТ (production)</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step">
+            <strong>Шаг 7 — Send via WB API</strong><br>
+            <span style="font-size:12px;font-weight:400">
+              review → <code>answer_feedback()</code> &nbsp;|&nbsp;
+              question → <code>patch_question()</code> &nbsp;|&nbsp;
+              chat → <code>send_message()</code>
+            </span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→ fail</span>
+          <div class="pipe-out skip">SKIP &nbsp;— API ошибка</div>
+        </div>
+        <div class="pipe-down">↓ <small>OK</small></div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step">
+            <strong>Шаг 8 — Mark interaction</strong><br>
+            <span style="font-size:12px;font-weight:400"><code>is_auto_response=True</code>, <code>status='responded'</code>, <code>needs_response=False</code>, <code>priority='low'</code></span>
+          </div>
+        </div>
+        <div class="pipe-down">↓</div>
+
+        <div class="pipeline-row">
+          <div class="pipe-step done">
+            <strong>Шаг 9 — Log + InteractionEvent</strong><br>
+            <span style="font-size:12px;font-weight:400">event_type=<code>auto_response_sent</code>, intent, rating, draft_source, reply_length, promo_code</span>
+          </div>
+          <span style="color:#9aa0a6;font-size:15px;padding:0 6px">→</span>
+          <div class="pipe-out" style="background:rgba(52,168,83,0.08);color:#1f6c37;border:1px solid rgba(52,168,83,0.3);">✓ SUCCESS</div>
+        </div>
+      </div>
+
+      <h3>4 уровня защиты (независимые)</h3>
+      <div class="grid2">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Layer 1: Rating Gate</span>
+            <span class="status" style="border-color:rgba(234,67,53,0.35);background:rgba(234,67,53,0.07);color:#8e1b0f;"><span class="statusDot" style="background:var(--color-danger)"></span>HARDCODED</span>
+          </div>
+          <ul class="list">
+            <li>Константа <code>MIN_AUTO_RESPONSE_RATING = 4</code></li>
+            <li>Нельзя переопределить через настройки продавца</li>
+            <li>rating &lt; 4 или None → всегда заблокировано</li>
+            <li>Логируется INFO: <code>BLOCKED -- rating=3 &lt; 4 (safety guard)</code></li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Layer 2: Scenario Routing</span>
+            <span class="status inprogress"><span class="statusDot"></span>CONFIGURABLE</span>
+          </div>
+          <ul class="list">
+            <li><code>action="auto"</code> + <code>enabled=true</code> → продолжить</li>
+            <li><code>action="draft"</code> → генерировать, не отправлять</li>
+            <li><code>action="block"</code> → всегда заблокировано</li>
+            <li>Жёстко заблокированы: <code>defect_not_working</code>, <code>wrong_item</code>, <code>quality_complaint</code></li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Layer 3: Content Guardrails</span>
+            <span class="status" style="border-color:rgba(234,67,53,0.35);background:rgba(234,67,53,0.07);color:#8e1b0f;"><span class="statusDot" style="background:var(--color-danger)"></span>HARD</span>
+          </div>
+          <ul class="list">
+            <li>Banned phrases: ai_mention, promises, blame, dismissive</li>
+            <li>Unsolicited return mentions</li>
+            <li>Length violations</li>
+            <li>Любой error-severity → блокировка авто-ответа</li>
+          </ul>
+        </div>
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Layer 4: Channel Rules</span>
+            <span class="status inprogress"><span class="statusDot"></span>CONFIGURABLE</span>
+          </div>
+          <ul class="list">
+            <li><strong>review / question:</strong> strictest — все banned categories</li>
+            <li><strong>chat:</strong> relaxed — только ai_mention error-level</li>
+            <li>Max length: 500 (review/question), 1000 (chat)</li>
+            <li>Promo codes: только review 5★</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:24px;">Конфигурация: 3 пресета</h3>
+      <table class="cost-table">
+        <thead>
+          <tr><th>Пресет</th><th>Каналы</th><th>Интенты (action=auto)</th><th>Когда использовать</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Safe</strong> (Безопасный старт)</td>
+            <td><span class="mono">review</span></td>
+            <td><span class="mono">thanks</span></td>
+            <td>Первый запуск. Только 4-5★ с благодарностью</td>
+          </tr>
+          <tr>
+            <td><strong>Balanced</strong> (Сбалансированный)</td>
+            <td><span class="mono">review, question</span></td>
+            <td><span class="mono">thanks, delivery_status, pre_purchase, sizing_fit, availability, compatibility</span></td>
+            <td>~70% обращений, включая вопросы перед покупкой</td>
+          </tr>
+          <tr>
+            <td><strong>Max</strong> (Максимум)</td>
+            <td><span class="mono">review, question, chat</span></td>
+            <td>Всё кроме негатива + <span class="mono">refund_exchange</span> (шаблон)</td>
+            <td>Максимальная автоматизация, нужен мониторинг</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:24px;">Поддерживаемые каналы</h3>
+      <table class="cost-table">
+        <thead>
+          <tr><th>Параметр</th><th>review</th><th>question</th><th>chat</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WB API</td><td><code>answer_feedback()</code></td><td><code>patch_question()</code></td><td><code>send_message()</code></td></tr>
+          <tr><td>Max длина</td><td>500 символов</td><td>500 символов</td><td>1000 символов</td></tr>
+          <tr><td>Публичный</td><td>Да</td><td>Да</td><td>Нет</td></tr>
+          <tr><td>Guardrails</td><td>Строгий</td><td>Строгий</td><td>Мягкий</td></tr>
+          <tr><td>Промокод</td><td>Да (только 5★)</td><td>Нет</td><td>Нет</td></tr>
+          <tr><td>Рейтинг доступен</td><td>Да</td><td>Нет</td><td>Нет</td></tr>
+        </tbody>
+      </table>
+
+      <div class="pillRow" style="margin-top:16px;">
+        <a class="pill" href="./auto-response/ARCHITECTURE.md">ARCHITECTURE.md (полный тех. doc)</a>
+        <a class="pill" href="./auto-response/GUARDRAILS.md">Auto-Response Guardrails</a>
+        <a class="pill" href="./auto-response/sandbox-testing.html" style="background:#e6f4ea;border-color:#b7dfca;color:#1e8e3e;font-weight:600;">✓ Sandbox & Чеклист запуска</a>
+        <a class="pill" href="./auto-response/SANDBOX_TESTING.md">Sandbox Testing Guide</a>
+        <a class="pill" href="../apps/chat-center/backend/app/services/auto_response.py">Code: auto_response.py</a>
+        <a class="pill" href="../apps/chat-center/backend/app/services/auto_response_presets.py">Code: presets.py</a>
+      </div>
+    </div>
+
+    <div class="section" id="lifecycle">
+      <h2><span class="badge">8</span> Communication Strategy (Multi-Marketplace)</h2>
+      <p>
+        AI-ассистент для идеальной реакции на обращения клиентов. <strong>Текущий фокус: WB — реализован.</strong>
+        Roadmap: Яндекс Маркет (Phase 2) → Авито (Phase 3). Детали по API: <a href="./research/MARKETPLACE_COMM_API_RESEARCH.md">MARKETPLACE_COMM_API_RESEARCH.md</a>.
+      </p>
+
+      <h3>Текущий статус: WB (реализовано)</h3>
+      <div class="callout">
+        <div class="calloutTitle">WB — ограничения + платные возможности</div>
+        <p style="margin-bottom: 12px;">WB <strong>НЕ даёт</strong> историю покупок, email/телефоны. Нет webhooks — только polling каждые 30 сек. Чат с покупателем = <strong>платная опция</strong> (+0.5-0.7% комиссии), отложенный негатив +~1%.</p>
+        <p style="font-weight: 600; margin-bottom: 8px;">Что работает сейчас:</p>
         <ul class="list">
           <li><strong>+20%</strong> конверсия вопрос→покупка при ответе &lt;1h (реактивный)</li>
           <li><strong>15-30%</strong> win rate спасения 1★→4-5★ через платный чат WB</li>
@@ -794,7 +1110,7 @@
             <span class="status implemented"><span class="statusDot"></span>Готово</span>
           </div>
           <p class="subtitle" style="margin-bottom: 8px;">
-            Интерактивный прототип Dashboard для управления реактивными сценариями (с учётом ограничений WB/Ozon API).
+            Интерактивный прототип Dashboard для управления реактивными сценариями (с учётом ограничений WB API).
           </p>
           <ul class="list">
             <li>Live метрики: Upsell Conversion, Win Rate, ROI</li>
@@ -829,7 +1145,7 @@
         </div>
       </div>
 
-      <h3 style="margin-top: 24px;">Сценарии (краткая справка)</h3>
+      <h3 style="margin-top: 24px;">Сценарии WB (краткая справка)</h3>
       <table class="cost-table">
         <thead>
           <tr>
@@ -885,16 +1201,122 @@
         </tbody>
       </table>
 
+      <h3 style="margin-top: 24px;">Roadmap: другие маркетплейсы</h3>
+      <p style="margin-bottom: 16px; font-size: 14px; color: var(--color-text-secondary);">
+        Исследование завершено: <a href="./research/MARKETPLACE_COMM_API_RESEARCH.md">MARKETPLACE_COMM_API_RESEARCH.md</a>. Интеграция — после MVP WB.
+      </p>
+
+      <div class="grid2">
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Phase 2: Яндекс Маркет</span>
+            <span class="status hypothesis"><span class="statusDot"></span>Post-MVP, ~3-5 дней</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            YM принципиально лучше WB по API: webhooks вместо polling, orderId в каждом чате, продавец может первым написать покупателю.
+          </p>
+          <ul class="list">
+            <li><strong>Webhooks</strong> — реальный real-time, не polling каждые 30 сек</li>
+            <li><strong>orderId в чате</strong> — автоматическая связка с заказом в CRM</li>
+            <li><strong>Проактивный чат</strong> — продавец инициирует по ORDER или RETURN</li>
+            <li><strong>WAITING_FOR_PARTNER</strong> — фильтр "ждут ответа" прямо в API</li>
+            <li><strong>goods-feedback API</strong> — аналог WB отзывов + редактирование ответа</li>
+            <li>⚠️ Нет чата FBY, DIRECT только входящий, webhook timeout 10 сек</li>
+          </ul>
+        </div>
+
+        <div class="cardMini">
+          <div class="cardMiniTitle">
+            <span>Phase 3: Авито</span>
+            <span class="status hypothesis"><span class="statusDot"></span>Post-MVP, ~5-7 дней</span>
+          </div>
+          <p class="subtitle" style="margin-bottom: 8px;">
+            Уникальная аудитория 50М+. Чат = основной канал продаж (80%+ продаж через чат). Нет API отзывов — половина ценности отрезана.
+          </p>
+          <ul class="list">
+            <li><strong>Messenger API v3</strong> — чаты привязаны к объявлению (item_id)</li>
+            <li><strong>Webhooks</strong> — retry до 10 попыток, 60 сек задержка</li>
+            <li><strong>Бесплатно</strong> — нет тарифов на чат</li>
+            <li><strong>Повторные продажи</strong> — можно писать покупателям, которые писали ранее</li>
+            <li>❌ Нет API отзывов (ключевой пробел)</li>
+            <li>❌ OAuth per-seller (сложнее Bearer/API-key)</li>
+            <li>⚠️ C2C контекст — нужны новые AI-шаблоны</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 20px;">Сравнение возможностей по маркетплейсам</h3>
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Возможность</th>
+            <th>WB <span class="status implemented" style="font-size:11px;padding:2px 6px;"><span class="statusDot"></span>MVP</span></th>
+            <th>Яндекс Маркет <span class="status hypothesis" style="font-size:11px;padding:2px 6px;"><span class="statusDot"></span>Phase 2</span></th>
+            <th>Авито <span class="status hypothesis" style="font-size:11px;padding:2px 6px;"><span class="statusDot"></span>Phase 3</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chat API</td>
+            <td>✅ v1</td>
+            <td>✅ v2</td>
+            <td>✅ v3</td>
+          </tr>
+          <tr>
+            <td>Webhooks (real-time)</td>
+            <td>❌ polling 30 сек</td>
+            <td>✅ HTTPS push</td>
+            <td>✅ HTTPS push</td>
+          </tr>
+          <tr>
+            <td>orderId в чате</td>
+            <td>❌ Gap</td>
+            <td>✅ Есть</td>
+            <td>N/A (item_id)</td>
+          </tr>
+          <tr>
+            <td>Продавец инициирует чат</td>
+            <td>❌</td>
+            <td>✅ (по заказу/возврату)</td>
+            <td>❌</td>
+          </tr>
+          <tr>
+            <td>API отзывов</td>
+            <td>✅ WBCON</td>
+            <td>✅ goods-feedback</td>
+            <td>❌ нет</td>
+          </tr>
+          <tr>
+            <td>Тариф на чат</td>
+            <td>+0.5-0.7% комиссии</td>
+            <td>Включён</td>
+            <td>Бесплатно</td>
+          </tr>
+          <tr>
+            <td>ROI AI ответа на отзыв</td>
+            <td>Высокий</td>
+            <td>Высокий</td>
+            <td>❌ нет API</td>
+          </tr>
+          <tr>
+            <td>ROI AI ответа в чат</td>
+            <td>Высокий</td>
+            <td>Высокий</td>
+            <td>Высокий</td>
+          </tr>
+        </tbody>
+      </table>
+
       <div class="pillRow" style="margin-top: 16px;">
-        <a class="pill" href="../pages/index.html">Главная страница</a>
         <a class="pill" href="../pages/lifecycle-dashboard.html">Dashboard (UI prototype)</a>
         <a class="pill" href="../pages/scenarios.html">Scenarios (documentation)</a>
+        <a class="pill" href="./research/MARKETPLACE_COMM_API_RESEARCH.md">Marketplace API Research</a>
         <a class="pill" href="../pages/README.md">README (setup guide)</a>
       </div>
     </div>
 
     <div class="section" id="techdebt">
-      <h2><span class="badge">8</span> Tech Debt Status</h2>
+      <h2><span class="badge">9</span> Tech Debt Status</h2>
       <p>
         Каталог технического долга ведётся в <a href="./PROJECT_ANALYSIS_2026.md">PROJECT_ANALYSIS_2026.md</a> (секция 7).
         Ниже — сводка по состоянию на 2026-02-17.
@@ -1032,7 +1454,7 @@
     </div>
 
     <div class="section" id="docs">
-      <h2><span class="badge">9</span> Навигация по документации (ссылки + статус)</h2>
+      <h2><span class="badge">10</span> Навигация по документации (ссылки + статус)</h2>
 
       <h3>Product</h3>
       <ul class="list">
@@ -1093,11 +1515,12 @@
         <li><a href="./ops/DEPLOYMENT.md">ops/DEPLOYMENT.md</a> <span class="status implemented"><span class="statusDot"></span>Реализовано</span></li>
         <li><a href="./ops/HARD_PILOT_SLO_RUNBOOK_20260216.md">ops/HARD_PILOT_SLO_RUNBOOK_20260216.md</a> <span class="status implemented"><span class="statusDot"></span>SLO/p95 пороги</span></li>
         <li><a href="./research/INDEX.md">research/INDEX.md</a> <span class="status research"><span class="statusDot"></span>Исследование</span></li>
+        <li><a href="./research/MARKETPLACE_COMM_API_RESEARCH.md">research/MARKETPLACE_COMM_API_RESEARCH.md</a> <span class="status research"><span class="statusDot"></span>YM + Авито API — чаты, вебхуки, roadmap</span></li>
       </ul>
     </div>
 
     <div class="section" id="next">
-      <h2><span class="badge">10</span> Что дальше (как поддерживать актуальность)</h2>
+      <h2><span class="badge">11</span> Что дальше (как поддерживать актуальность)</h2>
       <p>
         Чтобы документация не “протухала”, важно ввести простую дисциплину:
       </p>

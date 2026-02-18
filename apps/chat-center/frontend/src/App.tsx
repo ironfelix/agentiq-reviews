@@ -423,7 +423,10 @@ function App() {
   interactionCacheRef.current = interactionCache;
   // If interactionCache was populated synchronously above, mark cache as already restored
   const cacheRestoredRef = useRef(Object.keys(interactionCache).length > 0);
-  const interactions = interactionCache[activeChannel] || [];
+  const interactions = useMemo(
+    () => interactionCache[activeChannel] || [],
+    [interactionCache, activeChannel],
+  );
   const handleChannelChange = useCallback((channel: 'all' | 'review' | 'question' | 'chat') => {
     setActiveChannelRaw(channel);
     const hasCachedData = (interactionCacheRef.current[channel]?.length ?? 0) > 0;
@@ -783,7 +786,7 @@ function App() {
     } finally {
       setIsLoadingChats(false);
     }
-  }, [filters, selectedInteractionId, paginationMeta]);
+  }, [filters, selectedInteractionId]);
 
   // Background pagination: load ALL remaining pages in one go, update state once
   const fetchAllRemainingPages = useCallback(async (channelKey: string) => {
@@ -1034,7 +1037,7 @@ function App() {
     }, 3000);
 
     return () => clearInterval(pollInterval);
-  }, [user?.sync_status, syncAutoTransitioned, fetchInteractions, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
+  }, [user, syncAutoTransitioned, fetchInteractions, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
 
   const handleSelectChat = useCallback(async (chat: Chat) => {
     setSelectedInteractionId(chat.id);
@@ -1076,7 +1079,7 @@ function App() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [selectedInteractionId, isAnalyzing, upsertInteraction, fetchTimeline, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
+  }, [selectedInteractionId, isAnalyzing, upsertInteraction, fetchMessages, fetchTimeline, fetchQualityMetrics, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
 
   const handleSendMessage = useCallback(async (text: string) => {
     if (!selectedInteractionId) return;
@@ -1233,7 +1236,7 @@ function App() {
       fetchInteractions();
       fetchQualityMetrics();
     }
-  }, [user]);
+  }, [user, fetchInteractions, fetchQualityMetrics]);
 
   // Fetch analytics data only when analytics tab is active
   const isAnalyticsActive = activeWorkspace === 'analytics';
@@ -1243,7 +1246,7 @@ function App() {
       fetchOpsAlerts();
       fetchPilotReadiness();
     }
-  }, [user, isAnalyticsActive]);
+  }, [user, isAnalyticsActive, fetchQualityHistory, fetchOpsAlerts, fetchPilotReadiness]);
 
   // Poll unified interactions (essential — always active)
   usePolling(fetchInteractions, 10000, !!user);

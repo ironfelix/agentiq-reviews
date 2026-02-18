@@ -268,12 +268,13 @@
         }
 
         .hero h1 {
-            font-size: clamp(30px, 5vw, 52px);
+            font-size: clamp(28px, 4vw, 44px);
             font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -1.5px;
+            line-height: 1.15;
+            letter-spacing: -1.2px;
             color: var(--color-text-primary);
-            margin-bottom: var(--space-5);
+            max-width: 640px;
+            margin-bottom: var(--space-4);
             animation: fade-up 0.6s ease 0.1s forwards;
             opacity: 0;
         }
@@ -1846,6 +1847,90 @@
             .mock-url { justify-content: flex-start; }
         }
 
+        /* Responsive: desktop mocks only on ≥768px, mobile cards only on <768px */
+        @media (max-width: 767px) {
+            .proof-gallery .proof-card:nth-child(-n+3) { display: none; }
+        }
+        @media (min-width: 768px) {
+            .proof-gallery .proof-card:nth-child(n+4) { display: none; }
+        }
+
+        /* Mock v3: queue section labels */
+        .mock-queue-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9aa0a6;
+            padding: 6px 10px 2px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .mock-queue-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .mock-queue-dot.red  { background: #ea4335; }
+        .mock-queue-dot.yellow { background: #f9ab00; }
+        .mock-queue-dot.green  { background: #34a853; }
+
+        /* Mock v3: chat item */
+        .mock-item-v3 {
+            padding: 7px 8px;
+            border-radius: 7px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .mock-item-v3.active { background: #f0f7ff; }
+
+        /* Mock v3: WB icon */
+        .mock-wb-icon {
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            background: #8b33ff;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Mock v3: analytics (mock 02) */
+        .mock-score-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; background: #f0f7ff; border-radius: 8px; margin-bottom: 8px;
+        }
+        .mock-score-num { font-size: 24px; font-weight: 800; color: #1a73e8; line-height: 1; }
+        .mock-bar-v3 { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .mock-bar-v3 label { font-size: 10px; color: #5f6368; width: 46px; flex-shrink: 0; }
+        .mock-bar-v3 .trk { flex: 1; height: 6px; background: #f1f3f4; border-radius: 3px; overflow: hidden; }
+        .mock-bar-v3 .fll { height: 100%; border-radius: 3px; background: #34a853; }
+        .mock-bar-v3 .fll.risky { background: #f9ab00; }
+        .mock-bar-v3 .fll.harm { background: #ea4335; }
+        .mock-bar-v3 .fll.neutral { background: #9aa0a6; }
+        .mock-bar-v3 b { font-size: 10px; color: #1a1a1a; width: 26px; text-align: right; flex-shrink: 0; }
+        .mock-insight {
+            background: #fff8f0; border-left: 3px solid #f9ab00;
+            padding: 7px 9px; border-radius: 0 6px 6px 0; margin-top: 8px;
+            font-size: 10px; color: #5f6368; line-height: 1.4;
+        }
+        .mock-insight strong { display: block; color: #1a1a1a; margin-bottom: 2px; font-size: 10px; font-weight: 700; }
+
+        /* Mock v3: SLA badges (mock 03) */
+        .mock-sla-badge {
+            font-size: 8px; font-weight: 700; padding: 2px 5px;
+            border-radius: 3px; text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0;
+        }
+        .mock-sla-badge.overdue { background: #fce8e6; color: #c62828; }
+        .mock-sla-badge.soon    { background: #fef7e0; color: #e37400; }
+        .mock-item-v3-meta { display: flex; align-items: center; gap: 3px; font-size: 9px; color: #9aa0a6; margin: 1px 0; }
+
         /* ===== MOBILE MOCKUPS (iPhone style) ===== */
         .proof-mock.mobile {
             aspect-ratio: 9 / 19.5;
@@ -3242,9 +3327,9 @@
                     <span class="hero-badge-dot"></span>
                     Для продавцов Wildberries
                 </div>
-                <h1>Все коммуникации <span class="highlight">Wildberries</span> в одном окне</h1>
+                <h1>AI отвечает на ваши отзывы, чаты <span style="white-space:nowrap">и вопросы —</span> меньше ручной работы, <span class="highlight">больше продаж</span></h1>
                 <p class="hero-subtitle">
-                    Собираем чаты, вопросы и отзывы по вашим товарам в одном рабочем пространстве и показываем, где есть точки риска и низкая отдача.
+                    Собираем все сообщения в один поток, автоматически приоритезируем критичные и подсказываем готовые ответы
                 </p>
                 <div class="hero-cta-group">
                     <a href="#" class="btn-primary" onclick="openModal(event)">
@@ -3559,55 +3644,79 @@
                             <div class="mock-app messages">
                                 <div class="mock-side">
                                     <div class="mock-side-head">
-                                        <div class="mock-side-title">Коммуникации</div>
+                                        <div class="mock-side-title">Сообщения</div>
                                         <div class="mock-search" aria-hidden="true"></div>
                                     </div>
+                                    <div style="display:flex;gap:4px;padding:0 10px 6px;flex-wrap:wrap;">
+                                        <span style="font-size:10px;padding:2px 8px;background:#1a1a1a;color:#fff;border-radius:99px;font-weight:600;">Все</span>
+                                        <span style="font-size:10px;padding:2px 8px;border:1px solid rgba(234,67,53,0.25);color:#c5221f;background:rgba(234,67,53,0.07);border-radius:99px;">Срочно</span>
+                                    </div>
                                     <div class="mock-list">
-                                        <div class="mock-item hot">
-                                            <div class="mock-item-head">
-                                                <div class="mock-avatar" aria-hidden="true"></div>
-                                                <div class="mock-name">Отзыв: возврат</div>
-                                                <span class="mock-sla overdue">ПРОСРОЧЕН</span>
+                                        <div class="mock-queue-label"><span class="mock-queue-dot red"></span>В работе</div>
+                                        <div class="mock-item-v3 active">
+                                            <div class="mock-wb-icon">W</div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                                    <span style="font-size:12px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Анна М.</span>
+                                                    <span style="font-size:10px;color:#9aa0a6;flex-shrink:0;">12:47</span>
+                                                </div>
+                                                <div style="font-size:10px;color:#9aa0a6;display:flex;align-items:center;gap:4px;margin:2px 0;">
+                                                    <span style="width:5px;height:5px;border-radius:50%;background:#ea4335;flex-shrink:0;display:inline-block;"></span>Отзыв · Термокружка
+                                                </div>
+                                                <div style="font-size:11px;color:#5f6368;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Товар пришёл с браком...</div>
                                             </div>
-                                            <div class="mock-preview">Покупатель: "Вы обманули..."</div>
                                         </div>
-                                        <div class="mock-item">
-                                            <div class="mock-item-head">
-                                                <div class="mock-avatar" aria-hidden="true"></div>
-                                                <div class="mock-name">Вопрос: размер</div>
-                                                <span class="mock-sla soon">СКОРО</span>
+                                        <div class="mock-queue-label"><span class="mock-queue-dot yellow"></span>Ожидают ответа</div>
+                                        <div class="mock-item-v3">
+                                            <div class="mock-wb-icon">W</div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                                    <span style="font-size:12px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Дмитрий К.</span>
+                                                    <span style="font-size:10px;color:#9aa0a6;flex-shrink:0;">11:20</span>
+                                                </div>
+                                                <div style="font-size:10px;color:#9aa0a6;display:flex;align-items:center;gap:4px;margin:2px 0;">
+                                                    <span style="width:5px;height:5px;border-radius:50%;background:#f9ab00;flex-shrink:0;display:inline-block;"></span>Вопрос · Куртка зимняя
+                                                </div>
+                                                <div style="font-size:11px;color:#5f6368;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Подойдёт ли на рост 180?</div>
                                             </div>
-                                            <div class="mock-preview">"Подойдет ли на рост 180?"</div>
                                         </div>
-                                        <div class="mock-item">
-                                            <div class="mock-item-head">
-                                                <div class="mock-avatar" aria-hidden="true"></div>
-                                                <div class="mock-name">Чат: доставка</div>
-                                                <span class="mock-sla">В НОРМЕ</span>
+                                        <div class="mock-item-v3">
+                                            <div class="mock-wb-icon">W</div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                                    <span style="font-size:12px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Ирина С.</span>
+                                                    <span style="font-size:10px;color:#9aa0a6;flex-shrink:0;">10:05</span>
+                                                </div>
+                                                <div style="font-size:10px;color:#9aa0a6;display:flex;align-items:center;gap:4px;margin:2px 0;">
+                                                    <span style="width:5px;height:5px;border-radius:50%;background:#34a853;flex-shrink:0;display:inline-block;"></span>Чат · Кроссовки
+                                                </div>
+                                                <div style="font-size:11px;color:#5f6368;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Когда ждать доставку?</div>
                                             </div>
-                                            <div class="mock-preview">"Когда привезете?"</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mock-chat">
                                     <div class="mock-chat-head">
                                         <div>
-                                            <b>Отзыв: возврат</b><br>
-                                            <span>негатив, публично</span>
+                                            <b>Анна М.</b><br>
+                                            <span>Отзыв · Термокружка · ★1</span>
                                         </div>
-                                        <span class="mock-callout"><i></i>Срок и приоритет</span>
+                                        <span class="mock-callout" style="background:rgba(234,67,53,0.1);border-color:rgba(234,67,53,0.25);color:#c5221f;"><i style="background:#ea4335;"></i>ПРОСРОЧЕН</span>
                                     </div>
-                                    <div class="mock-msgs">
-                                        <div class="mock-bubble">Товар пришел с браком. Ужасный сервис.</div>
-                                        <div class="mock-ai">
-                                            <div class="mock-ai-label">AI draft</div>
-                                            <div class="mock-ai-text">Понимаю ваше раздражение. Давайте решим: оформим замену или возврат, подскажите номер заказа.</div>
+                                    <div class="mock-msgs" style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:6px;background:#f0f4f8;padding:10px 12px;">
+                                        <div style="max-width:82%;align-self:flex-start;">
+                                            <div style="font-size:9px;color:#9aa0a6;margin-bottom:3px;">Анна М. · 12:47</div>
+                                            <div style="background:#fff;border:1px solid #e8eaed;border-radius:10px;padding:7px 9px;font-size:11px;line-height:1.4;">Товар пришёл с браком. Кнопка не работает. Ужасный сервис!</div>
                                         </div>
-                                        <div class="mock-bubble me">Извините за ситуацию. Подскажите номер заказа, и мы решим вопрос.</div>
+                                        <div style="margin:2px 0;padding:8px 10px;background:#f5f6f7;border-left:3px solid #1a1a1a;border-radius:6px;">
+                                            <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:#9aa0a6;font-weight:700;margin-bottom:4px;">Рекомендация AI</div>
+                                            <div style="font-size:11px;line-height:1.4;color:#1a1a1a;">Анна, приносим извинения! Оформите возврат через ЛК WB — деньги вернём в 10 дней.</div>
+                                            <div style="margin-top:5px;font-size:11px;color:#1a73e8;font-weight:500;">Использовать ответ →</div>
+                                        </div>
                                     </div>
                                     <div class="mock-chat-compose">
                                         <div class="mock-input" aria-hidden="true"></div>
-                                        <div class="mock-send" aria-hidden="true"></div>
+                                        <div class="mock-send" aria-hidden="true" style="background:#1a1a1a;border-radius:8px;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -3634,70 +3743,35 @@
                             <span class="mock-chip"><i></i>Операционный</span>
                         </div>
                         <div class="proof-mock-body">
-                            <div class="mock-app analytics">
-                                <div class="mock-topbar">
+                            <div class="mock-app analytics" style="padding: 10px; overflow: hidden; height: 100%; display: flex; flex-direction: column;">
+                                <!-- Topbar -->
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                    <div style="font-size:12px;font-weight:700;color:#1a1a1a;">Качество ответов</div>
+                                    <div style="font-size:9px;background:#f1f3f4;padding:3px 8px;border-radius:10px;color:#5f6368;">7 дней ▾</div>
+                                </div>
+                                <!-- Score row -->
+                                <div class="mock-score-row">
                                     <div>
-                                        <h4>Качество и скорость</h4>
-                                        <p>Где ответы вредят: шаблоны, обвинения, игнор</p>
+                                        <div class="mock-score-num">8.4</div>
+                                        <div style="font-size:8px;color:#9aa0a6;margin-top:1px;">из 10</div>
                                     </div>
-                                    <div class="mock-mode" aria-hidden="true">
-                                        <span class="active">ops</span>
-                                        <span>full</span>
+                                    <div style="flex:1;">
+                                        <div style="height:8px;background:#e8f0fe;border-radius:4px;overflow:hidden;margin-bottom:4px;">
+                                            <div style="height:100%;width:84%;background:#1a73e8;border-radius:4px;"></div>
+                                        </div>
+                                        <div style="font-size:9px;color:#5f6368;">Индекс качества коммуникации</div>
                                     </div>
                                 </div>
-                                <div class="mock-analytics-body">
-                                    <div class="mock-kpis">
-                                        <div class="mock-card">
-                                            <div class="k">SLA</div>
-                                            <div class="v">7%</div>
-                                            <div class="s">просрочек</div>
-                                        </div>
-                                        <div class="mock-card">
-                                            <div class="k">Качество</div>
-                                            <div class="v">−</div>
-                                            <div class="s">4% вредных</div>
-                                        </div>
-                                        <div class="mock-card">
-                                            <div class="k">Потери</div>
-                                            <div class="v">₽</div>
-                                            <div class="s">оценка влияния</div>
-                                        </div>
-                                    </div>
-                                    <div class="mock-split">
-                                        <div class="mock-card">
-                                            <div class="k">Качество ответов</div>
-                                            <div class="mock-bars">
-                                                <div class="mock-bar">
-                                                    <label>Хорошие</label>
-                                                    <div class="mock-track"><div class="mock-fill good" style="width: 62%"></div></div>
-                                                    <b>62%</b>
-                                                </div>
-                                                <div class="mock-bar">
-                                                    <label>Допуст.</label>
-                                                    <div class="mock-track"><div class="mock-fill" style="width: 24%"></div></div>
-                                                    <b>24%</b>
-                                                </div>
-                                                <div class="mock-bar">
-                                                    <label>Риск</label>
-                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 10%"></div></div>
-                                                    <b>10%</b>
-                                                </div>
-                                                <div class="mock-bar">
-                                                    <label>Вред</label>
-                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 4%"></div></div>
-                                                    <b>4%</b>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mock-card">
-                                            <div class="k">Почему падает рейтинг</div>
-                                            <div class="v" style="font-size: 14px; margin-top: 6px;">“Отписки” + “обвинения”</div>
-                                            <div class="s" style="margin-top: 8px;">Команда видит причины, а не просто цифру.</div>
-                                            <div style="margin-top: 10px;">
-                                                <span class="mock-callout"><i></i>Контроль качества</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Distribution -->
+                                <div style="font-size:9px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">Распределение</div>
+                                <div class="mock-bar-v3"><label>Хорошие</label><div class="trk"><div class="fll" style="width:62%"></div></div><b>62%</b></div>
+                                <div class="mock-bar-v3"><label>Допуст.</label><div class="trk"><div class="fll neutral" style="width:24%"></div></div><b>24%</b></div>
+                                <div class="mock-bar-v3"><label>Риск</label><div class="trk"><div class="fll risky" style="width:10%"></div></div><b>10%</b></div>
+                                <div class="mock-bar-v3"><label>Вред</label><div class="trk"><div class="fll harm" style="width:4%"></div></div><b>4%</b></div>
+                                <!-- Insight -->
+                                <div class="mock-insight">
+                                    <strong>Главная проблема</strong>
+                                    «Отписки» и «обвинения» в ответах на 1–2★
                                 </div>
                             </div>
                         </div>
@@ -3719,65 +3793,101 @@
                                 <span class="mock-dot yellow"></span>
                                 <span class="mock-dot green"></span>
                             </div>
-                            <div class="mock-url">agentiq.ru/app</div>
-                            <span class="mock-chip"><i></i>Приоритеты</span>
+                            <div class="mock-url">agentiq.ru/app/settings</div>
+                            <span class="mock-chip"><i></i>Авто-ответы</span>
                         </div>
                         <div class="proof-mock-body">
-                            <div class="mock-app analytics">
-                                <div class="mock-topbar">
-                                    <div>
-                                        <h4>Что чинить в первую очередь</h4>
-                                        <p>Срочные кейсы, backlog, ответственность</p>
+                            <div class="mock-app" style="height:100%;overflow:hidden;display:flex;flex-direction:column;">
+                                <!-- Header row -->
+                                <div style="padding:7px 10px;border-bottom:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+                                    <div style="font-size:11px;font-weight:700;color:#1a1a1a;">Авто-ответы</div>
+                                    <div style="width:28px;height:16px;background:#1a73e8;border-radius:8px;position:relative;flex-shrink:0;">
+                                        <div style="width:12px;height:12px;background:white;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div>
                                     </div>
-                                    <span class="mock-callout"><i></i>скоро / просрочен</span>
                                 </div>
-                                <div class="mock-analytics-body">
-                                    <div class="mock-split" style="grid-template-columns: 1fr 1fr;">
-                                        <div class="mock-card">
-                                            <div class="k">Сейчас горит</div>
-                                            <div class="mock-bars">
-                                                <div class="mock-bar">
-                                                    <label>Негатив</label>
-                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 36%"></div></div>
-                                                    <b>36%</b>
-                                                </div>
-                                                <div class="mock-bar">
-                                                    <label>Вопросы</label>
-                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 22%"></div></div>
-                                                    <b>22%</b>
-                                                </div>
-                                                <div class="mock-bar">
-                                                    <label>Чаты</label>
-                                                    <div class="mock-track"><div class="mock-fill" style="width: 18%"></div></div>
-                                                    <b>18%</b>
-                                                </div>
-                                            </div>
-                                            <div class="s" style="margin-top: 10px;">Видно, что просрочено и кто отвечает.</div>
+                                <!-- Scrollable body -->
+                                <div style="overflow:auto;flex:1;padding:8px 10px;">
+                                    <!-- Presets -->
+                                    <div style="font-size:8px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px;">Быстрая настройка</div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:9px;">
+                                        <div style="border:1.5px solid #1a73e8;border-radius:5px;padding:5px 6px;background:#f0f7ff;">
+                                            <div style="font-size:8px;font-weight:700;color:#1a73e8;margin-bottom:1px;">Безопасный</div>
+                                            <div style="font-size:7px;color:#5f6368;">4-5★ отзывы</div>
                                         </div>
-                                        <div class="mock-card">
-                                            <div class="k">Backlog</div>
-                                            <div class="v" style="font-size: 14px; margin-top: 6px;">Единая очередь вместо “прыжков” по кабинетам</div>
-                                            <div class="s" style="margin-top: 8px;">Команда не теряет контекст между разделами.</div>
-                                            <div style="margin-top: 10px;">
-                                                <span class="mock-callout"><i></i>единая картина</span>
-                                            </div>
+                                        <div style="border:1px solid #e0e0e0;border-radius:5px;padding:5px 6px;">
+                                            <div style="font-size:8px;font-weight:700;color:#1a1a1a;margin-bottom:1px;">Баланс</div>
+                                            <div style="font-size:7px;color:#5f6368;">+WISMO +вопросы</div>
+                                        </div>
+                                        <div style="border:1px solid #e0e0e0;border-radius:5px;padding:5px 6px;">
+                                            <div style="font-size:8px;font-weight:700;color:#1a1a1a;margin-bottom:1px;">Максимум</div>
+                                            <div style="font-size:7px;color:#5f6368;">все каналы</div>
                                         </div>
                                     </div>
-                                    <div class="mock-kpis" style="grid-template-columns: 1fr 1fr 1fr;">
-                                        <div class="mock-card">
-                                            <div class="k">Окно</div>
-                                            <div class="v" style="font-size: 16px;">короткое</div>
-                                            <div class="s">момент решения</div>
+                                    <!-- Channels -->
+                                    <div style="font-size:8px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px;">Каналы</div>
+                                    <div style="display:flex;gap:4px;margin-bottom:9px;">
+                                        <div style="display:flex;align-items:center;gap:3px;padding:3px 6px;border:1px solid #1a73e8;border-radius:4px;background:#f0f7ff;">
+                                            <div style="width:9px;height:9px;border-radius:2px;background:#1a73e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                                                <div style="width:3px;height:5px;border:solid white;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);margin-top:-1px;"></div>
+                                            </div>
+                                            <span style="font-size:8px;font-weight:500;color:#1a1a1a;">Отзывы</span>
                                         </div>
-                                        <div class="mock-card">
-                                            <div class="k">Алерты</div>
-                                            <div class="v" style="font-size: 16px;">есть</div>
-                                            <div class="s">просрочен / скоро</div>
+                                        <div style="display:flex;align-items:center;gap:3px;padding:3px 6px;border:1px solid #1a73e8;border-radius:4px;background:#f0f7ff;">
+                                            <div style="width:9px;height:9px;border-radius:2px;background:#1a73e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                                                <div style="width:3px;height:5px;border:solid white;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);margin-top:-1px;"></div>
+                                            </div>
+                                            <span style="font-size:8px;font-weight:500;color:#1a1a1a;">Вопросы</span>
                                         </div>
-                                        <div class="mock-card">
-                                            <div class="k">Ответст.</div>
-                                            <div class="v" style="font-size: 16px;">понятно</div>
-                                            <div class="s">кто держит SLA</div>
+                                        <div style="display:flex;align-items:center;gap:3px;padding:3px 6px;border:1px solid #dadce0;border-radius:4px;">
+                                            <div style="width:9px;height:9px;border-radius:2px;border:1.5px solid #dadce0;flex-shrink:0;"></div>
+                                            <span style="font-size:8px;font-weight:500;color:#9aa0a6;">Чаты</span>
+                                        </div>
+                                    </div>
+                                    <!-- Scenarios -->
+                                    <div style="font-size:8px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:5px;">Сценарии</div>
+                                    <div style="border:1px solid #e8eaed;border-radius:6px;overflow:hidden;">
+                                        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #f5f6f7;">
+                                            <div style="width:9px;height:9px;border-radius:2px;background:#1a73e8;flex-shrink:0;"></div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:9px;font-weight:500;">Позитивные отзывы (4-5★)</div>
+                                                <div style="font-size:8px;color:#9aa0a6;">«Спасибо за отзыв!»</div>
+                                            </div>
+                                            <div style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:#d4edda;color:#155724;flex-shrink:0;white-space:nowrap;">АВТО</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #f5f6f7;">
+                                            <div style="width:9px;height:9px;border-radius:2px;background:#1a73e8;flex-shrink:0;"></div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:9px;font-weight:500;">WISMO — «Где мой заказ?»</div>
+                                                <div style="font-size:8px;color:#9aa0a6;">Ссылка на ЛК WB → Доставки</div>
+                                            </div>
+                                            <div style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:#d4edda;color:#155724;flex-shrink:0;white-space:nowrap;">АВТО</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #f5f6f7;">
+                                            <div style="width:9px;height:9px;border-radius:2px;background:#1a73e8;flex-shrink:0;"></div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:9px;font-weight:500;">Pre-purchase вопросы</div>
+                                                <div style="font-size:8px;color:#9aa0a6;">Размер, наличие, совместимость</div>
+                                            </div>
+                                            <div style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:#d4edda;color:#155724;flex-shrink:0;white-space:nowrap;">АВТО</div>
+                                        </div>
+                                        <div style="padding:3px 8px;background:#f8f9fa;border-bottom:1px solid #f5f6f7;">
+                                            <span style="font-size:7px;font-weight:700;color:#9aa0a6;text-transform:uppercase;letter-spacing:0.4px;">Только вручную</span>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #f5f6f7;">
+                                            <div style="width:9px;height:9px;border-radius:2px;border:1.5px solid #dadce0;flex-shrink:0;"></div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:9px;font-weight:500;color:#5f6368;">Брак / дефект</div>
+                                                <div style="font-size:8px;color:#9aa0a6;">AI готовит черновик — вы решаете</div>
+                                            </div>
+                                            <div style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:#f8d7da;color:#721c24;flex-shrink:0;white-space:nowrap;">БЛОК</div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;">
+                                            <div style="width:9px;height:9px;border-radius:2px;border:1.5px solid #dadce0;flex-shrink:0;"></div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:9px;font-weight:500;color:#5f6368;">Жалоба на качество</div>
+                                                <div style="font-size:8px;color:#9aa0a6;">AI предложит вариант — отправка вручную</div>
+                                            </div>
+                                            <div style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:#f8d7da;color:#721c24;flex-shrink:0;white-space:nowrap;">БЛОК</div>
                                         </div>
                                     </div>
                                 </div>
@@ -3787,8 +3897,8 @@
                     </div>
                     <div class="proof-slide-text">
                         <span class="proof-slide-num">03</span>
-                        <h3>Приоритеты и SLA</h3>
-                        <p>Видно, что просрочено и что "горит" сейчас. Очередь управляется, а не живёт сама по себе.</p>
+                        <h3>Авто-ответы</h3>
+                        <p>Настройте раз — система отвечает 24/7. Позитив уходит автоматически, негатив всегда остаётся за вами.</p>
                     </div>
 	                </div>
 

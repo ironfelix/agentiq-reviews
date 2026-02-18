@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   AISettings,
   AutoResponseChannel,
@@ -111,8 +111,14 @@ export function AutoResponseSettings(props: {
     setScope(ids.length > 0 ? 'specific' : 'all');
   }, [aiSettings.auto_response_nm_ids]);
 
-  const scenarios = aiSettings.auto_response_scenarios || {};
-  const channels = aiSettings.auto_response_channels || ['review'];
+  const scenarios = useMemo(
+    () => aiSettings.auto_response_scenarios || {},
+    [aiSettings.auto_response_scenarios],
+  );
+  const channels = useMemo(
+    () => aiSettings.auto_response_channels || (['review'] as AutoResponseChannel[]),
+    [aiSettings.auto_response_channels],
+  );
 
   const toggleMaster = useCallback(() => {
     onSettingsChange({
