@@ -136,6 +136,8 @@ jobs:
     name: Deploy to Production
     needs: backup
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
 
     steps:
       - name: Checkout code
@@ -234,6 +236,7 @@ jobs:
         run: sleep 15
 
       - name: Smoke test production
+        id: smoke_test
         run: |
           echo "🧪 Running production smoke tests..."
 
@@ -311,7 +314,7 @@ jobs:
             });
 
       - name: Rollback on failure
-        if: failure()
+        if: steps.smoke_test.outcome == 'failure'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 79.137.175.164
@@ -344,7 +347,7 @@ jobs:
             curl -f https://agentiq.ru/api/health || echo "⚠️ Health check still failing after rollback"
 
       - name: Notify on failure
-        if: failure()
+        if: steps.smoke_test.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
