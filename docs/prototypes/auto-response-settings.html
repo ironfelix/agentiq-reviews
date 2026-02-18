@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прототип — Настройки авто-ответов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #fafbfc;
+            --color-bg-tertiary: #f8f9fa;
+            --color-bg-hover: #f5f6f7;
+            --color-bg-active: #f0f7ff;
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #5f6368;
+            --color-text-tertiary: #9aa0a6;
+            --color-border-light: #f5f6f7;
+            --color-border-medium: #e8eaed;
+            --color-border-dark: #dadce0;
+            --color-accent: #1a73e8;
+            --color-success: #0f7f4e;
+            --color-warning: #f9ab00;
+            --color-danger: #d93025;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 999px;
+            --transition-fast: 0.12s ease;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+            padding: 32px;
+        }
+
+        .prototype-badge {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            z-index: 100;
+        }
+
+        .settings-container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .settings-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .settings-section-desc {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 24px;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        /* ===== TOGGLE ===== */
+        .toggle {
+            width: 42px;
+            height: 24px;
+            background: var(--color-border-dark);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            border: none;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .toggle.on { background: var(--color-accent); }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: left var(--transition-fast);
+        }
+        .toggle.on::after { left: 20px; }
+
+        /* ===== EXPANDABLE SECTION ===== */
+        .expand-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border-light);
+            display: none;
+        }
+
+        .expand-section.visible {
+            display: block;
+        }
+
+        .section-block {
+            margin-bottom: 20px;
+        }
+
+        .section-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: 10px;
+        }
+
+        /* ===== SCOPE RADIO ===== */
+        .scope-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scope-radio {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .scope-radio input[type="radio"] { display: none; }
+
+        .radio-mark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--color-border-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: all var(--transition-fast);
+        }
+
+        .scope-radio input:checked + .radio-mark {
+            border-color: var(--color-accent);
+        }
+
+        .scope-radio input:checked + .radio-mark::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--color-accent);
+            border-radius: 50%;
+        }
+
+        .radio-content {
+            flex: 1;
+        }
+
+        .radio-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .radio-desc {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* ===== NM_ID INPUT ===== */
+        .nm-input-wrap {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .nm-input-wrap.visible {
+            display: block;
+        }
+
+        .nm-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            outline: none;
+            transition: border-color var(--transition-fast);
+        }
+
+        .nm-input:focus { border-color: var(--color-accent); }
+        .nm-input::placeholder { color: var(--color-text-tertiary); }
+
+        .nm-hint {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            margin-top: 4px;
+        }
+
+        .nm-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .nm-tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-pill);
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nm-tag-remove {
+            cursor: pointer;
+            color: var(--color-text-tertiary);
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .nm-tag-remove:hover {
+            color: var(--color-danger);
+        }
+
+        /* ===== CHANNEL CHECKBOXES ===== */
+        .channel-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .channel-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 14px;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+
+        .channel-check:hover {
+            border-color: var(--color-accent);
+        }
+
+        .channel-check.checked {
+            background: var(--color-bg-active);
+            border-color: var(--color-accent);
+        }
+
+        .channel-check input { display: none; }
+
+        .check-mark {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-border-dark);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .channel-check.checked .check-mark {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        .channel-check.checked .check-mark::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-top: -1px;
+        }
+
+        .check-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* ===== SCENARIOS ===== */
+        .scenario-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .scenario-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--color-border-light);
+            transition: background var(--transition-fast);
+        }
+
+        .scenario-row:last-child {
+            border-bottom: none;
+        }
+
+        .scenario-row:hover {
+            background: var(--color-bg-hover);
+        }
+
+        .scenario-row.disabled {
+            opacity: 0.5;
+        }
+
+        .scenario-check {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-border-dark);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .scenario-check.checked {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        .scenario-check.checked::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-top: -1px;
+        }
+
+        .scenario-check.locked {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-medium);
+            cursor: not-allowed;
+        }
+
+        .scenario-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .scenario-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .scenario-desc {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            margin-top: 1px;
+        }
+
+        .scenario-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: var(--radius-pill);
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .scenario-badge.auto {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .scenario-badge.draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scenario-badge.blocked {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Separator between auto and review scenarios */
+        .scenario-separator {
+            padding: 6px 14px;
+            background: var(--color-bg-tertiary);
+            border-bottom: 1px solid var(--color-border-light);
+            display: flex;
+            align-items: center;
+        }
+
+        .scenario-separator span {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        /* Review rows — always on, always ЧЕРНОВИК */
+        .scenario-row.review-row {
+            background: var(--color-bg-tertiary);
+        }
+
+        .scenario-row.review-row:hover {
+            background: var(--color-bg-hover);
+        }
+
+        .scenario-check.locked-on {
+            background: var(--color-warning);
+            border-color: var(--color-warning);
+            cursor: default;
+        }
+
+        .scenario-check.locked-on::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-top: -1px;
+        }
+
+        /* Channel tags on scenario rows */
+        .scenario-channels {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .ch-tag {
+            font-size: 9px;
+            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: var(--radius-pill);
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-tertiary);
+            letter-spacing: 0.2px;
+        }
+
+        /* ===== RATE LIMITS ===== */
+        .rate-section {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .rate-field {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .rate-label {
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            margin-bottom: 6px;
+        }
+
+        .rate-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rate-input {
+            width: 64px;
+            padding: 6px 8px;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-family: var(--font-mono);
+            text-align: center;
+            outline: none;
+        }
+
+        .rate-input:focus {
+            border-color: var(--color-accent);
+        }
+
+        .rate-unit {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        /* ===== SAFETY NOTICE ===== */
+        .safety-notice {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .safety-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            line-height: 1.4;
+        }
+
+        .safety-text {
+            font-size: 12px;
+            color: #5d4037;
+            line-height: 1.5;
+        }
+
+        .safety-text strong {
+            font-weight: 600;
+        }
+
+        /* ===== SAVE ROW ===== */
+        .save-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-save {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-save:hover { background: #1557b0; }
+
+        .save-hint {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+        }
+
+        /* ===== STATE LABELS ===== */
+        .state-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .state-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .state-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .state-dot.green { background: var(--color-success); }
+        .state-dot.yellow { background: var(--color-warning); }
+        .state-dot.red { background: var(--color-danger); }
+
+        /* ===== PRESETS ===== */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .preset-card {
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .preset-card:hover {
+            border-color: var(--color-accent);
+        }
+
+        .preset-card.active {
+            border-color: var(--color-accent);
+            background: var(--color-bg-active);
+            box-shadow: 0 0 0 1px var(--color-accent);
+        }
+
+        .preset-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .preset-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .preset-desc {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+        }
+
+        .preset-badge {
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        /* ===== TOP BAR NOTIFICATION ===== */
+        .topbar-preview {
+            margin-bottom: 32px;
+            border: 2px dashed var(--color-border-dark);
+            border-radius: var(--radius-lg);
+            padding: 2px;
+            position: relative;
+        }
+
+        .topbar-preview-label {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: var(--color-bg-secondary);
+            padding: 0 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: var(--radius-md);
+            gap: 12px;
+        }
+
+        .topbar-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .topbar-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .topbar-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .topbar-text strong {
+            font-weight: 600;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .topbar-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 14px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .topbar-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .topbar-btn.primary {
+            background: white;
+            color: var(--color-accent);
+            border-color: white;
+        }
+
+        .topbar-btn.primary:hover {
+            background: #f0f7ff;
+        }
+
+        .topbar-dismiss {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 4px;
+            line-height: 1;
+        }
+
+        .topbar-dismiss:hover {
+            color: white;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 640px) {
+            body { padding: 16px; }
+
+            .channel-grid {
+                flex-direction: column;
+            }
+
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-badge">PROTOTYPE v1</div>
+
+    <div class="settings-container">
+        <!-- TOP BAR PREVIEW (shown in Chat Center, not in Settings) -->
+        <div class="topbar-preview">
+            <div class="topbar-preview-label">Top-bar в Чат Центре</div>
+            <div class="topbar">
+                <div class="topbar-content">
+                    <div class="topbar-icon">&#x26A1;</div>
+                    <div class="topbar-text">
+                        <strong>Экономьте до 3 часов в день</strong> — включите авто-ответы на частые обращения
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="topbar-btn primary">Настроить</button>
+                    <button class="topbar-dismiss" title="Скрыть">&times;</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section-title">Авто-ответы</div>
+        <div class="settings-section-desc">Настройте автоматические ответы на обращения покупателей. Ответы помечаются значком АВТО.</div>
+
+        <!-- ===== MASTER TOGGLE ===== -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Авто-ответы включены</div>
+                <button class="toggle on" onclick="this.classList.toggle('on'); toggleExpand()"></button>
+            </div>
+            <div class="card-desc">
+                Мы отвечаем на обращения покупателей за вас. Каждый ответ проверяется на безопасность перед отправкой.
+            </div>
+
+            <!-- Expanded settings -->
+            <div class="expand-section visible" id="expandSection">
+
+                <!-- SCOPE -->
+                <div class="section-block">
+                    <div class="section-label">Область действия</div>
+                    <div class="scope-options">
+                        <label class="scope-radio">
+                            <input type="radio" name="scope" value="all" checked onchange="toggleNmInput()">
+                            <div class="radio-mark"></div>
+                            <div class="radio-content">
+                                <div class="radio-title">Весь кабинет</div>
+                                <div class="radio-desc">Авто-ответы для всех артикулов</div>
+                            </div>
+                        </label>
+                        <label class="scope-radio">
+                            <input type="radio" name="scope" value="specific" onchange="toggleNmInput()">
+                            <div class="radio-mark"></div>
+                            <div class="radio-content">
+                                <div class="radio-title">Конкретные артикулы</div>
+                                <div class="radio-desc">Только для выбранных товаров (идеально для тестового запуска)</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="nm-input-wrap" id="nmInputWrap">
+                        <input type="text" class="nm-input" placeholder="Введите артикулы через запятую, напр. 145839201, 78234512" oninput="parseNmIds(this.value)">
+                        <div class="nm-hint">Укажите 1-3 артикула для пилотного запуска</div>
+                        <div class="nm-tags" id="nmTags">
+                            <span class="nm-tag">145839201 <span class="nm-tag-remove" onclick="this.parentElement.remove()">&times;</span></span>
+                            <span class="nm-tag">78234512 <span class="nm-tag-remove" onclick="this.parentElement.remove()">&times;</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHANNELS -->
+                <div class="section-block">
+                    <div class="section-label">Каналы</div>
+                    <div class="channel-grid">
+                        <label class="channel-check checked" onclick="this.classList.toggle('checked')">
+                            <input type="checkbox" checked>
+                            <span class="check-mark"></span>
+                            <span class="check-label">Отзывы</span>
+                        </label>
+                        <label class="channel-check checked" onclick="this.classList.toggle('checked')">
+                            <input type="checkbox" checked>
+                            <span class="check-mark"></span>
+                            <span class="check-label">Вопросы</span>
+                        </label>
+                        <label class="channel-check" onclick="this.classList.toggle('checked')">
+                            <input type="checkbox">
+                            <span class="check-mark"></span>
+                            <span class="check-label">Чаты</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- RECOMMENDED PRESET (сначала выбери уровень, потом кастомизируй) -->
+                <div class="section-block">
+                    <div class="section-label">Быстрая настройка</div>
+                    <div class="preset-grid">
+                        <div class="preset-card active" onclick="selectPreset(this, 'safe')">
+                            <div class="preset-icon">&#x1F6E1;</div>
+                            <div class="preset-name">Безопасный старт</div>
+                            <div class="preset-desc">Только позитивные отзывы 4-5★. Идеально для первого запуска.</div>
+                            <div class="preset-badge">Рекомендуем</div>
+                        </div>
+                        <div class="preset-card" onclick="selectPreset(this, 'balanced')">
+                            <div class="preset-icon">&#x2696;</div>
+                            <div class="preset-name">Сбалансированный</div>
+                            <div class="preset-desc">Позитив + WISMO + pre-purchase вопросы. Покрывает ~70% обращений.</div>
+                        </div>
+                        <div class="preset-card" onclick="selectPreset(this, 'max')">
+                            <div class="preset-icon">&#x26A1;</div>
+                            <div class="preset-name">Максимум</div>
+                            <div class="preset-desc">Всё кроме негатива. Включает возврат/обмен (шаблонный ответ).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCENARIOS (тонкая настройка после выбора пресета) -->
+                <div class="section-block">
+                    <div class="section-label">Сценарии <span style="font-weight: 400; color: var(--color-text-tertiary)">— тонкая настройка</span></div>
+                    <div class="scenario-grid">
+                        <div class="scenario-row" onclick="toggleScenario(this)">
+                            <div class="scenario-check checked"></div>
+                            <div class="scenario-info">
+                                <div class="scenario-name">Позитивные отзывы (4-5★)</div>
+                                <div class="scenario-desc">«Спасибо за отзыв!» — благодарность, вариативный текст</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span></div>
+                            </div>
+                            <div class="scenario-badge auto">АВТО</div>
+                        </div>
+                        <div class="scenario-row" onclick="toggleScenario(this)" id="promoRow">
+                            <div class="scenario-check checked"></div>
+                            <div class="scenario-info">
+                                <div class="scenario-name">Промокод за 5★</div>
+                                <div class="scenario-desc">Благодарность + промокод из <a href="#" style="color: var(--color-accent)">Настройки → Промокоды</a>. <strong style="color: var(--color-warning)">Ответ на отзыв публичный</strong> — промокод увидят все посетители карточки</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span></div>
+                            </div>
+                            <div class="scenario-badge auto">АВТО</div>
+                        </div>
+                        <div class="scenario-row" onclick="toggleScenario(this)">
+                            <div class="scenario-check checked"></div>
+                            <div class="scenario-info">
+                                <div class="scenario-name">WISMO — «Где мой заказ?»</div>
+                                <div class="scenario-desc">Шаблон: «Отследите в ЛК WB → Доставки»</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge auto">АВТО</div>
+                        </div>
+                        <div class="scenario-row" onclick="toggleScenario(this)">
+                            <div class="scenario-check checked"></div>
+                            <div class="scenario-info">
+                                <div class="scenario-name">Pre-purchase вопросы</div>
+                                <div class="scenario-desc">Размер, наличие, совместимость — с контекстом из карточки товара</div>
+                                <div class="scenario-channels"><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge auto">АВТО</div>
+                        </div>
+                        <div class="scenario-row" onclick="toggleScenario(this)">
+                            <div class="scenario-check"></div>
+                            <div class="scenario-info">
+                                <div class="scenario-name">Возврат / обмен</div>
+                                <div class="scenario-desc">Инструкция по возврату через ЛК WB</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge draft">ЧЕРНОВИК</div>
+                        </div>
+
+                        <!-- Негативные сценарии — не отвечаем автоматически -->
+                        <div class="scenario-separator">
+                            <span>Не обрабатываются автоматически</span>
+                        </div>
+                        <div class="scenario-row review-row">
+                            <div class="scenario-info">
+                                <div class="scenario-name">Брак / дефект</div>
+                                <div class="scenario-desc">AI поможет составить ответ — решение за вами</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge blocked">БЛОК</div>
+                        </div>
+                        <div class="scenario-row review-row">
+                            <div class="scenario-info">
+                                <div class="scenario-name">Не тот товар</div>
+                                <div class="scenario-desc">AI предложит вариант ответа — отправка только вручную</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge blocked">БЛОК</div>
+                        </div>
+                        <div class="scenario-row review-row">
+                            <div class="scenario-info">
+                                <div class="scenario-name">Жалоба на качество</div>
+                                <div class="scenario-desc">AI подготовит черновик — вы редактируете и решаете</div>
+                                <div class="scenario-channels"><span class="ch-tag">отзывы</span><span class="ch-tag">вопросы</span><span class="ch-tag">чаты</span></div>
+                            </div>
+                            <div class="scenario-badge blocked">БЛОК</div>
+                        </div>
+                    </div>
+
+                    <div class="state-row">
+                        <div class="state-item"><div class="state-dot green"></div> АВТО — отправляется автоматически</div>
+                        <div class="state-item"><div class="state-dot yellow"></div> ЧЕРНОВИК — AI готовит ответ, вы решаете</div>
+                        <div class="state-item"><div class="state-dot red"></div> БЛОК — только вручную, авто-ответ не отправляется</div>
+                    </div>
+                </div>
+
+                <!-- SAFETY -->
+                <div class="section-block">
+                    <div class="safety-notice">
+                        <div class="safety-icon">&#9888;&#65039;</div>
+                        <div class="safety-text">
+                            <strong>Безопасность:</strong> Негативные отзывы (1-3★) никогда не получают авто-ответ. Каждый текст перед отправкой проверяется — запрещённые фразы, обещания возвратов, упоминания AI блокируются автоматически. Пауза между ответами делает паттерн естественным.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="save-row">
+            <button class="btn-save">Сохранить</button>
+            <div class="save-hint">Изменения вступают в силу в течение 3 минут</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleExpand() {
+            const section = document.getElementById('expandSection');
+            section.classList.toggle('visible');
+        }
+
+        function toggleNmInput() {
+            const specific = document.querySelector('input[name="scope"][value="specific"]');
+            const wrap = document.getElementById('nmInputWrap');
+            wrap.classList.toggle('visible', specific.checked);
+        }
+
+        function toggleScenario(row) {
+            if (row.classList.contains('review-row')) return; // always ЧЕРНОВИК
+            const check = row.querySelector('.scenario-check');
+            if (check.classList.contains('locked') || check.classList.contains('locked-on')) return;
+            check.classList.toggle('checked');
+
+            const badge = row.querySelector('.scenario-badge');
+            if (check.classList.contains('checked')) {
+                badge.textContent = 'АВТО';
+                badge.className = 'scenario-badge auto';
+            } else {
+                badge.textContent = 'ЧЕРНОВИК';
+                badge.className = 'scenario-badge draft';
+            }
+        }
+
+        function parseNmIds(value) {
+            // Just a prototype — real logic in React
+        }
+
+        const presets = {
+            safe: {
+                scenarios: [0, 1],  // Позитив + Промокод
+                channels: [0],     // Только отзывы
+            },
+            balanced: {
+                scenarios: [0, 1, 2, 3],  // + WISMO + Pre-purchase
+                channels: [0, 1],          // Отзывы + Вопросы
+            },
+            max: {
+                scenarios: [0, 1, 2, 3, 4],  // + Возврат
+                channels: [0, 1, 2],           // Все каналы
+            },
+        };
+
+        function selectPreset(card, preset) {
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            const config = presets[preset];
+            const rows = document.querySelectorAll('.scenario-row:not(.review-row)');
+            rows.forEach((row, i) => {
+                const check = row.querySelector('.scenario-check');
+                const badge = row.querySelector('.scenario-badge');
+                if (config.scenarios.includes(i)) {
+                    check.classList.add('checked');
+                    badge.textContent = 'АВТО';
+                    badge.className = 'scenario-badge auto';
+                } else {
+                    check.classList.remove('checked');
+                    badge.textContent = 'ЧЕРНОВИК';
+                    badge.className = 'scenario-badge draft';
+                }
+            });
+
+            const channels = document.querySelectorAll('.channel-check');
+            channels.forEach((ch, i) => {
+                if (config.channels.includes(i)) {
+                    ch.classList.add('checked');
+                } else {
+                    ch.classList.remove('checked');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

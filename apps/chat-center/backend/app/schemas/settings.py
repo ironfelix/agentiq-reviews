@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Any, Dict, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -22,6 +22,7 @@ class PromoCode(BaseModel):
     discount_label: str = "—"
     expires_label: str = "без срока"
     scope_label: str = "Все товары"
+    nm_ids: list[int] = Field(default_factory=list)
     sent_count: int = 0
     active: bool = True
     channels: PromoChannels = Field(default_factory=PromoChannels)
@@ -48,6 +49,22 @@ class PromoSettingsUpdateRequest(BaseModel):
 
 Tone = Literal["formal", "friendly", "neutral"]
 
+ScenarioAction = Literal["auto", "draft", "block"]
+
+
+class ScenarioConfig(BaseModel):
+    """Configuration for a single auto-response scenario."""
+    action: ScenarioAction = "block"
+    channels: list[str] = Field(default_factory=list)
+    enabled: bool = False
+
+
+class AutoResponseDelayConfig(BaseModel):
+    """Random delay config between auto-responses."""
+    min_seconds: float = 3.0
+    max_seconds: float = 8.0
+    word_count_factor: float = 0.025
+
 
 class AISettings(BaseModel):
     tone: Tone = "friendly"
@@ -60,6 +77,14 @@ class AISettings(BaseModel):
     auto_response_nm_ids: list[int] = Field(
         default_factory=list,
         description="Whitelist of article IDs (nm_id) for auto-response. Empty = all articles.",
+    )
+    auto_response_scenarios: Dict[str, ScenarioConfig] = Field(
+        default_factory=dict,
+        description="Mapping intent -> scenario config (action/channels/enabled).",
+    )
+    auto_response_promo_on_5star: bool = Field(
+        default=False,
+        description="Insert promo code in auto-response for 5-star reviews.",
     )
 
 
@@ -117,6 +142,14 @@ class SLAConfig(BaseModel):
     auto_response_nm_ids: list[int] = Field(
         default_factory=list,
         description="Whitelist of article IDs (nm_id) for auto-response. Empty = all articles.",
+    )
+    auto_response_scenarios: Dict[str, ScenarioConfig] = Field(
+        default_factory=dict,
+        description="Mapping intent -> scenario config (action/channels/enabled).",
+    )
+    auto_response_promo_on_5star: bool = False
+    auto_response_delay: AutoResponseDelayConfig = Field(
+        default_factory=AutoResponseDelayConfig,
     )
 
 

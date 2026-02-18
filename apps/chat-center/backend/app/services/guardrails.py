@@ -14,12 +14,17 @@ Key rules:
 - Blame phrases: NEVER in any channel.
 - Dismissive phrases: NEVER in public channels.
 - Chat channel is more relaxed (private), but AI mentions still banned.
+- Auto-responses have STRICTER guardrails (see validate_auto_response).
 """
 
 from __future__ import annotations
 
+import logging
 import re
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Banned phrase lists (detection)
@@ -156,6 +161,99 @@ RETURN_MENTION_PATTERNS: List[str] = [
     "замен",
     "обмен",
 ]
+
+# ---------------------------------------------------------------------------
+# Auto-response STRICTER banned patterns (substring match)
+# ---------------------------------------------------------------------------
+# Auto-responses are sent WITHOUT human review and must be extra-safe.
+# These patterns use substring matching (case-insensitive) for broader coverage.
+
+AUTO_RESPONSE_BANNED_PATTERNS: List[str] = [
+    # --- All existing banned phrases (substring form) ---
+    # AI/bot mentions
+    "ИИ",
+    "бот",
+    "нейросеть",
+    "GPT",
+    "ChatGPT",
+    "автоматический ответ",
+    "искусственный интеллект",
+    "нейронная сеть",
+    # Promises
+    "вернём деньги",
+    "вернем деньги",
+    "гарантируем возврат",
+    "гарантируем замену",
+    "полный возврат",
+    "бесплатную замену",
+    "бесплатная замена",
+    "мы одобрим возврат",
+    "мы одобрим заявку",
+    "доставим завтра",
+    "отменим ваш заказ",
+    "ускорим доставку",
+    # Blame
+    "вы неправильно",
+    "вы не так",
+    "ваша вина",
+    "сами виноваты",
+    "вы ошиблись",
+    "ваша ошибка",
+    # Dismissive
+    "обратитесь в поддержку",
+    "напишите в поддержку",
+    "мы не можем повлиять",
+    # Legal
+    "характеристики не соответствуют",
+    "наша ошибка",
+    "мы виноваты",
+    # Jargon
+    "уважаемый клиент",
+    "уважаемый покупатель",
+    "пересорт",
+    "FBO",
+    "FBS",
+    "SKU",
+    # --- ADDITIONAL auto-response-specific patterns ---
+    "компенсац",        # компенсация/компенсируем
+    "скидк",            # скидка (unless promo context, checked separately)
+    "бесплатн",         # бесплатная доставка/замена
+    "гарантир",         # гарантируем
+    "100%",
+    "обещ",             # обещаем
+    "точно",            # overpromising
+    "обязательно",      # overpromising
+    "к сожалению",      # negative framing in positive response
+    # Competitors
+    "Ozon",
+    "СДЭК",
+    "Яндекс Маркет",
+    "AliExpress",
+    "Lamoda",
+]
+
+# Regex patterns for auto-response (URLs, emails, phone numbers)
+AUTO_RESPONSE_BANNED_REGEX: List[re.Pattern] = [
+    re.compile(r"https?://", re.IGNORECASE),                         # URLs
+    re.compile(r"www\.", re.IGNORECASE),                              # URLs without scheme
+    re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"),  # Email addresses
+    re.compile(r"(?:\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}"),  # Phone numbers
+]
+
+# Auto-response length limits (stricter than general limits)
+AUTO_RESPONSE_MAX_LENGTH_REVIEW = 500
+AUTO_RESPONSE_MAX_LENGTH_QUESTION = 800
+AUTO_RESPONSE_MAX_LENGTH_CHAT = 1000
+
+
+def get_auto_response_max_length(channel: str) -> int:
+    """Return the maximum auto-response length for a given channel."""
+    if channel == "question":
+        return AUTO_RESPONSE_MAX_LENGTH_QUESTION
+    if channel == "chat":
+        return AUTO_RESPONSE_MAX_LENGTH_CHAT
+    return AUTO_RESPONSE_MAX_LENGTH_REVIEW  # review or unknown
+
 
 # ---------------------------------------------------------------------------
 # Channel-specific length constraints (matching WB API limits)
@@ -517,3 +615,178 @@ def validate_reply_text(
         result["valid"] = False
 
     return result
+
+
+# ---------------------------------------------------------------------------
+# Auto-response stricter validation (TASK 1)
+# ---------------------------------------------------------------------------
+
+def _check_auto_response_banned_patterns(text: str) -> List[str]:
+    """Check text against the stricter auto-response banned patterns.
+
+    Returns a list of reason strings for each violation found.
+    Uses word-boundary matching for short tokens (same as _compile_pattern)
+    and substring matching for longer patterns.
+    """
+    reasons: List[str] = []
+    if not text:
+        return reasons
+
+    for pattern_str in AUTO_RESPONSE_BANNED_PATTERNS:
+        pat = _compile_pattern(pattern_str)
+        if pat.search(text):
+            reasons.append(f"Запрещённый паттерн для автоответа: \"{pattern_str}\"")
+
+    # Regex patterns (URLs, emails, phones)
+    for regex in AUTO_RESPONSE_BANNED_REGEX:
+        if regex.search(text):
+            reasons.append(f"Запрещённый паттерн: {regex.pattern}")
+
+    return reasons
+
+
+def _check_auto_response_length(text: str, channel: str) -> List[str]:
+    """Check auto-response text length against channel-specific limits.
+
+    Returns a list of reason strings if the length exceeds the limit.
+    """
+    max_len = get_auto_response_max_length(channel)
+    if len(text) > max_len:
+        return [f"Автоответ слишком длинный ({len(text)} > {max_len} символов для канала '{channel}')"]
+    if len(text) < REPLY_MIN_LENGTH:
+        return [f"Автоответ слишком короткий ({len(text)} < {REPLY_MIN_LENGTH} символов)"]
+    return []
+
+
+def _check_language_russian(text: str) -> List[str]:
+    """Check that the response is predominantly in Russian (Cyrillic).
+
+    Returns a list of reason strings if non-Cyrillic characters dominate.
+    """
+    if not text:
+        return []
+
+    # Count Cyrillic vs Latin alphabetic characters
+    cyrillic_count = 0
+    latin_count = 0
+    for ch in text:
+        if "\u0400" <= ch <= "\u04ff" or "\u0500" <= ch <= "\u052f":
+            cyrillic_count += 1
+        elif ch.isalpha():
+            latin_count += 1
+
+    total_alpha = cyrillic_count + latin_count
+    if total_alpha == 0:
+        return []  # No alphabetic characters (e.g. emojis only)
+
+    cyrillic_ratio = cyrillic_count / total_alpha
+    if cyrillic_ratio < 0.7:
+        return [
+            f"Ответ не на русском языке (кириллица: {cyrillic_ratio:.0%}, "
+            f"порог: 70%)"
+        ]
+    return []
+
+
+async def _check_repetition(
+    text: str,
+    seller_id: int,
+    db,
+) -> List[str]:
+    """Check if the exact same text was sent to this seller in the last 24h.
+
+    Prevents copy-paste repetition in auto-responses.
+    Returns a list of reason strings if a duplicate is found.
+    """
+    from sqlalchemy import select, and_
+    from app.models.interaction import Interaction
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+
+    try:
+        result = await db.execute(
+            select(Interaction.id).where(
+                and_(
+                    Interaction.seller_id == seller_id,
+                    Interaction.is_auto_response == True,
+                    Interaction.updated_at >= cutoff,
+                )
+            ).limit(200)
+        )
+        interaction_ids = [row[0] for row in result.all()]
+
+        if not interaction_ids:
+            return []
+
+        # Check extra_data for matching reply text
+        from app.models.interaction import Interaction as InteractionModel
+        result2 = await db.execute(
+            select(InteractionModel).where(
+                InteractionModel.id.in_(interaction_ids)
+            )
+        )
+        interactions = result2.scalars().all()
+        normalized_text = text.strip().lower()
+        for interaction in interactions:
+            if isinstance(interaction.extra_data, dict):
+                last_reply = interaction.extra_data.get("last_reply_text", "")
+                if last_reply and last_reply.strip().lower() == normalized_text:
+                    return [
+                        f"Дублирование: такой же текст уже был отправлен "
+                        f"(interaction_id={interaction.id}) за последние 24ч"
+                    ]
+    except Exception as exc:
+        logger.warning("auto_response repetition check failed: %s", exc)
+        # Non-blocking: if DB check fails, allow the response
+        return []
+
+    return []
+
+
+async def validate_auto_response(
+    text: str,
+    channel: str,
+    seller_id: int,
+    db,
+) -> Tuple[bool, List[str]]:
+    """Run ALL stricter checks for auto-responses.
+
+    Auto-responses are sent WITHOUT human review, so they must be extra-safe.
+
+    Checks:
+    a) Stricter banned phrase patterns (including overpromising, competitors, etc.)
+    b) Channel-specific max length (500/800/1000)
+    c) Repetition check (same text to same seller in last 24h)
+    d) Language check (must be predominantly Russian/Cyrillic)
+
+    Args:
+        text: The auto-response text to validate.
+        channel: The channel (review, question, chat).
+        seller_id: The seller's ID for repetition checks.
+        db: AsyncSession for DB queries.
+
+    Returns:
+        Tuple of (is_safe, list_of_reasons_if_blocked).
+        If is_safe is True, the list is empty.
+    """
+    if not text or not text.strip():
+        return False, ["Текст автоответа пуст"]
+
+    text = text.strip()
+    all_reasons: List[str] = []
+
+    # a) Stricter banned patterns
+    all_reasons.extend(_check_auto_response_banned_patterns(text))
+
+    # b) Length check
+    all_reasons.extend(_check_auto_response_length(text, channel))
+
+    # c) Repetition check (async, requires DB)
+    repetition_reasons = await _check_repetition(text, seller_id, db)
+    all_reasons.extend(repetition_reasons)
+
+    # d) Language check
+    all_reasons.extend(_check_language_russian(text))
+
+    is_safe = len(all_reasons) == 0
+    return is_safe, all_reasons

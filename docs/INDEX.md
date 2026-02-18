@@ -34,6 +34,12 @@ Last updated: 2026-02-17
 - `reviews/QUICKSTART.md` — детальный quickstart
 - `reviews/API.md` — API endpoints
 
+### Auto-Response System
+
+- **`auto-response/ARCHITECTURE.md`** — архитектура авто-ответов: 9-step pipeline, сценарии, каналы, Celery, мониторинг
+- **`auto-response/SANDBOX_TESTING.md`** — sandbox mode, preview endpoint, чеклист перед запуском, демо-данные
+- **`auto-response/GUARDRAILS.md`** — banned phrases для авто-ответов, лимиты длины, примеры blocked/allowed
+
 ## Architecture & Tech Debt
 
 - **`PROJECT_ANALYSIS_2026.md`** — технический анализ проекта (Feb 2026): оценка 7.5/10, Tech Debt каталог (18 items, 11 resolved)
@@ -57,7 +63,12 @@ Last updated: 2026-02-17
 
 ## Design System & Prototypes
 
+- **`design-system/design-system.html`** — визуальная документация дизайн-системы (компоненты, цвета, типографика, макеты — HTML)
 - `design-system/README.md`
+- `design-system/COLORS.md`
+- `design-system/TYPOGRAPHY.md`
+- `design-system/COMPONENTS.md`
+- `design-system/PANELS.md`
 - `design-system/HELP_PANEL.md`
 - `prototypes/` — прототипы экранов
 - `prototypes/legacy/` — старые прототипы
@@ -65,6 +76,7 @@ Last updated: 2026-02-17
 ## Research
 
 - `research/INDEX.md` — индекс исследований (рынок, UX, WB research)
+- **`research/MARKETPLACE_COMM_API_RESEARCH.md`** — Яндекс Маркет + Авито: chat/reviews API, возможности для повторных продаж (2026-02-18)
 - `research/WB_LOGISTICS_CJM.html` — пример "человеческой" CJM-документации (HTML)
 - **`product/CRM_PERFORMANCE_INTEGRATION_PLAN.md`** — исследование интеграции CRM-маркетинга и performance-каналов (2026, РФ рынок)
 - **`../crm-performance-plan.html`** — HTML версия CRM research для GitHub Pages

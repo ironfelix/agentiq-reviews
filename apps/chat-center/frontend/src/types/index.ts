@@ -99,6 +99,7 @@ export type PromoCode = {
   discount_label: string;
   expires_label: string;
   scope_label: string;
+  nm_ids: number[];
   sent_count: number;
   active: boolean;
   channels: PromoChannels;
@@ -122,12 +123,22 @@ export type AITone = 'formal' | 'friendly' | 'neutral';
 
 export type AutoResponseChannel = 'review' | 'question' | 'chat';
 
+export type ScenarioAction = 'auto' | 'draft' | 'block';
+
+export type ScenarioConfig = {
+  action: ScenarioAction;
+  channels: string[];
+  enabled: boolean;
+};
+
 export type AISettings = {
   tone: AITone;
   auto_replies_positive: boolean;
   ai_suggestions: boolean;
   auto_response_channels: AutoResponseChannel[];
   auto_response_nm_ids: number[];
+  auto_response_scenarios: Record<string, ScenarioConfig>;
+  auto_response_promo_on_5star: boolean;
 };
 
 export type AISettingsResponse = {
@@ -135,6 +146,27 @@ export type AISettingsResponse = {
 };
 
 export type AISettingsUpdateRequest = AISettingsResponse;
+
+export type PresetInfo = {
+  name: string;
+  label: string;
+  description: string;
+  channels: string[];
+};
+
+export type PresetsResponse = {
+  presets: PresetInfo[];
+};
+
+export type ApplyPresetRequest = {
+  preset: string;
+};
+
+export type ApplyPresetResponse = {
+  preset: string;
+  channels: string[];
+  scenarios: Record<string, ScenarioConfig>;
+};
 
 // Message Types (matching backend MessageResponse)
 export interface Message {

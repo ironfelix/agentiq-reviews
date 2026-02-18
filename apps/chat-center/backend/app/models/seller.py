@@ -29,6 +29,9 @@ class Seller(Base):
     sync_status = Column(String(50), nullable=True)  # 'idle', 'syncing', 'error', 'success'
     sync_error = Column(Text, nullable=True)  # Error message if sync failed
 
+    # Sandbox mode: run full auto-response pipeline but do NOT send to marketplace
+    sandbox_mode = Column(Boolean, default=False, server_default="false", nullable=False)
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

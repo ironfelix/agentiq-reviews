@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailPimp Agent</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: #f5f5f5; color: #1a1a1a; height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ===== Shell ===== */
+  .shell {
+    width: 100%; max-width: 720px; height: 100dvh;
+    background: white; display: flex; flex-direction: column;
+    border-left: 1px solid #e8e8e8; border-right: 1px solid #e8e8e8;
+  }
+  @media (max-width: 720px) { .shell { border: none; } }
+
+  /* ===== Header ===== */
+  .hdr {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-bottom: 1px solid #e8e8e8;
+    background: white; flex-shrink: 0;
+  }
+  .hdr-logo {
+    width: 28px; height: 28px; border-radius: 7px; background: #1a1a1a;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .hdr-title { font-size: 13px; font-weight: 700; letter-spacing: -.01em; flex: 1; }
+  .hdr-title span { color: #1a73e8; }
+  .hdr-model {
+    font-size: 10px; font-weight: 500; color: #666;
+    background: #f0f0f0; border: 1px solid #e0e0e0;
+    padding: 3px 8px; border-radius: 5px; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    transition: background .12s;
+  }
+  .hdr-model:hover { background: #e8e8e8; }
+  .hdr-dot { width: 6px; height: 6px; border-radius: 50%; background: #34a853; }
+  .hdr-privacy {
+    font-size: 10px; font-weight: 500; color: #2e7d32;
+    background: #e8f5e9; border: 1px solid #c8e6c9;
+    padding: 3px 8px; border-radius: 5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .hdr-back {
+    display: none; width: 28px; height: 28px; border: 1px solid #e0e0e0;
+    border-radius: 6px; background: white; cursor: pointer;
+    align-items: center; justify-content: center; color: #666;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .hdr-back:hover { background: #f5f5f5; }
+
+  /* ===== Context bar ===== */
+  .ctx-bar {
+    padding: 7px 16px; background: #fafafa; border-bottom: 1px solid #ebebeb;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .ctx-label { font-size: 10px; color: #999; }
+  .ctx-chip {
+    font-size: 10px; font-weight: 500; color: #1a73e8;
+    background: #eff6ff; border: 1px solid #bfdbfe;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .ctx-sep { color: #ddd; font-size: 12px; }
+  .ctx-action {
+    font-size: 10px; color: #999; cursor: pointer;
+    padding: 2px 7px; border-radius: 4px; border: 1px solid #e8e8e8;
+    background: white; font-family: inherit;
+    transition: background .1s;
+  }
+  .ctx-action:hover { background: #f5f5f5; color: #333; }
+  .ctx-right { margin-left: auto; display: flex; gap: 6px; }
+
+  /* ===== Messages ===== */
+  .msgs {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    background: #fafafa;
+  }
+  .msgs::-webkit-scrollbar { width: 3px; }
+  .msgs::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+  .msg { display: flex; flex-direction: column; gap: 3px; max-width: 100%; }
+  .msg.user { align-items: flex-end; }
+  .msg-role {
+    font-size: 9px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: #aaa; padding: 0 2px;
+  }
+  .msg.user .msg-role { color: #6aa3f5; }
+
+  .bubble {
+    max-width: 82%; padding: 8px 11px;
+    border-radius: 8px; font-size: 12.5px; line-height: 1.55;
+    color: #1a1a1a; background: white; border: 1px solid #e8e8e8;
+  }
+  .msg.user .bubble { background: #1a73e8; color: white; border-color: #1a73e8; max-width: 75%; }
+
+  /* Tool call block (Cursor style) */
+  .tool-call {
+    background: #f8f9fa; border: 1px solid #e4e8ed;
+    border-radius: 6px; padding: 8px 10px; margin-top: 6px;
+    font-size: 11px; color: #555;
+  }
+  .tool-call-head {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+    font-weight: 600; color: #333; font-size: 11px;
+  }
+  .tool-icon {
+    width: 16px; height: 16px; border-radius: 3px; background: #e8f0fe;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .tool-status {
+    margin-left: auto; font-size: 9px; font-weight: 600;
+    padding: 1px 5px; border-radius: 3px;
+  }
+  .tool-status.done { background: #e8f5e9; color: #2e7d32; }
+  .tool-status.running { background: #fff3e0; color: #e65100; }
+  .tool-params { font-size: 10.5px; color: #777; white-space: pre-wrap; }
+
+  /* Action card */
+  .act-card {
+    margin-top: 8px; padding: 9px 11px;
+    background: #f5f7ff; border: 1px solid #d0d9f8; border-radius: 7px;
+    font-size: 11px; color: #555;
+  }
+  .act-title { font-weight: 600; color: #1a1a1a; font-size: 11.5px; margin-bottom: 4px; }
+  .act-body { font-size: 11px; color: #666; white-space: pre-line; line-height: 1.5; }
+  .act-btns { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+  .act-btn {
+    font-size: 10.5px; font-weight: 500; padding: 4px 10px;
+    border-radius: 5px; border: 1px solid #d8d8d8;
+    cursor: pointer; background: white; color: #333; font-family: inherit;
+    transition: all .1s;
+  }
+  .act-btn:hover { background: #f5f5f5; border-color: #bbb; }
+  .act-btn.primary { background: #1a73e8; color: white; border-color: #1a73e8; }
+  .act-btn.primary:hover { background: #1557b0; }
+
+  /* Thinking dots */
+  .thinking { display: flex; gap: 3px; align-items: center; padding: 5px 0; }
+  .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #bbb;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); opacity:.3; }
+    30% { transform: translateY(-4px); opacity:1; }
+  }
+
+  /* ===== Quick actions ===== */
+  .quick-row {
+    padding: 8px 16px; border-top: 1px solid #ebebeb; background: white;
+    display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .quick-row::-webkit-scrollbar { display: none; }
+  .qbtn {
+    font-size: 10.5px; font-weight: 500;
+    padding: 4px 10px; border-radius: 5px;
+    border: 1px solid #ddd; cursor: pointer;
+    background: #fafafa; color: #555; font-family: inherit;
+    transition: all .1s; white-space: nowrap; flex-shrink: 0;
+  }
+  .qbtn:hover { background: #eff6ff; border-color: #93c5fd; color: #1a73e8; }
+
+  /* ===== Input ===== */
+  .input-row {
+    padding: 10px 16px 14px; border-top: 1px solid #e8e8e8;
+    background: white; display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
+  }
+  .txt {
+    flex: 1; min-height: 36px; max-height: 110px;
+    padding: 8px 12px; border: 1px solid #ddd;
+    border-radius: 8px; font-size: 12.5px; font-family: inherit;
+    resize: none; outline: none; line-height: 1.45;
+    background: #fafafa; color: #1a1a1a;
+    transition: border-color .12s, box-shadow .12s;
+  }
+  .txt:focus { border-color: #1a73e8; background: white; box-shadow: 0 0 0 2px rgba(26,115,232,.1); }
+  .txt::placeholder { color: #aaa; }
+  .send-btn {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    background: #1a1a1a; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s;
+  }
+  .send-btn:hover { background: #333; }
+  .send-btn:disabled { background: #ccc; cursor: default; }
+
+  /* ===== Kbd shortcuts hint ===== */
+  .kbd-hint { font-size: 9px; color: #ccc; padding: 0 16px 8px; text-align: right; background: white; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="hdr">
+    <a class="hdr-back" id="hdr-back" href="../mailpimp-ui.html" title="Назад в MailPimp">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <div class="hdr-logo">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5" stroke="white" stroke-width="1.3"/>
+        <circle cx="8" cy="8" r="2" fill="white"/>
+        <path d="M8 1.5V.5M8 15.5v-1M1.5 8H.5M15.5 8h-1" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="hdr-title">Mail<span>Pimp</span> Agent</div>
+    <div class="hdr-model" onclick="cycleModel()">
+      <div class="hdr-dot"></div>
+      <span id="model-name">GPT-4o</span>
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor" opacity=".5"><path d="M1 2.5l3 3 3-3"/></svg>
+    </div>
+    <div class="hdr-privacy">
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><path d="M4 .5L1.5 2.5V4c0 1.5.9 2.8 2.5 3.4C5.6 6.8 6.5 5.5 6.5 4V2.5L4 .5z"/></svg>
+      Без личных данных
+    </div>
+  </div>
+
+  <!-- Context bar -->
+  <div class="ctx-bar">
+    <span class="ctx-label">Контекст:</span>
+    <span class="ctx-chip" id="ctx-chip">Главная — Дашборд</span>
+    <span class="ctx-sep">·</span>
+    <span class="ctx-label">47 820 контактов</span>
+    <div class="ctx-right">
+      <button class="ctx-action" onclick="clearChat()">Очистить</button>
+      <button class="ctx-action" onclick="newSession()">Новый чат</button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="msgs" id="msgs">
+
+    <div class="msg">
+      <div class="msg-role">Agent</div>
+      <div class="bubble">
+        Привет! Готов помочь с MailPimp. Вижу несколько вещей на дашборде, о которых стоит знать:
+        <div class="act-card">
+          <div class="act-title">CTR упал на 0.2%</div>
+          <div class="act-body">Средний CTR: 3.8% за 30 дней. Причина — усталость от темы «распродажа».</div>
+          <div class="act-btns">
+            <button class="act-btn primary" onclick="send('Помоги поднять CTR')">Что делать?</button>
+            <button class="act-btn" onclick="send('Покажи аналитику CTR')">Аналитика</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg">
+      <div class="msg-role">Agent</div>
+      <div class="bubble">
+        У вас <strong>1 890 контактов</strong> с брошенной корзиной без автоматизации. Упущено ~<strong style="color:#34a853">₽38–45K</strong>/мес.
+        <div class="act-card">
+          <div class="act-title">Запустить "Брошенная корзина"?</div>
+          <div class="act-body">3 письма · 48 ч · OR ~45% · Шаблоны готовы</div>
+          <div class="act-btns">
+            <button class="act-btn primary" onclick="runScenario()">Запустить</button>
+            <button class="act-btn" onclick="send('Покажи настройки сценария')">Настроить</button>
+            <button class="act-btn" onclick="send('Не сейчас')">Позже</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick actions -->
+  <div class="quick-row">
+    <button class="qbtn" onclick="send('Создай рассылку на март')">+ Рассылка на март</button>
+    <button class="qbtn" onclick="send('Покажи топ сегменты по OR')">Топ сегменты</button>
+    <button class="qbtn" onclick="send('Что слать VIP клиентам?')">Идеи для VIP</button>
+    <button class="qbtn" onclick="send('Анализ последней кампании')">Анализ кампании</button>
+    <button class="qbtn" onclick="send('Запусти A/B тест темы письма')">A/B тест темы</button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-row">
+    <textarea class="txt" id="txt" placeholder="Спроси или скажи что сделать..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInput()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendInput()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M1.5 7h11M8 2.5L12.5 7 8 11.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="kbd-hint">Enter — отправить &nbsp;·&nbsp; Shift+Enter — новая строка</div>
+
+</div>
+<script>
+  const MODELS = ['GPT-4o', 'GPT-4o mini', 'Claude Sonnet', 'Gemini Flash'];
+  let modelIdx = 0;
+  function cycleModel() {
+    modelIdx = (modelIdx + 1) % MODELS.length;
+    document.getElementById('model-name').textContent = MODELS[modelIdx];
+  }
+
+  const REPLIES = {
+    'помоги поднять ctr': {
+      thinking: true,
+      tools: [{ name: 'analyze_campaigns', params: 'last_n=7, metric="ctr"', status: 'done' }],
+      text: 'Проанализировал 7 последних кампаний. Вот что влияет на CTR:',
+      card: {
+        title: 'Рекомендации по CTR',
+        body: '• Кнопки с конкретной выгодой: +34% («Скидка 20%» > «Купить»)\n• Одна CTA-кнопка > три (рассеивание внимания)\n• Превью ссылки в письме: +18% к кликам',
+        actions: [
+          { label: 'Применить к следующей', primary: true, fn: "send('Создай кампанию с лучшим CTR')" },
+          { label: 'A/B тест', fn: "send('Запусти A/B тест CTA кнопки')" },
+        ]
+      }
+    },
+    'создай рассылку на март': {
+      thinking: true,
+      tools: [{ name: 'create_campaign', params: 'name="Мартовская", base="февраль-2025"', status: 'done' }],
+      text: 'Создал черновик на основе февральской кампании.',
+      card: {
+        title: 'Черновик создан',
+        body: 'Аудитория: Все подписчики · 47 820\nДата: 1 марта · 10:00 МСК\nТема: [скопирована из февральской]',
+        actions: [
+          { label: 'Открыть редактор', primary: true, fn: "send('Открой редактор кампании')" },
+          { label: 'Изменить дату', fn: "send('Перенеси на 5 марта')" },
+        ]
+      }
+    },
+    'покажи топ сегменты по or': {
+      thinking: true,
+      tools: [{ name: 'query_segments', params: 'metric="open_rate", period=30, limit=3', status: 'done' }],
+      text: 'Топ-3 сегмента по Open Rate за 30 дней:',
+      card: {
+        title: 'Лучшие сегменты',
+        body: '1. VIP клиенты — 41.2% OR\n2. После первой покупки — 38.5% OR\n3. Активные 7 дней — 34.1% OR',
+        actions: [
+          { label: 'Кампания для VIP', primary: true, fn: "send('Создай кампанию для VIP')" },
+          { label: 'Подробная аналитика', fn: "send('Покажи полную аналитику сегментов')" },
+        ]
+      }
+    },
+    'что слать vip клиентам?': {
+      thinking: true,
+      text: 'Анализирую историю VIP сегмента...',
+      card: {
+        title: 'Идеи для VIP',
+        body: '• Ранний доступ к новинкам\n• Персональная скидка именинника\n• Закрытая распродажа «только для своих»\n• «Чем пользуются наши лучшие клиенты»',
+        actions: [
+          { label: 'Создать кампанию', primary: true, fn: "send('Создай кампанию для VIP')" },
+        ]
+      }
+    },
+    'анализ последней кампании': {
+      thinking: true,
+      tools: [
+        { name: 'get_campaign', params: 'id="last"', status: 'done' },
+        { name: 'analyze_metrics', params: 'campaign_id="camp_231"', status: 'done' },
+      ],
+      text: 'Последняя кампания: «Февральская акция» · 12 фев 2025',
+      card: {
+        title: 'Результаты кампании',
+        body: 'OR: 24.3% (+2.1% к среднему)\nCTR: 3.6% (-0.2%)\nОтписки: 0.4%\nДоход: ₽67 400',
+        actions: [
+          { label: 'Сделать лучше', primary: true, fn: "send('Как улучшить следующую кампанию?')" },
+        ]
+      }
+    },
+    'default': [
+      'Понял, работаю над этим...',
+      'Смотрю данные, одну секунду.',
+      'Хороший вопрос! Вот что я нашёл:',
+    ]
+  };
+
+  function addMsg(html, role = 'agent') {
+    const msgs = document.getElementById('msgs');
+    const div = document.createElement('div');
+    div.className = 'msg' + (role === 'user' ? ' user' : '');
+    const roleLabel = `<div class="msg-role">${role === 'user' ? 'You' : 'Agent'}</div>`;
+    div.innerHTML = roleLabel + html;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  function thinking() {
+    return addMsg(`<div class="bubble"><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`);
+  }
+
+  function toolBlock(tools) {
+    return tools.map(t => `
+      <div class="tool-call">
+        <div class="tool-call-head">
+          <div class="tool-icon">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="#1a73e8"><path d="M2 5h6M5 2v6"/></svg>
+          </div>
+          ${t.name}()
+          <span class="tool-status ${t.status}">${t.status === 'done' ? 'done' : 'running'}</span>
+        </div>
+        <div class="tool-params">${t.params}</div>
+      </div>
+    `).join('');
+  }
+
+  function makeCard(card) {
+    const btns = (card.actions || []).map(a =>
+      `<button class="act-btn ${a.primary ? 'primary' : ''}" onclick="${a.fn}">${a.label}</button>`
+    ).join('');
+    return `<div class="act-card"><div class="act-title">${card.title}</div><div class="act-body">${card.body}</div>${btns ? '<div class="act-btns">' + btns + '</div>' : ''}</div>`;
+  }
+
+  function replyHtml(r) {
+    const tools = r.tools ? toolBlock(r.tools) : '';
+    const card = r.card ? makeCard(r.card) : '';
+    return `<div class="bubble">${tools}${r.text}${card}</div>`;
+  }
+
+  function send(text) {
+    addMsg(`<div class="bubble">${text}</div>`, 'user');
+    const key = text.toLowerCase().trim().replace('?', '').replace('!', '');
+    const reply = REPLIES[key] || { text: REPLIES.default[Math.floor(Math.random() * 3)] };
+    const thinkEl = thinking();
+    setTimeout(() => {
+      thinkEl.remove();
+      addMsg(replyHtml(reply));
+    }, reply.thinking ? 1400 : 700);
+  }
+
+  function runScenario() {
+    addMsg(`<div class="bubble">Запустить автоматизацию "Брошенная корзина"</div>`, 'user');
+    const thinkEl = thinking();
+    setTimeout(() => {
+      thinkEl.remove();
+      addMsg(replyHtml({
+        tools: [
+          { name: 'create_automation', params: 'template="abandoned_cart", contacts=1890', status: 'done' },
+          { name: 'schedule_emails', params: 'sequence=[1h, 24h, 48h]', status: 'done' },
+        ],
+        text: 'Автоматизация активирована.',
+        card: {
+          title: 'Брошенная корзина — запущено',
+          body: '3 письма · 48 ч · 1 890 контактов в очереди\nПервое письмо уйдёт через 1 час.',
+          actions: [{ label: 'Посмотреть сценарий', primary: true, fn: "send('Открой редактор сценария')" }]
+        }
+      }));
+    }, 1800);
+  }
+
+  function sendInput() {
+    const t = document.getElementById('txt');
+    const text = t.value.trim();
+    if (!text) return;
+    t.value = ''; t.style.height = 'auto';
+    send(text);
+  }
+
+  function clearChat() {
+    const msgs = document.getElementById('msgs');
+    msgs.innerHTML = '';
+    addMsg('<div class="bubble">Чат очищен. Чем могу помочь?</div>');
+  }
+
+  function newSession() {
+    clearChat();
+    document.getElementById('ctx-chip').textContent = 'Новая сессия';
+  }
+
+  // Show back link only if opened from mailpimp-ui
+  if (document.referrer && document.referrer.includes('mailpimp')) {
+    document.getElementById('hdr-back').style.display = 'flex';
+  }
+</script>
+</body>
+</html>

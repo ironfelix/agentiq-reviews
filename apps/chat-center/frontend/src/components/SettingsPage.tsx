@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import type { AISettings, AITone, AutoResponseChannel, User } from '../types';
+import { useEffect, useMemo, useState } from 'react';
+import type { AISettings, AITone, User } from '../types';
 import { settingsApi } from '../services/api';
+import { AutoResponseSettings } from './AutoResponseSettings';
 import { PromoCodes } from './PromoCodes';
 
 type SettingsTab = 'connections' | 'ai' | 'promo' | 'profile';
@@ -26,6 +27,8 @@ const DEFAULT_AI_SETTINGS: AISettings = {
   ai_suggestions: true,
   auto_response_channels: ['review'],
   auto_response_nm_ids: [],
+  auto_response_scenarios: {},
+  auto_response_promo_on_5star: false,
 };
 
 export function SettingsPage(props: {
@@ -53,7 +56,6 @@ export function SettingsPage(props: {
   const [aiLoadState, setAILoadState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [aiSaveState, setAISaveState] = useState<SaveState>('idle');
   const [aiError, setAIError] = useState<string | null>(null);
-  const [nmIdsText, setNmIdsText] = useState<string>('');
 
   const isWbConnected = Boolean(user.has_api_credentials) && user.sync_status !== 'error';
   const wbStatusLabel = isWbConnected
@@ -84,8 +86,9 @@ export function SettingsPage(props: {
         // Ensure new fields have defaults for backwards compatibility
         if (!loaded.auto_response_channels) loaded.auto_response_channels = ['review'];
         if (!loaded.auto_response_nm_ids) loaded.auto_response_nm_ids = [];
+        if (!loaded.auto_response_scenarios) loaded.auto_response_scenarios = {};
+        if (loaded.auto_response_promo_on_5star === undefined) loaded.auto_response_promo_on_5star = false;
         setAISettings(loaded);
-        setNmIdsText(loaded.auto_response_nm_ids.length > 0 ? loaded.auto_response_nm_ids.join(', ') : '');
         setAILoadState('idle');
       } catch {
         if (cancelled) return;
@@ -108,27 +111,6 @@ export function SettingsPage(props: {
     };
     return map[aiSettings.tone];
   }, [aiSettings.tone]);
-
-  const toggleChannel = useCallback((ch: AutoResponseChannel) => {
-    setAISettings((prev) => {
-      const channels = prev.auto_response_channels || [];
-      const next = channels.includes(ch)
-        ? channels.filter((c) => c !== ch)
-        : [...channels, ch];
-      return { ...prev, auto_response_channels: next };
-    });
-  }, []);
-
-  const handleNmIdsChange = useCallback((value: string) => {
-    setNmIdsText(value);
-    // Parse comma-separated integers, ignoring invalid entries
-    const parsed = value
-      .split(/[,;\s]+/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0 && /^\d+$/.test(s))
-      .map(Number);
-    setAISettings((prev) => ({ ...prev, auto_response_nm_ids: parsed }));
-  }, []);
 
   const saveAI = async () => {
     setAISaveState('saving');
@@ -244,7 +226,7 @@ export function SettingsPage(props: {
           <div>
             <div className="settings-section-title">AI-ассистент</div>
             <div className="settings-section-desc">
-              Настройте, как AI генерирует ответы. Изменения влияют на черновики ответов и подсказки.
+              Настройте, как AI генерирует ответы и авто-ответы на обращения.
             </div>
 
             {aiLoadState === 'loading' && (
@@ -254,6 +236,7 @@ export function SettingsPage(props: {
               <div className="settings-inline-note error">{aiError || 'Ошибка загрузки'}</div>
             )}
 
+            {/* Tone */}
             <div className="ai-setting-card">
               <div className="ai-setting-header">
                 <div className="ai-setting-title">Тон ответов</div>
@@ -288,81 +271,7 @@ export function SettingsPage(props: {
               </div>
             </div>
 
-            <div className="ai-setting-card">
-              <div className="ai-setting-header">
-                <div className="ai-setting-title">Авто-ответы</div>
-                <button
-                  type="button"
-                  className={`toggle ${aiSettings.auto_replies_positive ? 'on' : ''}`}
-                  aria-label="Toggle auto replies"
-                  onClick={() =>
-                    setAISettings((prev) => ({ ...prev, auto_replies_positive: !prev.auto_replies_positive }))
-                  }
-                />
-              </div>
-              <div className="ai-setting-desc">
-                Автоматически отвечать на позитивные обращения (4-5★) без вашего участия. Ответы помечаются значком «АВТО».
-              </div>
-
-              {aiSettings.auto_replies_positive && (
-                <div className="auto-response-options">
-                  <div className="auto-response-section">
-                    <div className="auto-response-label">Каналы для авто-ответов</div>
-                    <div className="auto-response-channels">
-                      <label className="channel-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={(aiSettings.auto_response_channels || []).includes('review')}
-                          onChange={() => toggleChannel('review')}
-                        />
-                        <span className="channel-checkbox-mark" />
-                        <span className="channel-checkbox-text">Отзывы</span>
-                      </label>
-                      <label className="channel-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={(aiSettings.auto_response_channels || []).includes('question')}
-                          onChange={() => toggleChannel('question')}
-                        />
-                        <span className="channel-checkbox-mark" />
-                        <span className="channel-checkbox-text">Вопросы</span>
-                      </label>
-                      <label className="channel-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={(aiSettings.auto_response_channels || []).includes('chat')}
-                          onChange={() => toggleChannel('chat')}
-                        />
-                        <span className="channel-checkbox-mark" />
-                        <span className="channel-checkbox-text">Чаты</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="auto-response-section">
-                    <div className="auto-response-label">Артикулы (необязательно)</div>
-                    <input
-                      type="text"
-                      className="form-input auto-response-nm-input"
-                      placeholder="Введите артикулы через запятую, напр. 123456, 789012"
-                      value={nmIdsText}
-                      onChange={(e) => handleNmIdsChange(e.target.value)}
-                    />
-                    <div className="auto-response-hint">
-                      Пусто = все артикулы. Укажите 1-3 для тестового запуска.
-                    </div>
-                    {aiSettings.auto_response_nm_ids.length > 0 && (
-                      <div className="auto-response-nm-tags">
-                        {aiSettings.auto_response_nm_ids.map((nm) => (
-                          <span key={nm} className="nm-tag">{nm}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
+            {/* AI suggestions */}
             <div className="ai-setting-card">
               <div className="ai-setting-header">
                 <div className="ai-setting-title">AI-подсказки</div>
@@ -374,16 +283,24 @@ export function SettingsPage(props: {
                 />
               </div>
               <div className="ai-setting-desc">
-                Показывать AI-рекомендацию ответа для каждого нового обращения. Вы можете отредактировать или отклонить подсказку.
+                Показывать AI-рекомендацию ответа для каждого нового обращения.
               </div>
             </div>
 
+            {/* Auto-response settings (scenarios, presets, channels, promo, etc.) */}
+            <AutoResponseSettings
+              aiSettings={aiSettings}
+              onSettingsChange={setAISettings}
+            />
+
+            {/* Save all AI settings */}
             <div className="settings-save-row">
               <button className="form-save" type="button" onClick={saveAI} disabled={aiSaveState === 'saving'}>
                 {aiSaveState === 'saving' ? 'Сохранение...' : 'Сохранить'}
               </button>
               {aiSaveState === 'saved' && <div className="settings-inline-note success">Сохранено</div>}
               {aiSaveState === 'error' && <div className="settings-inline-note error">{aiError || 'Ошибка'}</div>}
+              <div className="ar-save-hint">Изменения применяются в течение 3 минут</div>
             </div>
           </div>
         )}

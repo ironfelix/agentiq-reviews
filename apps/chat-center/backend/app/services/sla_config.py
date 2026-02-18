@@ -33,6 +33,7 @@ DEFAULT_SLA_CONFIG: Dict[str, Any] = {
         "usage_howto": {"priority": "low", "sla_minutes": 1440},
         "product_spec": {"priority": "low", "sla_minutes": 1440},
         "thanks": {"priority": "low", "sla_minutes": 1440},
+        "quality_complaint": {"priority": "normal", "sla_minutes": 240},
         "other": {"priority": "normal", "sla_minutes": 240},
         # Pre-purchase: high
         "pre_purchase": {"priority": "high", "sla_minutes": 5},
@@ -41,9 +42,27 @@ DEFAULT_SLA_CONFIG: Dict[str, Any] = {
         "compatibility": {"priority": "high", "sla_minutes": 5},
     },
     "auto_response_enabled": False,
-    "auto_response_intents": ["thanks"],
+    "auto_response_intents": ["thanks"],  # legacy, kept for backward compat
     "auto_response_channels": ["review"],
     "auto_response_nm_ids": [],
+    "auto_response_scenarios": {
+        "thanks": {"action": "auto", "channels": ["review"], "enabled": True},
+        "delivery_status": {"action": "auto", "channels": ["review", "question", "chat"], "enabled": False},
+        "pre_purchase": {"action": "auto", "channels": ["question", "chat"], "enabled": False},
+        "sizing_fit": {"action": "auto", "channels": ["question", "chat"], "enabled": False},
+        "availability": {"action": "auto", "channels": ["question", "chat"], "enabled": False},
+        "compatibility": {"action": "auto", "channels": ["question", "chat"], "enabled": False},
+        "refund_exchange": {"action": "draft", "channels": ["review", "question", "chat"], "enabled": False},
+        "defect_not_working": {"action": "block", "channels": ["review", "question", "chat"], "enabled": True},
+        "wrong_item": {"action": "block", "channels": ["review", "question", "chat"], "enabled": True},
+        "quality_complaint": {"action": "block", "channels": ["review", "question", "chat"], "enabled": True},
+    },
+    "auto_response_promo_on_5star": False,
+    "auto_response_delay": {
+        "min_seconds": 3,
+        "max_seconds": 8,
+        "word_count_factor": 0.025,
+    },
 }
 
 
@@ -93,6 +112,26 @@ async def get_sla_config(db: AsyncSession, seller_id: int) -> Dict[str, Any]:
                         "sla_minutes": intent_val.get("sla_minutes", 240),
                     }
 
+        # Merge scenario config: defaults + seller overrides
+        merged_scenarios = dict(defaults.get("auto_response_scenarios", {}))
+        seller_scenarios = config.get("auto_response_scenarios", {})
+        if isinstance(seller_scenarios, dict):
+            for intent_key, scenario_val in seller_scenarios.items():
+                if isinstance(scenario_val, dict):
+                    merged_scenarios[intent_key] = {
+                        "action": scenario_val.get("action", "block"),
+                        "channels": scenario_val.get("channels", []),
+                        "enabled": scenario_val.get("enabled", False),
+                    }
+
+        # Backward compat: if seller has auto_response_intents but no scenarios,
+        # generate scenarios from legacy intents list
+        if not seller_scenarios and config.get("auto_response_intents"):
+            legacy_intents = config["auto_response_intents"]
+            for intent_key in legacy_intents:
+                if intent_key in merged_scenarios:
+                    merged_scenarios[intent_key]["enabled"] = True
+
         return {
             "intents": merged_intents,
             "auto_response_enabled": config.get(
@@ -110,6 +149,15 @@ async def get_sla_config(db: AsyncSession, seller_id: int) -> Dict[str, Any]:
             "auto_response_nm_ids": config.get(
                 "auto_response_nm_ids",
                 defaults["auto_response_nm_ids"],
+            ),
+            "auto_response_scenarios": merged_scenarios,
+            "auto_response_promo_on_5star": config.get(
+                "auto_response_promo_on_5star",
+                defaults.get("auto_response_promo_on_5star", False),
+            ),
+            "auto_response_delay": config.get(
+                "auto_response_delay",
+                defaults.get("auto_response_delay", {}),
             ),
         }
 

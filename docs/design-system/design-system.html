@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentIQ Design System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN TOKENS (Chat Center Light Theme) ===== */
+    :root {
+      --color-bg: #fafbfc;
+      --color-card: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-secondary: #5f6368;
+      --color-text-tertiary: #9aa0a6;
+      --color-accent: #1a73e8;
+      --color-success: #0f7f4e;
+      --color-danger: #d93025;
+      --color-warning: #f9ab00;
+      --color-border: #e8eaed;
+      --color-border-dark: #dadce0;
+      --color-border-light: #f5f6f7;
+      --color-bg-tertiary: #f8f9fa;
+      --color-bg-hover: #f5f6f7;
+      --color-bg-active: #f0f7ff;
+      --radius-sm: 5px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-pill: 999px;
+      --transition-fast: 0.12s ease;
+      --font-mono: 'SF Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+      padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 1060px; margin: 0 auto; }
+
+    /* ===== PROTOTYPE BADGE ===== */
+    .prototype-badge {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: var(--color-accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      z-index: 100;
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    h1 {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+      max-width: 92ch;
+    }
+
+    .meta {
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+      margin-bottom: 26px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--color-accent);
+    }
+
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    p { margin-bottom: 12px; }
+
+    a { color: var(--color-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ===== SECTION CARD ===== */
+    .section {
+      background: var(--color-card);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+    }
+
+    /* ===== BADGE (Section Number) ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      background: var(--color-accent);
+    }
+
+    /* ===== PILL ROW ===== */
+    .pillRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .pill {
+      font-size: 13px;
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      color: var(--color-text-secondary);
+      background: rgba(26,115,232,0.03);
+      white-space: nowrap;
+    }
+
+    /* ===== MONO CODE ===== */
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(26,115,232,0.06);
+      border: 1px solid rgba(26,115,232,0.18);
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* ===== TABLE ===== */
+    .ds-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    .ds-table th {
+      background: var(--color-bg);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .ds-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    /* ===== COMPONENT DEMO BOX ===== */
+    .demo {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .demo-label {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: var(--color-bg);
+      padding: 0 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .demo-meta {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .demo-meta strong {
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+
+    /* ===== COLOR SWATCHES ===== */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .swatch {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .swatch-color {
+      height: 48px;
+    }
+
+    .swatch-info {
+      padding: 8px 10px;
+      background: white;
+    }
+
+    .swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 2px;
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--color-text-tertiary);
+    }
+
+    /* ===== GRID ===== */
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 920px) {
+      .grid2 { grid-template-columns: 1fr; }
+    }
+
+    /* ===== CALLOUT ===== */
+    .callout {
+      background: rgba(26,115,232,0.06);
+      border-left: 4px solid var(--color-accent);
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+
+    .callout p { margin-bottom: 0; }
+
+    /* ===== INLINE COMPONENT STYLES (extracted from production CSS) ===== */
+
+    /* Toggle switch */
+    .ds-toggle {
+      width: 42px;
+      height: 24px;
+      background: var(--color-border-dark);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      border: none;
+      padding: 0;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .ds-toggle.on { background: var(--color-accent); }
+    .ds-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: left var(--transition-fast);
+    }
+    .ds-toggle.on::after { left: 20px; }
+
+    /* Scope radio */
+    .ds-scope-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ds-scope-radio {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .ds-scope-radio input[type="radio"] { display: none; }
+
+    .ds-radio-mark {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--color-border-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: all var(--transition-fast);
+    }
+
+    .ds-scope-radio input:checked + .ds-radio-mark {
+      border-color: var(--color-accent);
+    }
+
+    .ds-scope-radio input:checked + .ds-radio-mark::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--color-accent);
+      border-radius: 50%;
+    }
+
+    .ds-radio-content { flex: 1; }
+    .ds-radio-title { font-size: 13px; font-weight: 500; color: var(--color-text); }
+    .ds-radio-desc { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+    /* Channel checkboxes (pills) */
+    .ds-channel-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ds-channel-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .ds-channel-check:hover { border-color: var(--color-accent); }
+
+    .ds-channel-check.checked {
+      background: var(--color-bg-active);
+      border-color: var(--color-accent);
+    }
+
+    .ds-channel-check input { display: none; }
+
+    .ds-check-mark {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--color-border-dark);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+
+    .ds-channel-check.checked .ds-check-mark {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    .ds-channel-check.checked .ds-check-mark::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-top: -1px;
+    }
+
+    .ds-check-label { font-size: 13px; font-weight: 500; }
+
+    /* Preset cards */
+    .ds-preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .ds-preset-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .ds-preset-card:hover { border-color: var(--color-accent); }
+
+    .ds-preset-card.active {
+      border-color: var(--color-accent);
+      background: var(--color-bg-active);
+      box-shadow: 0 0 0 1px var(--color-accent);
+    }
+
+    .ds-preset-icon { font-size: 20px; margin-bottom: 8px; }
+    .ds-preset-name { font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 4px; }
+    .ds-preset-desc { font-size: 11px; color: var(--color-text-secondary); line-height: 1.4; }
+
+    .ds-preset-badge {
+      position: absolute;
+      top: -8px;
+      right: 10px;
+      background: var(--color-accent);
+      color: white;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* Scenario grid */
+    .ds-scenario-grid {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .ds-scenario-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border-light);
+      transition: background var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .ds-scenario-row:last-child { border-bottom: none; }
+    .ds-scenario-row:hover { background: var(--color-bg-hover); }
+
+    .ds-scenario-row.review-row {
+      background: var(--color-bg-tertiary);
+      cursor: default;
+    }
+
+    .ds-scenario-check {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--color-border-dark);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .ds-scenario-check.checked {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    .ds-scenario-check.checked::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-top: -1px;
+    }
+
+    .ds-scenario-info { flex: 1; min-width: 0; }
+    .ds-scenario-name { font-size: 13px; font-weight: 500; color: var(--color-text); }
+    .ds-scenario-desc { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+    .ds-scenario-channels { display: flex; gap: 4px; margin-top: 4px; }
+
+    .ds-ch-tag {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: var(--radius-pill);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-tertiary);
+      letter-spacing: 0.2px;
+    }
+
+    .ds-scenario-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .ds-scenario-badge.auto { background: #d4edda; color: #155724; }
+    .ds-scenario-badge.draft { background: #fff3cd; color: #856404; }
+    .ds-scenario-badge.blocked { background: #f8d7da; color: #721c24; }
+
+    .ds-scenario-separator {
+      padding: 6px 14px;
+      background: var(--color-bg-tertiary);
+      border-bottom: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+    }
+
+    .ds-scenario-separator span {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Tag input (nm_id) */
+    .ds-nm-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+      color: var(--color-text);
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .ds-nm-input:focus { border-color: var(--color-accent); }
+    .ds-nm-input::placeholder { color: var(--color-text-tertiary); }
+
+    .ds-nm-hint {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 4px;
+    }
+
+    .ds-nm-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .ds-nm-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--color-bg-tertiary);
+      border-radius: var(--radius-pill);
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ds-nm-tag-remove {
+      cursor: pointer;
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .ds-nm-tag-remove:hover { color: var(--color-danger); }
+
+    /* State legend */
+    .ds-state-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ds-state-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+
+    .ds-state-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .ds-state-dot.green { background: var(--color-success); }
+    .ds-state-dot.yellow { background: var(--color-warning); }
+    .ds-state-dot.red { background: var(--color-danger); }
+
+    /* Safety notice */
+    .ds-safety-notice {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .ds-safety-icon { font-size: 16px; flex-shrink: 0; line-height: 1.4; }
+    .ds-safety-text { font-size: 12px; color: #5d4037; line-height: 1.5; }
+    .ds-safety-text strong { font-weight: 600; }
+
+    /* Top bar notification */
+    .ds-topbar {
+      background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: var(--radius-md);
+      gap: 12px;
+    }
+
+    .ds-topbar-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .ds-topbar-icon { font-size: 18px; flex-shrink: 0; }
+
+    .ds-topbar-text { font-size: 13px; font-weight: 500; }
+    .ds-topbar-text strong { font-weight: 600; }
+
+    .ds-topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .ds-topbar-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .ds-topbar-btn:hover { background: rgba(255,255,255,0.3); }
+
+    .ds-topbar-btn.primary {
+      background: white;
+      color: var(--color-accent);
+      border-color: white;
+    }
+
+    .ds-topbar-btn.primary:hover { background: #f0f7ff; }
+
+    .ds-topbar-dismiss {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
+    }
+
+    .ds-topbar-dismiss:hover { color: white; }
+
+    /* Promo card */
+    .ds-promo-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      transition: all var(--transition-fast);
+    }
+
+    .ds-promo-card:hover {
+      border-color: var(--color-border-dark);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .ds-promo-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .ds-promo-code-name {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      color: var(--color-text);
+    }
+
+    .ds-promo-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .ds-promo-badge.active { background: rgba(52,168,83,0.1); color: var(--color-success); }
+    .ds-promo-badge.expired { background: var(--color-bg-tertiary); color: var(--color-text-tertiary); }
+
+    .ds-promo-meta {
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 10px;
+    }
+
+    .ds-promo-channels {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ds-promo-channel {
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .ds-promo-channel.on {
+      background: var(--color-bg-active);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      font-weight: 500;
+    }
+
+    /* Help panel */
+    .ds-help-panel-demo {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      width: 320px;
+      max-width: 100%;
+      position: relative;
+      box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+    }
+
+    .ds-help-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-tertiary);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .ds-help-close:hover { background: var(--color-bg-hover); }
+
+    .ds-help-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-right: 32px;
+    }
+
+    .ds-help-section { margin-bottom: 16px; }
+
+    .ds-help-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--color-text-tertiary);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .ds-help-text {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Type scale samples */
+    .type-sample {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .type-sample:last-child { border-bottom: none; }
+
+    .type-size {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--color-text-tertiary);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .type-weight {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      width: 50px;
+      flex-shrink: 0;
+    }
+
+    .type-usage {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-left: auto;
+      text-align: right;
+    }
+
+    /* Layout diagram */
+    .layout-diagram {
+      display: flex;
+      gap: 4px;
+      height: 160px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .layout-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-align: center;
+      padding: 8px;
+    }
+
+    .layout-panel.list { flex: 1; background: #e8f0fe; }
+    .layout-panel.chat { flex: 1.8; background: #f0f7ff; }
+    .layout-panel.context { flex: 1; background: #fef7e0; }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      body { padding: 20px 12px; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 14px; }
+      .section { padding: 20px 16px; }
+      h2 { font-size: 20px; }
+      .swatch-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .ds-preset-grid { grid-template-columns: 1fr; }
+      .ds-channel-grid { flex-direction: column; }
+      .grid2 { grid-template-columns: 1fr; }
+      .ds-topbar { flex-direction: column; align-items: flex-start; padding: 8px 12px; gap: 8px; }
+      .ds-topbar-actions { width: 100%; justify-content: space-between; }
+    }
+
+    @media (max-width: 640px) {
+      .ds-table { font-size: 12px; display: block; overflow-x: auto; }
+      .layout-diagram { height: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-badge">DESIGN SYSTEM v1</div>
+
+  <div class="container">
+    <!-- ===== HEADER ===== -->
+    <h1>AgentIQ Design System</h1>
+    <p class="subtitle">
+      Компоненты, цвета, типографика и макеты. Единый визуальный язык для всех разделов Chat Center.
+    </p>
+    <div class="meta">
+      Last updated: 2026-02-18 &bull; Status: Active &bull;
+      <a href="../docs-home.html" style="font-weight:600;">&larr; Documentation Portal</a> &bull;
+      <a href="./README.md">README (MD)</a>
+    </div>
+
+    <div class="pillRow" style="margin-top: 0; margin-bottom: 24px;">
+      <a class="pill" href="./COLORS.md">COLORS.md</a>
+      <a class="pill" href="./TYPOGRAPHY.md">TYPOGRAPHY.md</a>
+      <a class="pill" href="./COMPONENTS.md">COMPONENTS.md</a>
+      <a class="pill" href="./PANELS.md">PANELS.md</a>
+      <a class="pill" href="./HELP_PANEL.md">HELP_PANEL.md</a>
+      <a class="pill" href="../prototypes/auto-response-settings.html">Auto-Response Prototype</a>
+      <a class="pill" href="../prototypes/app-screens-v3-ru.html">App Screens v3</a>
+    </div>
+
+    <!-- ===== SECTION 1: COLOR PALETTE ===== -->
+    <div class="section" id="colors">
+      <h2><span class="badge">1</span> Color Palette</h2>
+      <p>
+        Chat Center использует светлую тему. Все цвета определены как CSS custom properties в
+        <span class="mono">:root</span> блоке <span class="mono">index.css</span> и прототипах.
+      </p>
+
+      <h3>Background &amp; Surface</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#ffffff;border-bottom:1px solid #eee;"></div><div class="swatch-info"><div class="swatch-name">bg-primary</div><div class="swatch-hex">#ffffff</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#fafbfc;"></div><div class="swatch-info"><div class="swatch-name">bg-secondary</div><div class="swatch-hex">#fafbfc</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f8f9fa;"></div><div class="swatch-info"><div class="swatch-name">bg-tertiary</div><div class="swatch-hex">#f8f9fa</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f5f6f7;"></div><div class="swatch-info"><div class="swatch-name">bg-hover</div><div class="swatch-hex">#f5f6f7</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f0f7ff;"></div><div class="swatch-info"><div class="swatch-name">bg-active</div><div class="swatch-hex">#f0f7ff</div></div></div>
+      </div>
+
+      <h3>Accent &amp; Semantic</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#1a73e8;"></div><div class="swatch-info"><div class="swatch-name">accent</div><div class="swatch-hex">#1a73e8</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0f7f4e;"></div><div class="swatch-info"><div class="swatch-name">success</div><div class="swatch-hex">#0f7f4e</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f9ab00;"></div><div class="swatch-info"><div class="swatch-name">warning</div><div class="swatch-hex">#f9ab00</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#d93025;"></div><div class="swatch-info"><div class="swatch-name">danger</div><div class="swatch-hex">#d93025</div></div></div>
+      </div>
+
+      <h3>Text</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#1a1a1a;"></div><div class="swatch-info"><div class="swatch-name">text-primary</div><div class="swatch-hex">#1a1a1a</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#5f6368;"></div><div class="swatch-info"><div class="swatch-name">text-secondary</div><div class="swatch-hex">#5f6368</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#9aa0a6;"></div><div class="swatch-info"><div class="swatch-name">text-tertiary</div><div class="swatch-hex">#9aa0a6</div></div></div>
+      </div>
+
+      <h3>Borders</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#e8eaed;"></div><div class="swatch-info"><div class="swatch-name">border-medium</div><div class="swatch-hex">#e8eaed</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#dadce0;"></div><div class="swatch-info"><div class="swatch-name">border-dark</div><div class="swatch-hex">#dadce0</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f5f6f7;"></div><div class="swatch-info"><div class="swatch-name">border-light</div><div class="swatch-hex">#f5f6f7</div></div></div>
+      </div>
+
+      <h3>Status Colors (Chat Center)</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#ea4335;"></div><div class="swatch-info"><div class="swatch-name">urgent</div><div class="swatch-hex">#ea4335</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f9ab00;"></div><div class="swatch-info"><div class="swatch-name">waiting</div><div class="swatch-hex">#f9ab00</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#34a853;"></div><div class="swatch-info"><div class="swatch-name">responded</div><div class="swatch-hex">#34a853</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#9aa0a6;"></div><div class="swatch-info"><div class="swatch-name">auto-response</div><div class="swatch-hex">#9aa0a6</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1a73e8;"></div><div class="swatch-info"><div class="swatch-name">client-replied</div><div class="swatch-hex">#1a73e8</div></div></div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 2: TYPOGRAPHY ===== -->
+    <div class="section" id="typography">
+      <h2><span class="badge">2</span> Typography</h2>
+      <p>
+        Chat Center использует <strong>Inter</strong> (weights 400, 500, 600, 700) как основной шрифт и
+        <strong>SF Mono / Fira Code</strong> для моноширинного текста (коды, артикулы, значения).
+      </p>
+
+      <h3>Type Scale</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="type-sample">
+          <span class="type-size">20px</span>
+          <span class="type-weight">600</span>
+          <span style="font-size:20px;font-weight:600;">Заголовок секции</span>
+          <span class="type-usage">section-title</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">14px</span>
+          <span class="type-weight">600</span>
+          <span style="font-size:14px;font-weight:600;">Заголовок карточки</span>
+          <span class="type-usage">card-title</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">13px</span>
+          <span class="type-weight">400</span>
+          <span style="font-size:13px;font-weight:400;">Основной текст, описания, контент</span>
+          <span class="type-usage">body</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">12px</span>
+          <span class="type-weight">400</span>
+          <span style="font-size:12px;font-weight:400;color:var(--color-text-secondary);">Описания, мета-информация, подписи</span>
+          <span class="type-usage">desc / meta</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">11px</span>
+          <span class="type-weight">400</span>
+          <span style="font-size:11px;font-weight:400;color:var(--color-text-tertiary);">Подсказки, hint-текст, доп. информация</span>
+          <span class="type-usage">hint</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">10px</span>
+          <span class="type-weight">600</span>
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--color-text-tertiary);">LABEL / UPPERCASE</span>
+          <span class="type-usage">label</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-size">13px</span>
+          <span class="type-weight">400</span>
+          <span style="font-size:13px;font-family:var(--font-mono);">145839201</span>
+          <span class="type-usage">mono</span>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>
+          <strong>CSS variables:</strong>
+          <span class="mono">--font-size-xs: 10px</span>,
+          <span class="mono">--font-size-sm: 11px</span>,
+          <span class="mono">--font-size-md: 12px</span>,
+          <span class="mono">--font-size-base: 13px</span>,
+          <span class="mono">--font-size-lg: 14px</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 3: CORE COMPONENTS ===== -->
+    <div class="section" id="components">
+      <h2><span class="badge">3</span> Core Components</h2>
+      <p>
+        Ниже задокументированы ключевые UI-компоненты с живыми примерами, CSS-классами и ссылками на прототипы.
+      </p>
+
+      <!-- 3.1 Toggle Switch -->
+      <h3 id="toggle">3.1 Toggle Switch</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div style="display:flex; align-items:center; gap:24px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:13px; font-weight:500;">Выкл</span>
+            <button class="ds-toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:13px; font-weight:500;">Вкл</span>
+            <button class="ds-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.toggle</span> <span class="mono">.toggle.on</span></span>
+          <span><strong>Production:</strong> <span class="mono">.ar-</span> prefix not needed (shared)</span>
+          <span><strong>Used in:</strong> Settings (AI tab), Promo settings</span>
+        </div>
+      </div>
+      <p>
+        Размер: 42&times;24px. Thumb: 20&times;20px, white circle. Off state: <span class="mono">#dadce0</span>,
+        On state: <span class="mono">#1a73e8</span> (accent). Transition: 0.12s ease.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/app-screens-v3-ru.html">app-screens-v3-ru.html</a> (SCREEN 8: SETTINGS)
+      </p>
+
+      <!-- 3.2 Radio Buttons (Scope) -->
+      <h3 id="radio">3.2 Radio Buttons (Scope)</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-scope-options">
+          <label class="ds-scope-radio">
+            <input type="radio" name="ds-scope" value="all" checked>
+            <div class="ds-radio-mark"></div>
+            <div class="ds-radio-content">
+              <div class="ds-radio-title">Весь кабинет</div>
+              <div class="ds-radio-desc">Авто-ответы для всех артикулов</div>
+            </div>
+          </label>
+          <label class="ds-scope-radio">
+            <input type="radio" name="ds-scope" value="specific">
+            <div class="ds-radio-mark"></div>
+            <div class="ds-radio-content">
+              <div class="ds-radio-title">Конкретные артикулы</div>
+              <div class="ds-radio-desc">Только для выбранных товаров (идеально для тестового запуска)</div>
+            </div>
+          </label>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-scope-radio</span> <span class="mono">.ar-radio-mark</span> <span class="mono">.ar-radio-content</span></span>
+          <span><strong>Used in:</strong> Auto-response settings (scope), Promo codes (scope)</span>
+        </div>
+      </div>
+      <p>
+        Радио-кнопки с описанием. Mark: 18&times;18px, border 2px. Checked state: blue border + 10&times;10px blue fill.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.3 Channel Checkboxes (Pills) -->
+      <h3 id="channel-check">3.3 Channel Checkboxes (Pills)</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-channel-grid">
+          <label class="ds-channel-check checked" onclick="this.classList.toggle('checked')">
+            <input type="checkbox" checked>
+            <span class="ds-check-mark"></span>
+            <span class="ds-check-label">Отзывы</span>
+          </label>
+          <label class="ds-channel-check checked" onclick="this.classList.toggle('checked')">
+            <input type="checkbox" checked>
+            <span class="ds-check-mark"></span>
+            <span class="ds-check-label">Вопросы</span>
+          </label>
+          <label class="ds-channel-check" onclick="this.classList.toggle('checked')">
+            <input type="checkbox">
+            <span class="ds-check-mark"></span>
+            <span class="ds-check-label">Чаты</span>
+          </label>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-channel-check</span> <span class="mono">.ar-check-mark</span> <span class="mono">.ar-check-label</span></span>
+          <span><strong>Used in:</strong> Auto-response settings (channels)</span>
+        </div>
+      </div>
+      <p>
+        Bordered pill style. Checked: blue background on checkbox + light blue pill background + blue border.
+        Checkbox: 16&times;16px, 3px radius. Checkmark: white rotated border trick.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.4 Preset Cards -->
+      <h3 id="preset">3.4 Preset Cards</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-preset-grid">
+          <div class="ds-preset-card active" onclick="document.querySelectorAll('.ds-preset-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+            <div class="ds-preset-icon">&#x1F6E1;</div>
+            <div class="ds-preset-name">Безопасный старт</div>
+            <div class="ds-preset-desc">Только позитивные отзывы 4-5&#x2605;. Идеально для первого запуска.</div>
+            <div class="ds-preset-badge">Рекомендуем</div>
+          </div>
+          <div class="ds-preset-card" onclick="document.querySelectorAll('.ds-preset-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+            <div class="ds-preset-icon">&#x2696;</div>
+            <div class="ds-preset-name">Сбалансированный</div>
+            <div class="ds-preset-desc">Позитив + WISMO + pre-purchase вопросы. ~70% обращений.</div>
+          </div>
+          <div class="ds-preset-card" onclick="document.querySelectorAll('.ds-preset-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+            <div class="ds-preset-icon">&#x26A1;</div>
+            <div class="ds-preset-name">Максимум</div>
+            <div class="ds-preset-desc">Всё кроме негатива. Включает возврат/обмен.</div>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-preset-card</span> <span class="mono">.ar-preset-icon</span> <span class="mono">.ar-preset-badge</span></span>
+          <span><strong>Used in:</strong> Auto-response settings (quick setup)</span>
+        </div>
+      </div>
+      <p>
+        3-column grid. Active state: blue border + <span class="mono">box-shadow: 0 0 0 1px accent</span> + light blue bg.
+        Badge: absolute positioned, top -8px, accent bg, white text, 9px uppercase.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.5 Scenario Rows (Grid) -->
+      <h3 id="scenarios">3.5 Scenario Rows (Grid)</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-scenario-grid">
+          <div class="ds-scenario-row">
+            <div class="ds-scenario-check checked"></div>
+            <div class="ds-scenario-info">
+              <div class="ds-scenario-name">Позитивные отзывы (4-5&#x2605;)</div>
+              <div class="ds-scenario-desc">Благодарность, вариативный текст</div>
+              <div class="ds-scenario-channels"><span class="ds-ch-tag">отзывы</span></div>
+            </div>
+            <div class="ds-scenario-badge auto">АВТО</div>
+          </div>
+          <div class="ds-scenario-row">
+            <div class="ds-scenario-check"></div>
+            <div class="ds-scenario-info">
+              <div class="ds-scenario-name">Возврат / обмен</div>
+              <div class="ds-scenario-desc">Инструкция по возврату через ЛК WB</div>
+              <div class="ds-scenario-channels"><span class="ds-ch-tag">отзывы</span><span class="ds-ch-tag">вопросы</span><span class="ds-ch-tag">чаты</span></div>
+            </div>
+            <div class="ds-scenario-badge draft">ЧЕРНОВИК</div>
+          </div>
+          <div class="ds-scenario-separator"><span>Не обрабатываются автоматически</span></div>
+          <div class="ds-scenario-row review-row">
+            <div class="ds-scenario-info">
+              <div class="ds-scenario-name">Брак / дефект</div>
+              <div class="ds-scenario-desc">AI поможет составить ответ — решение за вами</div>
+              <div class="ds-scenario-channels"><span class="ds-ch-tag">отзывы</span><span class="ds-ch-tag">вопросы</span><span class="ds-ch-tag">чаты</span></div>
+            </div>
+            <div class="ds-scenario-badge blocked">БЛОК</div>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-scenario-grid</span> <span class="mono">.ar-scenario-row</span> <span class="mono">.ar-scenario-check</span> <span class="mono">.ar-scenario-badge</span></span>
+          <span><strong>Badge variants:</strong> <span class="mono">.auto</span> (green) <span class="mono">.draft</span> (yellow) <span class="mono">.blocked</span> (red)</span>
+        </div>
+      </div>
+      <p>
+        Bordered grid container. Row: flex, 12px gap, 12px 14px padding. Checkbox: same 16&times;16px pattern.
+        Separator: tertiary bg, 10px uppercase label. Review rows: tertiary bg, no checkbox, cursor default.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.6 Tag Input (nm_id) -->
+      <h3 id="tag-input">3.6 Tag Input (nm_id)</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <input type="text" class="ds-nm-input" placeholder="Введите артикулы через запятую, напр. 145839201, 78234512" id="dsNmInput" onkeydown="dsHandleNmKey(event)">
+        <div class="ds-nm-hint">Укажите 1-3 артикула для пилотного запуска</div>
+        <div class="ds-nm-tags" id="dsNmTags">
+          <span class="ds-nm-tag">145839201 <span class="ds-nm-tag-remove" onclick="this.parentElement.remove()">&times;</span></span>
+          <span class="ds-nm-tag">78234512 <span class="ds-nm-tag-remove" onclick="this.parentElement.remove()">&times;</span></span>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-nm-input</span> <span class="mono">.ar-nm-tags</span> <span class="mono">.ar-nm-tag</span> <span class="mono">.ar-nm-tag-remove</span></span>
+          <span><strong>Used in:</strong> Auto-response settings (articles), Promo codes (articles)</span>
+        </div>
+      </div>
+      <p>
+        <strong>Behavior:</strong> Enter/comma commits tag. Backspace on empty input removes last tag.
+        &times; button removes specific tag. Tags: mono font, pill shape, tertiary bg.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.7 State Legend -->
+      <h3 id="state-legend">3.7 State Legend</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-state-row">
+          <div class="ds-state-item"><div class="ds-state-dot green"></div> АВТО — отправляется автоматически</div>
+          <div class="ds-state-item"><div class="ds-state-dot yellow"></div> ЧЕРНОВИК — AI готовит ответ, вы решаете</div>
+          <div class="ds-state-item"><div class="ds-state-dot red"></div> БЛОК — только вручную</div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-state-row</span> <span class="mono">.ar-state-dot</span></span>
+          <span><strong>Dot colors:</strong> <span class="mono">.green</span> (#0f7f4e) <span class="mono">.yellow</span> (#f9ab00) <span class="mono">.red</span> (#d93025)</span>
+        </div>
+      </div>
+      <p>
+        Dots: 8&times;8px circles. Flex row with 16px gap. Font: 11px secondary color.
+      </p>
+      <p>
+        <strong>Used in:</strong> Auto-response settings (bottom of scenario grid).
+      </p>
+
+      <!-- 3.8 Safety Notice -->
+      <h3 id="safety-notice">3.8 Safety Notice</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-safety-notice">
+          <div class="ds-safety-icon">&#9888;&#65039;</div>
+          <div class="ds-safety-text">
+            <strong>Безопасность:</strong> Негативные отзывы (1-3&#x2605;) никогда не получают авто-ответ. Каждый текст перед отправкой проверяется — запрещённые фразы, обещания возвратов, упоминания AI блокируются автоматически.
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-safety-notice</span> <span class="mono">.ar-safety-icon</span> <span class="mono">.ar-safety-text</span></span>
+          <span><strong>Used in:</strong> Auto-response settings (bottom)</span>
+        </div>
+      </div>
+      <p>
+        Background: <span class="mono">#fff8e1</span>, border: <span class="mono">#ffe082</span>, text: <span class="mono">#5d4037</span>.
+        Flex layout with 10px gap. Icon: 16px, flex-shrink 0. Text: 12px, line-height 1.5.
+      </p>
+      <p>
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.9 Top Bar Notification -->
+      <h3 id="topbar">3.9 Top Bar Notification</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-topbar">
+          <div class="ds-topbar-content">
+            <div class="ds-topbar-icon">&#x26A1;</div>
+            <div class="ds-topbar-text">
+              <strong>Экономьте до 3 часов в день</strong> — включите авто-ответы на частые обращения
+            </div>
+          </div>
+          <div class="ds-topbar-actions">
+            <button class="ds-topbar-btn primary">Настроить</button>
+            <button class="ds-topbar-dismiss" title="Скрыть">&times;</button>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.ar-topbar</span> <span class="mono">.ar-topbar-btn</span> <span class="mono">.ar-topbar-dismiss</span></span>
+          <span><strong>Used in:</strong> Chat Center (above main content)</span>
+        </div>
+      </div>
+      <p>
+        Gradient blue bar: <span class="mono">linear-gradient(135deg, #1a73e8, #1557b0)</span>.
+        CTA button: white bg, accent text. Dismiss: &times;, semi-transparent white.
+        Mobile: stacks vertically, actions span full width.
+      </p>
+      <p>
+        <strong>Production CSS:</strong> <span class="mono">index.css</span> line 4323.
+        <strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a>
+      </p>
+
+      <!-- 3.10 Promo Card -->
+      <h3 id="promo-card">3.10 Promo Card</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-promo-card" style="max-width:480px;">
+          <div class="ds-promo-card-header">
+            <span class="ds-promo-code-name">SPRING2026</span>
+            <span class="ds-promo-badge active">Активен</span>
+          </div>
+          <div class="ds-promo-meta">Скидка 15% &bull; Истекает 30.04.2026 &bull; Отправлено: 42</div>
+          <div class="ds-promo-channels">
+            <span class="ds-promo-channel on">Отзывы</span>
+            <span class="ds-promo-channel on">Вопросы</span>
+            <span class="ds-promo-channel">Чаты</span>
+          </div>
+        </div>
+        <div style="height:12px;"></div>
+        <div class="ds-promo-card" style="max-width:480px;">
+          <div class="ds-promo-card-header">
+            <span class="ds-promo-code-name">NEWYEAR25</span>
+            <span class="ds-promo-badge expired">Истёк</span>
+          </div>
+          <div class="ds-promo-meta">Скидка 10% &bull; Истёк 31.01.2026 &bull; Отправлено: 128</div>
+          <div class="ds-promo-channels">
+            <span class="ds-promo-channel">Отзывы</span>
+            <span class="ds-promo-channel">Вопросы</span>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.promo-card</span> <span class="mono">.promo-badge</span> <span class="mono">.promo-channel</span></span>
+          <span><strong>Badge:</strong> <span class="mono">.active</span> (green) <span class="mono">.expired</span> (gray)</span>
+          <span><strong>Used in:</strong> Promo codes page</span>
+        </div>
+      </div>
+      <p>
+        Card: white bg, border, 8px radius. Code name: mono font, 14px bold.
+        Channel pills: bordered, 11px. Active (.on): blue border + bg-active.
+      </p>
+      <p>
+        <strong>Production CSS:</strong> <span class="mono">index.css</span> line 3766.
+        <strong>Prototype:</strong> <a href="../prototypes/app-screens-v3-ru.html">app-screens-v3-ru.html</a> (SCREEN 7: PROMO CODES)
+      </p>
+
+      <!-- 3.11 Help Panel (Right Slide-out) -->
+      <h3 id="help-panel">3.11 Help Panel (Right Slide-out)</h3>
+      <div class="demo">
+        <div class="demo-label">Preview</div>
+        <div class="ds-help-panel-demo">
+          <button class="ds-help-close">&times;</button>
+          <div class="ds-help-title">Как работают промокоды</div>
+          <div class="ds-help-section">
+            <div class="ds-help-label">Логика выдачи</div>
+            <div class="ds-help-text">
+              Промокод автоматически добавляется в ответ на 5&#x2605; отзыв, если сценарий «Промокод за 5&#x2605;» активен в настройках авто-ответов.
+            </div>
+          </div>
+          <div class="ds-help-section">
+            <div class="ds-help-label">Важно</div>
+            <div class="ds-help-text">
+              Ответы на отзывы публичны — промокод увидят все посетители карточки товара.
+            </div>
+          </div>
+        </div>
+        <div class="demo-meta">
+          <span><strong>Classes:</strong> <span class="mono">.promo-help-panel</span> <span class="mono">.promo-help-close</span> <span class="mono">.promo-help-section</span></span>
+          <span><strong>Used in:</strong> Promo codes, potentially other pages</span>
+        </div>
+      </div>
+      <p>
+        Slide-out panel: fixed right, 360px wide, white bg, left border + shadow.
+        Animation: <span class="mono">slideInRight 0.2s ease</span>.
+        Toggle via <span class="mono">.open</span> class. Close: 28&times;28px button, top-right.
+        Mobile: width 100%.
+      </p>
+      <p>
+        <strong>Docs:</strong> <a href="./HELP_PANEL.md">HELP_PANEL.md</a>.
+        <strong>Production CSS:</strong> <span class="mono">index.css</span> line 4036.
+      </p>
+    </div>
+
+    <!-- ===== SECTION 4: PAGE LAYOUTS ===== -->
+    <div class="section" id="layouts">
+      <h2><span class="badge">4</span> Page Layouts</h2>
+      <p>
+        Основные макеты страниц Chat Center. Каждая страница строится внутри <span class="mono">.app-shell</span>
+        (sidebar + main content area).
+      </p>
+
+      <h3>Chat Center (3-panel)</h3>
+      <div class="layout-diagram">
+        <div class="layout-panel list">List<br><span style="font-size:10px;font-weight:400;">Queue sections<br>Filter pills</span></div>
+        <div class="layout-panel chat">Chat<br><span style="font-size:10px;font-weight:400;">Messages<br>AI suggestion<br>Reply input</span></div>
+        <div class="layout-panel context">Context<br><span style="font-size:10px;font-weight:400;">Product info<br>Timeline<br>Actions</span></div>
+      </div>
+      <p>
+        3-panel layout на desktop: список (flex: 1) + чат (flex: 1.8) + контекст (flex: 1).
+        Mobile: одна панель fullscreen, переключение через <span class="mono">data-mobile-view</span>.
+      </p>
+      <p><strong>Prototype:</strong> <a href="../prototypes/app-screens-v3-ru.html">app-screens-v3-ru.html</a> (SCREEN 3: CHAT CENTER)</p>
+
+      <h3>Settings Page (tabs)</h3>
+      <p>
+        Однопанельный layout с табами: Общие, AI, Промокоды.
+        Max-width: 640px, centered. Каждый таб — отдельная карточка (<span class="mono">.card</span>) с toggle + expand.
+      </p>
+      <p><strong>Prototype:</strong> <a href="../prototypes/app-screens-v3-ru.html">app-screens-v3-ru.html</a> (SCREEN 8: SETTINGS)</p>
+
+      <h3>Auto-Response Settings</h3>
+      <p>
+        Single card with expandable section. Contains: scope radio, channel checkboxes, preset grid,
+        scenario grid, safety notice. Master toggle controls visibility of the expand section.
+      </p>
+      <p><strong>Prototype:</strong> <a href="../prototypes/auto-response-settings.html">auto-response-settings.html</a></p>
+
+      <h3>Promo Codes</h3>
+      <p>
+        Вертикальный список карточек промокодов. Max-width: 780px. Каждая карточка expandable.
+        Help panel — slide-out справа.
+      </p>
+      <p><strong>Prototype:</strong> <a href="../prototypes/app-screens-v3-ru.html">app-screens-v3-ru.html</a> (SCREEN 7: PROMO CODES)</p>
+    </div>
+
+    <!-- ===== SECTION 5: PROTOTYPE LINKS ===== -->
+    <div class="section" id="prototypes">
+      <h2><span class="badge">5</span> Prototype Links</h2>
+      <p>
+        Ниже — таблица всех прототипов. Source of truth для дизайна — <span class="mono">app-screens-v3-ru.html</span>.
+      </p>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Prototype</th>
+            <th>Path</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>App Screens v3</strong></td>
+            <td><a href="../prototypes/app-screens-v3-ru.html"><span class="mono">prototypes/app-screens-v3-ru.html</span></a></td>
+            <td>Main app flow (source of truth). All screens: onboarding, dashboard, chat, analytics, settings, promo.</td>
+          </tr>
+          <tr>
+            <td><strong>Auto-Response Settings</strong></td>
+            <td><a href="../prototypes/auto-response-settings.html"><span class="mono">prototypes/auto-response-settings.html</span></a></td>
+            <td>Auto-response configuration UI. Toggle, scope, channels, presets, scenarios, safety notice.</td>
+          </tr>
+          <tr>
+            <td><strong>Chat Center Final</strong></td>
+            <td><a href="../prototypes/chat-center-final.html"><span class="mono">prototypes/chat-center-final.html</span></a></td>
+            <td>Chat center layout with 3-panel view. Real data structure.</td>
+          </tr>
+          <tr>
+            <td><strong>Landing</strong></td>
+            <td><a href="../prototypes/landing-next.html"><span class="mono">prototypes/landing-next.html</span></a></td>
+            <td>Landing page design. Dark theme, different design system.</td>
+          </tr>
+          <tr>
+            <td><strong>Scenario Screens</strong></td>
+            <td><a href="../prototypes/screen-scenarios.html"><span class="mono">prototypes/screen-scenarios.html</span></a></td>
+            <td>Scenario management screens.</td>
+          </tr>
+          <tr>
+            <td><strong>Chat Center Filters</strong></td>
+            <td><a href="../prototypes/chat-center-filters-demo.html"><span class="mono">prototypes/chat-center-filters-demo.html</span></a></td>
+            <td>Filter pills and advanced filter panel demo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== SECTION 6: RESPONSIVE BREAKPOINTS ===== -->
+    <div class="section" id="responsive">
+      <h2><span class="badge">6</span> Responsive Breakpoints</h2>
+      <p>
+        Chat Center использует 3 основных breakpoint-а. Принцип: mobile-first, progressive enhancement.
+      </p>
+
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Breakpoint</th>
+            <th>Range</th>
+            <th>Layout</th>
+            <th>Panels</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mobile</strong></td>
+            <td>&le; 768px</td>
+            <td>Single panel, full-width</td>
+            <td>One panel at a time. List &rarr; Chat &rarr; Context via <span class="mono">data-mobile-view</span>. Back button visible. Bottom sheet for filters.</td>
+          </tr>
+          <tr>
+            <td><strong>Tablet</strong></td>
+            <td>769 &ndash; 1024px</td>
+            <td>2 panels</td>
+            <td>List + Chat. Context hidden by default, shown as floating overlay on demand.</td>
+          </tr>
+          <tr>
+            <td><strong>Desktop</strong></td>
+            <td>&gt; 1024px</td>
+            <td>3 panels</td>
+            <td>List + Chat + Context side by side. Sidebar visible.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p>
+          <strong>Touch targets:</strong> minimum 44&times;44px on mobile.
+          <strong>Input font-size:</strong> &ge; 16px to avoid iOS auto-zoom.
+          <strong>Filter pills:</strong> horizontal scroll via <span class="mono">.filters-scroll</span> with <span class="mono">overflow-x: auto</span>.
+        </p>
+      </div>
+
+      <h3>CSS Variables (Spacing Scale)</h3>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono">--space-1</span></td><td>4px</td><td>Micro gaps</td></tr>
+          <tr><td><span class="mono">--space-2</span></td><td>8px</td><td>Tight padding</td></tr>
+          <tr><td><span class="mono">--space-3</span></td><td>12px</td><td>Card inner gap</td></tr>
+          <tr><td><span class="mono">--space-4</span></td><td>16px</td><td>Standard padding</td></tr>
+          <tr><td><span class="mono">--space-5</span></td><td>20px</td><td>Section padding</td></tr>
+          <tr><td><span class="mono">--space-6</span></td><td>24px</td><td>Large section margin</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Border Radius Tokens</h3>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono">--radius-sm</span></td><td>5px</td><td>Small elements, close buttons</td></tr>
+          <tr><td><span class="mono">--radius-md</span></td><td>6px</td><td>Inputs, buttons, badges</td></tr>
+          <tr><td><span class="mono">--radius-lg</span></td><td>8px</td><td>Cards, panels</td></tr>
+          <tr><td><span class="mono">--radius-pill</span></td><td>999px</td><td>Pills, tags, channel badges</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== SECTION 7: CSS CLASS REFERENCE ===== -->
+    <div class="section" id="css-reference">
+      <h2><span class="badge">7</span> CSS Class Reference</h2>
+      <p>
+        Полный список CSS-классов, используемых в Auto-Response и Promo UI.
+        Все классы определены в <span class="mono">apps/chat-center/frontend/src/index.css</span>.
+      </p>
+
+      <h3>Auto-Response (.ar-*) Classes</h3>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Element</th>
+            <th>Line</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono">.ar-card</span></td><td>Main settings card container</td><td>3228</td></tr>
+          <tr><td><span class="mono">.ar-card-header</span></td><td>Card header (title + toggle)</td><td>3236</td></tr>
+          <tr><td><span class="mono">.ar-card-title</span></td><td>Card title text</td><td>3243</td></tr>
+          <tr><td><span class="mono">.ar-card-desc</span></td><td>Card description</td><td>3248</td></tr>
+          <tr><td><span class="mono">.ar-expand</span></td><td>Expandable section</td><td>3255</td></tr>
+          <tr><td><span class="mono">.ar-section-block</span></td><td>Section block within expand</td><td>3261</td></tr>
+          <tr><td><span class="mono">.ar-section-label</span></td><td>Section label (12px, 600)</td><td>3266</td></tr>
+          <tr><td><span class="mono">.ar-scope-radio</span></td><td>Scope radio option</td><td>3284</td></tr>
+          <tr><td><span class="mono">.ar-radio-mark</span></td><td>Radio circle</td><td>3292</td></tr>
+          <tr><td><span class="mono">.ar-radio-content</span></td><td>Radio text content</td><td>3315</td></tr>
+          <tr><td><span class="mono">.ar-nm-input</span></td><td>NM ID input field</td><td>3323</td></tr>
+          <tr><td><span class="mono">.ar-nm-tags</span></td><td>Tags container</td><td>3338</td></tr>
+          <tr><td><span class="mono">.ar-nm-tag</span></td><td>Individual tag pill</td><td>3339</td></tr>
+          <tr><td><span class="mono">.ar-nm-tag-remove</span></td><td>Tag remove button (&times;)</td><td>3351</td></tr>
+          <tr><td><span class="mono">.ar-channel-check</span></td><td>Channel checkbox pill</td><td>3365</td></tr>
+          <tr><td><span class="mono">.ar-check-mark</span></td><td>Checkbox square</td><td>3382</td></tr>
+          <tr><td><span class="mono">.ar-check-label</span></td><td>Checkbox label</td><td>3406</td></tr>
+          <tr><td><span class="mono">.ar-preset-grid</span></td><td>Preset cards grid</td><td>3409</td></tr>
+          <tr><td><span class="mono">.ar-preset-card</span></td><td>Preset card</td><td>3414</td></tr>
+          <tr><td><span class="mono">.ar-preset-badge</span></td><td>Preset badge (absolute)</td><td>3431</td></tr>
+          <tr><td><span class="mono">.ar-scenario-grid</span></td><td>Scenario list container</td><td>3446</td></tr>
+          <tr><td><span class="mono">.ar-scenario-row</span></td><td>Scenario row</td><td>3453</td></tr>
+          <tr><td><span class="mono">.ar-scenario-check</span></td><td>Scenario checkbox</td><td>3472</td></tr>
+          <tr><td><span class="mono">.ar-scenario-badge</span></td><td>Scenario status badge</td><td>3512</td></tr>
+          <tr><td><span class="mono">.ar-scenario-separator</span></td><td>Section divider in grid</td><td>3531</td></tr>
+          <tr><td><span class="mono">.ar-state-row</span></td><td>State legend row</td><td>3547</td></tr>
+          <tr><td><span class="mono">.ar-state-dot</span></td><td>State dot (8px circle)</td><td>3560</td></tr>
+          <tr><td><span class="mono">.ar-safety-notice</span></td><td>Safety warning block</td><td>3570</td></tr>
+          <tr><td><span class="mono">.ar-topbar</span></td><td>Top bar notification</td><td>4323</td></tr>
+          <tr><td><span class="mono">.ar-topbar-btn</span></td><td>Top bar CTA button</td><td>4362</td></tr>
+          <tr><td><span class="mono">.ar-topbar-dismiss</span></td><td>Top bar dismiss button</td><td>4390</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Promo (.promo-*) Classes</h3>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Element</th>
+            <th>Line</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono">.promo-card</span></td><td>Promo code card</td><td>3766</td></tr>
+          <tr><td><span class="mono">.promo-badge</span></td><td>Status badge (active/expired)</td><td>3794</td></tr>
+          <tr><td><span class="mono">.promo-channel</span></td><td>Channel pill</td><td>3815</td></tr>
+          <tr><td><span class="mono">.promo-help-panel</span></td><td>Right slide-out panel</td><td>4036</td></tr>
+          <tr><td><span class="mono">.promo-help-close</span></td><td>Panel close button</td><td>4056</td></tr>
+          <tr><td><span class="mono">.promo-help-section</span></td><td>Panel content section</td><td>4079</td></tr>
+          <tr><td><span class="mono">.promo-help-label</span></td><td>Section label (10px uppercase)</td><td>4082</td></tr>
+          <tr><td><span class="mono">.promo-help-text</span></td><td>Section body text</td><td>4090</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Shared Classes</h3>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Element</th>
+            <th>Line</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="mono">.toggle</span></td><td>Toggle switch (42x24)</td><td>3201</td></tr>
+          <tr><td><span class="mono">.toggle.on</span></td><td>Toggle enabled state</td><td>3213</td></tr>
+          <tr><td><span class="mono">.settings-section-title</span></td><td>Section title (20px)</td><td>Settings</td></tr>
+          <tr><td><span class="mono">.settings-section-desc</span></td><td>Section description</td><td>Settings</td></tr>
+          <tr><td><span class="mono">.settings-save-row</span></td><td>Save button row</td><td>3662</td></tr>
+          <tr><td><span class="mono">.form-save</span></td><td>Save button (accent bg)</td><td>3644</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // Tag input demo
+    function dsHandleNmKey(e) {
+      const input = e.target;
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        const val = input.value.replace(/,/g, '').trim();
+        if (val && /^\d+$/.test(val)) {
+          const tags = document.getElementById('dsNmTags');
+          const tag = document.createElement('span');
+          tag.className = 'ds-nm-tag';
+          tag.innerHTML = val + ' <span class="ds-nm-tag-remove" onclick="this.parentElement.remove()">&times;</span>';
+          tags.appendChild(tag);
+          input.value = '';
+        }
+      } else if (e.key === 'Backspace' && input.value === '') {
+        const tags = document.getElementById('dsNmTags');
+        const last = tags.lastElementChild;
+        if (last) last.remove();
+      }
+    }
+  </script>
+</body>
+</html>

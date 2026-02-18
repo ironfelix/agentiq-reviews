@@ -3,6 +3,8 @@ import type {
   AuthResponse,
   AISettingsResponse,
   AISettingsUpdateRequest,
+  ApplyPresetRequest,
+  ApplyPresetResponse,
   Chat,
   ChatFilters,
   ChatsResponse,
@@ -20,6 +22,7 @@ import type {
   LoginRequest,
   Message,
   MessagesResponse,
+  PresetsResponse,
   PromoSettingsResponse,
   PromoSettingsUpdateRequest,
   RegisterRequest,
@@ -374,6 +377,16 @@ export const settingsApi = {
 
   updateAISettings: async (payload: AISettingsUpdateRequest): Promise<AISettingsResponse> => {
     const response = await api.put<AISettingsResponse>('/settings/ai', payload);
+    return response.data;
+  },
+
+  getAutoResponsePresets: async (): Promise<PresetsResponse> => {
+    const response = await api.get<PresetsResponse>('/settings/auto-response/presets');
+    return response.data;
+  },
+
+  applyPreset: async (payload: ApplyPresetRequest): Promise<ApplyPresetResponse> => {
+    const response = await api.post<ApplyPresetResponse>('/settings/auto-response/apply-preset', payload);
     return response.data;
   },
 };

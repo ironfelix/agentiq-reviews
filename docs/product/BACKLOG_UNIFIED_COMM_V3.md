@@ -1,6 +1,6 @@
 # Backlog — Unified Inbox v3 (WB: Reviews + Questions + Chats)
 
-**Last updated:** 2026-02-17
+**Last updated:** 2026-02-18
 **Source of truth UI:** `docs/prototypes/app-screens-v3-ru.html`
 
 ---
@@ -449,6 +449,39 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
     - Tasks: Ozon Reviews/Questions connectors, marketplace-aware ingestion.
     - Estimate: 3-5 дней.
 
+46. **BL-POST-011: Яндекс Маркет — Chat + Reviews интеграция**
+    - Goal: Поддержка YM как второго маркетплейса в unified inbox.
+    - Research: `docs/research/MARKETPLACE_COMM_API_RESEARCH.md`
+    - Tasks:
+      - `YMConnector` — Chat API v2: polling чатов (`WAITING_FOR_PARTNER`) + отправка
+      - Webhook handler (`CHAT_CREATED`, `CHAT_MESSAGE_SENT`, `NEW_FEEDBACK`) — endpoint в FastAPI, dedup по eventId, async AI (timeout webhook = 10 сек)
+      - Проактивные чаты: продавец инициирует чат по `orderId` — уведомление о доставке, cross-sell
+      - Reviews connector: `goods-feedback` → `Interaction`, webhook `NEW_FEEDBACK` → AI авто-ответ
+      - Фильтр `NEED_REACTION` — очередь необработанных отзывов
+      - Alembic migration: добавить `marketplace = 'ym'` в `Interaction.source`
+      - Настройки продавца: поле `ym_api_key` в `seller.credentials`
+    - Auth: API-Key в заголовке (проще, чем OAuth)
+    - Rate limit: 10 000 req/h (достаточно для polling)
+    - Ключевое vs WB: вебхуки (не polling) + orderId в чате (автосвязка с заказом)
+    - Estimate: 3-5 дней.
+    - Priority: POST-PILOT (Фаза 2 после пилота WB)
+
+47. **BL-POST-012: Авито — Messenger интеграция**
+    - Goal: Поддержка Авито как третьего канала (C2C/B2C, уникальная аудитория).
+    - Research: `docs/research/MARKETPLACE_COMM_API_RESEARCH.md`
+    - Tasks:
+      - OAuth 2.0 flow: per-seller авторизация, refresh tokens, scopes `messenger:read messenger:write`
+      - `AvitoConnector` — Messenger API v3: получать чаты + сообщения, отправлять ответы
+      - Webhook регистрация: `POST /messenger/v3/webhook` на `/api/webhooks/avito`, dedup, retry до 10 раз
+      - Ingestion: чат → `Interaction`, source = `avito`, контекст = item_id (не orderId)
+      - AI шаблоны для C2C тона (менее формальный, без WB/YM специфики)
+      - UI: новая вкладка/метка `Авито` в unified inbox (marketplace filter)
+      - Настройки: OAuth connect flow в Settings → Подключение
+    - Auth: OAuth 2.0 (сложнее Bearer/API-Key — нужен отдельный flow)
+    - Ключевой пробел: нет API отзывов → ценность ниже, чем WB/YM
+    - Estimate: 5-7 дней.
+    - Priority: POST-PILOT (Фаза 3, после WB + YM стабилизации)
+
 36. **BL-POST-003: Webhooks вместо polling**
     - Tasks: WB webhook subscription (когда будет доступен), fallback на polling.
     - Estimate: 2-3 дня.
@@ -468,6 +501,44 @@ See `docs/bugs/INBOX.md` items #21-42 for details.
 40. **BL-POST-007: Auto-response mode**
     - Tasks: AI auto-reply для low-risk questions (pre-purchase, positive feedback) с confidence threshold.
     - Estimate: 2-3 дня.
+
+43. **BL-POST-008: Auto-response Feedback Loop & ML Dataset**
+    - Goal: Собирать данные для улучшения модели авто-ответов.
+    - Tasks:
+      - Расширенный `InteractionEvent`: сохранять product_context, guardrails_warnings, response_time_ms, promo_inserted
+      - Таблица `auto_response_feedback`: seller 👍/👎 на авто-ответ + причина (неточный, не тот тон, ошибка в фактах)
+      - Трекинг customer reaction: если клиент ответил после авто-ответа → ответ не решил вопрос
+      - Трекинг изменения рейтинга: WB позволяет менять оценку → 1★→5★ = успех авто-ответа
+      - `POST /api/interactions/{id}/feedback` — оператор ставит 👍/👎
+      - `GET /api/auto-response/analytics` — sent/blocked/customer_replied/rating_changed/feedback_positive_rate
+      - Экспорт ML-датасета: text + rating + intent + response + customer_reaction + seller_feedback → CSV/JSON
+    - Data signals для улучшения модели:
+      - Customer reply after auto-response → ответ не решил вопрос → negative signal
+      - Seller 👎 → direct negative label
+      - Rating change after response → success/failure signal
+      - Guardrails false positives (seller sent manually what guardrails blocked) → relax rules
+      - Same intent, different responses → A/B data for prompt improvement
+    - Estimate: 3-4 дня.
+    - Priority: POST-PILOT (после сбора первых 200-500 авто-ответов).
+
+44. **BL-POST-009: Draft Approval Workflow**
+    - Goal: Завершить draft-режим для сценариев action="draft".
+    - Tasks:
+      - Сохранять черновик в `interaction.extra_data["pending_draft"]`
+      - `GET /api/interactions/{id}/pending-draft` — получить черновик
+      - `POST /api/interactions/{id}/approve-draft` — одобрить и отправить
+      - UI: кнопка "Отправить черновик" в чат-панели для draft-сценариев
+      - Notification: badge на чате "AI подготовил черновик"
+    - Estimate: 2-3 дня.
+
+45. **BL-POST-010: Customer Blacklist for Auto-Response**
+    - Goal: Исключить проблемных покупателей из авто-ответов.
+    - Tasks:
+      - `auto_response_blacklist_customers: list[int]` в sla_config
+      - Проверка перед отправкой в auto_response.py
+      - UI в настройках: список исключённых покупателей
+      - Auto-add: если seller 👎 на авто-ответ → предложить добавить в blacklist
+    - Estimate: 1 день.
 
 ---
 

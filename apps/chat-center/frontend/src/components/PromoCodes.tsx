@@ -16,7 +16,9 @@ function loadPromoCodes(): PromoCode[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Backward compat: ensure nm_ids field exists
+    return parsed.map((p: PromoCode) => ({ ...p, nm_ids: p.nm_ids || [] }));
   } catch {
     return [];
   }
@@ -86,6 +88,8 @@ export function PromoCodes(props: { user: User }) {
   const [draftDiscount, setDraftDiscount] = useState('10%');
   const [draftExpires, setDraftExpires] = useState('до конца месяца');
   const [draftScope, setDraftScope] = useState<'all' | 'selected'>('all');
+  const [draftNmIds, setDraftNmIds] = useState<number[]>([]);
+  const [draftNmText, setDraftNmText] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -157,12 +161,16 @@ export function PromoCodes(props: { user: User }) {
     const code = draftCode.trim().toUpperCase();
     if (!code) return;
     const ts = nowIso();
+    const nmIds = draftScope === 'all' ? [] : draftNmIds;
     const promo: PromoCode = {
       id: `promo_${Math.random().toString(16).slice(2)}_${Date.now()}`,
       code,
       discount_label: draftDiscount.trim() || '—',
       expires_label: draftExpires.trim() || 'без срока',
-      scope_label: draftScope === 'all' ? 'Все товары' : 'Выбранные артикулы',
+      scope_label: draftScope === 'all'
+        ? 'Все товары'
+        : `Артикулы: ${nmIds.join(', ')}`,
+      nm_ids: nmIds,
       sent_count: 0,
       active: true,
       channels: defaultChannels(),
@@ -171,6 +179,9 @@ export function PromoCodes(props: { user: User }) {
     };
     setItems((prev) => [promo, ...prev].slice(0, MAX_PROMOS));
     setDraftCode('');
+    setDraftNmIds([]);
+    setDraftNmText('');
+    setDraftScope('all');
     setShowAddForm(false);
   };
 
@@ -332,7 +343,7 @@ export function PromoCodes(props: { user: User }) {
                     type="radio"
                     name="promo-scope"
                     checked={draftScope === 'all'}
-                    onChange={() => setDraftScope('all')}
+                    onChange={() => { setDraftScope('all'); setDraftNmIds([]); setDraftNmText(''); }}
                   />
                   Все товары
                 </label>
@@ -346,6 +357,63 @@ export function PromoCodes(props: { user: User }) {
                   Выбранные артикулы
                 </label>
               </div>
+              {draftScope === 'selected' && (
+                <div className="promo-nm-wrap">
+                  <input
+                    type="text"
+                    className="promo-nm-input"
+                    placeholder="Введите артикул и нажмите Enter"
+                    value={draftNmText}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (/[,;]\s*$/.test(v)) {
+                        const num = parseInt(v.replace(/[,;\s]+$/, ''), 10);
+                        if (!isNaN(num) && !draftNmIds.includes(num)) {
+                          setDraftNmIds((prev) => [...prev, num]);
+                        }
+                        setDraftNmText('');
+                      } else {
+                        setDraftNmText(v);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const num = parseInt(draftNmText.trim(), 10);
+                        if (!isNaN(num) && !draftNmIds.includes(num)) {
+                          setDraftNmIds((prev) => [...prev, num]);
+                        }
+                        setDraftNmText('');
+                      } else if (e.key === 'Backspace' && draftNmText === '' && draftNmIds.length > 0) {
+                        setDraftNmIds((prev) => prev.slice(0, -1));
+                      }
+                    }}
+                    onBlur={() => {
+                      const num = parseInt(draftNmText.trim(), 10);
+                      if (!isNaN(num) && !draftNmIds.includes(num)) {
+                        setDraftNmIds((prev) => [...prev, num]);
+                      }
+                      setDraftNmText('');
+                    }}
+                  />
+                  {draftNmIds.length > 0 && (
+                    <div className="promo-nm-tags">
+                      {draftNmIds.map((nm) => (
+                        <span key={nm} className="promo-nm-tag">
+                          {nm}
+                          <span
+                            className="promo-nm-tag-remove"
+                            onClick={() => setDraftNmIds((prev) => prev.filter((n) => n !== nm))}
+                          >
+                            &times;
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="promo-nm-hint">Артикулы WB (nm_id), напр. 145839201</div>
+                </div>
+              )}
             </div>
           </div>
           <div className="promo-form-actions">

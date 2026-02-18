@@ -21,5 +21,8 @@
 ## Market Segments
 - `market-segments/healthcare-clinics-analysis.md`
 
+## Marketplace API Research
+- `MARKETPLACE_COMM_API_RESEARCH.md` — Яндекс Маркет + Авито: чаты, вебхуки, отзывы, возможности для повторных продаж (2026-02-18)
+
 ## Outreach
 - `COLD_OUTREACH_SELLERS.md`

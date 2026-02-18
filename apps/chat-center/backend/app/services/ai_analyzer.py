@@ -153,6 +153,7 @@ INTENTS = {
     "product_spec": "Характеристики товара",
     "refund_exchange": "Возврат или обмен",
     "thanks": "Благодарность",
+    "quality_complaint": "Жалоба на качество",
     # Pre-purchase intents (HIGH priority - potential sale!)
     "pre_purchase": "Вопрос перед покупкой",
     "sizing_fit": "Какой размер выбрать?",
@@ -174,6 +175,7 @@ SLA_PRIORITIES = {
     "delivery_delay": "high",
     "cancel_request": "high",
     # P2 (normal) < 4 hours
+    "quality_complaint": "normal",
     "refund_exchange": "normal",
     "delivery_status": "normal",
     # P3 (low) < 24 hours

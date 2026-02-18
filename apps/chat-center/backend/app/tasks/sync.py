@@ -1510,6 +1510,19 @@ def process_auto_responses(self):
                             if sent:
                                 total_sent += 1
 
+                                # Random delay between auto-responses
+                                import random as _random
+                                delay_cfg = sla_config.get("auto_response_delay", {})
+                                min_sec = delay_cfg.get("min_seconds", 3)
+                                max_sec = delay_cfg.get("max_seconds", 8)
+                                word_factor = delay_cfg.get("word_count_factor", 0.025)
+                                msg_text = interaction.text or ""
+                                word_count = len(msg_text.split())
+                                base_delay = _random.uniform(min_sec, max_sec)
+                                total_delay = min(base_delay + word_count * word_factor, 12)
+                                import asyncio as _asyncio
+                                await _asyncio.sleep(total_delay)
+
                         except Exception as exc:
                             logger.warning(
                                 "auto_response: error processing interaction=%s seller=%s: %s",

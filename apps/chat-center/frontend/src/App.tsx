@@ -5,7 +5,8 @@ import { FolderStrip } from './components/FolderStrip';
 import { Login } from './components/Login';
 import { MarketplaceOnboarding } from './components/MarketplaceOnboarding';
 import { SettingsPage } from './components/SettingsPage';
-import { authApi, chatApi, getToken, interactionsApi } from './services/api';
+import { AutoResponseTopBar } from './components/AutoResponseTopBar';
+import { authApi, chatApi, getToken, interactionsApi, settingsApi } from './services/api';
 import { usePolling } from './hooks/usePolling';
 import type {
   AIAnalysis,
@@ -460,6 +461,9 @@ function App() {
     replyActivityWindowDays: 30,
   });
 
+  // Auto-response top bar: track whether auto_replies_positive is enabled
+  const [autoResponseEnabled, setAutoResponseEnabled] = useState(true); // default true to hide bar until loaded
+
   // Persist active workspace to sessionStorage
   useEffect(() => {
     try { sessionStorage.setItem('agentiq_workspace', activeWorkspace); } catch { /* ignore */ }
@@ -547,6 +551,23 @@ function App() {
     };
     checkAuth();
   }, []);
+
+  // Fetch AI settings to check auto_replies_positive for top bar
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    settingsApi.getAISettings()
+      .then((res) => {
+        if (cancelled) return;
+        setAutoResponseEnabled(res.settings?.auto_replies_positive ?? false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // On error, assume disabled so the bar shows
+        setAutoResponseEnabled(false);
+      });
+    return () => { cancelled = true; };
+  }, [user]);
 
   const handleLogin = useCallback((loggedInUser: User) => {
     setUser(loggedInUser);
@@ -1407,6 +1428,11 @@ function App() {
   ).length;
   const showDemoBanner = connectionSkipped && !user.has_api_credentials;
 
+  const handleNavigateToAutoResponseSettings = () => {
+    window.location.hash = '#settings-ai';
+    setActiveWorkspace('settings');
+  };
+
   const getReadinessBadgeClass = (status: string) => {
     if (status === 'fail') return 'insight-badge urgent';
     if (status === 'warn') return 'insight-badge warning';
@@ -1426,6 +1452,10 @@ function App() {
           </button>
         </div>
       )}
+      <AutoResponseTopBar
+        autoResponseEnabled={autoResponseEnabled}
+        onNavigateToSettings={handleNavigateToAutoResponseSettings}
+      />
       <div className="app-shell">
         <nav className={`sidebar${isSidebarCollapsed ? ' collapsed' : ''}`}>
           <div className="sidebar-logo">AGENT<span>IQ</span></div>
