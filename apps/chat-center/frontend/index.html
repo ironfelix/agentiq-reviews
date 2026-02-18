@@ -2,42 +2,26 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AgentIQ — Центр контроля коммуникаций Wildberries</title>
-    <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, AI-аналитика, контроль качества ответов. Бесплатный аудит коммуникаций для продавцов WB.">
-    <meta name="keywords" content="Wildberries, WB, управление отзывами, чаты Wildberries, вопросы покупателей, аналитика WB, продавец Wildberries, контроль коммуникаций, аудит WB, рейтинг карточки, ответы на отзывы">
-    <meta name="author" content="AgentIQ">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#1a73e8">
-    <link rel="canonical" href="https://agentiq.ru/">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций Wildberries">
-    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный аудит коммуникаций для продавцов WB.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentIQ — Все коммуникации Wildberries в одном окне</title>
+    <meta name="description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, аналитика, контроль качества ответов.">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="AgentIQ — Центр контроля коммуникаций WB">
+    <meta property="og:description" content="Все чаты, вопросы и отзывы Wildberries в одном месте. Бесплатный анализ коммуникаций.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://agentiq.ru/">
-    <meta property="og:image" content="https://agentiq.ru/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:locale" content="ru_RU">
-    <meta property="og:site_name" content="AgentIQ">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AgentIQ — Центр контроля коммуникаций Wildberries">
-    <meta name="twitter:description" content="Все чаты, вопросы и отзывы WB в одном месте. Приоритизация, аналитика, бесплатный аудит.">
-    <meta name="twitter:image" content="https://agentiq.ru/og-image.png">
-
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-weight='700' font-size='16' fill='white' letter-spacing='0.5'%3EIQ%3C/text%3E%3C/svg%3E">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"AgentIQ","url":"https://agentiq.ru","logo":"https://agentiq.ru/og-image.png","description":"Центр контроля коммуникаций для продавцов Wildberries"},{"@type":"WebPage","name":"AgentIQ — Центр контроля коммуникаций Wildberries","description":"Все чаты, вопросы и отзывы Wildberries в одном месте. Приоритизация, AI-аналитика, контроль качества ответов.","url":"https://agentiq.ru/","inLanguage":"ru"},{"@type":"SoftwareApplication","name":"AgentIQ","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":[{"@type":"Offer","name":"Коммуникационный аудит WB","price":"0","priceCurrency":"RUB"},{"@type":"Offer","name":"Центр контроля коммуникаций","price":"4990","priceCurrency":"RUB"}]}]}</script>
     <style>
-        /* ===== DESIGN SYSTEM (synced with app-screens-v2.html) ===== */
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===== DESIGN SYSTEM (from chat-center.html) ===== */
         :root {
+            /* Colors — chat-center palette */
             --color-bg-primary: #ffffff;
             --color-bg-secondary: #fafbfc;
             --color-bg-tertiary: #f8f9fa;
@@ -53,51 +37,46 @@
             --color-border-dark: #dadce0;
 
             --color-accent: #1a73e8;
-            --color-accent-light: #e8f0fe;
+            --color-accent-light: #4a90e8;
+            --color-accent-bg: rgba(26, 115, 232, 0.06);
+            --color-accent-bg-strong: rgba(26, 115, 232, 0.12);
+
             --color-urgent: #ea4335;
             --color-success: #34a853;
             --color-warning: #f9ab00;
 
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
+            /* CTA — warm accent for conversion */
+            --color-cta: #1a73e8;
+            --color-cta-hover: #1565c0;
+            --color-cta-shadow: rgba(26, 115, 232, 0.25);
+
+            /* Spacing Scale (4px base) — from chat-center */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+
+            /* Typography — from chat-center */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            /* Border Radius — from chat-center */
+            --radius-sm: 5px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 14px;
             --radius-xl: 16px;
-            --radius-pill: 100px;
+            --radius-2xl: 20px;
+            --radius-full: 9999px;
 
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-
-            --transition-fast: 0.15s ease;
-            --transition-medium: 0.25s ease;
+            /* Transitions — from chat-center */
+            --transition-fast: 0.12s ease;
+            --transition-medium: 0.2s ease;
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
             --container-max: 1080px;
-        }
-
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Thin scrollbars (product-style) */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,0,0,0.15) transparent;
-        }
-        *::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        *::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        *::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.15);
-            border-radius: 3px;
-        }
-        *::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.25);
+            --section-gap: 100px;
         }
 
         html {
@@ -107,8 +86,8 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--color-bg-secondary);
+            font-family: var(--font-family);
+            background: var(--color-bg-primary);
             color: var(--color-text-primary);
             line-height: 1.6;
             overflow-x: hidden;
@@ -119,11 +98,42 @@
         .container {
             max-width: var(--container-max);
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 var(--space-6);
         }
 
         @media (min-width: 768px) {
-            .container { padding: 0 32px; }
+            .container { padding: 0 40px; }
+        }
+
+        /* ===== SUBTLE BACKGROUND PATTERN ===== */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(26, 115, 232, 0.04) 0%, transparent 70%);
+        }
+
+        .gradient-bg::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(26, 115, 232, 0.03) 0%, transparent 70%);
         }
 
         /* ===== NAVBAR ===== */
@@ -133,9 +143,16 @@
             left: 0;
             right: 0;
             z-index: 100;
-            background: var(--color-bg-primary);
+            padding: var(--space-4) 0;
+            transition: all var(--transition-medium);
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--color-border-medium);
-            padding: 16px 0;
+            padding: var(--space-3) 0;
         }
 
         .navbar-inner {
@@ -148,38 +165,14 @@
             display: flex;
             align-items: center;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 700;
-            letter-spacing: -0.3px;
+            letter-spacing: 0.8px;
             color: var(--color-text-primary);
         }
 
         .logo span {
             color: var(--color-accent);
-        }
-
-        .navbar-links {
-            display: none;
-        }
-
-        @media (min-width: 768px) {
-            .navbar-links {
-                display: flex;
-                align-items: center;
-                gap: 24px;
-            }
-
-            .navbar-links a {
-                font-size: 13px;
-                font-weight: 500;
-                color: var(--color-text-secondary);
-                text-decoration: none;
-                transition: color var(--transition-fast);
-            }
-
-            .navbar-links a:hover {
-                color: var(--color-text-primary);
-            }
         }
 
         .navbar-cta {
@@ -190,22 +183,24 @@
             .navbar-cta {
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
+                gap: var(--space-2);
                 padding: 10px 20px;
-                background: var(--color-accent);
-                color: white;
+                background: var(--color-text-primary);
+                color: var(--color-bg-primary);
                 border: none;
-                border-radius: var(--radius-md);
+                border-radius: var(--radius-full);
                 font-family: inherit;
                 font-size: 13px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all var(--transition-fast);
+                transition: all var(--transition-medium);
                 text-decoration: none;
             }
 
             .navbar-cta:hover {
-                background: #1557b0;
+                background: #2a2a2a;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+                transform: translateY(-1px);
             }
 
             .navbar-cta:active {
@@ -215,25 +210,26 @@
 
         /* ===== HERO ===== */
         .hero {
-            background: var(--color-bg-primary);
-            padding: 100px 0 60px;
+            position: relative;
+            z-index: 1;
+            padding: 120px 0 80px;
         }
 
         @media (min-width: 768px) {
-            .hero { padding: 120px 0 80px; }
+            .hero { padding: 140px 0 100px; }
         }
 
         .hero-layout {
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 48px;
         }
 
         @media (min-width: 768px) {
             .hero-layout {
                 flex-direction: row;
                 align-items: flex-start;
-                gap: 48px;
+                gap: 60px;
             }
         }
 
@@ -245,30 +241,41 @@
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 12px 4px 6px;
-            background: var(--color-accent-light);
-            border-radius: var(--radius-pill);
+            gap: var(--space-2);
+            padding: 5px 14px 5px 8px;
+            background: var(--color-accent-bg);
+            border: 1px solid rgba(26, 115, 232, 0.12);
+            border-radius: var(--radius-full);
             font-size: 12px;
             font-weight: 600;
             color: var(--color-accent);
-            margin-bottom: 24px;
+            margin-bottom: var(--space-6);
+            animation: fade-up 0.6s ease forwards;
+            opacity: 0;
         }
 
         .hero-badge-dot {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             background: var(--color-accent);
             border-radius: 50%;
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         .hero h1 {
-            font-size: clamp(28px, 5vw, 44px);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -1px;
+            font-size: clamp(30px, 5vw, 52px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
             color: var(--color-text-primary);
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
+            animation: fade-up 0.6s ease 0.1s forwards;
+            opacity: 0;
         }
 
         .hero h1 .highlight {
@@ -276,146 +283,255 @@
         }
 
         .hero-subtitle {
-            font-size: clamp(14px, 1.6vw, 16px);
+            font-size: clamp(15px, 1.8vw, 18px);
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.65;
             max-width: 520px;
-            margin-bottom: 32px;
+            margin-bottom: 36px;
+            animation: fade-up 0.6s ease 0.2s forwards;
+            opacity: 0;
         }
 
         .hero-cta-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 40px;
+            gap: var(--space-3);
+            margin-bottom: 44px;
+            animation: fade-up 0.6s ease 0.3s forwards;
+            opacity: 0;
         }
 
         .btn-primary {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 14px 24px;
-            background: var(--color-accent);
-            color: white;
+            gap: var(--space-2);
+            padding: 14px 28px;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-full);
             font-family: inherit;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
             text-decoration: none;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary:hover {
-            background: #1557b0;
+            background: #2a2a2a;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
         }
 
         .btn-primary:active {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
         }
 
         .btn-secondary {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
             padding: 14px 24px;
             background: transparent;
             color: var(--color-text-secondary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border-dark);
+            border-radius: var(--radius-full);
             font-family: inherit;
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
             text-decoration: none;
         }
 
         .btn-secondary:hover {
             color: var(--color-text-primary);
-            border-color: var(--color-border-dark);
-            background: var(--color-bg-hover);
+            border-color: var(--color-text-tertiary);
+            background: var(--color-bg-tertiary);
         }
 
         .hero-proof {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            animation: fade-up 0.6s ease 0.4s forwards;
+            opacity: 0;
         }
 
         @media (min-width: 768px) {
             .hero-proof {
                 flex-shrink: 0;
-                width: 220px;
-                padding-top: 40px;
+                width: 200px;
+                padding-top: 60px;
             }
         }
 
         .hero-proof-item {
-            padding: 20px;
-            background: var(--color-bg-primary);
+            flex: 1;
+            padding: 16px;
+            background: var(--color-bg-secondary);
             border: 1px solid var(--color-border-medium);
             border-radius: var(--radius-lg);
-            transition: all var(--transition-fast);
-        }
-
-        .hero-proof-item:hover {
-            border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .hero-proof-value {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             letter-spacing: -0.5px;
             color: var(--color-text-primary);
-            margin-bottom: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-proof-value {
+                font-size: 26px;
+            }
         }
 
         .hero-proof-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--color-text-tertiary);
-            line-height: 1.4;
+            line-height: 1.35;
         }
 
         .hero-proof-source {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--color-text-tertiary);
+            opacity: 0.7;
             margin-top: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-proof-source {
+                margin-top: 2px;
+            }
+        }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            padding: 60px 0;
+            background: var(--color-bg-secondary);
+        }
+
+        @media (min-width: 768px) {
+            .testimonials {
+                padding: 80px 0;
+            }
+        }
+
+        .testimonials-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .testimonials-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        @media (min-width: 768px) {
+            .testimonials-title {
+                font-size: 34px;
+            }
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+            transition: all var(--transition-fast);
+        }
+
+        .testimonial-card:hover {
+            background: var(--color-bg-active);
+            border-color: var(--color-accent);
+        }
+
+        .testimonial-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            font-weight: 500;
         }
 
         /* ===== SECTION COMMON ===== */
         .section {
-            padding: 60px 0;
+            position: relative;
+            z-index: 1;
+            padding: 70px 0;
         }
 
         @media (min-width: 768px) {
-            .section { padding: 80px 0; }
+            .section { padding: var(--section-gap) 0; }
         }
 
         .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--color-accent);
-            margin-bottom: 12px;
+            margin-bottom: var(--space-3);
+        }
+
+        .section-label::before {
+            content: '';
+            width: 16px;
+            height: 2px;
+            background: var(--color-accent);
+            border-radius: 1px;
         }
 
         .section-title {
-            font-size: clamp(24px, 3vw, 32px);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.3;
-            margin-bottom: 16px;
+            font-size: clamp(26px, 3.5vw, 38px);
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            line-height: 1.15;
+            margin-bottom: var(--space-4);
             color: var(--color-text-primary);
         }
 
         .section-subtitle {
-            font-size: clamp(14px, 1.5vw, 16px);
+            font-size: clamp(15px, 1.6vw, 17px);
             color: var(--color-text-secondary);
-            max-width: 540px;
+            max-width: 520px;
             line-height: 1.6;
         }
 
@@ -427,8 +543,8 @@
         .pain-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
+            gap: var(--space-3);
+            margin-top: 40px;
         }
 
         @media (min-width: 768px) {
@@ -436,37 +552,58 @@
         }
 
         .pain-card {
-            padding: 20px;
+            padding: var(--space-6);
             background: var(--color-bg-primary);
             border: 1px solid var(--color-border-medium);
+            border-left: 3px solid var(--color-accent);
             border-radius: var(--radius-lg);
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-urgent), transparent);
+            opacity: 0;
+            transition: opacity var(--transition-medium);
         }
 
         .pain-card:hover {
             border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            border-left-color: var(--color-accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transform: translateY(-2px);
+        }
+
+        .pain-card:hover::before {
+            opacity: 1;
         }
 
         .pain-card h3 {
             font-size: 15px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
 
         .pain-card p {
             font-size: 13px;
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.55;
         }
 
         /* ===== COMPARISON SECTION ===== */
         .comparison {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
+            gap: var(--space-4);
+            margin-top: 40px;
         }
 
         @media (min-width: 768px) {
@@ -474,16 +611,10 @@
         }
 
         .comparison-card {
-            padding: 24px;
+            padding: 28px;
             border-radius: var(--radius-lg);
             border: 1px solid var(--color-border-medium);
-            background: var(--color-bg-primary);
-            transition: all var(--transition-fast);
-        }
-
-        .comparison-card:hover {
-            border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            position: relative;
         }
 
         .comparison-card.old {
@@ -491,18 +622,20 @@
         }
 
         .comparison-card.new {
+            background: var(--color-bg-primary);
             border-color: var(--color-accent);
+            box-shadow: 0 0 0 1px var(--color-accent), 0 2px 12px rgba(26, 115, 232, 0.08);
         }
 
         .comparison-tag {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: var(--radius-pill);
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            margin-bottom: var(--space-4);
         }
 
         .comparison-card.old .comparison-tag {
@@ -511,14 +644,14 @@
         }
 
         .comparison-card.new .comparison-tag {
-            background: var(--color-accent-light);
+            background: var(--color-accent-bg);
             color: var(--color-accent);
         }
 
         .comparison-card h3 {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: var(--space-4);
             color: var(--color-text-primary);
         }
 
@@ -526,22 +659,22 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: var(--space-3);
         }
 
         .comparison-list li {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .comparison-list .icon {
             flex-shrink: 0;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -560,12 +693,67 @@
             color: var(--color-success);
         }
 
+        /* ===== HOW IT WORKS ===== */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+            margin-top: 40px;
+        }
+
+        @media (min-width: 900px) {
+            .steps-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .step-card {
+            padding: 26px 24px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-medium);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            border-color: var(--color-border-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: var(--color-accent-bg-strong);
+            border: 1px solid rgba(26, 115, 232, 0.16);
+            color: var(--color-accent);
+            font-weight: 900;
+            letter-spacing: 0.2px;
+            margin-bottom: 12px;
+        }
+
+        .step-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        .step-card p {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
         /* ===== FEATURES SECTION ===== */
         .features-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
+            gap: var(--space-4);
+            margin-top: 40px;
         }
 
         @media (min-width: 640px) {
@@ -573,34 +761,99 @@
         }
 
         .feature-card {
-            padding: 20px;
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-lg);
-            transition: all var(--transition-fast);
+            padding: 26px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--radius-2xl);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
+            transition: all var(--transition-medium);
             position: relative;
+            overflow: hidden;
         }
 
         .feature-card:hover {
-            border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            border-color: rgba(0,0,0,0.16);
+            transform: translateY(-2px);
+            box-shadow: 0 18px 48px rgba(0,0,0,0.08);
         }
 
-        .feature-number {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 48px;
-            font-weight: 700;
-            color: rgba(26, 115, 232, 0.06);
-            line-height: 1;
-            pointer-events: none;
+        .feature-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feature-chip {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            color: rgba(26,115,232,0.95);
+            background: rgba(26,115,232,0.10);
+            border: 1px solid rgba(26,115,232,0.18);
+            white-space: nowrap;
+        }
+
+        .feature-chip i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(26,115,232,0.85);
+            display: inline-block;
+        }
+
+        .feature-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.06);
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .feature-icon.queue {
+            background: rgba(26,115,232,0.10);
+            border-color: rgba(26,115,232,0.18);
+            color: rgba(26,115,232,0.95);
+        }
+
+        .feature-icon.deadline {
+            background: rgba(249,171,0,0.14);
+            border-color: rgba(249,171,0,0.22);
+            color: rgba(160,90,0,0.95);
+        }
+
+        .feature-icon.ai {
+            background: rgba(103,58,183,0.10);
+            border-color: rgba(103,58,183,0.18);
+            color: rgba(103,58,183,0.95);
+        }
+
+        .feature-icon.quality {
+            background: rgba(52,168,83,0.10);
+            border-color: rgba(52,168,83,0.18);
+            color: rgba(52,168,83,0.95);
         }
 
         .feature-card h3 {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
 
@@ -610,12 +863,31 @@
             line-height: 1.6;
         }
 
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .feature-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+            color: rgba(0,0,0,0.62);
+            font-size: 11px;
+            font-weight: 750;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
         /* ===== MONEY SECTION ===== */
         .money-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
+            gap: var(--space-3);
+            margin-top: 40px;
         }
 
         @media (min-width: 768px) {
@@ -623,37 +895,38 @@
         }
 
         .money-card {
-            padding: 20px;
+            padding: var(--space-6);
             background: var(--color-bg-primary);
             border: 1px solid var(--color-border-medium);
             border-radius: var(--radius-lg);
             text-align: center;
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
         }
 
         .money-card:hover {
             border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transform: translateY(-2px);
         }
 
         .money-card h3 {
             font-size: 15px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
 
         .money-card p {
             font-size: 13px;
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .money-bottom-text {
-            margin-top: 24px;
-            padding: 20px;
-            background: var(--color-accent-light);
-            border: 1px solid var(--color-border-medium);
+            margin-top: var(--space-6);
+            padding: var(--space-5);
+            background: var(--color-accent-bg);
+            border: 1px solid rgba(26, 115, 232, 0.1);
             border-radius: var(--radius-lg);
             font-size: 14px;
             color: var(--color-text-secondary);
@@ -661,64 +934,336 @@
             text-align: center;
         }
 
+        /* ===== CASES CAROUSEL ===== */
+        .cases-slider {
+            position: relative;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+        }
+
+        .cases-gallery {
+            --snap-max: 560px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding: 6px max(16px, calc((100vw - var(--snap-max)) / 2)) 18px;
+            scroll-snap-type: x mandatory;
+            scroll-padding-inline: max(16px, calc((100vw - var(--snap-max)) / 2));
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x pan-y;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .cases-gallery::-webkit-scrollbar { display: none; }
+
+        .case-card {
+            flex: 0 0 auto;
+            width: min(92vw, var(--snap-max));
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--color-border-medium);
+        }
+
+        .cases-slider::before,
+        .cases-slider::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(22px, 6vw, 96px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .cases-slider::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--color-bg-secondary), rgba(250,251,252,0));
+        }
+        .cases-slider::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--color-bg-secondary), rgba(250,251,252,0));
+        }
+
+        .cases-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .cases-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border-medium);
+            background: rgba(255,255,255,0.9);
+            color: var(--color-text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .cases-arrow:hover {
+            border-color: var(--color-border-dark);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        .cases-arrow:active { transform: scale(0.98); }
+
+        .cases-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        .cases-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.15);
+            transition: all var(--transition-fast);
+        }
+        .cases-dot.active {
+            width: 22px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.75);
+        }
+
+        .case-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .case-subtitle {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .review-box {
+            background: #f9fafb;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--color-accent);
+        }
+
+        .review-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .review-stars {
+            color: var(--color-warning);
+        }
+
+        .review-text {
+            font-size: 13px;
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .response-box {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .response-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .response-text {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .comparison-side {
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            border: 2px solid var(--color-border-medium);
+        }
+
+        .comparison-side.before {
+            border-color: #fca5a5;
+        }
+
+        .comparison-side.after {
+            border-color: #86efac;
+        }
+
+        .comparison-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .comparison-side.before .comparison-label {
+            color: var(--color-urgent);
+        }
+
+        .comparison-side.after .comparison-label {
+            color: var(--color-success);
+        }
+
+        .comparison-text {
+            font-size: 12px;
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag {
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tag.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .tag.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .insight-box {
+            background: #fef3c7;
+            border-left: 3px solid var(--color-warning);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .insight-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .insight-text {
+            font-size: 12px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .case-card {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cases-arrow { display: none; }
+        }
+
         /* ===== OFFER SECTION ===== */
         .offer-wrapper {
-            margin-top: 32px;
+            margin-top: 40px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: var(--space-5);
         }
 
         @media (min-width: 768px) {
             .offer-wrapper { grid-template-columns: 1fr 1fr; }
         }
-
         .offer-card {
-            padding: 24px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--color-border-medium);
-            background: var(--color-bg-primary);
-            transition: all var(--transition-fast);
+            padding: 32px;
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.06);
         }
-
-        .offer-card:hover {
-            border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
-        }
-
         .offer-card.primary {
-            border-color: var(--color-accent);
+            border-color: rgba(0,0,0,0.82);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.82), 0 16px 46px rgba(0,0,0,0.10);
         }
 
+        .offer-card.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--color-text-primary);
+        }
         .offer-card.secondary {
-            background: var(--color-bg-secondary);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
         }
 
         .offer-badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: var(--radius-pill);
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            margin-bottom: var(--space-4);
         }
 
         .offer-card.primary .offer-badge {
-            background: var(--color-accent-light);
-            color: var(--color-accent);
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
         }
 
         .offer-card.secondary .offer-badge {
-            background: var(--color-bg-tertiary);
-            color: var(--color-text-tertiary);
+            background: var(--color-accent-bg);
+            color: var(--color-accent);
         }
 
         .offer-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--space-3);
             color: var(--color-text-primary);
         }
 
@@ -726,7 +1271,7 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
         }
 
         .offer-checklist {
@@ -734,16 +1279,19 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 24px;
+            margin-bottom: var(--space-6);
         }
-
         .offer-checklist li {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
+            gap: var(--space-2);
             font-size: 13px;
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.06);
         }
 
         .offer-checklist .check {
@@ -757,25 +1305,25 @@
             align-items: center;
             justify-content: center;
             font-size: 10px;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .offer-price {
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: var(--space-2);
+            margin-bottom: var(--space-5);
         }
 
         .offer-price .amount {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
             color: var(--color-text-primary);
         }
 
         .offer-price .period {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--color-text-tertiary);
         }
 
@@ -783,26 +1331,28 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: var(--space-2);
             width: 100%;
-            padding: 14px 24px;
+            padding: 13px var(--space-5);
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-full);
             font-family: inherit;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
             text-decoration: none;
         }
 
         .btn-offer.primary {
-            background: var(--color-accent);
-            color: white;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
         }
 
         .btn-offer.primary:hover {
-            background: #1557b0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transform: translateY(-1px);
         }
 
         .btn-offer.primary:active {
@@ -811,22 +1361,33 @@
 
         .btn-offer.secondary {
             background: transparent;
-            color: var(--color-text-secondary);
-            border: 1px solid var(--color-border-medium);
+            color: var(--color-accent);
+            border: 1px solid var(--color-border-dark);
         }
 
         .btn-offer.secondary:hover {
-            background: var(--color-bg-hover);
-            border-color: var(--color-border-dark);
-            color: var(--color-text-primary);
+            background: var(--color-accent-bg);
+            border-color: var(--color-accent);
         }
+
+        .offer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            font-size: 13px;
+            font-weight: 650;
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+        .offer-link:hover { text-decoration: underline; }
 
         /* ===== AUDIENCE SECTION ===== */
         .audience-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
+            gap: var(--space-3);
+            margin-top: 40px;
         }
 
         @media (min-width: 768px) {
@@ -834,57 +1395,143 @@
         }
 
         .audience-card {
-            padding: 20px;
+            padding: var(--space-6);
             background: var(--color-bg-primary);
             border: 1px solid var(--color-border-medium);
+            border-top: 2px solid var(--color-accent);
             border-radius: var(--radius-lg);
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
         }
 
         .audience-card:hover {
             border-color: var(--color-border-dark);
-            box-shadow: var(--shadow-sm);
+            border-top-color: var(--color-accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .audience-card h3 {
             font-size: 15px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
 
         .audience-card p {
             font-size: 13px;
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        /* ===== SOCIAL PROOF — SLIDER ===== */
+        /* ===== PRODUCT — “INSIDE” GALLERY (SaaS snap carousel) ===== */
         .proof-slider {
-            margin-top: 32px;
+            margin-top: 26px;
             position: relative;
-            overflow: hidden;
+            width: 100vw;
+            /* Break out of the container for the “big screens” SaaS feel */
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
         }
 
-        .proof-slide {
-            display: none;
-            gap: 20px;
-            align-items: center;
+        .proof-gallery {
+            --snap-max: 1040px;
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            padding: 6px max(16px, calc((100vw - var(--snap-max)) / 2)) 18px;
+            scroll-snap-type: x mandatory;
+            scroll-padding-inline: max(16px, calc((100vw - var(--snap-max)) / 2));
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            touch-action: pan-x pan-y;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .proof-gallery::-webkit-scrollbar { display: none; }
 
-        .proof-slide.active {
+        .proof-card {
+            flex: 0 0 auto;
+            width: min(96vw, var(--snap-max));
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
             display: flex;
             flex-direction: column;
+            gap: 14px;
+        }
+        @media (max-width: 640px) {
+            .proof-card { width: 92vw; }
         }
 
-        @media (min-width: 768px) {
-            .proof-slide.active {
-                flex-direction: row;
-            }
+        /* Edge fades to hint “scroll me” without looking like a broken block */
+        .proof-slider::before,
+        .proof-slider::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(22px, 6vw, 96px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .proof-slider::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+        .proof-slider::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--color-bg-primary), rgba(255,255,255,0));
+        }
+
+        .proof-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .proof-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border-medium);
+            background: rgba(255,255,255,0.9);
+            color: var(--color-text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .proof-arrow:hover {
+            border-color: var(--color-border-dark);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        .proof-arrow:active { transform: scale(0.98); }
+
+        .proof-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        .proof-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.15);
+            transition: all var(--transition-fast);
+        }
+        .proof-dot.active {
+            width: 22px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.75);
+        }
+        @media (max-width: 640px) {
+            .proof-arrow { display: none; }
         }
 
         .proof-slide-img {
-            flex: 1 1 0;
             min-width: 0;
         }
 
@@ -894,23 +1541,1016 @@
             display: block;
         }
 
-        @media (min-width: 768px) {
-            .proof-slide-img img {
-                transform: scale(1.08);
-                transform-origin: center center;
+        /* “Screenshots” as HTML mockups (no iframe) */
+        .proof-mock {
+            width: 100%;
+            height: min(72vh, 560px);
+            border-radius: var(--radius-2xl);
+            border: 1px solid rgba(0,0,0,0.10);
+            background: radial-gradient(1200px 600px at 20% 10%, rgba(26,115,232,0.10), transparent 55%),
+                        linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.10);
+        }
+
+        .proof-mock::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(700px 400px at 85% 85%, rgba(26,115,232,0.08), transparent 60%);
+            pointer-events: none;
+        }
+
+        .proof-mock-top {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(250, 251, 252, 0.95);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .mock-dots { display: flex; gap: 6px; }
+        .mock-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.12); }
+        .mock-dot.red { background: rgba(234,67,53,0.55); }
+        .mock-dot.yellow { background: rgba(249,171,0,0.60); }
+        .mock-dot.green { background: rgba(52,168,83,0.55); }
+
+        .mock-url {
+            flex: 1;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            color: rgba(0,0,0,0.60);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mock-chip {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(26,115,232,0.95);
+            background: rgba(26,115,232,0.10);
+            border: 1px solid rgba(26,115,232,0.18);
+        }
+        .mock-chip i {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(26,115,232,0.85);
+            display: inline-block;
+        }
+
+        .proof-mock-body {
+            height: calc(100% - 44px);
+            position: relative;
+            z-index: 1;
+            padding: 12px;
+        }
+
+        .mock-app {
+            height: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            overflow: hidden;
+            display: grid;
+        }
+
+        /* Messages mock */
+        .mock-app.messages { grid-template-columns: 240px 1fr; }
+        .mock-side {
+            border-right: 1px solid rgba(0,0,0,0.08);
+            background: linear-gradient(180deg, #ffffff, #fbfcfe);
+        }
+        .mock-side-head {
+            padding: 12px 12px 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-side-title { font-size: 13px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 8px; }
+        .mock-search {
+            height: 28px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .mock-list { padding: 10px 10px 12px; display: grid; gap: 8px; }
+        .mock-item {
+            padding: 10px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+            background: #fff;
+            display: grid;
+            gap: 6px;
+        }
+        .mock-item.hot { border-color: rgba(234,67,53,0.20); background: rgba(234,67,53,0.05); }
+        .mock-item-head { display: flex; align-items: center; gap: 8px; }
+        .mock-avatar { width: 18px; height: 18px; border-radius: 5px; background: rgba(26,115,232,0.20); border: 1px solid rgba(26,115,232,0.25); }
+        .mock-name { font-size: 12px; font-weight: 800; color: rgba(0,0,0,0.80); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mock-sla {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.10);
+            color: rgba(0,0,0,0.70);
+            background: rgba(0,0,0,0.04);
+            white-space: nowrap;
+        }
+        .mock-sla.overdue { background: rgba(234,67,53,0.12); border-color: rgba(234,67,53,0.20); color: rgba(234,67,53,0.95); }
+        .mock-sla.soon { background: rgba(249,171,0,0.14); border-color: rgba(249,171,0,0.22); color: rgba(160,90,0,0.95); }
+        .mock-preview { font-size: 12px; color: rgba(0,0,0,0.55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .mock-chat {
+            background: linear-gradient(180deg, rgba(26,115,232,0.06), rgba(26,115,232,0.02));
+            display: grid;
+            grid-template-rows: 48px 1fr 54px;
+        }
+        .mock-chat-head {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.96);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .mock-chat-head b { font-size: 12px; font-weight: 900; letter-spacing: -0.2px; }
+        .mock-chat-head span { font-size: 11px; color: rgba(0,0,0,0.55); font-weight: 700; }
+        .mock-msgs { padding: 12px; display: grid; gap: 10px; }
+        .mock-bubble {
+            max-width: 72%;
+            padding: 9px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.92);
+            font-size: 12px;
+            line-height: 1.35;
+            color: rgba(0,0,0,0.75);
+        }
+        .mock-bubble.me {
+            margin-left: auto;
+            background: rgba(26,115,232,0.12);
+            border-color: rgba(26,115,232,0.18);
+        }
+        .mock-ai {
+            padding: 10px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-ai-label {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.50);
+            margin-bottom: 6px;
+        }
+        .mock-ai-text { font-size: 12px; color: rgba(0,0,0,0.70); line-height: 1.35; }
+        .mock-chat-compose {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.96);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mock-input {
+            flex: 1;
+            height: 34px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+        }
+        .mock-send {
+            height: 34px;
+            width: 88px;
+            border-radius: 12px;
+            background: rgba(26,115,232,0.95);
+            border: 1px solid rgba(26,115,232,0.40);
+        }
+
+        /* Analytics mock */
+        .mock-app.analytics { grid-template-rows: 64px 1fr; }
+        .mock-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            background: linear-gradient(180deg, #ffffff, #fbfcfe);
+        }
+        .mock-topbar h4 { font-size: 13px; font-weight: 900; letter-spacing: -0.2px; }
+        .mock-topbar p { font-size: 11px; font-weight: 650; color: rgba(0,0,0,0.55); }
+        .mock-mode {
+            display: inline-flex;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(0,0,0,0.03);
+        }
+        .mock-mode span {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(0,0,0,0.55);
+        }
+        .mock-mode span.active {
+            background: #fff;
+            color: rgba(0,0,0,0.82);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .mock-analytics-body {
+            padding: 14px 16px;
+            display: grid;
+            gap: 12px;
+            background: radial-gradient(1000px 400px at 10% 0%, rgba(26,115,232,0.08), transparent 60%);
+        }
+        .mock-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .mock-card {
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.92);
+            border-radius: 14px;
+            padding: 12px 12px;
+        }
+        .mock-card .k { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900; color: rgba(0,0,0,0.45); margin-bottom: 6px; }
+        .mock-card .v { font-size: 18px; font-weight: 950; letter-spacing: -0.5px; color: rgba(0,0,0,0.84); }
+        .mock-card .s { margin-top: 4px; font-size: 11px; font-weight: 700; color: rgba(0,0,0,0.55); }
+
+        .mock-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 10px;
+        }
+        .mock-bars { display: grid; gap: 8px; margin-top: 10px; }
+        .mock-bar {
+            display: grid;
+            grid-template-columns: 90px 1fr 40px;
+            gap: 8px;
+            align-items: center;
+        }
+        .mock-bar label { font-size: 11px; font-weight: 800; color: rgba(0,0,0,0.62); }
+        .mock-track { height: 8px; border-radius: 999px; background: rgba(0,0,0,0.06); overflow: hidden; }
+        .mock-fill { height: 100%; border-radius: 999px; background: rgba(26,115,232,0.70); }
+        .mock-fill.good { background: rgba(52,168,83,0.70); }
+        .mock-fill.risky { background: rgba(249,171,0,0.75); }
+        .mock-fill.harm { background: rgba(234,67,53,0.75); }
+        .mock-bar b { font-size: 11px; font-weight: 900; color: rgba(0,0,0,0.70); text-align: right; }
+
+        .mock-callout {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(26,115,232,0.18);
+            background: rgba(26,115,232,0.08);
+            color: rgba(0,0,0,0.70);
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .mock-callout i { width: 8px; height: 8px; border-radius: 50%; background: rgba(26,115,232,0.85); display: inline-block; }
+
+        /* Responsive tweaks for mockups */
+        @media (max-width: 420px) {
+            .proof-mock { aspect-ratio: 4 / 3; }
+            .mock-app.messages { grid-template-columns: 1fr; }
+            .mock-side { display: none; }
+            .mock-kpis { grid-template-columns: 1fr; }
+            .mock-split { grid-template-columns: 1fr; }
+            .mock-topbar { flex-direction: column; align-items: flex-start; }
+            .mock-url { justify-content: flex-start; }
+        }
+
+        /* ===== MOBILE MOCKUPS (iPhone style) ===== */
+        .proof-mock.mobile {
+            aspect-ratio: 9 / 19.5;
+            max-width: 340px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 42px;
+            padding: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-statusbar {
+            height: 44px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-time {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mobile-icons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mobile-icon {
+            width: 18px;
+            height: 12px;
+            background: #1a1a1a;
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .mobile-navbar {
+            height: 56px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .mobile-navbar-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .mobile-navbar-action {
+            padding: 6px 12px;
+            background: #1a73e8;
+            color: #ffffff;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .mobile-content {
+            flex: 1;
+            overflow: hidden;
+            background: #fafbfc;
+        }
+
+        /* Mobile Chat List */
+        .mobile-chatlist {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-chat-item {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mobile-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-chat-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mobile-sla {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .mobile-sla.overdue {
+            background: rgba(234,67,53,0.12);
+            color: #ea4335;
+        }
+
+        .mobile-sla.soon {
+            background: rgba(249,171,0,0.12);
+            color: #f9ab00;
+        }
+
+        .mobile-sla.ok {
+            background: rgba(52,168,83,0.12);
+            color: #34a853;
+        }
+
+        .mobile-chat-preview {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.4;
+        }
+
+        .mobile-chat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .mobile-marketplace-icon {
+            width: 16px;
+            height: 16px;
+            background: #8b3eea;
+            border-radius: 4px;
+        }
+
+        /* Mobile Chat Messages */
+        .mobile-chat-messages {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8f9fa;
+            height: 100%;
+        }
+
+        .mobile-message {
+            max-width: 75%;
+            padding: 10px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .mobile-message.customer {
+            align-self: flex-start;
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e8eaed;
+        }
+
+        .mobile-message.seller {
+            align-self: flex-end;
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        .mobile-ai-draft {
+            padding: 12px;
+            background: rgba(26,115,232,0.06);
+            border: 1px solid rgba(26,115,232,0.15);
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        .mobile-ai-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1a73e8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .mobile-ai-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .mobile-ai-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .mobile-ai-btn {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .mobile-ai-btn.primary {
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        .mobile-ai-btn.secondary {
+            background: #f0f7ff;
+            color: #1a73e8;
+        }
+
+        /* Mobile Review */
+        .mobile-review {
+            padding: 16px;
+            background: #ffffff;
+        }
+
+        .mobile-review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .mobile-review-stars {
+            font-size: 16px;
+            color: #f9ab00;
+        }
+
+        .mobile-review-date {
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .mobile-review-text {
+            font-size: 14px;
+            color: #1a1a1a;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .mobile-review-input {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mobile-review-input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f6368;
+            margin-bottom: 6px;
+        }
+
+        .mobile-review-input-text {
+            font-size: 14px;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        /* Mobile CRM Message */
+        .mobile-crm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(52,168,83,0.12);
+            color: #34a853;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mobile-crm-icon {
+            width: 12px;
+            height: 12px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        /* Mobile Auto-Response Badge */
+        .mobile-auto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: rgba(26,115,232,0.08);
+            border: 1px solid rgba(26,115,232,0.2);
+            color: #1a73e8;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .mobile-auto-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* ===== CARD MOCKUPS (like screenshots) ===== */
+        .card-mock {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-mock-section {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #5f6368;
+        }
+
+        .card-mock-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+
+        /* Priority List */
+        .priority-item {
+            padding: 14px;
+            background: #fafbfc;
+            border-radius: 8px;
+            border-left: 3px solid #e8eaed;
+            margin-bottom: 10px;
+        }
+
+        .priority-item.overdue {
+            border-left-color: #ea4335;
+            background: rgba(234,67,53,0.04);
+        }
+
+        .priority-item.soon {
+            border-left-color: #f9ab00;
+            background: rgba(249,171,0,0.04);
+        }
+
+        .priority-item.ok {
+            border-left-color: #34a853;
+            background: rgba(52,168,83,0.04);
+        }
+
+        .priority-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .priority-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-badge.overdue {
+            background: #ea4335;
+            color: #ffffff;
+        }
+
+        .priority-badge.soon {
+            background: rgba(249,171,0,0.25);
+            color: #9a6800;
+        }
+
+        .priority-badge.ok {
+            background: rgba(52,168,83,0.25);
+            color: #1e7e34;
+        }
+
+        .priority-preview {
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.4;
+        }
+
+        /* Chat Dialog */
+        .chat-dialog {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 85%;
+        }
+
+        .chat-message.customer {
+            align-self: flex-start;
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .chat-ai-draft {
+            align-self: flex-start;
+            padding: 14px;
+            background: rgba(138,62,234,0.08);
+            border: 1.5px solid rgba(138,62,234,0.25);
+            border-radius: 12px;
+            max-width: 90%;
+        }
+
+        .chat-ai-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #8b3eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .chat-ai-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        /* Quality Bars */
+        .quality-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quality-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quality-label {
+            min-width: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .quality-track {
+            flex: 1;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .quality-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+
+        .quality-fill.good { background: #34a853; }
+        .quality-fill.acceptable { background: #1a73e8; }
+        .quality-fill.risky { background: #f9ab00; }
+        .quality-fill.harmful { background: #ea4335; }
+
+        .quality-value {
+            min-width: 40px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: right;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            background: #fafbfc;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-value.red { color: #ea4335; }
+        .metric-value.green { color: #34a853; }
+        .metric-value.gray { color: #5f6368; }
+
+        .metric-label {
+            font-size: 13px;
+            color: #5f6368;
+            font-weight: 500;
+        }
+
+        /* CRM Card */
+        .crm-review {
+            padding: 14px;
+            background: rgba(249,171,0,0.08);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .crm-stars {
+            font-size: 18px;
+            color: #f9ab00;
+            margin-bottom: 6px;
+        }
+
+        .crm-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .crm-response {
+            padding: 14px;
+            background: rgba(52,168,83,0.08);
+            border-left: 3px solid #34a853;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .crm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34a853;
+            margin-bottom: 8px;
+        }
+
+        .crm-badge-icon {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .crm-effect {
+            padding: 16px;
+            background: rgba(52,168,83,0.06);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .crm-effect-label {
+            font-size: 12px;
+            color: #5f6368;
+            margin-bottom: 6px;
+        }
+
+        .crm-effect-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #34a853;
+        }
+
+        /* Auto Response */
+        .auto-question {
+            padding: 14px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .auto-question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .auto-question-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .auto-pre-badge {
+            padding: 4px 8px;
+            background: #1a73e8;
+            color: #ffffff;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .auto-question-text {
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .auto-answer {
+            padding: 14px;
+            background: rgba(52,168,83,0.08);
+            border-left: 3px solid #34a853;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .auto-answer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34a853;
+            margin-bottom: 8px;
+        }
+
+        .auto-answer-text {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .auto-timing {
+            padding: 14px;
+            background: rgba(249,171,0,0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auto-timing-icon {
+            font-size: 20px;
+        }
+
+        .auto-timing-text {
+            flex: 1;
+        }
+
+        .auto-timing-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #9a6800;
+            margin-bottom: 2px;
+        }
+
+        .auto-timing-desc {
+            font-size: 11px;
+            color: #5f6368;
+        }
+
+        /* Hide desktop mocks on mobile, show only card mocks */
+        @media (max-width: 768px) {
+            #proof .proof-card:nth-child(1),
+            #proof .proof-card:nth-child(2),
+            #proof .proof-card:nth-child(3) {
+                display: none;
             }
         }
 
         .proof-slide-text {
-            flex: 0 0 220px;
-            padding: 8px 0;
-        }
-
-        @media (max-width: 767px) {
-            .proof-slide-text {
-                flex: none;
-                text-align: center;
-            }
+            padding: 2px 4px 0;
         }
 
         .proof-slide-num {
@@ -936,67 +2576,31 @@
             line-height: 1.6;
         }
 
-        .proof-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 20px;
+        .proof-swipe-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            font-weight: 650;
+            letter-spacing: 0.1px;
+            display: none;
+            text-align: center;
         }
-
-        .proof-nav-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid var(--color-border-medium);
-            background: var(--color-bg-primary);
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--transition-fast);
-        }
-
-        .proof-nav-btn:hover {
-            border-color: var(--color-text-tertiary);
-            color: var(--color-text-primary);
-        }
-
-        .proof-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .proof-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--color-border-medium);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .proof-dot.active {
-            background: var(--color-text-primary);
-            width: 20px;
-            border-radius: 4px;
+        @media (max-width: 900px) {
+            .proof-swipe-hint { display: block; }
         }
 
         /* ===== FINAL CTA ===== */
         .final-cta {
-            padding: 60px 0;
-        }
-
-        @media (min-width: 768px) {
-            .final-cta { padding: 80px 0; }
+            position: relative;
+            z-index: 1;
+            padding: 80px 0;
         }
 
         .final-cta-inner {
-            padding: 32px;
-            background: var(--color-bg-primary);
+            padding: 48px 40px;
+            background: var(--color-bg-secondary);
             border: 1px solid var(--color-border-medium);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-2xl);
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -1007,8 +2611,7 @@
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
-                gap: 32px;
-                padding: 40px;
+                gap: 40px;
             }
         }
 
@@ -1017,16 +2620,16 @@
         }
 
         .final-cta h2 {
-            font-size: clamp(20px, 3vw, 26px);
-            font-weight: 600;
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .final-cta .section-subtitle {
-            margin-bottom: 24px;
+            margin-bottom: var(--space-5);
         }
 
         @media (min-width: 768px) {
@@ -1038,7 +2641,7 @@
         .final-cta-buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: var(--space-3);
             flex-shrink: 0;
         }
 
@@ -1313,6 +2916,10 @@
 
         /* All mobile (≤640px) */
         @media (max-width: 640px) {
+            body {
+                padding-bottom: 86px; /* space for the fixed mobile CTA bar */
+            }
+
             .hero {
                 min-height: auto;
                 padding: 100px 0 40px;
@@ -1390,17 +2997,24 @@
             .comparison-card h3 {
                 font-size: 16px;
             }
-
             /* Feature cards */
             .feature-card {
                 padding: 22px;
             }
 
-            .feature-number {
-                font-size: 44px;
-                top: 14px;
-                right: 14px;
+            .feature-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 12px;
             }
+
+            /* Steps */
+            .step-card { padding: 22px; }
+            .step-num { width: 32px; height: 32px; border-radius: 12px; }
+
+            /* Product preview */
+            .proof-card { flex-basis: auto; }
+            .proof-slide-text h3 { font-size: 17px; }
 
             /* Money cards */
             .money-card {
@@ -1502,6 +3116,52 @@
             }
         }
 
+        /* Mobile bottom CTA bar */
+        .mobile-cta-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 900;
+            padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-top: 1px solid var(--color-border-medium);
+            transform: translateY(110%);
+            transition: transform var(--transition-medium);
+        }
+
+        .mobile-cta-bar.show {
+            transform: translateY(0);
+        }
+
+        .mobile-cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--color-text-primary);
+            color: var(--color-bg-primary);
+            border: none;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all var(--transition-medium);
+        }
+
+        .mobile-cta-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 641px) {
+            .mobile-cta-bar { display: none; }
+        }
+
         /* Mobile navbar CTA */
         .navbar-cta-mobile {
             display: inline-flex;
@@ -1539,6 +3199,23 @@
             }
         }
     </style>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+       m[i].l=1*new Date();
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+       ym(106846293, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true
+       });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106846293" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
 </head>
 <body>
 
@@ -1548,14 +3225,9 @@
 <nav class="navbar" id="navbar">
     <div class="container navbar-inner">
         <a href="#" class="logo">AGENT<span>IQ</span></a>
-        <div class="navbar-links">
-            <a href="#features">Возможности</a>
-            <a href="#proof">Продукт</a>
-            <a href="#offer">Цены</a>
-        </div>
-        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Аудит</a>
+        <a href="#" class="navbar-cta-mobile" onclick="openModal(event)">Демо</a>
         <a href="#" class="navbar-cta" onclick="openModal(event)">
-            Заказать аудит
+            Записаться на демо
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
     </div>
@@ -1570,17 +3242,17 @@
                     <span class="hero-badge-dot"></span>
                     Для продавцов Wildberries
                 </div>
-                <h1>Центр контроля коммуникаций <span class="highlight">Wildberries</span></h1>
+                <h1>Все коммуникации <span class="highlight">Wildberries</span> в одном окне</h1>
                 <p class="hero-subtitle">
-                    Собираем чаты, вопросы и&nbsp;отзывы по&nbsp;вашим товарам в&nbsp;одном рабочем пространстве и&nbsp;показываем, где есть точки риска и&nbsp;низкая отдача.
+                    Собираем чаты, вопросы и отзывы по вашим товарам в одном рабочем пространстве и показываем, где есть точки риска и низкая отдача.
                 </p>
                 <div class="hero-cta-group">
                     <a href="#" class="btn-primary" onclick="openModal(event)">
-                        Заказать аудит WB
+                        Записаться на демо (15 мин)
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                     <a href="#proof" class="btn-secondary">
-                        Посмотреть пример
+                        Посмотреть интерфейс
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                 </div>
@@ -1603,29 +3275,76 @@
     </div>
 </section>
 
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials">
+    <div class="container">
+        <div class="testimonials-header reveal">
+            <h2 class="testimonials-title">Что говорят селлеры на&nbsp;интервью</h2>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal reveal-delay-1">
+                <div class="testimonial-text">
+                    Отзывы — это валюта, за которую ты покупаешь возможность продаж
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-2">
+                <div class="testimonial-text">
+                    Не смог оцифровать эту работу, по наитию ориентируешься
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-3">
+                <div class="testimonial-text">
+                    Заменили товар и оценка упала с 4.9 до 4.6... если продадим ещё 5 тысяч, какой рейтинг будет? Где граница — не понимаю
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-4">
+                <div class="testimonial-text">
+                    Неприятно когда негативный отзыв последний висит, продажи снижаются
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-5">
+                <div class="testimonial-text">
+                    Товаров если много, отзывы копятся, сначала отвечаешь раз в неделю, и потом копится хвост
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal reveal-delay-6">
+                <div class="testimonial-text">
+                    Чатов около 20 в день. Если плохо ответишь — влияет на воронку
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ===== PAIN ===== -->
 <section class="section" id="pain">
     <div class="container">
         <div class="reveal">
             <span class="section-label">Проблема</span>
-            <h2 class="section-title">Почему коммуникации по&nbsp;Wildberries сложно контролировать</h2>
+            <h2 class="section-title">Почему селлеры теряют деньги на&nbsp;коммуникациях</h2>
         </div>
         <div class="pain-grid">
             <div class="pain-card reveal reveal-delay-1">
-                <h3>Информация разбросана</h3>
-                <p>Чаты, отзывы и вопросы живут в разных разделах кабинета WB. Единой картины нет.</p>
+                <h3>Каналы разорваны</h3>
+                <p>Чаты, вопросы и&nbsp;отзывы — в&nbsp;разных местах. Команда переключается между разделами кабинета и&nbsp;теряет контекст.</p>
             </div>
             <div class="pain-card reveal reveal-delay-2">
-                <h3>Нет приоритетов</h3>
-                <p>Все сообщения выглядят одинаково. Непонятно, что важно прямо сейчас, а что может подождать.</p>
+                <h3>Срочное не видно</h3>
+                <p>Негатив, сомнения до покупки, повторные обращения выглядят как обычные сообщения. Без дедлайнов легко пропустить важное.</p>
             </div>
             <div class="pain-card reveal reveal-delay-3">
-                <h3>Ручная обработка не масштабируется</h3>
-                <p>С ростом ассортимента объём сообщений растёт быстрее, чем эффективность команды.</p>
+                <h3>Качество ответов не контролируется</h3>
+                <p>Шаблонные отписки, обвинения и&nbsp;игнор жалобы портят доверие и&nbsp;рейтинг. Проверять всё вручную невозможно.</p>
             </div>
             <div class="pain-card reveal reveal-delay-4">
-                <h3>Невидимые потери</h3>
-                <p>Пропущенный вопрос, плохой ответ, проигнорированный негатив — каждый стоит денег, но это трудно отследить.</p>
+                <h3>Нет понятной картины</h3>
+                <p>Сколько просрочено, где “копится” очередь, у&nbsp;каких товаров повторяется проблема, где ответы вредят — всё это сложно увидеть быстро.</p>
             </div>
         </div>
     </div>
@@ -1675,7 +3394,7 @@
                     </li>
                     <li>
                         <span class="icon">✓</span>
-                        Аналитика по проблемным SKU
+                        Аналитика по проблемным артикулам
                     </li>
                     <li>
                         <span class="icon">✓</span>
@@ -1687,34 +3406,721 @@
     </div>
 </section>
 
+<!-- ===== REAL CASES ===== -->
+<section class="section" id="cases" style="background: var(--color-bg-secondary);">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Реальные кейсы</span>
+            <h2 class="section-title">Как отвечают сейчас vs&nbsp;как&nbsp;нужно</h2>
+            <p class="section-subtitle">Разбираем реальные отзывы с маркетплейсов. Шаблонные ответы вредят продажам — мы показываем, как отвечать правильно.</p>
+        </div>
+
+        <div class="cases-slider reveal" style="margin-top: 32px;">
+            <div class="cases-gallery">
+
+                <!-- Case 1: Размерная сетка -->
+                <div class="case-card">
+                    <h3 class="case-title">Системная проблема — размерная сетка</h3>
+                    <p class="case-subtitle">UrbanThreads · Брюки чинос · 4 отзыва про размер</p>
+
+                    <div class="review-box">
+                        <div class="review-meta">
+                            <span class="review-stars">★★★★☆</span>
+                            <span>Дарья · 29 января</span>
+                        </div>
+                        <div class="review-text">
+                            <strong>Достоинства:</strong> Качество хорошее, но маломерит на размер
+                        </div>
+                        <div class="response-box">
+                            <div class="response-label">Ответ продавца</div>
+                            <div class="response-text">
+                                Добрый день. Благодарим за ваш отзыв. Надеемся, что не доставили вам неудобств...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-side before">
+                            <div class="comparison-label">❌ Шаблонный ответ</div>
+                            <div class="comparison-text">
+                                "Благодарим за ваш отзыв. Надеемся, что не доставили вам неудобств. Будем рады, если вам подойдет другая модель."
+                            </div>
+                            <div class="tags">
+                                <span class="tag error">Игнорирует проблему</span>
+                                <span class="tag error">Шаблон</span>
+                            </div>
+                        </div>
+
+                        <div class="comparison-side after">
+                            <div class="comparison-label">✅ AgentIQ рекомендует</div>
+                            <div class="comparison-text">
+                                "Благодарим за отзыв! Нам жаль, что модель маломерит — учтём для размерной таблицы. По опыту покупателей, эта модель лучше брать на размер больше."
+                            </div>
+                            <div class="tags">
+                                <span class="tag success">Эмпатия</span>
+                                <span class="tag success">Конкретика</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">💡 Что критично</div>
+                        <div class="insight-text">
+                            4 отзыва про размер — системная проблема. Шаблоны → возвраты → потери 150-200k₽/год на логистике.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case 2: Две проблемы -->
+                <div class="case-card">
+                    <h3 class="case-title">Скрытая жалоба в 5★ отзыве</h3>
+                    <p class="case-subtitle">UrbanThreads · 5★ отзыв, но товар вернули</p>
+
+                    <div class="review-box">
+                        <div class="review-meta">
+                            <span class="review-stars">★★★★★</span>
+                            <span>Лилиана · 06 февраля</span>
+                        </div>
+                        <div class="review-text">
+                            <strong>Достоинства:</strong> Качество хорошее, но не подошел размер, большемерят.<br>
+                            <strong>Комментарий:</strong> Ужасно упакован — брюки скомканы, в рванном пакете...
+                        </div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-side before">
+                            <div class="comparison-label">⚠️ Текущий ответ</div>
+                            <div class="comparison-text">
+                                "Благодарим и извиняемся за упаковку. Передадим в логистику. Рады, что качество порадовало. Размер не подошел — надеемся, найдете подходящую модель."
+                            </div>
+                            <div class="tags">
+                                <span class="tag error">Пассивно</span>
+                                <span class="tag error">Не признаёт системность</span>
+                            </div>
+                        </div>
+
+                        <div class="comparison-side after">
+                            <div class="comparison-label">✅ AgentIQ рекомендует</div>
+                            <div class="comparison-text">
+                                "Спасибо за отзыв! Нам очень жаль за упаковку — это недопустимо, передали в логистику. По размеру: проверим размерную сетку и добавим рекомендацию в описание."
+                            </div>
+                            <div class="tags">
+                                <span class="tag success">Обе проблемы</span>
+                                <span class="tag success">Признаёт системность</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">💡 Что критично</div>
+                        <div class="insight-text">
+                            5 звёзд, но товар вернули. Это скрытая жалоба — похвала маскирует проблему. Нужно адресовать ОБЕ части.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="cases-controls">
+                <button class="cases-arrow" type="button" data-cases-arrow="-1" aria-label="Предыдущий кейс">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="cases-dots" id="casesDots" aria-hidden="true"></div>
+                <button class="cases-arrow" type="button" data-cases-arrow="1" aria-label="Следующий кейс">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRODUCT PREVIEW ===== -->
+<section class="section" id="proof">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Продукт</span>
+            <h2 class="section-title">Внутри сервиса</h2>
+            <p class="section-subtitle">Как выглядит контроль коммуникаций на&nbsp;практике.</p>
+        </div>
+	        <div class="proof-slider reveal">
+	            <div class="proof-gallery" aria-label="Превью интерфейса AgentIQ">
+	                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Единое окно: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app</div>
+                            <span class="mock-chip"><i></i>Wildberries</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app messages">
+                                <div class="mock-side">
+                                    <div class="mock-side-head">
+                                        <div class="mock-side-title">Коммуникации</div>
+                                        <div class="mock-search" aria-hidden="true"></div>
+                                    </div>
+                                    <div class="mock-list">
+                                        <div class="mock-item hot">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Отзыв: возврат</div>
+                                                <span class="mock-sla overdue">ПРОСРОЧЕН</span>
+                                            </div>
+                                            <div class="mock-preview">Покупатель: "Вы обманули..."</div>
+                                        </div>
+                                        <div class="mock-item">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Вопрос: размер</div>
+                                                <span class="mock-sla soon">СКОРО</span>
+                                            </div>
+                                            <div class="mock-preview">"Подойдет ли на рост 180?"</div>
+                                        </div>
+                                        <div class="mock-item">
+                                            <div class="mock-item-head">
+                                                <div class="mock-avatar" aria-hidden="true"></div>
+                                                <div class="mock-name">Чат: доставка</div>
+                                                <span class="mock-sla">В НОРМЕ</span>
+                                            </div>
+                                            <div class="mock-preview">"Когда привезете?"</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mock-chat">
+                                    <div class="mock-chat-head">
+                                        <div>
+                                            <b>Отзыв: возврат</b><br>
+                                            <span>негатив, публично</span>
+                                        </div>
+                                        <span class="mock-callout"><i></i>Срок и приоритет</span>
+                                    </div>
+                                    <div class="mock-msgs">
+                                        <div class="mock-bubble">Товар пришел с браком. Ужасный сервис.</div>
+                                        <div class="mock-ai">
+                                            <div class="mock-ai-label">AI draft</div>
+                                            <div class="mock-ai-text">Понимаю ваше раздражение. Давайте решим: оформим замену или возврат, подскажите номер заказа.</div>
+                                        </div>
+                                        <div class="mock-bubble me">Извините за ситуацию. Подскажите номер заказа, и мы решим вопрос.</div>
+                                    </div>
+                                    <div class="mock-chat-compose">
+                                        <div class="mock-input" aria-hidden="true"></div>
+                                        <div class="mock-send" aria-hidden="true"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">01</span>
+                        <h3>Единое окно</h3>
+                        <p>Вся коммуникация по товарам в одной очереди. Команда не теряет контекст.</p>
+                    </div>
+                </div>
+
+                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Качество ответов: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app/analytics</div>
+                            <span class="mock-chip"><i></i>Операционный</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app analytics">
+                                <div class="mock-topbar">
+                                    <div>
+                                        <h4>Качество и скорость</h4>
+                                        <p>Где ответы вредят: шаблоны, обвинения, игнор</p>
+                                    </div>
+                                    <div class="mock-mode" aria-hidden="true">
+                                        <span class="active">ops</span>
+                                        <span>full</span>
+                                    </div>
+                                </div>
+                                <div class="mock-analytics-body">
+                                    <div class="mock-kpis">
+                                        <div class="mock-card">
+                                            <div class="k">SLA</div>
+                                            <div class="v">7%</div>
+                                            <div class="s">просрочек</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Качество</div>
+                                            <div class="v">−</div>
+                                            <div class="s">4% вредных</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Потери</div>
+                                            <div class="v">₽</div>
+                                            <div class="s">оценка влияния</div>
+                                        </div>
+                                    </div>
+                                    <div class="mock-split">
+                                        <div class="mock-card">
+                                            <div class="k">Качество ответов</div>
+                                            <div class="mock-bars">
+                                                <div class="mock-bar">
+                                                    <label>Хорошие</label>
+                                                    <div class="mock-track"><div class="mock-fill good" style="width: 62%"></div></div>
+                                                    <b>62%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Допуст.</label>
+                                                    <div class="mock-track"><div class="mock-fill" style="width: 24%"></div></div>
+                                                    <b>24%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Риск</label>
+                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 10%"></div></div>
+                                                    <b>10%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Вред</label>
+                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 4%"></div></div>
+                                                    <b>4%</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Почему падает рейтинг</div>
+                                            <div class="v" style="font-size: 14px; margin-top: 6px;">“Отписки” + “обвинения”</div>
+                                            <div class="s" style="margin-top: 8px;">Команда видит причины, а не просто цифру.</div>
+                                            <div style="margin-top: 10px;">
+                                                <span class="mock-callout"><i></i>Контроль качества</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">02</span>
+                        <h3>Качество ответов</h3>
+                        <p>Понятно, где ответы вредят: шаблоны, обвинения, игнор. Можно обучать команду на реальных кейсах.</p>
+                    </div>
+                </div>
+
+                <div class="proof-card">
+                    <div class="proof-slide-img">
+                        <div class="proof-mock" aria-label="Потери и приоритеты: статичный макет интерфейса">
+                        <div class="proof-mock-top">
+                            <div class="mock-dots" aria-hidden="true">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                            </div>
+                            <div class="mock-url">agentiq.ru/app</div>
+                            <span class="mock-chip"><i></i>Приоритеты</span>
+                        </div>
+                        <div class="proof-mock-body">
+                            <div class="mock-app analytics">
+                                <div class="mock-topbar">
+                                    <div>
+                                        <h4>Что чинить в первую очередь</h4>
+                                        <p>Срочные кейсы, backlog, ответственность</p>
+                                    </div>
+                                    <span class="mock-callout"><i></i>скоро / просрочен</span>
+                                </div>
+                                <div class="mock-analytics-body">
+                                    <div class="mock-split" style="grid-template-columns: 1fr 1fr;">
+                                        <div class="mock-card">
+                                            <div class="k">Сейчас горит</div>
+                                            <div class="mock-bars">
+                                                <div class="mock-bar">
+                                                    <label>Негатив</label>
+                                                    <div class="mock-track"><div class="mock-fill harm" style="width: 36%"></div></div>
+                                                    <b>36%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Вопросы</label>
+                                                    <div class="mock-track"><div class="mock-fill risky" style="width: 22%"></div></div>
+                                                    <b>22%</b>
+                                                </div>
+                                                <div class="mock-bar">
+                                                    <label>Чаты</label>
+                                                    <div class="mock-track"><div class="mock-fill" style="width: 18%"></div></div>
+                                                    <b>18%</b>
+                                                </div>
+                                            </div>
+                                            <div class="s" style="margin-top: 10px;">Видно, что просрочено и кто отвечает.</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Backlog</div>
+                                            <div class="v" style="font-size: 14px; margin-top: 6px;">Единая очередь вместо “прыжков” по кабинетам</div>
+                                            <div class="s" style="margin-top: 8px;">Команда не теряет контекст между разделами.</div>
+                                            <div style="margin-top: 10px;">
+                                                <span class="mock-callout"><i></i>единая картина</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mock-kpis" style="grid-template-columns: 1fr 1fr 1fr;">
+                                        <div class="mock-card">
+                                            <div class="k">Окно</div>
+                                            <div class="v" style="font-size: 16px;">короткое</div>
+                                            <div class="s">момент решения</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Алерты</div>
+                                            <div class="v" style="font-size: 16px;">есть</div>
+                                            <div class="s">просрочен / скоро</div>
+                                        </div>
+                                        <div class="mock-card">
+                                            <div class="k">Ответст.</div>
+                                            <div class="v" style="font-size: 16px;">понятно</div>
+                                            <div class="s">кто держит SLA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="proof-slide-text">
+                        <span class="proof-slide-num">03</span>
+                        <h3>Приоритеты и SLA</h3>
+                        <p>Видно, что просрочено и что "горит" сейчас. Очередь управляется, а не живёт сама по себе.</p>
+                    </div>
+	                </div>
+
+                    <!-- Card 1: Приоритеты -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">ПРИОРИТЕТЫ</div>
+                                <div class="priority-item overdue">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Отзыв: возврат</span>
+                                        <span class="priority-badge overdue">ПРОСРОЧЕН</span>
+                                    </div>
+                                    <div class="priority-preview">Покупатель: "Вы обманули, товар не тот..."</div>
+                                </div>
+                                <div class="priority-item soon">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Вопрос: размер</span>
+                                        <span class="priority-badge soon">СКОРО</span>
+                                    </div>
+                                    <div class="priority-preview">"Подойдет ли на рост 180?"</div>
+                                </div>
+                                <div class="priority-item ok">
+                                    <div class="priority-header">
+                                        <span class="priority-name">Чат: доставка</span>
+                                        <span class="priority-badge ok">В НОРМЕ</span>
+                                    </div>
+                                    <div class="priority-preview">"Когда привезете?"</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">04</span>
+                            <h3>Сортировка по срочности</h3>
+                            <p>Срочные чаты — сверху. Команда видит дедлайны и не пропускает критичное.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Работа с негативом -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">РАБОТА С НЕГАТИВОМ</div>
+                                <div class="chat-dialog">
+                                    <div class="chat-message customer">
+                                        Товар пришёл с браком! Вообще не работает.
+                                    </div>
+                                    <div class="chat-message customer">
+                                        Ставлю 1 звезду и пишу отзыв. Больше у вас не закажу!
+                                    </div>
+                                    <div class="chat-ai-draft">
+                                        <div class="chat-ai-label">ИИ ЧЕРНОВИК</div>
+                                        <div class="chat-ai-text">
+                                            Нам очень жаль что товар оказался бракованным! Это недопустимо.
+                                            <br><br>
+                                            Оформите возврат через личный кабинет WB как "Не соответствует описанию" — деньги вернутся в течение 10 дней.
+                                            <br><br>
+                                            Мы проверим партию, чтобы исключить повторение. Спасибо за понимание.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">05</span>
+                            <h3>ИИ знает как работать с негативом</h3>
+                            <p>Эскалация (брак → угроза 1★) — ИИ генерирует правильный тон и предлагает решение.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Аналитика качества -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">КАЧЕСТВО ОТВЕТОВ</div>
+                                <div class="quality-bars">
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Хорошие</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill good" style="width: 62%"></div>
+                                        </div>
+                                        <span class="quality-value">62%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Допустимые</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill acceptable" style="width: 24%"></div>
+                                        </div>
+                                        <span class="quality-value">24%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Рискованные</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill risky" style="width: 10%"></div>
+                                        </div>
+                                        <span class="quality-value">10%</span>
+                                    </div>
+                                    <div class="quality-bar-item">
+                                        <span class="quality-label">Вредные</span>
+                                        <div class="quality-track">
+                                            <div class="quality-fill harmful" style="width: 4%"></div>
+                                        </div>
+                                        <span class="quality-value">4%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">06</span>
+                            <h3>Аналитика качества</h3>
+                            <p>Видно где ответы вредят: шаблоны, обвинения, игнорирование жалоб.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Ключевые метрики -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="metrics-grid">
+                                    <div class="metric-card">
+                                        <div class="metric-value red">7%</div>
+                                        <div class="metric-label">просрочек по срокам</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-value green">93%</div>
+                                        <div class="metric-label">ответов в срок</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-value gray">4%</div>
+                                        <div class="metric-label">вредных ответов</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">07</span>
+                            <h3>Ключевые метрики</h3>
+                            <p>Команда видит где проседает скорость и качество. Можно быстро среагировать.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: CRM-маркетинг -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">CRM-МАРКЕТИНГ</div>
+                                <div class="crm-review">
+                                    <div class="crm-stars">⭐⭐⭐⭐⭐</div>
+                                    <div class="crm-text">Товар отличный, всё быстро пришло!</div>
+                                </div>
+                                <div class="crm-response">
+                                    <div class="crm-badge">
+                                        <span class="crm-badge-icon"></span>
+                                        ИИ АВТООТВЕТ
+                                    </div>
+                                    <div class="crm-text">
+                                        Спасибо за отзыв! В знак благодарности дарим промокод <strong>THANKS10</strong> на скидку 10% на следующую покупку. Действует 30 дней.
+                                    </div>
+                                </div>
+                                <div class="crm-effect">
+                                    <div class="crm-effect-label">Эффект</div>
+                                    <div class="crm-effect-value">+30% повторных покупок</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">08</span>
+                            <h3>Промокоды за отзывы</h3>
+                            <p>ИИ автоматически предлагает промокод на 5★ отзывы — растёт лояльность и повторные покупки.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Автоответы на вопросы -->
+                    <div class="proof-card">
+                        <div class="proof-slide-img">
+                            <div class="card-mock">
+                                <div class="card-mock-section">АВТООТВЕТ (КОНВЕРСИЯ)</div>
+                                <div class="auto-question">
+                                    <div class="auto-question-header">
+                                        <span class="auto-question-title">Вопрос: размер XL</span>
+                                        <span class="auto-pre-badge">PRE-PURCHASE</span>
+                                    </div>
+                                    <div class="auto-question-text">"Есть размер XL в наличии?"</div>
+                                </div>
+                                <div class="auto-answer">
+                                    <div class="auto-answer-badge">
+                                        <span class="crm-badge-icon"></span>
+                                        АВТООТВЕТ ЧЕРЕЗ 2 МИН
+                                    </div>
+                                    <div class="auto-answer-text">
+                                        Да, размер XL в наличии! Доставка 2-5 дней. Размерная сетка в описании товара 👕
+                                    </div>
+                                </div>
+                                <div class="auto-timing">
+                                    <span class="auto-timing-icon">📊</span>
+                                    <div class="auto-timing-text">
+                                        <div class="auto-timing-title">Окно решения: 10-20 сек</div>
+                                        <div class="auto-timing-desc">Ответ в течение часа = +20% конверсия</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proof-slide-text">
+                            <span class="proof-slide-num">09</span>
+                            <h3>Автоответы на вопросы</h3>
+                            <p>Pre-purchase вопросы отвечаются за минуты — покупатель не уходит к конкурентам. +20% конверсия.</p>
+                        </div>
+                    </div>
+
+	            </div>
+	            <div class="proof-controls" aria-label="Навигация по превью">
+	                <button class="proof-arrow" type="button" data-proof-arrow="-1" aria-label="Предыдущий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	                <div class="proof-dots" id="proofDots" aria-hidden="true"></div>
+	                <button class="proof-arrow" type="button" data-proof-arrow="1" aria-label="Следующий экран">
+	                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+	                </button>
+	            </div>
+	            <div class="proof-swipe-hint">Листайте превью влево-вправо.</div>
+	        </div>
+	    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="how">
+    <div class="container">
+        <div class="reveal">
+            <span class="section-label">Процесс</span>
+            <h2 class="section-title">Как это выглядит в работе</h2>
+            <p class="section-subtitle">Без “прыжков” по разделам и без ручного контроля каждого ответа.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card reveal reveal-delay-1">
+                <div class="step-num">01</div>
+                <h3>Подключаете кабинет</h3>
+                <p>Собираем чаты, вопросы и отзывы по вашим товарам в один поток.</p>
+            </div>
+            <div class="step-card reveal reveal-delay-2">
+                <div class="step-num">02</div>
+                <h3>Работаете из одного окна</h3>
+                <p>Очередь, контекст и история общения видны сразу. Процесс “оператор → менеджер” становится управляемым.</p>
+            </div>
+            <div class="step-card reveal reveal-delay-3">
+                <div class="step-num">03</div>
+                <h3>Контроль сроков и качества</h3>
+                <p>Приоритеты, скоро/просрочен и понятные причины проблем. ИИ помогает черновиками или автоответами — команда работает быстрее и аккуратнее.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ===== FEATURES ===== -->
 <section class="section" id="features">
     <div class="container">
         <div class="reveal">
-            <span class="section-label">Возможности</span>
-            <h2 class="section-title">Как это работает на&nbsp;практике</h2>
-            <p class="section-subtitle">Четыре ключевых компонента, которые превращают хаос в систему.</p>
+            <span class="section-label">Решение</span>
+            <h2 class="section-title">От ответов к лояльности: влияйте на&nbsp;повторные покупки</h2>
+            <p class="section-subtitle">Используйте отзывы, вопросы и чаты как каналы коммуникации — растите рейтинг и&nbsp;LTV.</p>
         </div>
         <div class="features-grid">
             <div class="feature-card reveal reveal-delay-1">
-                <span class="feature-number">01</span>
-                <h3>Единое рабочее пространство</h3>
-                <p>Все чаты, вопросы и отзывы WB в одном интерфейсе. Больше не нужно переключаться между разделами.</p>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Единое окно</span>
+                    <span class="feature-icon queue" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M4 4h10M4 8h10M4 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M2 4h0.01M2 8h0.01M2 12h0.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <h3>Единая очередь обращений</h3>
+                <p>Все чаты, вопросы и&nbsp;отзывы&nbsp;WB в&nbsp;одном интерфейсе. Быстро находите нужное и не теряете контекст.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">Чаты</span>
+                    <span class="feature-tag">Вопросы</span>
+                    <span class="feature-tag">Отзывы</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-2">
-                <span class="feature-number">02</span>
-                <h3>Приоритизация сообщений</h3>
-                <p>Понимаете, что важнее и что требует реакции прямо сейчас. Срочное всегда наверху.</p>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Срок и приоритет</span>
+                    <span class="feature-icon deadline" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                </div>
+                <h3>Приоритет и дедлайн ответа</h3>
+                <p>Срочные кейсы всегда наверху. Видно, что просрочено и что “горит” в ближайшее время.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">скоро</span>
+                    <span class="feature-tag">просрочен</span>
+                    <span class="feature-tag">алерты</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-3">
-                <span class="feature-number">03</span>
-                <h3>Аналитика по карточкам</h3>
-                <p>Видите, где повторяющиеся проблемы, растущий негатив или пропуски в ответах.</p>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>ИИ помощник</span>
+                    <span class="feature-icon ai" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M3.5 12.5V4.8c0-.7.6-1.3 1.3-1.3h6.4c.7 0 1.3.6 1.3 1.3v6.4c0 .7-.6 1.3-1.3 1.3H6.7L4.8 13.9c-.6.4-1.3 0-1.3-.7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6 6.7h4M6 9.2h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <h3>Черновики или автоответы</h3>
+                <p>ИИ предлагает готовый текст под ситуацию — можно отредактировать или отправить как есть. На типовые вопросы и позитив отвечает автоматически.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">черновики</span>
+                    <span class="feature-tag">автоответы</span>
+                    <span class="feature-tag">скорость</span>
+                </div>
             </div>
             <div class="feature-card reveal reveal-delay-4">
-                <span class="feature-number">04</span>
-                <h3>Снижение нагрузки</h3>
-                <p>Команда тратит меньше времени на хаос и больше — на действия, которые приносят результат.</p>
+                <div class="feature-head">
+                    <span class="feature-chip"><i></i>Контроль качества</span>
+                    <span class="feature-icon quality" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none">
+                            <path d="M8 14s5-2 5-6V4.4L8 2 3 4.4V8c0 4 5 6 5 6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                            <path d="M6.2 8.1l1.1 1.1 2.6-2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+                <h3>Контроль качества и проблемных точек</h3>
+                <p>Видно, где ответы чаще редактируются вручную, где растёт негатив и какие товары требуют внимания.</p>
+                <div class="feature-tags" aria-hidden="true">
+                    <span class="feature-tag">причины негатива</span>
+                    <span class="feature-tag">товары риска</span>
+                    <span class="feature-tag">обучение</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1758,8 +4164,8 @@
         <div class="offer-wrapper">
             <div class="offer-card primary reveal reveal-delay-1">
                 <span class="offer-badge">Старт</span>
-                <h3>Коммуникационный аудит WB</h3>
-                <p class="description">Разберём чаты, отзывы и вопросы по выбранным товарам. Покажем зоны риска, что приоритезировать и какие действия принесут результат.</p>
+                <h3>Анализ коммуникаций по&nbsp;артикулу</h3>
+                <p class="description">Соберём чаты, отзывы и&nbsp;вопросы по&nbsp;вашему артикулу. Покажем, что срочно и&nbsp;что исправить в&nbsp;первую очередь.</p>
                 <ul class="offer-checklist">
                     <li><span class="check">✓</span> Конкретное понимание проблемных точек</li>
                     <li><span class="check">✓</span> Приоритеты для обработки сообщений</li>
@@ -1770,7 +4176,7 @@
                     <span class="amount">Бесплатно</span>
                 </div>
                 <a href="#" class="btn-offer primary" onclick="openModal(event)">
-                    Получить аудит
+                    Записаться на демо
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
             </div>
@@ -1788,9 +4194,7 @@
                     <span class="amount">от 4 990 ₽</span>
                     <span class="period">/мес</span>
                 </div>
-                <a href="#" class="btn-offer secondary" onclick="openModal(event)">
-                    Узнать подробнее
-                </a>
+                <a href="#" class="btn-offer secondary" onclick="openModal(event)">Начать пилот</a>
             </div>
         </div>
     </div>
@@ -1810,7 +4214,7 @@
             </div>
             <div class="audience-card reveal reveal-delay-2">
                 <h3>Команды с менеджерами</h3>
-                <p>Хотите видеть, как отвечают ваши менеджеры и аутсорсеры, без чтения каждого диалога.</p>
+                <p>Хотите видеть, как отвечают ваши менеджеры и аутсорсоры, без чтения каждого диалога.</p>
             </div>
             <div class="audience-card reveal reveal-delay-3">
                 <h3>Растущие магазины</h3>
@@ -1818,75 +4222,18 @@
             </div>
         </div>
     </div>
-</section>
-
-<!-- ===== SOCIAL PROOF ===== -->
-<section class="section" id="proof">
-    <div class="container">
-        <div class="reveal">
-            <span class="section-label">Продукт</span>
-            <h2 class="section-title">Внутри сервиса</h2>
-            <p class="section-subtitle">Как выглядит контроль коммуникаций на&nbsp;практике.</p>
-        </div>
-        <div class="proof-slider reveal" id="proofSlider">
-            <div class="proof-slide active" data-slide="0">
-                <div class="proof-slide-img">
-                    <img src="screenshots/chat-center.png" alt="Центр коммуникаций">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">01 / 03</span>
-                    <h3>Единое окно</h3>
-                    <p>Чаты, вопросы, отзывы — один поток. AI подсказывает ответ.</p>
-                </div>
-            </div>
-            <div class="proof-slide" data-slide="1">
-                <div class="proof-slide-img">
-                    <img src="screenshots/quality-score.png" alt="Оценка качества ответов">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">02 / 03</span>
-                    <h3>Оценка качества</h3>
-                    <p>Что вредит продажам и сколько это стоит в деньгах.</p>
-                </div>
-            </div>
-            <div class="proof-slide" data-slide="2">
-                <div class="proof-slide-img">
-                    <img src="screenshots/review-analysis.png" alt="Разбор проблемного ответа">
-                </div>
-                <div class="proof-slide-text">
-                    <span class="proof-slide-num">03 / 03</span>
-                    <h3>Разбор ответа</h3>
-                    <p>Что не так и готовый текст — как стоило ответить.</p>
-                </div>
-            </div>
-            <div class="proof-nav">
-                <button class="proof-nav-btn" onclick="changeSlide(-1)">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="proof-dots">
-                    <div class="proof-dot active" onclick="goToSlide(0)"></div>
-                    <div class="proof-dot" onclick="goToSlide(1)"></div>
-                    <div class="proof-dot" onclick="goToSlide(2)"></div>
-                </div>
-                <button class="proof-nav-btn" onclick="changeSlide(1)">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-</section>
-
+    </section>
 <!-- ===== FINAL CTA ===== -->
 <section class="final-cta">
     <div class="container">
         <div class="final-cta-inner reveal">
             <div class="final-cta-text">
-                <h2>Разберём ваши коммуникации и&nbsp;покажем, что исправить</h2>
-                <p class="section-subtitle">Аудит занимает 1–2 дня. Вы получите отчёт с&nbsp;конкретными рекомендациями.</p>
+                <h2>Проанализируем ваши коммуникации и&nbsp;покажем, что исправить</h2>
+                <p class="section-subtitle">Первые выводы за 1–2 дня: просрочки, качество ответов и понятные приоритеты.</p>
             </div>
             <div class="final-cta-buttons">
                 <a href="#" class="btn-primary" onclick="openModal(event)">
-                    Заказать аудит
+                    Записаться на демо
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <a href="#offer" class="btn-secondary">Подробнее</a>
@@ -1909,30 +4256,35 @@
     </div>
 </footer>
 
+<!-- ===== MOBILE CTA BAR ===== -->
+<div class="mobile-cta-bar" id="mobileCtaBar" aria-hidden="true">
+    <a href="#" class="mobile-cta-btn" onclick="openModal(event)">Записаться на демо</a>
+</div>
+
 <!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <button class="modal-close" onclick="closeModal()">&times;</button>
 
         <div id="formContent">
-            <h3>Заказать аудит WB</h3>
-            <p class="modal-desc">Оставьте контакты — мы свяжемся, чтобы обсудить детали и подготовить анализ ваших коммуникаций.</p>
+            <h3>Получить анализ по&nbsp;артикулу</h3>
+            <p class="modal-desc">Оставьте артикул и контакт — мы подготовим анализ отзывов, вопросов и чатов и пришлём рекомендации.</p>
 
             <form id="auditForm" onsubmit="submitForm(event)">
                 <div class="form-group">
-                    <label for="name">Имя</label>
-                    <input type="text" id="name" placeholder="Как вас зовут?" required>
+                    <label for="nm">Артикул WB</label>
+                    <input type="text" id="nm" placeholder="Например: 282955222" inputmode="numeric" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="email@company.ru" required>
+                    <label for="contact">Контакт</label>
+                    <input type="text" id="contact" placeholder="@telegram или +7... или email" required>
                 </div>
                 <div class="form-group">
-                    <label for="company">Компания</label>
+                    <label for="company">Магазин (опционально)</label>
                     <input type="text" id="company" placeholder="Название бренда / магазина">
                 </div>
                 <div class="form-group">
-                    <label for="wblink">Ссылка на WB кабинет или товар</label>
+                    <label for="wblink">Ссылка на товар (опционально)</label>
                     <input type="url" id="wblink" placeholder="https://www.wildberries.ru/...">
                 </div>
                 <button type="submit" class="form-submit">Отправить заявку</button>
@@ -1951,6 +4303,17 @@
 <script>
     // ===== NAVBAR SCROLL EFFECT =====
     const navbar = document.getElementById('navbar');
+    const mobileCtaBar = document.getElementById('mobileCtaBar');
+
+    function updateMobileCtaBar() {
+        if (!mobileCtaBar) return;
+        const isMobile = window.innerWidth <= 640;
+        const overlay = document.getElementById('modalOverlay');
+        const modalOpen = overlay && overlay.classList.contains('open');
+        const shouldShow = isMobile && !modalOpen && window.scrollY > 420;
+        mobileCtaBar.classList.toggle('show', shouldShow);
+        mobileCtaBar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    }
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
@@ -1958,7 +4321,11 @@
         } else {
             navbar.classList.remove('scrolled');
         }
+        updateMobileCtaBar();
     }, { passive: true });
+
+    window.addEventListener('resize', updateMobileCtaBar, { passive: true });
+    updateMobileCtaBar();
 
     // ===== SCROLL REVEAL =====
     const revealElements = document.querySelectorAll('.reveal');
@@ -1985,12 +4352,14 @@
         document.body.style.overflow = 'hidden';
         document.getElementById('formContent').style.display = 'block';
         document.getElementById('formSuccess').classList.remove('show');
+        updateMobileCtaBar();
     }
 
     function closeModal() {
         const overlay = document.getElementById('modalOverlay');
         overlay.classList.remove('open');
         document.body.style.overflow = '';
+        updateMobileCtaBar();
     }
 
     document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -2002,47 +4371,136 @@
     });
 
     // ===== FORM SUBMIT =====
-    function submitForm(e) {
+    async function submitForm(e) {
         e.preventDefault();
-        document.getElementById('formContent').style.display = 'none';
-        document.getElementById('formSuccess').classList.add('show');
 
         const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
+            nm: document.getElementById('nm').value,
+            contact: document.getElementById('contact').value,
             company: document.getElementById('company').value,
             wblink: document.getElementById('wblink').value,
         };
-        console.log('Form submitted:', formData);
+
+        // Show loading state
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton ? submitButton.textContent : '';
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Отправка...';
+        }
+
+        try {
+            // Detect API URL based on hostname
+            const hostname = window.location.hostname;
+            const apiUrl = (hostname === 'localhost' || hostname === '127.0.0.1')
+                ? 'http://localhost:8001/api/leads'
+                : '/api/leads';
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                if (response.status === 422 && error.detail && Array.isArray(error.detail)) {
+                    const fieldNames = {
+                        'nm': 'Артикул',
+                        'contact': 'Контакт',
+                        'company': 'Магазин',
+                        'wblink': 'Ссылка'
+                    };
+                    const fieldErrors = error.detail.map(err => {
+                        const field = err.loc ? err.loc[err.loc.length - 1] : 'поле';
+                        return `${fieldNames[field] || field}: ${err.msg}`;
+                    }).join('\n');
+                    throw new Error(fieldErrors);
+                }
+                throw new Error(error.detail || 'Ошибка отправки заявки');
+            }
+
+            // Success
+            document.getElementById('formContent').style.display = 'none';
+            document.getElementById('formSuccess').classList.add('show');
+
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('Ошибка отправки заявки. Попробуйте позже или свяжитесь с нами напрямую.');
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        }
     }
 
-    // ===== PROOF SLIDER =====
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.proof-slide');
-    const dots = document.querySelectorAll('.proof-dot');
+    // “Внутри сервиса” is pure HTML mockups with native horizontal scroll on mobile (scroll-snap).
+    (function initProofSnapCarousel() {
+        const track = document.querySelector('#proof .proof-gallery');
+        const dots = document.getElementById('proofDots');
+        if (!track || !dots) return;
 
-    function goToSlide(n) {
-        slides[currentSlide].classList.remove('active');
-        dots[currentSlide].classList.remove('active');
-        currentSlide = (n + slides.length) % slides.length;
-        slides[currentSlide].classList.add('active');
-        dots[currentSlide].classList.add('active');
-    }
+        const cards = Array.from(track.querySelectorAll('.proof-card'));
+        if (!cards.length) return;
 
-    function changeSlide(dir) {
-        goToSlide(currentSlide + dir);
-    }
+        dots.innerHTML = '';
+        const dotEls = cards.map((_, i) => {
+            const d = document.createElement('span');
+            d.className = 'proof-dot' + (i === 0 ? ' active' : '');
+            dots.appendChild(d);
+            return d;
+        });
 
-    // Swipe support
-    let touchStartX = 0;
-    const slider = document.getElementById('proofSlider');
-    if (slider) {
-        slider.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-        slider.addEventListener('touchend', e => {
-            const diff = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+        function scrollByCard(dir) {
+            const card = cards[0];
+            const cardW = card ? card.getBoundingClientRect().width : 0;
+            // Match the CSS gap (18px) so each click lands close to the next snap point.
+            track.scrollBy({ left: dir * (cardW + 18), behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('[data-proof-arrow]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dir = parseInt(btn.getAttribute('data-proof-arrow'), 10) || 0;
+                scrollByCard(dir);
+            });
+        });
+
+        // Active dot: based on which card is closest to the center of the viewport.
+        let raf = 0;
+        function updateActiveDot() {
+            raf = 0;
+            const trackRect = track.getBoundingClientRect();
+            const centerX = trackRect.left + trackRect.width / 2;
+
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            cards.forEach((card, idx) => {
+                const r = card.getBoundingClientRect();
+                const c = r.left + r.width / 2;
+                const dist = Math.abs(c - centerX);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIdx = idx;
+                }
+            });
+
+            dotEls.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        }
+
+        track.addEventListener('scroll', () => {
+            if (raf) return;
+            raf = requestAnimationFrame(updateActiveDot);
         }, { passive: true });
-    }
+
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(updateActiveDot);
+        });
+
+        updateActiveDot();
+    })();
 
     // ===== SMOOTH SCROLL =====
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2056,6 +4514,80 @@
             }
         });
     });
+
+    // Open modal from links like "/?open=1" (used from audit example page).
+    (function autoOpenModalFromQuery() {
+        try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('open') === '1') {
+                openModal({ preventDefault: () => {} });
+            }
+        } catch (e) {}
+    })();
+
+    // Cases Carousel (same pattern as proof)
+    (function initCasesCarousel() {
+        const track = document.querySelector('#cases .cases-gallery');
+        const dots = document.getElementById('casesDots');
+        if (!track || !dots) return;
+
+        const cards = Array.from(track.querySelectorAll('.case-card'));
+        if (!cards.length) return;
+
+        dots.innerHTML = '';
+        const dotEls = cards.map((_, i) => {
+            const d = document.createElement('span');
+            d.className = 'cases-dot' + (i === 0 ? ' active' : '');
+            dots.appendChild(d);
+            return d;
+        });
+
+        function scrollByCard(dir) {
+            const card = cards[0];
+            const cardW = card ? card.getBoundingClientRect().width : 0;
+            track.scrollBy({ left: dir * (cardW + 18), behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('[data-cases-arrow]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dir = parseInt(btn.getAttribute('data-cases-arrow'), 10) || 0;
+                scrollByCard(dir);
+            });
+        });
+
+        let raf = 0;
+        function updateActiveDot() {
+            raf = 0;
+            const trackRect = track.getBoundingClientRect();
+            const centerX = trackRect.left + trackRect.width / 2;
+
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            cards.forEach((card, idx) => {
+                const r = card.getBoundingClientRect();
+                const c = r.left + r.width / 2;
+                const dist = Math.abs(c - centerX);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIdx = idx;
+                }
+            });
+
+            dotEls.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        }
+
+        track.addEventListener('scroll', () => {
+            if (raf) return;
+            raf = requestAnimationFrame(updateActiveDot);
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(updateActiveDot);
+        });
+
+        updateActiveDot();
+    })();
 </script>
 
 </body>
